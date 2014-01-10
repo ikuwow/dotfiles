@@ -37,30 +37,31 @@ filetype off
 
 "NeoBUndle"
 if has('vim_starting')
-  set runtimepath+=~/.vim/bundle/neobundle.vim/
-  call neobundle#rc(expand('~/.vim/bundle/'))
+  set runtimepath+=~/.vim/bundle/neobundle/
 endif
 
-"個々に書いたものが:NeoBundleInstallでインストールされる
-NeoBundle 'Shougo/neobundle.vim'
-NeoBundle 'Shougo/vimproc'
-NeoBundle 'scrooloose/nerdtree'
-NeoBundle 'altercation/vim-colors-solarized'
-NeoBundle 'croaker/mustang-vim'
-NeoBundle 'jeffreyiacono/vim-colors-wombat'
-NeoBundle 'Shougo/unite.vim'
-NeoBundle 'ujihisa/unite-colorscheme'
-NeoBundle 'nanotech/jellybeans.vim'
-NeoBundle 'vim-scripts/Lucius'
-NeoBundle 'vim-scripts/Zenburn'
-NeoBundle 'mrkn/mrkn256.vim'
-NeoBundle 'jpo/vim-railscasts-theme'
-NeoBundle 'therubymug/vim-pyte'
-NeoBundle 'tomasr/molokai'
+call neobundle#rc(expand('~/.vim/bundle/'))
+
+"ここに書いたものが:NeoBundleInstallでインストールされる
+"NeoBundle 'Shougo/neobundle.vim'
+"NeoBundle 'Shougo/vimproc'
+"NeoBundle 'scrooloose/nerdtree'
+"NeoBundle 'altercation/vim-colors-solarized'
+"NeoBundle 'croaker/mustang-vim'
+"NeoBundle 'jeffreyiacono/vim-colors-wombat'
+"NeoBundle 'Shougo/unite.vim'
+"NeoBundle 'ujihisa/unite-colorscheme'
+"NeoBundle 'nanotech/jellybeans.vim'
+"NeoBundle 'vim-scripts/Lucius'
+"NeoBundle 'vim-scripts/Zenburn'
+"NeoBundle 'mrkn/mrkn256.vim'
+"NeoBundle 'jpo/vim-railscasts-theme'
+"NeoBundle 'therubymug/vim-pyte'
+"NeoBundle 'tomasr/molokai'
 
 " vim-over
 " :OverCommandLineで起動、%s/old/new/gでハイライトされる
-NeoBundle 'osyo-manga/vim-over'
+" NeoBundle 'osyo-manga/vim-over'
 
 "先ほど解除したのを復帰
 "後者は'filetype on'も適用される
@@ -80,7 +81,7 @@ autocmd FileType * setlocal formatoptions-=ro
 "      \    },
 "      \ }
 "
-"NeoBundleCheck
+NeoBundleCheck
 """"""""""""""
 
 "ファイラー。ちょっとうっとうしいから
