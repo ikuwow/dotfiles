@@ -44,7 +44,7 @@ endif
 "ここに書いたものが:NeoBundleInstallでインストールされる
 "NeoBundle 'Shougo/neobundle.vim'
 "NeoBundle 'Shougo/vimproc'
-"NeoBundle 'scrooloose/nerdtree'
+NeoBundle 'scrooloose/nerdtree'
 "NeoBundle 'altercation/vim-colors-solarized'
 "NeoBundle 'croaker/mustang-vim'
 "NeoBundle 'jeffreyiacono/vim-colors-wombat'

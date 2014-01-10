@@ -1,3 +1,6 @@
 [submodule ".vim/bundle/neobundle"]
 	path = .vim/bundle/neobundle
 	url = https://github.com/Shougo/neobundle.vim
+[submodule ".vim/bundle/nerdtree"]
+	path = .vim/bundle/nerdtree
+	url = git://github.com/scrooloose/nerdtree
