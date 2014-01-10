@@ -103,6 +103,21 @@ Now configure your neobundles. (Refer to |neobundle-examples|)
 Run the |:NeoBundleInstall| command to install your plugins.
 >
 	$ vim +NeoBundleInstall +q
+
+or
+>
+	$ . ~/.vim/bundle/neobundle.vim/bin/neoinstall
+<
+Note: To use neoinstall in Windows, Vim command must be in $PATH. >
+        > .vim/bundle/neobundle.vim/bin/neoinstall
+Note: To update and build vimproc in Windows, you can use
+"neoinstall_novimproc" command. >
+	>.vim/bundle/neobundle.vim/bin/neoinstall_novimproc vimproc.vim
+
+neoinstall can take arguments(install/update plugin names).
+>
+	# Build vimproc before install plugins
+	$ . ~/.vim/bundle/neobundle.vim/bin/neoinstall vimproc.vim
 <
 ==============================================================================
 INTERFACE					*neobundle-interface*
@@ -134,32 +149,35 @@ neobundle#source({bundle-names})		*neobundle#source()*
 		Same as |:NeoBundleSource|.
 		{bundle-names} is a list of bundle names.
 
-neobundle#exists_not_installed_bundles()
 				*neobundle#exists_not_installed_bundles()*
+neobundle#exists_not_installed_bundles()
 		Checks if there are any bundles that are not installed.
 
-neobundle#get_not_installed_bundle_names()
 				*neobundle#get_not_installed_bundle_names()*
+neobundle#get_not_installed_bundle_names()
 		Returns the names of bundles that are not installed.
 
+						*neobundle#is_installed()*
 neobundle#is_installed({bundle-name})
-				*neobundle#is_installed()*
 		Checks if bundle {bundle-name} is installed.
 
+						*neobundle#is_sourced()*
 neobundle#is_sourced({bundle-name})
-				*neobundle#is_sourced()*
 		Checks if bundle {bundle-name} is loaded.
 
-neobundle#local({directory}, [{options}])		 *neobundle#local()*
+						 *neobundle#local()*
+neobundle#local({directory}, [{options}, [{names}]])
 		Adds the subdirectories in {directory} to
 		runtimepath, like |pathogen| does. See |neobundle-options| for
 		keys to set in {options}.
+		If {names} is given, {names} directories are only loaded.
 		Note: |:NeoBundleLocal| is a shortcut for this function.
-		Note: Unlike |:NeoBundleLocal|, all plugins in {directory}
-		get loaded.
 >
 		" Load plugin from "~/.vim/bundle".
 		call neobundle#local("~/.vim/bundle", {})
+		" Load plugin1 and plugin2 from "~/.vim/bundle".
+		call neobundle#local("~/.vim/bundle",
+		\   {}, ['plugin1', 'plugin2'])
 <
 neobundle#get({bundle-name})			 *neobundle#get()*
 		Get the neobundle options dictionary for {bundle-name}.
@@ -194,9 +212,12 @@ neobundle#call_hook({hook-name})		 *neobundle#call_hook()*
 		"on_source" hooks in sourced bundles.
 
 neobundle#config({bundle-name}, {dict})		 *neobundle#config()*
+neobundle#config({dict})
 		Change plugin options for {bundle-name}.
 		Note: To lazy-load a plugin, you can set the "lazy" flag after
 		calling |:NeoBundle| or |:NeoBundleLocal|.
+		It you omit {bundle-name}, it uses |neobundle#tapped|
+		variable.
 >
 	NeoBundle 'Shougo/neocomplcache'
 	call neobundle#config('neocomplcache', {
@@ -204,7 +225,25 @@ neobundle#config({bundle-name}, {dict})		 *neobundle#config()*
 	\ 'autoload' : {
 	\   'insert' : 1,
 	\ }})
+
+	" Use neobundle#tap()
+	NeoBundle 'Shougo/neocomplete'
+	if neobundle#tap('neocomplete')
+	  " Some settings...
+	  function! neobundle#tapped.hooks.on_source(bundle)
+	    " Some settings...
+	  endfunction
+	  call neobundle#untap()
+	endif
 <
+neobundle#tap({bundle-name})		 *neobundle#tap()*
+		Initialize |neobundle#tapped| variable as {bundle-name}
+		bundle.
+		It returns non-zero if {bundle-name} is exists.
+
+neobundle#untap()		 *neobundle#untap()*
+		Clear current |neobundle#tapped| variable.
+
 ------------------------------------------------------------------------------
 COMMANDS 					*neobundle-commands*
 
@@ -304,17 +343,6 @@ COMMANDS 					*neobundle-commands*
 :NeoBundleDocs					*:NeoBundleDocs*
 		Execute |:helptags| for all bundles manually.
 
-						*:NeoBundleDepends*
-:NeoBundleDepends {repository} [, {options}]
-		Registers a bundle and installs the plugin.  This command is
-		useful for defining Vim plugin dependencies.
-		Note: This command does not overwrite user neobundle
-		configuration.
->
-		if exists(':NeoBundleDepends')
-		  NeoBundleDepends 'Shougo/unite.vim.git'
-		endif
-<
 						*:NeoBundleDirectInstall*
 :NeoBundleDirectInstall {repository} [, {options}]
 		Registers a bundle, and installs it directly.
@@ -351,10 +379,13 @@ COMMANDS 					*neobundle-commands*
 		Note: You must install recipes(|neobundle-recipe|) before
 		executing it.
 >
-		NeoBundleRecipe 'vimproc'
+		NeoBundleRecipe 'vimproc.vim'
 <
 ------------------------------------------------------------------------------
 VARIABLES 					*neobundle-variables*
+
+neobundle#tapped				*neobundle#tapped*
+		Current bundle variable set by |neobundle#tap()|.
 
 g:neobundle#default_site			*g:neobundle#default_site*
 		The default repository site if "site" option is omitted.
@@ -401,6 +432,7 @@ g:neobundle#install_max_processes
 					*g:neobundle#install_process_timeout*
 g:neobundle#install_process_timeout
 		The time of timeout seconds when updating/installing bundles.
+		Note: This feature is available if you installed |vimproc|.
 
 		Defaults to "60".
 
@@ -434,6 +466,13 @@ g:neobundle#types#git#default_protocol
 		Note: |g:neobundle_default_git_protocol| is obsolete.
 
 		Defaults to "https".
+
+				*g:neobundle#types#git#enable_submodule*
+g:neobundle#types#git#enable_submodule
+		If it is non-zero, neobundle enables git submodule support.
+		But it may be slow in Windows environment.
+
+		Defaults to 1.
 
 				*g:neobundle#types#hg#default_protocol*
 g:neobundle#types#hg#default_protocol
@@ -621,7 +660,7 @@ OPTIONS 					*neobundle-options*
 
 		Example:
 >
-	      NeoBundle 'Shougo/vimproc', {
+	      NeoBundle 'Shougo/vimproc.vim', {
 	      \ 'build' : {
 	      \     'windows' : 'make -f make_mingw32.mak',
 	      \     'cygwin' : 'make -f make_cygwin.mak',
@@ -694,127 +733,6 @@ OPTIONS 					*neobundle-options*
 		If set to 1, neobundle doesn't add the path to user
 		runtimepath.
 
-						*neobundle-options-autoload*
-		autoload		(Dictionary)
-		Specify autoload conditions.
-		If you set it, neobundle will execute |:NeoBundleSource|
-		automatically when the conditions are met.
-
-		This dictionary accepts the following keys:
-
-			filetypes	(List) or (String)
-			Filetype list.
-
-			commands	(List) or (String)
-			Command list. The item can be following dictionary.
-				name		(String)
-				Command name.
-
-				complete	(String)
-				The type of completion supported for the
-				input.  Refer to |:command-completion| for
-				information.
-
-				Example:
-
-			functions	(List)
-			Functions list.
-
-			function_prefix	(String)
-			Autoload function prefix in functions.
-			{function_prefix}#...
-			If the prefix is set, functions were loaded
-			automatically.
-			If omitted it, automatically generated prefix is used.
-			Example: If you use "unite.vim", "unite" function
-			prefix is used.
-
-			mappings	(List)
-			Mappings list. The items are {mapping} or
-			[{mode}, {mapping1}, [{mapping2}, ...]].  If {mode} is
-			omitted, "nxo" is used.
-			Note: You can use plugin prefix mappings.
-			For example, you can use "<Plug>(ref-" instead of
-			"<Plug>(ref-back)" and so on.
-			Note: But you cannot use lazy <Plug> mappings twice.
-			For example: >
-			NeoBundleLazy 'osyo-manga/vim-anzu', {'autoload': {'mappings': '<Plug>(anzu-'}}
-			  " Not working!!
-			  nmap n <Plug>(anzu-jump-n)<Plug>(anzu-echo-search-status)zv
-			  nmap N <Plug>(anzu-jump-N)<Plug>(anzu-echo-search-status)zv
-<
-			unite_sources	(List)
-			Unite source name list.
-			Note: To use this feature, you must install latest
-			|unite.vim|.
-
-			insert		(Number)
-			If set to non-zero, neobundle will |:NeoBundleSource|
-			on |InsertEnter| autocmd.
-
-			explorer	(Number)
-			If set to non-zero, neobundle will |:NeoBundleSource|
-			on editing non-file.
-			Note: It is useful for explorer behavior plugins.
-			Ex: vimfiler, metarw...
-			Note: To autoload vimfiler, you must disable netrw in
-			.vimrc.
->
-			" Disable netrw.vim
-			let g:loaded_netrwPlugin = 1
-<
-
-		Examples:
->
-	NeoBundleLazy 'Rip-Rip/clang_complete', {
-	      \ 'autoload' : {
-	      \     'filetypes' : ['c', 'cpp'],
-	      \    },
-	      \ }
-	NeoBundleLazy 'basyura/TweetVim', { 'depends' :
-	      \ ['basyura/twibill.vim', 'tyru/open-browser.vim'],
-	      \ 'autoload' : { 'commands' : 'TweetVimHomeTimeline' }}
-	NeoBundleLazy 'kana/vim-smartword', { 'autoload' : {
-	      \ 'mappings' : [
-	      \   '<Plug>(smartword-'']
-	      \ }}
-	NeoBundleLazy 'Shougo/vim-vcs', {
-	      \ 'depends' : 'thinca/vim-openbuf',
-	      \ 'autoload' : {'functions' : 'vcs#info', 'commands' : 'Vcs'},
-	      \   }
-	NeoBundleLazy 'Shougo/vimshell',{
-	      \ 'depends' : 'Shougo/vimproc',
-	      \ 'autoload' : {
-	      \   'commands' : [{ 'name' : 'VimShell',
-	      \                   'complete' : 'customlist,vimshell#complete'},
-	      \                 'VimShellExecute', 'VimShellInteractive',
-	      \                 'VimShellTerminal', 'VimShellPop'],
-	      \   'mappings' : ['<Plug>(vimshell_']
-	      \ }})
-	NeoBundleLazy 'Shougo/vimfiler', {
-	      \ 'depends' : 'Shougo/unite.vim',
-	      \ 'autoload' : {
-	      \    'commands' : [{ 'name' : 'VimFiler',
-	      \                    'complete' : 'customlist,vimfiler#complete' },
-	      \                  'VimFilerExplorer',
-	      \                  'Edit', 'Read', 'Source', 'Write'],
-	      \    'mappings' : ['<Plug>(vimfiler_'],
-	      \    'explorer' : 1,
-	      \ }
-	      \ }
-	NeoBundleLazy 'Shougo/junkfile.vim', {
-	      \ 'autoload' : {
-	      \   'commands' : 'JunkfileOpen',
-	      \   'unite_sources' : ['junkfile', 'junkfile/new'],
-	      \ }}
-	NeoBundleLazy 'tyru/winmove.vim', { 'autoload' : {
-	      \ 'gui' : 1,
-	      \ 'mappings' : [
-	      \   ['n', '<Plug>(winmove-']],
-	      \ },
-	      \ 'augroup' : 'winmove',
-	      \ }
-<
 						*neobundle-options-overwrite*
 		overwrite		(Number)
 		If set to 1, neobundle doesn't overwrite the path to user
@@ -860,6 +778,151 @@ OPTIONS 					*neobundle-options*
 	    \ }
 <
 
+						*neobundle-options-autoload*
+		autoload		(Dictionary)
+		Specify autoload conditions.
+		If you set it, neobundle will execute |:NeoBundleSource|
+		automatically when the conditions are met.
+		Note: You can omit "autoload" dictionary. It is useful for
+		|:NeoBundleLazy| command.
+
+		This dictionary accepts the following keys:
+
+			filetypes	(List) or (String)
+			Filetype list.
+
+			filename_patterns	(List) or (String)
+			Filename regex pattern list.
+
+			commands	(List) or (String)
+			Command list. The item can be following dictionary.
+				name		(String)
+				Command name.
+
+				complete	(String)
+				The type of completion supported for the
+				input.  Refer to |:command-completion| for
+				information.
+
+				Example:
+
+			functions	(List) or (String)
+			Functions list.
+
+			mappings	(List) or (String)
+			Mappings list. The items are {mapping} or
+			[{mode}, {mapping1}, [{mapping2}, ...]].  If {mode} is
+			omitted, "nxo" is used.
+			Note: You can use plugin prefix mappings.
+			For example, you can use "<Plug>(ref-" instead of
+			"<Plug>(ref-back)" and so on.
+			Note: But you cannot use lazy <Plug> mappings twice.
+			For example: >
+			NeoBundleLazy 'osyo-manga/vim-anzu', {
+			  \'autoload': {'mappings': '<Plug>(anzu-'}}
+			" Not working!!
+			nmap n <Plug>(anzu-jump-n)<Plug>(anzu-echo-search-status)zv
+			nmap N <Plug>(anzu-jump-N)<Plug>(anzu-echo-search-status)zv
+<
+			unite_sources	(List) or (String)
+			Unite source name list.
+			Note: To use this feature, you must install latest
+			|unite.vim|.
+
+			insert		(Number)
+			If set to non-zero, neobundle will |:NeoBundleSource|
+			on |InsertEnter| autocmd.
+
+			explorer	(Number)
+			If set to non-zero, neobundle will |:NeoBundleSource|
+			on editing non-file.
+			Note: It is useful for explorer behavior plugins.
+			Ex: vimfiler, metarw...
+			Note: To autoload vimfiler, you must disable netrw in
+			.vimrc. >
+			" Disable netrw.vim
+			let g:loaded_netrwPlugin = 1
+<
+			on_source	(List) or (String)
+			Load the bundle when the list bundles are loaded.
+			For example: >
+			if neobundle#tap('plugin-B.vim')
+			  call neobundle#config({
+			        \   'autoload' : {
+			        \     'on_source' : [ 'plugin-A.vim' ]
+			        \   }
+			        \ })
+			  call neobundle#untap()
+			endif
+<
+			plugin-B is loaded before plugin-A is loaded.
+
+			function_prefix	(String)
+			Autoload function prefix in functions.
+			{function_prefix}#...
+			If the prefix is set, functions were loaded
+			automatically.
+			If omitted it, automatically generated prefix is used.
+			Example: If you use "unite.vim", "unite" function
+			prefix is used.
+
+		Examples:
+>
+	NeoBundleLazy 'Rip-Rip/clang_complete', {
+	      \ 'autoload' : {
+	      \     'filetypes' : ['c', 'cpp'],
+	      \    },
+	      \ }
+	NeoBundleLazy 'basyura/TweetVim', { 'depends' :
+	      \ ['basyura/twibill.vim', 'tyru/open-browser.vim'],
+	      \ 'autoload' : { 'commands' : 'TweetVimHomeTimeline' }}
+	NeoBundleLazy 'kana/vim-smartword', { 'autoload' : {
+	      \ 'mappings' : [
+	      \   '<Plug>(smartword-'']
+	      \ }}
+	NeoBundleLazy 'Shougo/vim-vcs', {
+	      \ 'depends' : 'thinca/vim-openbuf',
+	      \ 'autoload' : {'functions' : 'vcs#info', 'commands' : 'Vcs'},
+	      \   }
+	NeoBundleLazy 'Shougo/vimshell',{
+	      \ 'depends' : 'Shougo/vimproc.vim',
+	      \ 'autoload' : {
+	      \   'commands' : [{ 'name' : 'VimShell',
+	      \                   'complete' : 'customlist,vimshell#complete'},
+	      \                 'VimShellExecute', 'VimShellInteractive',
+	      \                 'VimShellTerminal', 'VimShellPop'],
+	      \   'mappings' : ['<Plug>(vimshell_']
+	      \ }})
+	NeoBundleLazy 'Shougo/vimfiler', {
+	      \ 'depends' : 'Shougo/unite.vim',
+	      \ 'autoload' : {
+	      \    'commands' : [{ 'name' : 'VimFiler',
+	      \                    'complete' : 'customlist,vimfiler#complete' },
+	      \                  'VimFilerExplorer',
+	      \                  'Edit', 'Read', 'Source', 'Write'],
+	      \    'mappings' : ['<Plug>(vimfiler_'],
+	      \    'explorer' : 1,
+	      \ }
+	      \ }
+	NeoBundleLazy 'Shougo/junkfile.vim', {
+	      \ 'autoload' : {
+	      \   'commands' : 'JunkfileOpen',
+	      \   'unite_sources' : ['junkfile', 'junkfile/new'],
+	      \ }}
+	NeoBundleLazy 'tyru/winmove.vim', { 'autoload' : {
+	      \ 'mappings' : [
+	      \   ['n', '<Plug>(winmove-']],
+	      \ },
+	      \ 'gui' : 1,
+	      \ 'augroup' : 'winmove',
+	      \ }
+	NeoBundleLazy 'sophacles/vim-processing', { 'autoload' : {
+	      \'filename_patterns': '\.pde$'
+	      \}}
+	" Omit autoload dictionary.
+	NeoBundleLazy 'LeafCage/cmdlineplus.vim', {
+	      \ 'mappings': [['c', '<Plug>(cmdlineplus-']]}
+<
 						*neobundle-options-hooks*
 		hooks			(Dictionary)
 		Specify hook functions. The following hook functions are
@@ -1015,14 +1078,14 @@ neobundle
 		If argument is bang(!), print plugins status instead of plugins
 		path.
 
-		http://github.com/Shougo/vimproc
+		http://github.com/Shougo/vimproc.vim
 
 				*neobundle-unite-source-neobundle-install*
 neobundle/install
 		Install configured plugins asynchronously.
 
 		Note: To install |vimproc| plugin is recommended.
-		http://github.com/Shougo/vimproc
+		http://github.com/Shougo/vimproc.vim
 
 		If argument is bang(!), it will install and update all plugins.
 
@@ -1222,7 +1285,7 @@ Q: Vim freezes when a NeoBundle command is run with a typo in the repo name.
 
 A: It's a git feature. Git awaits user input when the repo name is
 wrong. You can install |vimproc| to keep your Vim from freezing:
-	https://github.com/Shougo/vimproc
+	https://github.com/Shougo/vimproc.vim
 
 Q: Duplicated error was printed when sourcing .vimrc.
 
@@ -1244,7 +1307,7 @@ Q: I want to compile vimproc automatically.
 
 A:
 >
-	NeoBundle 'Shougo/vimproc', {
+	NeoBundle 'Shougo/vimproc.vim', {
 		\ 'build' : {
 			\     'windows' : 'make -f make_mingw32.mak',
 			\     'cygwin' : 'make -f make_cygwin.mak',
@@ -1357,6 +1420,16 @@ A: You must not call |neobundle#rc()| inner "has('vim_starting')".
 	endif
 	" OK!
 	call neobundle#rc(expand('~/.vim/bundle'))
-<
+>
+
+Q: Timeout on github makes Vim terribly slow if the repository is not found in
+console Vim.
+https://github.com/Shougo/neobundle.vim/issues/175
+
+A: |vimproc| and |system()| uses input redirection.  But git ignores it when
+you used https protocol in console Vim. So it freezes. I think it is bad
+feature in git. I cannot fix it.  You should change
+|g:neobundle#types#git#default_protocol| to "git".
+
 ==============================================================================
 vim:tw=78:ts=8:ft=help:norl:noet:fen:
