@@ -1,0 +1,10 @@
+let g:netrw_dirhistmax  =10
+let g:netrw_dirhist_cnt =8
+let g:netrw_dirhist_1='/Users/degawaikuo'
+let g:netrw_dirhist_2='/Applications/MAMP/bin/php/php5.4.10'
+let g:netrw_dirhist_3='/Users/degawaikuo/.dropbox'
+let g:netrw_dirhist_4='/private/etc/apache2'
+let g:netrw_dirhist_5='/usr/local/etc/php'
+let g:netrw_dirhist_6='/Users/degawaikuo/workspace/gf_engineer/.git'
+let g:netrw_dirhist_7='/Users/degawaikuo/Dropbox/practice_programming/JavaScript'
+let g:netrw_dirhist_8='/Users/degawaikuo/local.ikuwow.com/app'
