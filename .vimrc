@@ -45,6 +45,7 @@ endif
 "NeoBundle 'Shougo/neobundle.vim'
 "NeoBundle 'Shougo/vimproc'
 NeoBundle 'scrooloose/nerdtree'
+let NERDTreeShowHidden = 1
 "NeoBundle 'altercation/vim-colors-solarized'
 "NeoBundle 'croaker/mustang-vim'
 "NeoBundle 'jeffreyiacono/vim-colors-wombat'
