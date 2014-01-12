@@ -16,5 +16,5 @@ alias saying='while (true) do f=$(fortune); echo "$f"; echo ""; say "$f"; sleep 
 # eval "$(rbenv init -)"
 
 if [ -e ~/.bashrc ]; then
-    source .~/.bashrc
+    source ~/.bashrc
 fi
