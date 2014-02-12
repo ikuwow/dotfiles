@@ -7,6 +7,7 @@ alias ll='ls -l'
 alias la='ls -A'
 alias rm='rm -i'
 alias less='less -iM'
+alias bye='exit'
 
 # alias devstart='sudo apachectl start & sudo mysql.server start'
 # alias devstop='sudo apachectl stop & sudo mysql.server stop'
