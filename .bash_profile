@@ -16,6 +16,9 @@ alias saying='while (true) do f=$(fortune); echo "$f"; echo ""; say "$f"; sleep 
 # railsに必要
 # eval "$(rbenv init -)"
 
+# railsコマンドはhomeの物を使う
+export PATH="$HOME/.rbenv/shims/:$PATH"
+
 if [ -e ~/.bashrc ]; then
     source ~/.bashrc
 fi
