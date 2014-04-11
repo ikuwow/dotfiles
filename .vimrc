@@ -89,4 +89,10 @@ NeoBundleCheck
 "必要なときにコマンドうつわ。
 "autocmd VimEnter * NERDTree
 
+"文法チェック
+nmap ,l :call PHPLint()
 
+function PHPLint()
+    let result = system( &ft . ' -l ' . bufname(""))
+    echo result
+endfunction
