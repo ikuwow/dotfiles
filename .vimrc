@@ -59,6 +59,7 @@ let NERDTreeShowHidden = 1
 "NeoBundle 'jpo/vim-railscasts-theme'
 "NeoBundle 'therubymug/vim-pyte'
 "NeoBundle 'tomasr/molokai'
+NeoBundle 'tpope/vim-fugitive'
 
 " vim-over
 " :OverCommandLineで起動、%s/old/new/gでハイライトされる
