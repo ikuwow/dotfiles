@@ -88,4 +88,4 @@ NeoBundleCheck
 "必要なときにコマンドうつわ。
 "autocmd VimEnter * NERDTree
 
-
+" MATLAB関係
