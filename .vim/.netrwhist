@@ -1,0 +1,5 @@
+let g:netrw_dirhistmax  =10
+let g:netrw_dirhist_cnt =3
+let g:netrw_dirhist_1='/Users/degawaikuo/workspace/gf_engineer/.git'
+let g:netrw_dirhist_2='/Users/degawaikuo/workspace/slogan_sql/goodfind'
+let g:netrw_dirhist_3='/Users/degawaikuo/Vagrant/gf_top/app/Config'
