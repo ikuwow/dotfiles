@@ -1,7 +1,9 @@
 #!/bin/bash
 
+# dotfilesのシンボリックリンクを作成するスクリプト
+
 if [ ! -e ~/dotfiles ]; then
-    echo 'Error: directory "dotfiles" must be your home directory.'
+    echo 'Error: A directory named "dotfiles" must be on your home directory.'
     exit 1
 fi
 
