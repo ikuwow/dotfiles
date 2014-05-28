@@ -99,3 +99,6 @@ function PHPLint()
 endfunction
 
 " MATLAB関係
+source ~/.vim/matlab/syntax/matlab.vim
+source ~/.vim/matlab/indent/matlab.vim
+source ~/.vim/matlab/ftplugin/matlab.vim
