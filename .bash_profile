@@ -1,4 +1,5 @@
 export PATH=/usr/local/Cellar/php53/5.3.28/bin:/usr/local/bin:/usr/local/sbin:$PATH
+export PATH=/Applications/MacVim.app/Contents/MacOS:${PATH}
 export LANG=ja_JP.UTF-8
 export LESSCHARSET=utf-8
 
