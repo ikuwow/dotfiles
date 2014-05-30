@@ -91,7 +91,7 @@ NeoBundleCheck
 "autocmd VimEnter * NERDTree
 
 " NERDTreeコマンドのエイリアス
-cmap nt NERDTree
+" cmap nt NERDTree
 
 "文法チェック
 nmap ,l :call PHPLint()
