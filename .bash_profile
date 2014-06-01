@@ -15,21 +15,18 @@ alias rm='rm -i'
 alias less='less -iM'
 alias bye='exit'
 
-# alias devstart='sudo apachectl start & sudo mysql.server start'
-# alias devstop='sudo apachectl stop & sudo mysql.server stop'
-
 alias saying='while (true) do f=$(fortune); echo "$f"; echo ""; say "$f"; sleep 5; done'
-# railsに必要
-# eval "$(rbenv init -)"
 
-# railsコマンドはhomeの物を使う
-export PATH="$HOME/.rbenv/shims:$PATH"
+# Rubyは全てrbenvで管理する（homebrewでは入れない）
+# export PATH="$HOME/.rbenv/shims:$PATH"
+eval "$(rbenv init -)"
 
 # gitオートコンプリート
 if [ -f ~/dotfiles/.git-completion.bash ]; then
     . ~/dotfiles/.git-completion.bash
 fi
 
+# .bashrc
 if [ -e ~/.bashrc ]; then
     source ~/.bashrc
 fi
