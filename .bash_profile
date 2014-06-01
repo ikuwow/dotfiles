@@ -1,5 +1,4 @@
 export PATH=/usr/local/Cellar/php53/5.3.28/bin:/usr/local/bin:/usr/local/sbin:$PATH
-export PATH=/Applications/MacVim.app/Contents/MacOS:${PATH}
 export LANG=ja_JP.UTF-8
 export LESSCHARSET=utf-8
 
@@ -24,7 +23,7 @@ alias saying='while (true) do f=$(fortune); echo "$f"; echo ""; say "$f"; sleep 
 # eval "$(rbenv init -)"
 
 # railsコマンドはhomeの物を使う
-export PATH="$HOME/.rbenv/shims:$PATH:/usr/local/Cellar/php53/5.3.27/bin"
+export PATH="$HOME/.rbenv/shims:$PATH"
 
 # gitオートコンプリート
 if [ -f ~/dotfiles/.git-completion.bash ]; then
