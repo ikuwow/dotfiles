@@ -24,7 +24,10 @@ set expandtab
 " autocmd! FileType html setlocal shiftwidth=2 tabstop=2 softtabstop=2
 " augroup END
 
-
+" 全角スペースの表示
+highlight ZenkakuSpace ctermbg=red guibg=#666666
+au BufWinEnter * let w:m3 = matchadd("ZenkakuSpace", '　')
+au WinEnter * let w:m3 = matchadd("ZenkakuSpace", '　')
 
 "勝手に改行しないでね
 set tw=0
