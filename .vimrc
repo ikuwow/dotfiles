@@ -92,6 +92,7 @@ NeoBundleCheck
 "ファイラー。ちょっとうっとうしいから
 "必要なときにコマンドうつわ。
 "autocmd VimEnter * NERDTree
+command Nt NERDTree
 
 " NERDTreeコマンドのエイリアス
 " cmap nt NERDTree
