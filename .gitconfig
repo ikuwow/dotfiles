@@ -1,0 +1,10 @@
+[user]
+	name = Ikuo Degawa
+	email = degawa@ikuwow.com
+[core]
+	excludesfile = /Users/degawaikuo/.gitignore
+    editor = vim
+[color]
+	ui = true
+[grep]
+    lineNumber = true
