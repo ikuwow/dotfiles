@@ -9,6 +9,7 @@ syntax on
 set nocompatible
 set nobackup "チルダつきのファイルが邪魔
 set ic "検索時に大文字小文字を区別しない
+set noundofile ".un~ファイルを作らない
 
 "tab関係
 set tabstop=4
