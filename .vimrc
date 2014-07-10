@@ -2,22 +2,26 @@
 " ちゃんとそのうちやるんだぞ。
 " がんばれよ
 
-"最低限
+" Basic Configuration
 set nu
-set title
+set title " display filename (not Thank you for using Vim.)
 syntax on
-set nocompatible
+set nocompatible " do not use vi compatible mode
 set nobackup "チルダつきのファイルが邪魔
 set ic "検索時に大文字小文字を区別しない
 set noundofile ".un~ファイルを作らない
+set ruler " display ruler (60,7 13%)
+set hlsearch " highlight the search word
+set showcmd " show inputting key
 
+    
 "tab関係
-set tabstop=4
 set shiftwidth=4
 "softtabstop is equal to tabstop in defalut
 "set softtabstop=4
 set autoindent
-set expandtab
+set expandtab "convert tab to spaces
+set tabstop=4 " spaces number of tab
 
 " ファイルごとにtab幅を変える。
 " 動かない、詳細を確認すべし
@@ -26,9 +30,9 @@ set expandtab
 " augroup END
 
 " 全角スペースの表示
-highlight ZenkakuSpace ctermbg=red guibg=#666666
+highlight ZenkakuSpace ctermbg=red guibg=#ff0000
 au BufWinEnter * let w:m3 = matchadd("ZenkakuSpace", '　')
-au WinEnter * let w:m3 = matchadd("ZenkakuSpace", '　')
+" au WinEnter * let w:m3 = matchadd("ZenkakuSpace", '　')
 
 "勝手に改行しないでね
 set tw=0
@@ -92,11 +96,8 @@ NeoBundleCheck
 
 "ファイラー。ちょっとうっとうしいから
 "必要なときにコマンドうつわ。
-"autocmd VimEnter * NERDTree
+"autocmd VimEnter * NERDTree " launch NERDTree automatically at opening files
 command Nt NERDTree
-
-" NERDTreeコマンドのエイリアス
-" cmap nt NERDTree
 
 "文法チェック
 nmap ,l :call PHPLint()
