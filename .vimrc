@@ -2,7 +2,7 @@
 " ちゃんとそのうちやるんだぞ。
 " がんばれよ
 
-" Basic Configuration
+" Basic Configuration 
 set nu
 set title " display filename (not Thank you for using Vim.)
 syntax on
@@ -106,6 +106,9 @@ function PHPLint()
     let result = system( &ft . ' -l ' . bufname(""))
     echo result
 endfunction
+
+" complement { after Enter
+inoremap {<Enter> {}<Left><CR><ESC><S-o>
 
 " MATLAB関係
 source ~/.vim/matlab/syntax/matlab.vim
