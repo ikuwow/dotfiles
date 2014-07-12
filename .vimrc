@@ -64,7 +64,6 @@ set formatoptions=q
 "NeoBundle 'jpo/vim-railscasts-theme'
 "NeoBundle 'therubymug/vim-pyte'
 "NeoBundle 'tomasr/molokai'
-" NeoBundle 'tpope/vim-fugitive'
 
 " vim-over
 " :OverCommandLineで起動、%s/old/new/gでハイライトされる
@@ -84,10 +83,6 @@ set formatoptions=q
 " NeoBundleCheck
 """"""""""""""
 
-"ファイラー。ちょっとうっとうしいから
-"必要なときにコマンドうつわ。
-"autocmd VimEnter * NERDTree " launch NERDTree automatically at opening files
-command Nt NERDTree
 
 "文法チェック
 nmap ,l :call PHPLint()
@@ -98,7 +93,7 @@ function PHPLint()
 endfunction
 
 " complement { after Enter
-inoremap {<Enter> {}<Left><CR><ESC><S-o>
+" inoremap {<Enter> {}<Left><CR><ESC><S-o>
 
 " MATLAB関係
 source ~/.vim/matlab/syntax/matlab.vim
@@ -113,7 +108,7 @@ source ~/.vim/matlab/ftplugin/matlab.vim
 " filetype off
 
 if has('vim_starting') " at launching vim only
-    set runtimepath+=.vim/bundle/neobundle.vim/
+    set runtimepath+=~/.vim/bundle/neobundle.vim/
 endif
 
 call neobundle#rc(expand('~/.vim/bundle/')) "required
@@ -121,7 +116,8 @@ call neobundle#rc(expand('~/.vim/bundle/')) "required
 NeoBundleFetch 'Shougo/neobundle.vim' " Let NeoBundle manage NeoBundle (Required)
 
 " ~ My Bundles Here... ~
-NeoBundle 'scrooloose/nerdtree'
+NeoBundle 'scrooloose/nerdtree' "filer
+NeoBundle 'tpope/vim-fugitive' "git commands on vim
 
 call neobundle#end()
 filetype plugin indent on
@@ -133,6 +129,11 @@ NeoBundleCheck
 " NeoBundle Configulation End 
 "========================================
 
+" launch NERDTree automatically at opening files
+" autocmd VimEnter * NERDTree 
+
+" alias of NERDTree
+command Nt NERDTree
 
 " 先ほど解除したのを復帰
 " 後者は'filetype on'も適用される
