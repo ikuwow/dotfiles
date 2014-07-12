@@ -41,8 +41,6 @@ set formatoptions=q
 "o:'o','O'の時にコメント開始文字列を自動で挿入
 "r:挿入モードでenterを打ち込むとコメント開始文字を自動で挿入
 
-"全てのfiletype系設定を解除
-filetype off
 
 " NeoBundle
 " if has('vim_starting')
@@ -53,7 +51,6 @@ filetype off
 "ここに書いたものが:NeoBundleInstallでインストールされる
 "NeoBundle 'Shougo/neobundle.vim'
 "NeoBundle 'Shougo/vimproc'
-"NeoBundle 'scrooloose/nerdtree'
 " let NERDTreeShowHidden = 1
 "NeoBundle 'altercation/vim-colors-solarized'
 "NeoBundle 'croaker/mustang-vim'
@@ -73,14 +70,7 @@ filetype off
 " :OverCommandLineで起動、%s/old/new/gでハイライトされる
 " NeoBundle 'osyo-manga/vim-over'
 
-"先ほど解除したのを復帰
-"後者は'filetype on'も適用される
-filetype plugin on
-filetype indent on
-autocmd FileType * setlocal formatoptions-=ro
 
-
-"NeoBundleFetch 'Shougo/neobundle.vim'
 
 "NeoBundle 'Shougo/vimproc', {
 "      \ 'build' : {
@@ -114,3 +104,37 @@ inoremap {<Enter> {}<Left><CR><ESC><S-o>
 source ~/.vim/matlab/syntax/matlab.vim
 source ~/.vim/matlab/indent/matlab.vim
 source ~/.vim/matlab/ftplugin/matlab.vim
+
+"=============================================
+"  NeoBundle Configulation Section (2014/7/12)
+"=============================================
+
+" 全てのfiletype系設定を解除
+" filetype off
+
+if has('vim_starting') " at launching vim only
+    set runtimepath+=.vim/bundle/neobundle.vim/
+endif
+
+call neobundle#rc(expand('~/.vim/bundle/')) "required
+
+NeoBundleFetch 'Shougo/neobundle.vim' " Let NeoBundle manage NeoBundle (Required)
+
+" ~ My Bundles Here... ~
+" NeoBundle 'scrooloose/nerdtree'
+
+call neobundle#end()
+filetype plugin indent on
+
+" If there are uninstalled bundles found on startup,
+" this will conveniently prompt you to install them.
+NeoBundleCheck
+
+" NeoBundle Configulation End 
+"========================================
+
+
+" 先ほど解除したのを復帰
+" 後者は'filetype on'も適用される
+" autocmd FileType * setlocal formatoptions-=ro
+
