@@ -121,7 +121,7 @@ call neobundle#rc(expand('~/.vim/bundle/')) "required
 NeoBundleFetch 'Shougo/neobundle.vim' " Let NeoBundle manage NeoBundle (Required)
 
 " ~ My Bundles Here... ~
-" NeoBundle 'scrooloose/nerdtree'
+NeoBundle 'scrooloose/nerdtree'
 
 call neobundle#end()
 filetype plugin indent on
