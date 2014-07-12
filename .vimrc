@@ -44,17 +44,17 @@ set formatoptions=q
 "全てのfiletype系設定を解除
 filetype off
 
-"NeoBUndle"
-if has('vim_starting')
-  set runtimepath+=~/.vim/bundle/neobundle/
-endif
-  call neobundle#rc(expand('~/.vim/bundle/'))
+" NeoBundle
+" if has('vim_starting')
+"   set runtimepath+=~/.vim/bundle/neobundle/
+" endif
+"   call neobundle#rc(expand('~/.vim/bundle/'))
 
 "ここに書いたものが:NeoBundleInstallでインストールされる
 "NeoBundle 'Shougo/neobundle.vim'
 "NeoBundle 'Shougo/vimproc'
-NeoBundle 'scrooloose/nerdtree'
-let NERDTreeShowHidden = 1
+"NeoBundle 'scrooloose/nerdtree'
+" let NERDTreeShowHidden = 1
 "NeoBundle 'altercation/vim-colors-solarized'
 "NeoBundle 'croaker/mustang-vim'
 "NeoBundle 'jeffreyiacono/vim-colors-wombat'
@@ -67,7 +67,7 @@ let NERDTreeShowHidden = 1
 "NeoBundle 'jpo/vim-railscasts-theme'
 "NeoBundle 'therubymug/vim-pyte'
 "NeoBundle 'tomasr/molokai'
-NeoBundle 'tpope/vim-fugitive'
+" NeoBundle 'tpope/vim-fugitive'
 
 " vim-over
 " :OverCommandLineで起動、%s/old/new/gでハイライトされる
@@ -91,7 +91,7 @@ autocmd FileType * setlocal formatoptions-=ro
 "      \    },
 "      \ }
 "
-NeoBundleCheck
+" NeoBundleCheck
 """"""""""""""
 
 "ファイラー。ちょっとうっとうしいから
