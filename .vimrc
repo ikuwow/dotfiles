@@ -42,6 +42,9 @@ set formatoptions=q
 "r:挿入モードでenterを打ち込むとコメント開始文字を自動で挿入
 
 
+" don't automatically continue comment line
+autocmd FileType * setlocal formatoptions-=ro
+
 
 "文法チェック
 nmap ,l :call PHPLint()
@@ -73,7 +76,6 @@ NeoBundleFetch 'Shougo/neobundle.vim' " Let NeoBundle manage NeoBundle (Required
 
 " ~ My Bundles Here... ~
 NeoBundle 'scrooloose/nerdtree' " Filer plugin
-let NERDTreeShowHidden = 1 " Display hidden files and folders on NERDTree
 NeoBundle 'tpope/vim-fugitive' "git commands on vim
 NeoBundle 'scrooloose/syntastic.git' " syntax checker
 
@@ -85,17 +87,16 @@ filetype plugin indent on
 " this will conveniently prompt you to install them.
 NeoBundleCheck
 
+" configuration for each plugin
+let NERDTreeShowHidden = 1 " Display hidden files and folders on NERDTree
+" launch NERDTree automatically at opening files
+" autocmd VimEnter * NERDTree 
+
+" alias for each plugin
+command! Nt NERDTree
 
 " NeoBundle Configulation End 
 "========================================
 
 
-" launch NERDTree automatically at opening files
-" autocmd VimEnter * NERDTree 
-
-" alias of NERDTree
-command! Nt NERDTree
-
-" don't automatically continue comment line
-autocmd FileType * setlocal formatoptions-=ro
 
