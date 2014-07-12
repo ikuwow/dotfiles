@@ -1,3 +1,4 @@
 neobundle.vim
 nerdtree
+syntastic
 vim-fugitive

@@ -42,58 +42,17 @@ set formatoptions=q
 "r:挿入モードでenterを打ち込むとコメント開始文字を自動で挿入
 
 
-" NeoBundle
-" if has('vim_starting')
-"   set runtimepath+=~/.vim/bundle/neobundle/
-" endif
-"   call neobundle#rc(expand('~/.vim/bundle/'))
-
-"ここに書いたものが:NeoBundleInstallでインストールされる
-"NeoBundle 'Shougo/neobundle.vim'
-"NeoBundle 'Shougo/vimproc'
-" let NERDTreeShowHidden = 1
-"NeoBundle 'altercation/vim-colors-solarized'
-"NeoBundle 'croaker/mustang-vim'
-"NeoBundle 'jeffreyiacono/vim-colors-wombat'
-"NeoBundle 'Shougo/unite.vim'
-"NeoBundle 'ujihisa/unite-colorscheme'
-"NeoBundle 'nanotech/jellybeans.vim'
-"NeoBundle 'vim-scripts/Lucius'
-"NeoBundle 'vim-scripts/Zenburn'
-"NeoBundle 'mrkn/mrkn256.vim'
-"NeoBundle 'jpo/vim-railscasts-theme'
-"NeoBundle 'therubymug/vim-pyte'
-"NeoBundle 'tomasr/molokai'
-
-" vim-over
-" :OverCommandLineで起動、%s/old/new/gでハイライトされる
-" NeoBundle 'osyo-manga/vim-over'
-
-
-
-"NeoBundle 'Shougo/vimproc', {
-"      \ 'build' : {
-"      \     'windows' : 'make -f make_mingw32.mak',
-"      \     'cygwin' : 'make -f make_cygwin.mak',
-"      \     'mac' : 'make -f make_mac.mak',
-"      \     'unix' : 'make -f make_unix.mak',
-"      \    },
-"      \ }
-"
-" NeoBundleCheck
-""""""""""""""
-
 
 "文法チェック
 nmap ,l :call PHPLint()
 
-function PHPLint()
+function! PHPLint() " exclamation mark means overriding the definition of function
     let result = system( &ft . ' -l ' . bufname(""))
     echo result
 endfunction
 
 " complement { after Enter
-" inoremap {<Enter> {}<Left><CR><ESC><S-o>
+inoremap {<Enter> {}<Left><CR><ESC><S-o>
 
 " MATLAB関係
 source ~/.vim/matlab/syntax/matlab.vim
@@ -104,9 +63,6 @@ source ~/.vim/matlab/ftplugin/matlab.vim
 "  NeoBundle Configulation Section (2014/7/12)
 "=============================================
 
-" 全てのfiletype系設定を解除
-" filetype off
-
 if has('vim_starting') " at launching vim only
     set runtimepath+=~/.vim/bundle/neobundle.vim/
 endif
@@ -116,26 +72,30 @@ call neobundle#rc(expand('~/.vim/bundle/')) "required
 NeoBundleFetch 'Shougo/neobundle.vim' " Let NeoBundle manage NeoBundle (Required)
 
 " ~ My Bundles Here... ~
-NeoBundle 'scrooloose/nerdtree' "filer
+NeoBundle 'scrooloose/nerdtree' " Filer plugin
+let NERDTreeShowHidden = 1 " Display hidden files and folders on NERDTree
 NeoBundle 'tpope/vim-fugitive' "git commands on vim
+NeoBundle 'scrooloose/syntastic.git' " syntax checker
 
 call neobundle#end()
 filetype plugin indent on
+
 
 " If there are uninstalled bundles found on startup,
 " this will conveniently prompt you to install them.
 NeoBundleCheck
 
+
 " NeoBundle Configulation End 
 "========================================
+
 
 " launch NERDTree automatically at opening files
 " autocmd VimEnter * NERDTree 
 
 " alias of NERDTree
-command Nt NERDTree
+command! Nt NERDTree
 
-" 先ほど解除したのを復帰
-" 後者は'filetype on'も適用される
-" autocmd FileType * setlocal formatoptions-=ro
+" don't automatically continue comment line
+autocmd FileType * setlocal formatoptions-=ro
 
