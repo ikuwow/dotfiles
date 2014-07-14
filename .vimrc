@@ -58,9 +58,9 @@ endfunction
 inoremap {<Enter> {}<Left><CR><ESC><S-o>
 
 " MATLAB関係
-source ~/.vim/matlab/syntax/matlab.vim
-source ~/.vim/matlab/indent/matlab.vim
-source ~/.vim/matlab/ftplugin/matlab.vim
+" source ~/.vim/matlab/syntax/matlab.vim
+" source ~/.vim/matlab/indent/matlab.vim
+" source ~/.vim/matlab/ftplugin/matlab.vim
 
 "=============================================
 "  NeoBundle Configulation Section (2014/7/12)
