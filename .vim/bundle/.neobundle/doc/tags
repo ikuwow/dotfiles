@@ -338,6 +338,7 @@ syntastic-pymode	syntastic.txt	/*syntastic-pymode*
 syntastic-quickstart	syntastic.txt	/*syntastic-quickstart*
 syntastic-statusline-flag	syntastic.txt	/*syntastic-statusline-flag*
 syntastic-vim-virtualenv	syntastic.txt	/*syntastic-vim-virtualenv*
+syntastic-ycm	syntastic.txt	/*syntastic-ycm*
 syntastic.txt	syntastic.txt	/*syntastic.txt*
 unite-action-neobundle-lazy	neobundle.txt	/*unite-action-neobundle-lazy*
 unite-action-neobundle-search	neobundle.txt	/*unite-action-neobundle-search*
