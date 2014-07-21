@@ -79,6 +79,7 @@ NeoBundle 'scrooloose/nerdtree' " Filer plugin
 NeoBundle 'tpope/vim-fugitive' "git commands on vim
 NeoBundle 'scrooloose/syntastic.git' " syntax checker
 NeoBundle 'toyamarinyon/vim-swift' " swift support
+NeoBundle 'thinca/vim-quickrun' " enable trying
 
 call neobundle#end()
 filetype plugin indent on
