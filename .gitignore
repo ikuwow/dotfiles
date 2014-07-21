@@ -5,9 +5,4 @@
 /bin/mlint
 
 # bundles
-/.vim/bundle/.neobundle/install_info
-/.vim/bundle/.neobundle/tags_info
-/.vim/bundle/nerdtree
-/.vim/bundle/syntastic
-/.vim/bundle/vim-fugitive
-/.vim/bundle/vim-swift
+/.vim/bundle/*
