@@ -78,6 +78,7 @@ NeoBundleFetch 'Shougo/neobundle.vim' " Let NeoBundle manage NeoBundle (Required
 NeoBundle 'scrooloose/nerdtree' " Filer plugin
 NeoBundle 'tpope/vim-fugitive' "git commands on vim
 NeoBundle 'scrooloose/syntastic.git' " syntax checker
+NeoBundle 'toyamarinyon/vim-swift' " swift support
 
 call neobundle#end()
 filetype plugin indent on
