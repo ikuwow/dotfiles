@@ -13,6 +13,7 @@ set noundofile ".un~ファイルを作らない
 set ruler " display ruler (60,7 13%)
 set hlsearch " highlight the search word
 set showcmd " show inputting key
+set mouse=a " enable mouse control (select, scroll etc.)
 
     
 "tab関係
@@ -80,6 +81,8 @@ NeoBundle 'tpope/vim-fugitive' "git commands on vim
 NeoBundle 'scrooloose/syntastic.git' " syntax checker
 NeoBundle 'toyamarinyon/vim-swift' " swift support
 NeoBundle 'thinca/vim-quickrun' " enable trying
+NeoBundle 'mhinz/vim-startify' " startpage of vim
+" NeoBundle 'AndrewRadev/switch.vim' " toggle some string (true<=>false etc.)
 
 call neobundle#end()
 filetype plugin indent on
@@ -91,6 +94,8 @@ NeoBundleCheck
 
 " configuration for each plugin
 let NERDTreeShowHidden = 1 " Display hidden files and folders on NERDTree
+let g:startify_custom_header = "Done is better than perfect." " startify custom header
+
 " launch NERDTree automatically at opening files
 " autocmd VimEnter * NERDTree 
 
