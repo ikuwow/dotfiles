@@ -1,1 +1,0 @@
-/Users/degawaikuo/dotfiles/.vim

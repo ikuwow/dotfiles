@@ -6,3 +6,5 @@
 
 # bundles
 /.vim/bundle/*
+!/.vim/bundle/bundles_are_managed_by_neobundle
+!/.vim/bundle/neobundle.vim
