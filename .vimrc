@@ -94,7 +94,7 @@ NeoBundleCheck
 
 " configuration for each plugin
 let NERDTreeShowHidden = 1 " Display hidden files and folders on NERDTree
-let g:startify_custom_header = "Done is better than perfect." " startify custom header
+" let g:startify_custom_header = "Done is better than perfect." " startify custom header
 
 " launch NERDTree automatically at opening files
 " autocmd VimEnter * NERDTree 
