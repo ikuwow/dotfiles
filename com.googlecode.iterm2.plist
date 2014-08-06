@@ -955,11 +955,11 @@
 	<key>Hotkey</key>
 	<false/>
 	<key>HotkeyChar</key>
-	<integer>0</integer>
+	<integer>32</integer>
 	<key>HotkeyCode</key>
-	<integer>0</integer>
+	<integer>49</integer>
 	<key>HotkeyModifiers</key>
-	<integer>0</integer>
+	<integer>524288</integer>
 	<key>IRMemory</key>
 	<integer>4</integer>
 	<key>JobName</key>
@@ -1245,11 +1245,11 @@
 	<key>NSWindow Frame FindPanel</key>
 	<string>650 748 409 113 0 0 1440 878 </string>
 	<key>NSWindow Frame Preferences</key>
-	<string>48 228 924 485 0 0 1440 878 </string>
+	<string>332 304 924 485 0 0 1440 878 </string>
 	<key>NSWindow Frame iTerm Window 0</key>
-	<string>660 14 780 864 0 0 1440 878 </string>
+	<string>869 14 570 864 0 0 1440 878 </string>
 	<key>NSWindow Frame iTerm Window 1</key>
-	<string>648 14 570 864 0 0 1440 878 </string>
+	<string>868 14 570 864 0 0 1440 878 </string>
 	<key>NSWindow Frame iTerm Window 2</key>
 	<string>77 14 570 864 0 0 1440 878 </string>
 	<key>NSWindow Frame iTerm Window 3</key>
@@ -2433,6 +2433,8 @@
 				<key>Red Component</key>
 				<real>1</real>
 			</dict>
+			<key>Bonjour Service Address</key>
+			<string>192.168.0.11</string>
 			<key>Character Encoding</key>
 			<integer>4</integer>
 			<key>Close Sessions On End</key>
@@ -2467,6 +2469,8 @@
 			<string>No</string>
 			<key>Default Bookmark</key>
 			<string>No</string>
+			<key>Description</key>
+			<string>IkuosMacmini</string>
 			<key>Disable Printing</key>
 			<false/>
 			<key>Disable Smcup Rmcup</key>
@@ -2485,7 +2489,7 @@
 				<real>0.97033727169036865</real>
 			</dict>
 			<key>Guid</key>
-			<string>3FC9011A-3875-456D-B0EC-5063F6E6E736</string>
+			<string>1DBD2FF8-F4A9-42A0-BD52-8683FA92E2D3</string>
 			<key>Hide After Opening</key>
 			<false/>
 			<key>Horizontal Spacing</key>
@@ -2557,7 +2561,7 @@
 			<key>Log Directory</key>
 			<string></string>
 			<key>Minimum Contrast</key>
-			<real>0.0</real>
+			<real>0.48544269800186157</real>
 			<key>Mouse Reporting</key>
 			<true/>
 			<key>Name</key>
@@ -2615,8 +2619,6 @@
 			<false/>
 			<key>Set Local Environment Vars</key>
 			<false/>
-			<key>Shortcut</key>
-			<string></string>
 			<key>Silence Bell</key>
 			<false/>
 			<key>Smart Cursor Color</key>
@@ -2816,7 +2818,7 @@
 	<key>SUHasLaunchedBefore</key>
 	<true/>
 	<key>SULastCheckTime</key>
-	<date>2014-08-05T01:45:35Z</date>
+	<date>2014-08-06T01:45:35Z</date>
 	<key>SavePasteHistory</key>
 	<false/>
 	<key>Show Toolbelt</key>
