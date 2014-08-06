@@ -14,6 +14,7 @@ set ruler " display ruler (60,7 13%)
 set hlsearch " highlight the search word
 set showcmd " show inputting key
 set mouse=a " enable mouse control (select, scroll etc.)
+set clipboard=unnamed " sharing clipboard
 
     
 "tab関係
