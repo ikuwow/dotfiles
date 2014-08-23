@@ -955,11 +955,11 @@
 	<key>Hotkey</key>
 	<false/>
 	<key>HotkeyChar</key>
-	<integer>32</integer>
+	<integer>0</integer>
 	<key>HotkeyCode</key>
-	<integer>49</integer>
+	<integer>0</integer>
 	<key>HotkeyModifiers</key>
-	<integer>524288</integer>
+	<integer>0</integer>
 	<key>IRMemory</key>
 	<integer>4</integer>
 	<key>JobName</key>
@@ -1206,6 +1206,8 @@
 	<true/>
 	<key>MaxVertically</key>
 	<true/>
+	<key>NSColorPanelMode</key>
+	<string>0</string>
 	<key>NSNavLastRootDirectory</key>
 	<string>~/dotfiles</string>
 	<key>NSQuotedKeystrokeBinding</key>
@@ -1231,12 +1233,16 @@
 	<array/>
 	<key>NSTableView Sort Ordering KeyBingingTable</key>
 	<array/>
+	<key>NSWindow Frame NSColorPanel</key>
+	<string>456 357 231 329 0 0 1920 1057 </string>
 	<key>NSWindow Frame Preferences</key>
-	<string>332 304 924 485 0 0 1440 878 </string>
+	<string>241 253 924 485 0 0 1920 1057 </string>
+	<key>NSWindow Frame UKCrashReporter</key>
+	<string>155 473 592 584 0 0 1920 1057 </string>
 	<key>NSWindow Frame iTerm Window 0</key>
-	<string>869 14 570 864 0 0 1440 878 </string>
+	<string>1245 163 570 864 0 0 1920 1057 </string>
 	<key>NSWindow Frame iTerm Window 1</key>
-	<string>868 14 570 864 0 0 1440 878 </string>
+	<string>1149 98 570 864 0 0 1920 1057 </string>
 	<key>NSWindow Frame iTerm Window 2</key>
 	<string>631 102 570 864 0 0 1920 1058 </string>
 	<key>New Bookmarks</key>
@@ -1917,7 +1923,7 @@
 			<key>Bold Color</key>
 			<dict>
 				<key>Blue Component</key>
-				<real>0.98028081655502319</real>
+				<real>1</real>
 				<key>Green Component</key>
 				<real>1</real>
 				<key>Red Component</key>
@@ -1968,11 +1974,11 @@
 			<key>Foreground Color</key>
 			<dict>
 				<key>Blue Component</key>
-				<real>0.9264865517616272</real>
+				<real>0.90251904726028442</real>
 				<key>Green Component</key>
-				<real>0.96665072441101074</real>
+				<real>0.90251904726028442</real>
 				<key>Red Component</key>
-				<real>0.97033727169036865</real>
+				<real>0.90251904726028442</real>
 			</dict>
 			<key>Guid</key>
 			<string>9E106F23-64C0-4844-AAF3-07D688802D5A</string>
@@ -2412,7 +2418,7 @@
 			<key>Bold Color</key>
 			<dict>
 				<key>Blue Component</key>
-				<real>0.98028081655502319</real>
+				<real>1</real>
 				<key>Green Component</key>
 				<real>1</real>
 				<key>Red Component</key>
@@ -2467,14 +2473,14 @@
 			<key>Foreground Color</key>
 			<dict>
 				<key>Blue Component</key>
-				<real>0.9264865517616272</real>
+				<real>0.90251904726028442</real>
 				<key>Green Component</key>
-				<real>0.96665072441101074</real>
+				<real>0.90251904726028442</real>
 				<key>Red Component</key>
-				<real>0.97033727169036865</real>
+				<real>0.90251904726028442</real>
 			</dict>
 			<key>Guid</key>
-			<string>6CB4E634-7F6F-40F7-8B20-058A4C9FC465</string>
+			<string>E187793D-717F-4E6B-8369-C401BB2F6BF4</string>
 			<key>Hide After Opening</key>
 			<false/>
 			<key>Horizontal Spacing</key>
@@ -2546,7 +2552,7 @@
 			<key>Log Directory</key>
 			<string></string>
 			<key>Minimum Contrast</key>
-			<real>0.48544269800186157</real>
+			<real>0.45835936069488525</real>
 			<key>Mouse Reporting</key>
 			<true/>
 			<key>Name</key>
@@ -2803,7 +2809,7 @@
 	<key>SUHasLaunchedBefore</key>
 	<true/>
 	<key>SULastCheckTime</key>
-	<date>2014-08-06T01:45:35Z</date>
+	<date>2014-08-21T08:03:03Z</date>
 	<key>SavePasteHistory</key>
 	<false/>
 	<key>Show Toolbelt</key>
@@ -2859,7 +2865,7 @@
 	<key>TripleClickSelectsFullWrappedLines</key>
 	<false/>
 	<key>UKCrashReporterLastCrashReportDate</key>
-	<real>1407234048</real>
+	<real>1407550208</real>
 	<key>URLHandlers</key>
 	<dict/>
 	<key>URLHandlersByGuid</key>
