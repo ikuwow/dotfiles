@@ -88,6 +88,7 @@ NeoBundle 'kannokanno/previm' " preview markdown
 NeoBundle 'thinca/vim-quickrun' " enable trying
 NeoBundle 'mhinz/vim-startify' " startpage of vim
 NeoBundle 'terryma/vim-multiple-cursors'
+NeoBundle 'vim-scripts/taglist.vim'
 " NeoBundle 'AndrewRadev/switch.vim' " toggle some string (true<=>false etc.)
 
 call neobundle#end()
