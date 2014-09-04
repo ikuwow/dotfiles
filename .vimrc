@@ -8,13 +8,14 @@ set title " display filename (not Thank you for using Vim.)
 syntax on
 set nocompatible " do not use vi compatible mode
 set nobackup "チルダつきのファイルが邪魔
-set ic "ignore case, 検索時に大文字小文字を区別しない
+set ic " ignore case, 検索時に大文字小文字を区別しない
 set noundofile ".un~ファイルを作らない
 set ruler " display ruler (60,7 13%)
 set hlsearch " highlight the search word
 set showcmd " show inputting key
 set mouse=a " enable mouse control (select, scroll etc.)
 set clipboard=unnamed " sharing clipboard
+set linebreak "auto linebreak
 
     
 "tab関係
@@ -86,6 +87,8 @@ NeoBundle 'tyru/open-browser.vim'
 NeoBundle 'kannokanno/previm' " preview markdown
 NeoBundle 'thinca/vim-quickrun' " enable trying
 NeoBundle 'mhinz/vim-startify' " startpage of vim
+NeoBundle 'terryma/vim-multiple-cursors'
+NeoBundle 'vim-scripts/taglist.vim'
 " NeoBundle 'AndrewRadev/switch.vim' " toggle some string (true<=>false etc.)
 
 call neobundle#end()
