@@ -8,7 +8,7 @@ set title " display filename (not Thank you for using Vim.)
 syntax on
 set nocompatible " do not use vi compatible mode
 set nobackup "チルダつきのファイルが邪魔
-set ic "検索時に大文字小文字を区別しない
+set ic "ignore case, 検索時に大文字小文字を区別しない
 set noundofile ".un~ファイルを作らない
 set ruler " display ruler (60,7 13%)
 set hlsearch " highlight the search word
