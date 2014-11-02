@@ -929,7 +929,7 @@
 	<key>EnableGrowl</key>
 	<false/>
 	<key>EnableRendezvous</key>
-	<true/>
+	<false/>
 	<key>FocusFollowsMouse</key>
 	<false/>
 	<key>FsTabDelay</key>
@@ -1240,11 +1240,11 @@
 	<key>NSWindow Frame NSFontPanel</key>
 	<string>1321 207 502 308 0 0 1920 1057 </string>
 	<key>NSWindow Frame Preferences</key>
-	<string>828 240 924 485 0 0 1920 1057 </string>
+	<string>690 296 924 485 0 0 1920 1057 </string>
 	<key>NSWindow Frame UKCrashReporter</key>
 	<string>155 473 592 584 0 0 1920 1057 </string>
 	<key>NSWindow Frame iTerm Window 0</key>
-	<string>497 139 570 864 0 0 1920 1057 </string>
+	<string>79 96 570 864 0 0 1920 1057 </string>
 	<key>NSWindow Frame iTerm Window 1</key>
 	<string>833 6 661 1051 0 0 1920 1057 </string>
 	<key>NSWindow Frame iTerm Window 2</key>
@@ -2795,7 +2795,7 @@
 	<key>PromptOnQuit</key>
 	<true/>
 	<key>QuitWhenAllWindowsClosed</key>
-	<true/>
+	<false/>
 	<key>RefreshRate</key>
 	<integer>10</integer>
 	<key>RightCommand</key>
