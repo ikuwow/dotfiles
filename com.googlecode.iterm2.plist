@@ -1236,11 +1236,11 @@
 	<key>NSWindow Frame NSColorPanel</key>
 	<string>456 357 231 329 0 0 1920 1057 </string>
 	<key>NSWindow Frame Preferences</key>
-	<string>973 256 924 485 0 0 1920 1057 </string>
+	<string>464 300 924 485 0 0 1920 1057 </string>
 	<key>NSWindow Frame UKCrashReporter</key>
 	<string>155 473 592 584 0 0 1920 1057 </string>
 	<key>NSWindow Frame iTerm Window 0</key>
-	<string>0 1080 1920 842 0 0 1920 1057 </string>
+	<string>943 193 871 864 0 0 1920 1057 </string>
 	<key>NSWindow Frame iTerm Window 1</key>
 	<string>833 6 661 1051 0 0 1920 1057 </string>
 	<key>NSWindow Frame iTerm Window 2</key>
@@ -3474,7 +3474,7 @@
 				<real>0.90251904726028442</real>
 			</dict>
 			<key>Guid</key>
-			<string>1CDF9D74-8C27-4A0E-B8CA-BCF30A04255B</string>
+			<string>392F7552-6A94-49AF-A176-56827FF0A9A5</string>
 			<key>Hide After Opening</key>
 			<false/>
 			<key>Horizontal Spacing</key>
@@ -3803,7 +3803,7 @@
 	<key>SUHasLaunchedBefore</key>
 	<true/>
 	<key>SULastCheckTime</key>
-	<date>2014-10-25T13:21:12Z</date>
+	<date>2014-11-01T11:23:41Z</date>
 	<key>SavePasteHistory</key>
 	<false/>
 	<key>Secure Input</key>
@@ -3881,7 +3881,7 @@
 	<key>WindowStyle</key>
 	<integer>0</integer>
 	<key>WordCharacters</key>
-	<string>/-+\~_.</string>
+	<string></string>
 	<key>findIgnoreCase_iTerm</key>
 	<true/>
 	<key>findRegex_iTerm</key>
