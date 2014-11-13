@@ -11,6 +11,7 @@ alias la='ls -A'
 alias rm='rm -i'
 alias less='less -iM'
 alias bye='exit'
+alias hosts='sudo vim /etc/hosts'
 
 alias ='echo "Stay hungly, stay foolish."'
 alias saying='while (true) do f=$(fortune); echo "$f"; echo ""; say "$f"; sleep 5; done'
