@@ -6,6 +6,11 @@ else
     alias ls='ls -G'
 fi
 
+# bash-completion
+if [ -f `brew --prefix`/etc/bash_completion ]; then
+    . `brew --prefix`/etc/bash_completion
+fi
+
 alias ll='ls -l'
 alias la='ls -A'
 alias rm='rm -i'

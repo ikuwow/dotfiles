@@ -15,7 +15,7 @@ set hlsearch " highlight the search word
 set showcmd " show inputting key
 set mouse=a " enable mouse control (select, scroll etc.)
 set clipboard=unnamed " sharing clipboard
-set linebreak "auto linebreak
+"set linebreak "auto linebreak
 
     
 "tab関係
