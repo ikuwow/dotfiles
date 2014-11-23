@@ -59,9 +59,9 @@ echo "Installing Ruby packages... "
 brew install $RUBY
 echo "Done!"
 
-CHEF="knife-solo berkshelf"
+GEMS="chef knife-solo berkshelf berkshelf kitchen-vagrant test-kitchen knife-solo_data_bag"
 echo "Installing Chef packages... "
-gem install $CHEF
+gem install $GEMS
 echo "Done!"
 
 CASKS="bettertouchtool menumeters vlc rescuetime firefox google-chrome karabiner cyberduck
