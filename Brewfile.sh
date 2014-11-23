@@ -47,8 +47,6 @@ if [ "${upgrade,,}" = "y" -o "${upgrade,,}" = "yes" ]; then
     echo "Done!"
 fi
 
-exit
-
 BASICS="vim brew-cask gcc pwgen tree git bash trash wget tmux"
 echo "Installing Basic packages... "
 brew install $BASICS
