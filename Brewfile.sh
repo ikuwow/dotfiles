@@ -1,31 +1,46 @@
 #!/bin/bash
-
-# App Storeでインストールするもの
-# Xcode (さきに), Evernote, LINE, Yorufukurou, The Unaarchiver, 1password, Degrees
+#
+# usage: $ bash Brewfile.sh
+#
+# To be installed by App Store in advance
+# Xcode, Evernote, LINE, Yorufukurou, The Unaarchiver, 1password, Degrees
 
 # homebrewが入っているか確認
 if [ ! `which brew` ]; then
     echo "You don't have homebrew! Start Installing."
     ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+    brew install brew-cask
     echo "Homebrew installation Done! Please type 'brew install'."
     exit
 fi
 
 export HOMEBREW_CASK_OPTS="--appdir=/Applications"
 
-echo "Do you 'yum update'? This takes a few minutes. (recommended) [Y/n]"
+echo "Do you 'brew update'? This takes a few minutes. (recommended) [Y/n]"
 echo -n "> "
 read update
-echo  "OK, next, do you 'yum upgrade'? This takes a lot of times. [y/N]"
+echo "OK, next, do you 'brew cask update'? This takes a few minutes. (recommended) [Y/n]"
+echo -n "> "
+read caskupdate
+echo  "OK, at last, do you 'brew upgrade'? This takes a lot of times. [y/N]"
 echo -n "> "
 read upgrade
 
+# brew update
 if [ ! "${update,,}" = "n" -a ! "${update,,}" = "no" ]; then
     echo "Updating Homebrew... "
     brew update
     echo "Done!"
 fi
 
+# brew cask update
+if [ ! "${caskupdate,,}" = "n" -a ! "${caskupdate,,}" = "no" ]; then
+    echo "Updating Homebrew Cask... "
+    brew cask update
+    echo "Done!"
+fi
+
+# brew upgrade
 if [ "${upgrade,,}" = "y" -o "${upgrade,,}" = "yes" ]; then
     echo -n "Upgrading Homebrew... "
     brew update
@@ -57,6 +72,7 @@ echo "Done!"
 
 echo "Cleanup... "
 brew cleanup
+brew cask cleanup
 echo "DONE!"
 
 
