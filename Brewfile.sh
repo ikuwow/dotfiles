@@ -63,7 +63,7 @@ gem install $GEMS
 echo "Done!"
 
 CASKS="bettertouchtool menumeters vlc rescuetime firefox google-chrome karabiner cyberduck
-    iterm2 dropbox virtualbox vagrant mysqlworkbench google-japanese-ime github macvim-kaoriya cocoarestclient"
+    iterm2 dropbox virtualbox vagrant mysqlworkbench google-japanese-ime github macvim-kaoriya cocoarestclient cacoo-ninja"
 echo "Installing Cask packages... "
 brew cask install $CASKS
 echo "Done!"
@@ -71,6 +71,7 @@ echo "Done!"
 echo "Cleanup... "
 brew cleanup
 brew cask cleanup
+gem cleanup
 echo "DONE!"
 
 
