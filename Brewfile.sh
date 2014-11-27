@@ -30,43 +30,68 @@ read upgrade
 if [ ! "${update,,}" = "n" -a ! "${update,,}" = "no" ]; then
     echo "Updating Homebrew... "
     brew update
-    echo "Done!"
+    echo "Done!\n"
 fi
 
 # brew cask update
 if [ ! "${caskupdate,,}" = "n" -a ! "${caskupdate,,}" = "no" ]; then
     echo "Updating Homebrew Cask... "
     brew cask update
-    echo "Done!"
+    echo "Done!\n"
 fi
 
 # brew upgrade
 if [ "${upgrade,,}" = "y" -o "${upgrade,,}" = "yes" ]; then
     echo -n "Upgrading Homebrew... "
     brew update
-    echo "Done!"
+    echo "Done!\n"
 fi
 
 BASICS="vim brew-cask gcc pwgen tree git bash trash wget tmux"
 echo "Installing Basic packages... "
 brew install $BASICS
-echo "Done!"
+echo "Done!\n"
 
 RUBY="ruby-build rbenv"
 echo "Installing Ruby packages... "
 brew install $RUBY
-echo "Done!"
+printf "Done!\n\n"
 
-GEMS="bundle chef knife-solo berkshelf berkshelf kitchen-vagrant test-kitchen knife-solo_data_bag"
-echo "Installing Chef packages... "
-gem install $GEMS
-echo "Done!"
+GEMS="bundler chef knife-solo berkshelf kitchen-vagrant test-kitchen knife-solo_data_bag"
+echo "Installing gem packages... "
+for pkg in $GEMS; do
+    gem list | grep $pkg > /dev/null
+    ec=$?
+    if [ ! $ec -eq 0 ]; then
+        echo $pkg
+        gem install $pkg
+    else
+        echo "gem package \"${pkg}\" is already installed. (Up to date)"
+    fi
+done
+printf "Done!\n\n"
 
-CASKS="bettertouchtool menumeters vlc rescuetime firefox google-chrome karabiner cyberduck
-    iterm2 dropbox virtualbox vagrant mysqlworkbench google-japanese-ime github macvim-kaoriya cocoarestclient cacoo-ninja"
+gem update
+
+echo "Installing vagrant plugins..."
+VAGRANT="vagrant-omnibus vagrant-vbguest vagrant-cachier sahara vagrant-global-status vagrant-vbox-snapshot"
+for pkg in $VAGRANT; do
+    vagrant plugin list | grep $pkg > /dev/null
+    ec=$?
+    if [ ! $ec -eq 0 ]; then
+        vagrant plugin install $pkg
+    else
+        echo "vagrant plugin \"${pkg}\" is already installed. (Up to date)"
+    fi
+done
+printf "Done!\n\n"
+
+CASKS="bettertouchtool menumeters vlc rescuetime firefox google-chrome karabiner \
+    cyberduck iterm2 dropbox virtualbox vagrant mysqlworkbench google-japanese-ime github \
+    macvim-kaoriya cocoarestclient adobe-air cacoo-ninja"
 echo "Installing Cask packages... "
 brew cask install $CASKS
-echo "Done!"
+printf "Done!\n"
 
 echo "Cleanup... "
 brew cleanup
