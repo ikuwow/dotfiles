@@ -57,7 +57,7 @@ echo "Installing Ruby packages... "
 brew install $RUBY
 echo "Done!"
 
-GEMS="chef knife-solo berkshelf berkshelf kitchen-vagrant test-kitchen knife-solo_data_bag"
+GEMS="bundle chef knife-solo berkshelf berkshelf kitchen-vagrant test-kitchen knife-solo_data_bag"
 echo "Installing Chef packages... "
 gem install $GEMS
 echo "Done!"
