@@ -74,7 +74,8 @@ printf "Done!\n\n"
 gem update
 
 echo "Installing vagrant plugins..."
-VAGRANT="vagrant-omnibus vagrant-vbguest vagrant-cachier sahara vagrant-global-status vagrant-vbox-snapshot"
+VAGRANT="vagrant-omnibus vagrant-vbguest vagrant-cachier sahara vagrant-vbox-snapshot"
+# vagrant-global-status is available on vagrant core without plugin!
 for pkg in $VAGRANT; do
     vagrant plugin list | grep $pkg > /dev/null
     ec=$?
