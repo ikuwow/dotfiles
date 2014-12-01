@@ -10,7 +10,7 @@ if [ ! `which brew` ]; then
     echo "You don't have homebrew! Start Installing."
     ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
     brew install brew-cask
-    echo "Homebrew installation Done! Please type 'brew install'."
+    echo "Homebrew installation Done! Please type 'brew doctor'."
     exit
 fi
 
@@ -30,27 +30,27 @@ read upgrade
 if [ ! "${update,,}" = "n" -a ! "${update,,}" = "no" ]; then
     echo "Updating Homebrew... "
     brew update
-    echo "Done!\n"
+    printf "Done!\n\n"
 fi
 
 # brew cask update
 if [ ! "${caskupdate,,}" = "n" -a ! "${caskupdate,,}" = "no" ]; then
     echo "Updating Homebrew Cask... "
     brew cask update
-    echo "Done!\n"
+    printf "Done!\n\n"
 fi
 
 # brew upgrade
 if [ "${upgrade,,}" = "y" -o "${upgrade,,}" = "yes" ]; then
     echo -n "Upgrading Homebrew... "
     brew update
-    echo "Done!\n"
+    printf "Done!\n\n"
 fi
 
 BASICS="vim brew-cask gcc pwgen tree git bash trash wget tmux"
 echo "Installing Basic packages... "
 brew install $BASICS
-echo "Done!\n"
+printf "Done!\n\n"
 
 RUBY="ruby-build rbenv"
 echo "Installing Ruby packages... "
@@ -92,7 +92,7 @@ CASKS="bettertouchtool menumeters vlc rescuetime firefox google-chrome karabiner
     macvim-kaoriya cocoarestclient adobe-air cacoo-ninja"
 echo "Installing Cask packages... "
 brew cask install $CASKS
-printf "Done!\n"
+printf "Done!\n\n"
 
 echo "Cleanup... "
 brew cleanup
