@@ -3,7 +3,7 @@
 # usage: $ bash Brewfile.sh
 #
 # To be installed by App Store in advance
-# Xcode, Evernote, LINE, Yorufukurou, The Unaarchiver, 1password, Degrees
+# Xcode, LINE, Yorufukurou, The Unaarchiver, 1password, Degrees
 
 # homebrewが入っているか確認
 if [ ! `which brew` ]; then
@@ -89,7 +89,7 @@ printf "Done!\n\n"
 
 CASKS="bettertouchtool menumeters vlc rescuetime firefox google-chrome karabiner \
     cyberduck iterm2 dropbox virtualbox vagrant mysqlworkbench google-japanese-ime github \
-    macvim-kaoriya cocoarestclient adobe-air cacoo-ninja"
+    macvim-kaoriya cocoarestclient adobe-air cacoo-ninja evernote"
 echo "Installing Cask packages... "
 brew cask install $CASKS
 printf "Done!\n\n"
