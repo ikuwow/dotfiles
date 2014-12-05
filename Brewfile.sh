@@ -57,7 +57,7 @@ echo "Installing Ruby packages... "
 brew install $RUBY
 printf "Done!\n\n"
 
-GEMS="bundler chef knife-solo berkshelf kitchen-vagrant test-kitchen knife-solo_data_bag"
+GEMS="bundler chef knife-solo berkshelf kitchen-vagrant test-kitchen knife-solo_data_bag cocoapods"
 echo "Installing gem packages... "
 for pkg in $GEMS; do
     gem list | grep $pkg > /dev/null
