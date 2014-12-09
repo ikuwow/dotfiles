@@ -10,6 +10,7 @@ if [ ! `which brew` ]; then
     echo "You don't have homebrew! Start Installing."
     ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
     brew install caskroom/cask/brew-cask
+    brew tap casroom/versions
     echo "Homebrew installation Done! Please type 'brew doctor'."
     exit
 fi
@@ -53,17 +54,18 @@ brew install $BASICS
 printf "Done!\n\n"
 
 RUBY="ruby-build rbenv"
+RUBY_VERSION="2.1.5"
 echo "Installing Ruby packages... "
 brew install $RUBY
-ruby -v | grep 2.1.5 | > /dev/null
+ruby -v | grep $RUBY_VERSION | > /dev/null
 if [ $? -eq 1 ];then
-    rbenv install 2.1.5
-    rbenv global 2.1.5
+    rbenv install $RUBY_VERSION
+    rbenv global $RUBY_VERSION
     rbenv rehash
     echo 'New version of Ruby is installed! Please reboot your terminal.'
     exit 0
 else
-    echo 'Ruby is already installed. (2.1.5)'
+    echo "Ruby is already installed. (${RUBY_VERSION})"
 fi
 printf "Done!\n\n"
 
@@ -87,7 +89,7 @@ gem update
 # Brew Cask
 CASKS="bettertouchtool menumeters vlc rescuetime firefox google-chrome karabiner \
     cyberduck iterm2 dropbox virtualbox vagrant mysqlworkbench google-japanese-ime github \
-    macvim-kaoriya cocoarestclient adobe-air cacoo-ninja evernote"
+    macvim-kaoriya cocoarestclient adobe-air cacoo-ninja evernote owncloud"
 echo "Installing Cask packages... "
 brew cask install $CASKS
 printf "Done!\n\n"
