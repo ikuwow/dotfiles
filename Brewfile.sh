@@ -55,7 +55,6 @@ printf "Done!\n\n"
 RUBY="ruby-build rbenv"
 echo "Installing Ruby packages... "
 brew install $RUBY
-printf "Done!\n\n"
 ruby -v | grep 2.1.5 | > /dev/null
 if [ $? -eq 1 ];then
     rbenv install 2.1.5
@@ -64,8 +63,10 @@ if [ $? -eq 1 ];then
     echo 'New version of Ruby is installed! Please reboot your terminal.'
     exit 0
 else
-    echo 'Ruby version is up-to-date.'
+    echo 'Ruby is already installed. (2.1.5)'
 fi
+printf "Done!\n\n"
+
 
 GEMS="bundler chef knife-solo berkshelf kitchen-vagrant test-kitchen knife-solo_data_bag cocoapods"
 echo "Installing gem packages... "
@@ -83,9 +84,17 @@ printf "Done!\n\n"
 
 gem update
 
+# Brew Cask
+CASKS="bettertouchtool menumeters vlc rescuetime firefox google-chrome karabiner \
+    cyberduck iterm2 dropbox virtualbox vagrant mysqlworkbench google-japanese-ime github \
+    macvim-kaoriya cocoarestclient adobe-air cacoo-ninja evernote"
+echo "Installing Cask packages... "
+brew cask install $CASKS
+printf "Done!\n\n"
+
+# Vagrant Plugins
 echo "Installing vagrant plugins..."
 VAGRANT="vagrant-omnibus vagrant-vbguest vagrant-cachier sahara vagrant-vbox-snapshot"
-# vagrant-global-status is available on vagrant core without plugin!
 for pkg in $VAGRANT; do
     vagrant plugin list | grep $pkg > /dev/null
     ec=$?
@@ -95,13 +104,6 @@ for pkg in $VAGRANT; do
         echo "vagrant plugin \"${pkg}\" is already installed. (Up to date)"
     fi
 done
-printf "Done!\n\n"
-
-CASKS="bettertouchtool menumeters vlc rescuetime firefox google-chrome karabiner \
-    cyberduck iterm2 dropbox virtualbox vagrant mysqlworkbench google-japanese-ime github \
-    macvim-kaoriya cocoarestclient adobe-air cacoo-ninja evernote"
-echo "Installing Cask packages... "
-brew cask install $CASKS
 printf "Done!\n\n"
 
 echo "Cleanup... "
