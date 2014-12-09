@@ -1,5 +1,5 @@
 #!/bin/bash
-#
+
 # usage: $ bash Brewfile.sh
 #
 # To be installed by App Store in advance
@@ -56,6 +56,16 @@ RUBY="ruby-build rbenv"
 echo "Installing Ruby packages... "
 brew install $RUBY
 printf "Done!\n\n"
+ruby -v | grep 2.1.5 | > /dev/null
+if [ $? -eq 1 ];then
+    rbenv install 2.1.5
+    rbenv global 2.1.5
+    rbenv rehash
+    echo 'New version of Ruby is installed! Please reboot your terminal.'
+    exit 0
+else
+    echo 'Ruby version is up-to-date.'
+fi
 
 GEMS="bundler chef knife-solo berkshelf kitchen-vagrant test-kitchen knife-solo_data_bag cocoapods"
 echo "Installing gem packages... "
