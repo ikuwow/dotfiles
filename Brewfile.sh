@@ -9,7 +9,7 @@
 if [ ! `which brew` ]; then
     echo "You don't have homebrew! Start Installing."
     ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-    brew install brew-cask
+    brew install caskroom/cask/brew-cask
     echo "Homebrew installation Done! Please type 'brew doctor'."
     exit
 fi
