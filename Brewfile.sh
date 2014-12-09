@@ -4,6 +4,7 @@
 #
 # To be installed by App Store in advance
 # Xcode, LINE, Yorufukurou, The Unaarchiver, 1password, Degrees
+# Keynote, Pages, Numbers
 
 # homebrewが入っているか確認
 if [ ! `which brew` ]; then
@@ -17,6 +18,7 @@ fi
 
 export HOMEBREW_CASK_OPTS="--appdir=/Applications"
 
+## Questions
 echo "Do you 'brew update'? This takes a few minutes. (recommended) [Y/n]"
 echo -n "> "
 read update
@@ -48,11 +50,13 @@ if [ "${upgrade,,}" = "y" -o "${upgrade,,}" = "yes" ]; then
     printf "Done!\n\n"
 fi
 
-BASICS="vim brew-cask gcc pwgen tree git bash trash wget tmux"
+## Basic Components
+BASICS="vim brew-cask gcc pwgen tree git bash trash wget tmux imagemagick ghostscript"
 echo "Installing Basic packages... "
 brew install $BASICS
 printf "Done!\n\n"
 
+## Ruby
 RUBY="ruby-build rbenv"
 RUBY_VERSION="2.1.5"
 echo "Installing Ruby packages... "
@@ -62,7 +66,7 @@ if [ $? -eq 1 ];then
     rbenv install $RUBY_VERSION
     rbenv global $RUBY_VERSION
     rbenv rehash
-    echo 'New version of Ruby is installed! Please reboot your terminal.'
+    echo 'New version of Ruby is installed! Please reboot your terminal and execute Brewfile again.'
     exit 0
 else
     echo "Ruby is already installed. (${RUBY_VERSION})"
@@ -70,6 +74,7 @@ fi
 printf "Done!\n\n"
 
 
+## Ruby Gems
 GEMS="bundler chef knife-solo berkshelf kitchen-vagrant test-kitchen knife-solo_data_bag cocoapods"
 echo "Installing gem packages... "
 for pkg in $GEMS; do
@@ -89,7 +94,7 @@ gem update
 # Brew Cask
 CASKS="bettertouchtool menumeters vlc rescuetime firefox google-chrome karabiner \
     cyberduck iterm2 dropbox virtualbox vagrant mysqlworkbench google-japanese-ime github \
-    macvim-kaoriya cocoarestclient adobe-air cacoo-ninja evernote owncloud"
+    macvim-kaoriya cocoarestclient adobe-air cacoo-ninja evernote owncloud mendeley-desktop mactex"
 echo "Installing Cask packages... "
 brew cask install $CASKS
 printf "Done!\n\n"
