@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/local/bin/bash
 
 # usage: $ bash Brewfile.sh
 #
@@ -61,7 +61,7 @@ RUBY="ruby-build rbenv"
 RUBY_VERSION="2.1.5"
 echo "Installing Ruby packages... "
 brew install $RUBY
-ruby -v | grep $RUBY_VERSION | > /dev/null
+ruby -v | grep $RUBY_VERSION > /dev/null
 if [ $? -eq 1 ];then
     rbenv install $RUBY_VERSION
     rbenv global $RUBY_VERSION
