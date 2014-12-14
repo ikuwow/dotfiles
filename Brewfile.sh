@@ -94,7 +94,8 @@ gem update
 # Brew Cask
 CASKS="bettertouchtool menumeters vlc rescuetime firefox google-chrome karabiner \
     cyberduck iterm2 dropbox virtualbox vagrant mysqlworkbench google-japanese-ime github \
-    macvim-kaoriya cocoarestclient adobe-air cacoo-ninja evernote owncloud mendeley-desktop mactex"
+    macvim-kaoriya cocoarestclient adobe-air cacoo-ninja evernote owncloud mendeley-desktop \
+    day-o onyx mactex"
 echo "Installing Cask packages... "
 brew cask install $CASKS
 printf "Done!\n\n"
