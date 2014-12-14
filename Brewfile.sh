@@ -56,6 +56,10 @@ echo "Installing Basic packages... "
 brew install $BASICS
 printf "Done!\n\n"
 
+## PHP
+PHP="php56 composer"
+brew install $PHP
+
 ## Ruby
 RUBY="ruby-build rbenv"
 RUBY_VERSION="2.1.5"
