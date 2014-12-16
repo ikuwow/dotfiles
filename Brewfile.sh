@@ -105,6 +105,8 @@ brew cask install $CASKS
 printf "Done!\n\n"
 
 # Vagrant Plugins
+echo "Updating existing vagrant plugins..."
+vagrant plugin update
 echo "Installing vagrant plugins..."
 VAGRANT="vagrant-omnibus vagrant-vbguest vagrant-cachier sahara vagrant-vbox-snapshot"
 for pkg in $VAGRANT; do
