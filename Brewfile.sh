@@ -79,7 +79,7 @@ printf "Done!\n\n"
 
 
 ## Ruby Gems
-GEMS="bundler chef knife-solo berkshelf kitchen-vagrant test-kitchen knife-solo_data_bag cocoapods"
+GEMS="bundler chef chef-zero knife-solo berkshelf kitchen-vagrant test-kitchen knife-solo_data_bag cocoapods tw"
 echo "Installing gem packages... "
 for pkg in $GEMS; do
     gem list | grep $pkg > /dev/null
