@@ -81,8 +81,9 @@ printf "Done!\n\n"
 ## Ruby Gems
 GEMS="bundler chef chef-zero knife-solo berkshelf kitchen-vagrant test-kitchen knife-solo_data_bag cocoapods tw"
 echo "Installing gem packages... "
+GEMLIST=`gem list`
 for pkg in $GEMS; do
-    gem list | grep $pkg > /dev/null
+    echo $GEMLIST | grep $pkg > /dev/null
     ec=$?
     if [ ! $ec -eq 0 ]; then
         echo $pkg
@@ -96,10 +97,10 @@ printf "Done!\n\n"
 gem update
 
 # Brew Cask
-CASKS="bettertouchtool menumeters vlc rescuetime firefox google-chrome karabiner \
+CASKS="bettertouchtool menumeters vlc rescuetime firefox google-chrome karabiner bartender \
     cyberduck iterm2 dropbox virtualbox vagrant mysqlworkbench google-japanese-ime github \
     macvim-kaoriya cocoarestclient adobe-air cacoo-ninja evernote owncloud mendeley-desktop \
-    day-o onyx mactex"
+    day-o onyx mactex "
 echo "Installing Cask packages... "
 brew cask install $CASKS
 printf "Done!\n\n"
