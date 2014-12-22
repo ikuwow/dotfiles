@@ -79,20 +79,20 @@ printf "Done!\n\n"
 
 
 ## Ruby Gems
-GEMS="bundler chef chef-zero knife-solo berkshelf kitchen-vagrant test-kitchen knife-solo_data_bag cocoapods tw"
-echo "Installing gem packages... "
-GEMLIST=`gem list`
-for pkg in $GEMS; do
-    echo $GEMLIST | grep $pkg > /dev/null
-    ec=$?
-    if [ ! $ec -eq 0 ]; then
-        echo $pkg
-        gem install $pkg
-    else
-        echo "gem package \"${pkg}\" is already installed. (Up to date)"
-    fi
-done
-printf "Done!\n\n"
+# GEMS="bundler chef chef-zero knife-solo berkshelf kitchen-vagrant test-kitchen knife-solo_data_bag cocoapods tw"
+# echo "Installing gem packages... "
+# GEMLIST=`gem list`
+# for pkg in $GEMS; do
+#     echo $GEMLIST | grep $pkg > /dev/null
+#     ec=$?
+#     if [ ! $ec -eq 0 ]; then
+#         echo $pkg
+#         gem install $pkg
+#     else
+#         echo "gem package \"${pkg}\" is already installed. (Up to date)"
+#     fi
+# done
+# printf "Done!\n\n"
 
 gem update
 
