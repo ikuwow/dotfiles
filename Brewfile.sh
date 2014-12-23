@@ -57,7 +57,7 @@ brew install $BASICS
 printf "Done!\n\n"
 
 ## PHP
-PHP="php56 composer"
+PHP="php56 composer php56-mcrypt"
 brew install $PHP
 
 ## Ruby
