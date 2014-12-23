@@ -51,7 +51,7 @@ if [ "${upgrade,,}" = "y" -o "${upgrade,,}" = "yes" ]; then
 fi
 
 ## Basic Components
-BASICS="vim brew-cask gcc pwgen tree git bash trash wget tmux imagemagick ghostscript"
+BASICS="vim brew-cask gcc pwgen tree git bash trash wget tmux imagemagick ghostscript bash-completion"
 echo "Installing Basic packages... "
 brew install $BASICS
 printf "Done!\n\n"
@@ -110,8 +110,9 @@ echo "Updating existing vagrant plugins..."
 vagrant plugin update
 echo "Installing vagrant plugins..."
 VAGRANT="vagrant-omnibus vagrant-vbguest vagrant-cachier sahara vagrant-vbox-snapshot"
+VAGRANT_PLUGIN_LIST=`vagrant plugin list`
 for pkg in $VAGRANT; do
-    vagrant plugin list | grep $pkg > /dev/null
+    echo $VAGRANT_PLUGIN_LIST | grep $pkg > /dev/null
     ec=$?
     if [ ! $ec -eq 0 ]; then
         vagrant plugin install $pkg
