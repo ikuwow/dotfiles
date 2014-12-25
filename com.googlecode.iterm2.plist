@@ -5,7 +5,7 @@
 	<key>AdjustWindowForFontSizeChange</key>
 	<true/>
 	<key>AllowClipboardAccess</key>
-	<false/>
+	<true/>
 	<key>AnimateDimming</key>
 	<false/>
 	<key>AppleAntiAliasingThreshold</key>
@@ -1240,15 +1240,15 @@
 	<key>NSWindow Frame NSFontPanel</key>
 	<string>1321 207 502 308 0 0 1920 1057 </string>
 	<key>NSWindow Frame Preferences</key>
-	<string>690 296 924 485 0 0 1920 1057 </string>
+	<string>479 562 924 485 0 0 2560 1417 </string>
 	<key>NSWindow Frame UKCrashReporter</key>
-	<string>155 473 592 584 0 0 1920 1057 </string>
+	<string>230 833 592 584 0 0 2560 1417 </string>
 	<key>NSWindow Frame iTerm Window 0</key>
-	<string>79 96 570 864 0 0 1920 1057 </string>
+	<string>1556 112 885 1136 0 0 2560 1417 </string>
 	<key>NSWindow Frame iTerm Window 1</key>
-	<string>833 6 661 1051 0 0 1920 1057 </string>
+	<string>1679 211 682 1068 0 0 2560 1417 </string>
 	<key>NSWindow Frame iTerm Window 2</key>
-	<string>631 102 570 864 0 0 1920 1058 </string>
+	<string>631 101 570 864 0 0 1920 1057 </string>
 	<key>New Bookmarks</key>
 	<array>
 		<dict>
@@ -2811,7 +2811,7 @@
 	<key>SUHasLaunchedBefore</key>
 	<true/>
 	<key>SULastCheckTime</key>
-	<date>2014-11-02T02:08:00Z</date>
+	<date>2014-12-25T07:05:25Z</date>
 	<key>SavePasteHistory</key>
 	<false/>
 	<key>Secure Input</key>
@@ -2825,7 +2825,7 @@
 	<key>SmartPlacement</key>
 	<false/>
 	<key>SplitPaneDimmingAmount</key>
-	<real>0.40000000596046448</real>
+	<real>0.25308242440223694</real>
 	<key>SwitchTabModifier</key>
 	<integer>4</integer>
 	<key>SwitchWindowModifier</key>
@@ -2869,7 +2869,7 @@
 	<key>TripleClickSelectsFullWrappedLines</key>
 	<false/>
 	<key>UKCrashReporterLastCrashReportDate</key>
-	<real>1407550208</real>
+	<real>1418162432</real>
 	<key>URLHandlers</key>
 	<dict/>
 	<key>URLHandlersByGuid</key>
@@ -2895,6 +2895,6 @@
 	<key>findRegex_iTerm</key>
 	<false/>
 	<key>iTerm Version</key>
-	<string>2.0.0.20141022</string>
+	<string>2.0.0.20141103</string>
 </dict>
 </plist>
