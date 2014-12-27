@@ -16,3 +16,7 @@ ln -is ~/dotfiles/.bashrc ~/.bashrc
 ln -is ~/dotfiles/.gitignore ~/.gitignore
 ln -is ~/dotfiles/.gitconfig ~/.gitconfig
 ln -ins ~/dotfiles/bin/ ~/bin
+
+if [ -d ~/.matlab/ ]; then
+    ln -is ~/dotfiles/mexopts.sh ~/.matlab/R2014b/mexopts.sh
+fi

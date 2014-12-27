@@ -131,9 +131,9 @@ echo "Error: Did not imbed 'options.sh' code"; exit 1 #imbed options.sh maci 12
 ## workaround clang defect temporarily use line below           SDKROOT='/Developer/SDKs/MacOSX10.9.sdk'
 # compute SDK root on the fly
 # target 10.9 
-            MW_SDKROOT_TMP="find `xcode-select -print-path` -name MacOSX10.9.sdk"
+            MW_SDKROOT_TMP="find `xcode-select -print-path` -name MacOSX10.10.sdk"
 			MW_SDKROOT=`$MW_SDKROOT_TMP`
-            MACOSX_DEPLOYMENT_TARGET='10.9'
+            MACOSX_DEPLOYMENT_TARGET='10.10'
             ARCHS='x86_64'
             CFLAGS="-fno-common -arch $ARCHS -isysroot $MW_SDKROOT -mmacosx-version-min=$MACOSX_DEPLOYMENT_TARGET"
             CFLAGS="$CFLAGS  -fexceptions"
