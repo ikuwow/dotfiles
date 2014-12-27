@@ -51,7 +51,7 @@ if [ "${upgrade,,}" = "y" -o "${upgrade,,}" = "yes" ]; then
 fi
 
 ## Basic Components
-BASICS="vim brew-cask gcc pwgen tree git bash trash wget tmux imagemagick ghostscript bash-completion"
+BASICS="vim brew-cask cloog gcc pwgen tree git bash trash wget tmux imagemagick ghostscript bash-completion"
 echo "Installing Basic packages... "
 brew install $BASICS
 printf "Done!\n\n"
