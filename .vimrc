@@ -90,6 +90,7 @@ NeoBundle 'mhinz/vim-startify' " startpage of vim
 NeoBundle 'terryma/vim-multiple-cursors'
 NeoBundle 'vim-scripts/taglist.vim'
 " NeoBundle 'AndrewRadev/switch.vim' " toggle some string (true<=>false etc.)
+NeoBundle 'tomtom/tcomment_vim'
 
 call neobundle#end()
 filetype plugin indent on
