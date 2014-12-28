@@ -100,7 +100,7 @@ gem update
 CASKS="xquartz bettertouchtool menumeters vlc rescuetime firefox google-chrome karabiner bartender \
     cyberduck iterm2 dropbox virtualbox vagrant mysqlworkbench google-japanese-ime github \
     macvim-kaoriya cocoarestclient adobe-air cacoo-ninja evernote owncloud mendeley-desktop \
-    day-o onyx mactex clamxav"
+    day-o onyx mactex clamxav heroku-toolbelt"
 echo "Installing Cask packages... "
 brew cask install $CASKS
 printf "Done!\n\n"
