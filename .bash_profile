@@ -1,6 +1,6 @@
 
 # Environment Variables
-export PATH=~/bin:/usr/local/Cellar/php53/5.3.28/bin:/usr/local/bin:/usr/local/sbin:$PATH
+export PATH=~/bin:/usr/local/heroku/bin:/usr/local/bin:/usr/local/sbin:$PATH
 export LANG=ja_JP.UTF-8
 export LESSCHARSET=utf-8
 export EDITOR=vim
