@@ -1244,11 +1244,11 @@
 	<key>NSWindow Frame UKCrashReporter</key>
 	<string>230 833 592 584 0 0 2560 1417 </string>
 	<key>NSWindow Frame iTerm Window 0</key>
-	<string>1556 112 885 1136 0 0 2560 1417 </string>
+	<string>3856 450 570 864 2560 360 1920 1057 </string>
 	<key>NSWindow Frame iTerm Window 1</key>
-	<string>1679 211 682 1068 0 0 2560 1417 </string>
+	<string>1847 307 570 864 0 0 2560 1417 </string>
 	<key>NSWindow Frame iTerm Window 2</key>
-	<string>631 101 570 864 0 0 1920 1057 </string>
+	<string>930 289 570 864 0 0 2560 1417 </string>
 	<key>New Bookmarks</key>
 	<array>
 		<dict>
@@ -2811,7 +2811,7 @@
 	<key>SUHasLaunchedBefore</key>
 	<true/>
 	<key>SULastCheckTime</key>
-	<date>2014-12-25T07:05:25Z</date>
+	<date>2014-12-28T01:25:47Z</date>
 	<key>SavePasteHistory</key>
 	<false/>
 	<key>Secure Input</key>
@@ -2825,7 +2825,7 @@
 	<key>SmartPlacement</key>
 	<false/>
 	<key>SplitPaneDimmingAmount</key>
-	<real>0.25308242440223694</real>
+	<real>0.10000000149011612</real>
 	<key>SwitchTabModifier</key>
 	<integer>4</integer>
 	<key>SwitchWindowModifier</key>
