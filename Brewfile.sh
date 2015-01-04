@@ -14,15 +14,28 @@ if [ ! `which brew` ]; then
     brew tap caskroom/versions
     brew install caskroom/cask/brew-cask
     echo "Homebrew installation Done! Please type 'brew doctor'."
-    exit
+    exit 0
 fi
 
 export HOMEBREW_CASK_OPTS="--appdir=/Applications"
 
-## Questions
 update="yes"
 caskupdate="yes"
 upgrade="no"
+
+## Options
+while [ $# -gt 0 ];do
+    case ${1} in
+        --upgrade)
+            upgrade="yes"
+        ;;
+        *)
+            echo "[ERROR] Invalid option '${1}'"
+            exit 1
+        ;;
+    esac
+    shift
+done
 
 # brew update
 if [ ! "${update,,}" = "n" -a ! "${update,,}" = "no" ]; then
