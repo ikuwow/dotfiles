@@ -20,15 +20,9 @@ fi
 export HOMEBREW_CASK_OPTS="--appdir=/Applications"
 
 ## Questions
-echo "Do you 'brew update'? This takes a few minutes. (recommended) [Y/n]"
-echo -n "> "
-read update
-echo "OK, next, do you 'brew cask update'? This takes a few minutes. (recommended) [Y/n]"
-echo -n "> "
-read caskupdate
-echo  "OK, at last, do you 'brew upgrade'? This takes a lot of times. [y/N]"
-echo -n "> "
-read upgrade
+update="yes"
+caskupdate="yes"
+upgrade="no"
 
 # brew update
 if [ ! "${update,,}" = "n" -a ! "${update,,}" = "no" ]; then
