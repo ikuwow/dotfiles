@@ -57,8 +57,8 @@ fi
 
 # brew upgrade
 if [ "${upgrade,,}" = "y" -o "${upgrade,,}" = "yes" ]; then
-    echo -n "Upgrading Homebrew... "
-    brew update
+    echo "Upgrading Homebrew... "
+    brew upgrade
     printf "Done!\n\n"
 fi
 
