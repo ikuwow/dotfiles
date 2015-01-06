@@ -26,12 +26,16 @@ upgrade="no"
 ## Options
 while [ $# -gt 0 ];do
     case ${1} in
-        --upgrade)
-            upgrade="yes"
-        ;;
-        *)
-            echo "[ERROR] Invalid option '${1}'"
-            exit 1
+    --upgrade)
+        upgrade="yes"
+    ;;
+    --noupdate)
+        update="no"
+        caskupdate="no"
+    ;;
+    *)
+        echo "[ERROR] Invalid option '${1}'"
+        exit 1
         ;;
     esac
     shift
