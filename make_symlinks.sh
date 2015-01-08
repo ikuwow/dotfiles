@@ -8,7 +8,7 @@ if [ ! -e ~/dotfiles ]; then
     exit 1
 fi
 
-ln -ins ~/dotfiles/.vim/ ~/.vim
+ln -ins ~/dotfiles/vim/ ~/.vim
 ln -is ~/dotfiles/vimrc ~/.vimrc
 ln -is ~/dotfiles/gvimrc ~/.gvimrc
 ln -is ~/dotfiles/bash_profile ~/.bash_profile
