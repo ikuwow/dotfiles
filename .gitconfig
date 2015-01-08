@@ -11,3 +11,6 @@
 [filter "media"]
 	clean = git-media-clean %f
 	smudge = git-media-smudge %f
+
+# このconfig fileはdotfilesのconfigでもあり、
+# でもあり、PC用グローバル.gitconfigでもある

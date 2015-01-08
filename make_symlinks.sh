@@ -14,7 +14,7 @@ ln -is ~/dotfiles/gvimrc ~/.gvimrc
 ln -is ~/dotfiles/bash_profile ~/.bash_profile
 ln -is ~/dotfiles/bashrc ~/.bashrc
 ln -is ~/dotfiles/.gitignore ~/.gitignore
-ln -is ~/dotfiles/.gitconfig ~/.gitconfig
+ln -is ~/dotfiles/gitconfig ~/.gitconfig
 ln -ins ~/dotfiles/bin/ ~/bin
 ln -ins ~/dotfiles/karabiner_private.xml ~/Library/Application\ Support/Karabiner/private.xml
 
