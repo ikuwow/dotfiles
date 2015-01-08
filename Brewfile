@@ -12,6 +12,7 @@ if [ ! `which brew` ]; then
     ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
     brew tap caskroom/cask
     brew tap caskroom/versions
+    brew tap homebrew/versions
     brew install caskroom/cask/brew-cask
     echo "Homebrew installation Done! Please type 'brew doctor'."
     exit 0
@@ -112,7 +113,7 @@ gem update
 CASKS="xquartz bettertouchtool menumeters vlc rescuetime firefox google-chrome karabiner bartender \
     cyberduck iterm2 dropbox virtualbox vagrant mysqlworkbench google-japanese-ime github \
     macvim-kaoriya cocoarestclient adobe-air cacoo-ninja evernote owncloud mendeley-desktop \
-    day-o onyx mactex clamxav heroku-toolbelt"
+    day-o onyx mactex heroku-toolbelt"
 echo "Installing Cask packages... "
 brew cask install $CASKS
 printf "Done!\n\n"
