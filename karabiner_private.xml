@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<root>
+    <list>
+        <item>
+            <name>absolute ctrl+j to return</name>
+            <identifier>remap.absolute_ctrl_j_to_return</identifier>
+            <autogen>--KeyToKey-- KeyCode::J, ModifierFlag::CONTROL_L, KeyCode::RETURN</autogen>
+        </item>
+    </list>
+</root>
