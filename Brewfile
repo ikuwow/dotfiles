@@ -69,9 +69,9 @@ if [ "${upgrade,,}" = "y" -o "${upgrade,,}" = "yes" ]; then
 fi
 
 # Brew Cask
-CASKS="iterm2 google-japanese-ime bettertouchtool dropbox menumeters rescuetime karabiner bartender \
-    cyberduck virtualbox vagrant mysqlworkbench github vlc \
-    macvim-kaoriya cocoarestclient adobe-air cacoo-ninja evernote owncloud mendeley-desktop \
+CASKS="dropbox owncloud iterm2 google-japanese-ime bettertouchtool menumeters karabiner evernote \
+    macvim-kaoriya flash cyberduck virtualbox vagrant mysqlworkbench bartender vlc rescuetime \
+    cocoarestclient adobe-air cacoo-ninja mendeley-desktop github \
     day-o onyx mactex heroku-toolbelt xquartz firefox google-chrome"
 echo "Installing Cask packages... "
 brew cask install $CASKS
