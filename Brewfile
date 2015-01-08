@@ -4,7 +4,7 @@
 #
 # Apps to be installed by App Store in advance: 
 # Xcode, LINE, Yorufukurou, The Unaarchiver, Degrees
-# Keynote, Pages, Numbers
+# Keynote, Pages, Numbers, 1password
 # 
 # Safari Extentions
 # Adblock plus, hatena, pocket, Evernote, HideNicoVideoNews
