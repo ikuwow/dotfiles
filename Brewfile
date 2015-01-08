@@ -75,6 +75,7 @@ brew install $BASICS
 printf "Done!\n\n"
 
 ## PHP
+brew tap homebrew/php
 PHP="php56 composer php56-mcrypt"
 brew install $PHP
 
