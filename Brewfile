@@ -2,9 +2,14 @@
 
 # usage: $ bash Brewfile.sh
 #
-# To be installed by App Store in advance
-# Xcode, LINE, Yorufukurou, The Unaarchiver, 1password, Degrees
+# Apps to be installed by App Store in advance: 
+# Xcode, LINE, Yorufukurou, The Unaarchiver, Degrees
 # Keynote, Pages, Numbers
+# 
+# Safari Extentions
+# Adblock plus, hatena, pocket, Evernote, HideNicoVideoNews
+# 
+
 
 # homebrewが入っているか確認
 if [ ! `which brew` ]; then
