@@ -10,8 +10,8 @@ export EDITOR=vim
 eval "$(rbenv init -)"
 
 # git autocomplete
-if [ -f ~/dotfiles/.git-completion.bash ]; then
-    . ~/dotfiles/.git-completion.bash
+if [ -f ~/dotfiles/git-completion.bash ]; then
+    . ~/dotfiles/git-completion.bash
 fi
 
 # load .bashrc
