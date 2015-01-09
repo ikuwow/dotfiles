@@ -25,19 +25,20 @@ fi
 
 export HOMEBREW_CASK_OPTS="--appdir=/Applications"
 
-update="yes"
-caskupdate="yes"
-upgrade="no"
+# Default values
+update=true
+caskupdate=true
+upgrade=false
 
 ## Options
 while [ $# -gt 0 ];do
     case ${1} in
     --upgrade)
-        upgrade="yes"
+        upgrade=true
     ;;
     --noupdate)
-        update="no"
-        caskupdate="no"
+        update=false
+        caskupdate=false
     ;;
     *)
         echo "[ERROR] Invalid option '${1}'"
@@ -48,21 +49,21 @@ while [ $# -gt 0 ];do
 done
 
 # brew update
-if [ ! "${update,,}" = "n" -a ! "${update,,}" = "no" ]; then
+if $update ; then
     echo "Updating Homebrew... "
     brew update
     printf "Done!\n\n"
 fi
 
 # brew cask update
-if [ ! "${caskupdate,,}" = "n" -a ! "${caskupdate,,}" = "no" ]; then
+if $caskupdate; then
     echo "Updating Homebrew Cask... "
     brew cask update
     printf "Done!\n\n"
 fi
 
 # brew upgrade
-if [ "${upgrade,,}" = "y" -o "${upgrade,,}" = "yes" ]; then
+if $upgrade; then
     echo "Upgrading Homebrew... "
     brew upgrade
     printf "Done!\n\n"
@@ -84,9 +85,11 @@ brew install $BASICS
 printf "Done!\n\n"
 
 ## PHP
-brew tap homebrew/php
+echo "Installing PHPs...."
+brew tap josegonzalez/php
 PHP="php56 composer php56-mcrypt"
 brew install $PHP
+printf "Done!\n\n"
 
 ## Ruby
 RUBY="ruby-build rbenv"
