@@ -85,9 +85,11 @@ brew install $BASICS
 printf "Done!\n\n"
 
 ## PHP
-brew tap homebrew/php
+echo "Installing PHPs...."
+brew tap josegonzalez/php
 PHP="php56 composer php56-mcrypt"
 brew install $PHP
+printf "Done!\n\n"
 
 ## Ruby
 RUBY="ruby-build rbenv"
