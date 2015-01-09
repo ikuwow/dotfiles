@@ -68,8 +68,17 @@ if [ "${upgrade,,}" = "y" -o "${upgrade,,}" = "yes" ]; then
     printf "Done!\n\n"
 fi
 
+# Brew Cask
+CASKS="iterm2 google-japanese-ime bettertouchtool dropbox menumeters rescuetime karabiner bartender \
+    cyberduck virtualbox vagrant mysqlworkbench github vlc \
+    macvim-kaoriya cocoarestclient adobe-air cacoo-ninja evernote owncloud mendeley-desktop \
+    day-o onyx mactex heroku-toolbelt xquartz firefox google-chrome"
+echo "Installing Cask packages... "
+brew cask install $CASKS
+printf "Done!\n\n"
+
 ## Basic Components
-BASICS="vim caskroom/cask/brew-cask cloog gcc pwgen tree git bash trash wget tmux imagemagick ghostscript bash-completion"
+BASICS="vim cloog gcc pwgen tree git bash trash wget tmux imagemagick ghostscript bash-completion"
 echo "Installing Basic packages... "
 brew install $BASICS
 printf "Done!\n\n"
@@ -115,14 +124,6 @@ printf "Done!\n\n"
 
 gem update
 
-# Brew Cask
-CASKS="xquartz bettertouchtool menumeters vlc rescuetime firefox google-chrome karabiner bartender \
-    cyberduck iterm2 dropbox virtualbox vagrant mysqlworkbench google-japanese-ime github \
-    macvim-kaoriya cocoarestclient adobe-air cacoo-ninja evernote owncloud mendeley-desktop \
-    day-o onyx mactex heroku-toolbelt"
-echo "Installing Cask packages... "
-brew cask install $CASKS
-printf "Done!\n\n"
 
 # Vagrant Plugins
 echo "Updating existing vagrant plugins..."
