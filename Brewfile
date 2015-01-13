@@ -86,7 +86,7 @@ printf "Done!\n\n"
 
 ## PHP
 echo "Installing PHPs...."
-brew tap josegonzalez/php
+brew tap homebrew/php
 PHP="php56 composer php56-mcrypt"
 brew install $PHP
 printf "Done!\n\n"
