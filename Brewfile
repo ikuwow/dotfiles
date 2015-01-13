@@ -73,7 +73,7 @@ fi
 CASKS="dropbox owncloud iterm2 google-japanese-ime bettertouchtool menumeters karabiner evernote \
     macvim-kaoriya flash cyberduck virtualbox vagrant mysqlworkbench bartender vlc rescuetime \
     cocoarestclient adobe-air cacoo-ninja mendeley-desktop github \
-    day-o onyx mactex heroku-toolbelt xquartz firefox google-chrome simple-comic"
+    day-o onyx mactex heroku-toolbelt xquartz firefox google-chrome simple-comic recordit"
 echo "Installing Cask packages... "
 brew cask install $CASKS
 printf "Done!\n\n"
