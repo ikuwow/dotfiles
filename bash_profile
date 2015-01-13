@@ -5,6 +5,10 @@ export LANG=ja_JP.UTF-8
 export LESSCHARSET=utf-8
 export EDITOR=vim
 
+if [ -f ~/.brew_api_token ];then
+    source ~/.brew_api_token
+fi
+
 # Rubyは全てrbenvで管理する（homebrewでは入れない）
 # export PATH="$HOME/.rbenv/shims:$PATH"
 eval "$(rbenv init -)"
