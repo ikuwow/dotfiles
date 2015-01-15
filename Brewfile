@@ -73,13 +73,13 @@ fi
 CASKS="dropbox owncloud iterm2 google-japanese-ime bettertouchtool menumeters karabiner evernote \
     macvim-kaoriya flash cyberduck virtualbox vagrant mysqlworkbench bartender vlc rescuetime \
     cocoarestclient adobe-air cacoo-ninja mendeley-desktop github \
-    day-o onyx mactex heroku-toolbelt xquartz firefox google-chrome simple-comic"
+    day-o onyx mactex heroku-toolbelt xquartz firefox google-chrome simple-comic goofy"
 echo "Installing Cask packages... "
 brew cask install $CASKS
 printf "Done!\n\n"
 
 ## Basic Components
-BASICS="vim cloog gcc pwgen tree git bash trash wget tmux imagemagick ghostscript bash-completion"
+BASICS="vim cloog gcc pwgen tree git bash trash wget tmux imagemagick ghostscript bash-completion watch"
 echo "Installing Basic packages... "
 brew install $BASICS
 printf "Done!\n\n"
