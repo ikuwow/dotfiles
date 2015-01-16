@@ -27,6 +27,8 @@ export HOMEBREW_CASK_OPTS="--appdir=/Applications"
 
 # Default values
 update=true
+gem_update=true
+vagrant_plugin_update=true
 caskupdate=true
 upgrade=false
 
@@ -39,6 +41,8 @@ while [ $# -gt 0 ];do
     --noupdate)
         update=false
         caskupdate=false
+        gem_update=false
+        vagrant_plugin_update=false
     ;;
     *)
         echo "[ERROR] Invalid option '${1}'"
@@ -73,13 +77,13 @@ fi
 CASKS="dropbox owncloud iterm2 google-japanese-ime bettertouchtool menumeters karabiner evernote \
     macvim-kaoriya flash cyberduck virtualbox vagrant mysqlworkbench bartender vlc rescuetime \
     cocoarestclient adobe-air cacoo-ninja mendeley-desktop github \
-    day-o onyx mactex heroku-toolbelt xquartz firefox google-chrome simple-comic recordit"
+    day-o onyx mactex heroku-toolbelt xquartz firefox google-chrome simple-comic goofy recordit"
 echo "Installing Cask packages... "
 brew cask install $CASKS
 printf "Done!\n\n"
 
 ## Basic Components
-BASICS="vim cloog gcc pwgen tree git bash trash wget tmux imagemagick ghostscript bash-completion"
+BASICS="vim cloog gcc pwgen tree git bash trash wget tmux imagemagick ghostscript bash-completion watch nkf"
 echo "Installing Basic packages... "
 brew install $BASICS
 printf "Done!\n\n"
@@ -125,12 +129,16 @@ for pkg in $GEMS; do
 done
 printf "Done!\n\n"
 
-gem update
+if $gem_update; then
+    gem update
+fi
 
 
 # Vagrant Plugins
-echo "Updating existing vagrant plugins..."
-vagrant plugin update
+if $vagrant_plugin_update;then
+    echo "Updating existing vagrant plugins..."
+    vagrant plugin update
+fi
 echo "Installing vagrant plugins..."
 VAGRANT="vagrant-omnibus vagrant-vbguest vagrant-cachier sahara vagrant-vbox-snapshot"
 VAGRANT_PLUGIN_LIST=`vagrant plugin list`
