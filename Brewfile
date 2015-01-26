@@ -75,7 +75,7 @@ fi
 
 # Brew Cask
 CASKS="dropbox owncloud iterm2 google-japanese-ime bettertouchtool menumeters karabiner evernote \
-    macvim-kaoriya flash cyberduck virtualbox vagrant mysqlworkbench bartender vlc rescuetime \
+    macvim-kaoriya flash java cyberduck virtualbox vagrant mysqlworkbench bartender vlc rescuetime \
     cocoarestclient adobe-air cacoo-ninja mendeley-desktop github \
     day-o onyx mactex heroku-toolbelt xquartz firefox google-chrome goofy recordit libreoffice"
 echo "Installing Cask packages... "
