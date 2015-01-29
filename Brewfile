@@ -114,7 +114,7 @@ printf "Done!\n\n"
 
 
 ## Ruby Gems
-GEMS="bundler chef chef-zero knife-solo berkshelf kitchen-vagrant test-kitchen knife-solo_data_bag cocoapods tw"
+GEMS="bundler chef chef-zero knife-solo berkshelf kitchen-vagrant test-kitchen knife-solo_data_bag cocoapods tw serverspec"
 echo "Installing gem packages... "
 GEMLIST=`gem list`
 for pkg in $GEMS; do
