@@ -11,6 +11,8 @@ if [ -f `brew --prefix`/etc/bash_completion ]; then
     . `brew --prefix`/etc/bash_completion
 fi
 
+complete -C aws_completer aws
+
 alias ll='ls -l'
 alias la='ls -A'
 alias rm='rm -i'

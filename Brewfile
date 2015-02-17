@@ -83,7 +83,7 @@ brew cask install $CASKS
 printf "Done!\n\n"
 
 ## Basic Components
-BASICS="vim cloog gcc pwgen tree git bash trash wget tmux imagemagick ghostscript bash-completion watch nkf nmap"
+BASICS="vim cloog gcc pwgen tree git bash trash wget tmux imagemagick ghostscript bash-completion watch nkf nmap awscli"
 echo "Installing Basic packages... "
 brew install $BASICS
 printf "Done!\n\n"
