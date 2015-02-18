@@ -83,7 +83,7 @@ brew cask install $CASKS
 printf "Done!\n\n"
 
 ## Basic Components
-BASICS="vim cloog gcc pwgen tree git bash trash wget tmux imagemagick ghostscript bash-completion watch nkf nmap awscli ansible"
+BASICS="vim cloog gcc pwgen tree git bash trash wget tmux imagemagick ghostscript bash-completion watch nkf nmap awscli ansible postgresql"
 echo "Installing Basic packages... "
 brew install $BASICS
 printf "Done!\n\n"
@@ -114,7 +114,7 @@ printf "Done!\n\n"
 
 
 ## Ruby Gems
-GEMS="bundler chef chef-zero knife-solo berkshelf kitchen-vagrant test-kitchen knife-solo_data_bag cocoapods tw serverspec"
+GEMS="rails bundler chef chef-zero knife-solo berkshelf kitchen-vagrant test-kitchen knife-solo_data_bag cocoapods tw serverspec"
 echo "Installing gem packages... "
 GEMLIST=`gem list`
 for pkg in $GEMS; do
