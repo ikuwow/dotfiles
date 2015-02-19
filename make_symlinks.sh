@@ -8,40 +8,6 @@ if [ ! -e ~/dotfiles ]; then
     exit 1
 fi
 
-# TODO: リンク先もチェックする
-
-if [ ! -L ~/.vim ]; then
-    ln -ins ~/dotfiles/vim/ ~/.vim
-fi
-
-if [ ! -L ~/.vimrc ]; then
-    ln -is ~/dotfiles/vimrc ~/.vimrc
-fi
-
-if [ ! -L ~/.gvimrc ]; then
-    ln -is ~/dotfiles/gvimrc ~/.gvimrc
-fi
-
-if [ ! -L ~/.bash_profile ]; then
-    ln -is ~/dotfiles/bash_profile ~/.bash_profile
-fi
-
-if [ ! -L ~/.bashrc ]; then
-    ln -is ~/dotfiles/bashrc ~/.bashrc
-fi
-
-if [ ! -L ~/.gitignore ]; then
-    ln -is ~/dotfiles/gitignore_global ~/.gitignore
-fi
-
-if [ ! -L ~/.gitconfig ]; then
-    ln -is ~/dotfiles/.gitconfig ~/.gitconfig
-fi
-
-if [ ! -L ~/bin ]; then
-    ln -ins ~/dotfiles/bin/ ~/bin
-fi
-
 if [ ! -L ~/Library/Application\ Support/Karabiner/private.xml ]; then
     ln -is ~/dotfiles/karabiner_private.xml ~/Library/Application\ Support/Karabiner/private.xml
 fi
