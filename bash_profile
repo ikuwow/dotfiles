@@ -4,6 +4,7 @@ export PATH=~/bin:/usr/local/heroku/bin:/usr/local/bin:/usr/local/sbin:$PATH
 export LANG=ja_JP.UTF-8
 export LESSCHARSET=utf-8
 export EDITOR=vim
+export HOMEBREW_CASK_OPTS="--appdir=/Applications"
 
 if [ -f ~/.brew_api_token ];then
     source ~/.brew_api_token
