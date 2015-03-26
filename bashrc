@@ -26,15 +26,3 @@ alias ='echo "Stay hungly, stay foolish."'
 alias saying='while (true) do f=$(fortune); echo "$f"; echo ""; say "$f"; sleep 5; done'
 
 
-# Git aliases
-alias gis='git status'
-alias gib='git branch'
-alias gid='git diff'
-alias gia='git add'
-alias gic='git commit'
-alias gich='git checkout'
-alias gil='git log'
-alias gir='git remote'
-alias giru='git remote update'
-alias gibl='git blame'
-alias gigr='git grep'
