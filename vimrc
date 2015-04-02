@@ -73,9 +73,9 @@ if has('vim_starting') " at launching vim only
     set runtimepath+=~/.vim/bundle/neobundle.vim/
 endif
 
-call neobundle#rc(expand('~/.vim/bundle/')) "required
-
+call neobundle#begin(expand('~/.vim/bundle/')) "required
 NeoBundleFetch 'Shougo/neobundle.vim' " Let NeoBundle manage NeoBundle (Required)
+call neobundle#end()
 
 " ~ My Bundles Here... ~
 NeoBundle 'scrooloose/nerdtree' " Filer plugin
