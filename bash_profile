@@ -24,4 +24,4 @@ if [ -e ~/.bashrc ]; then
     source ~/.bashrc
 fi
 
-alias ='echo "Stay hungly, stay foolish."'
+alias ='echo "Stay hungry, stay foolish."'
