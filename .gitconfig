@@ -2,7 +2,7 @@
 	name = Ikuo Degawa
 	email = degawa@ikuwow.com
 [core]
-	excludesfile = /Users/degawaikuo/.gitignore
+	excludesfile = ~/.gitignore
     editor = vim
 [color]
 	ui = true
