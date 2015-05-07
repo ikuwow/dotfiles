@@ -3,4 +3,4 @@
 	url = https://github.com/Shougo/neobundle.vim
 [submodule "XVim"]
 	path = XVim
-	url = git@github.com:XVimProject/XVim.git
+	url = https://github.com/XVimProject/XVim
