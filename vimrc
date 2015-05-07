@@ -36,6 +36,11 @@ set tabstop=4 " spaces number of tab
 highlight ZenkakuSpace ctermbg=red guibg=#ff0000
 au BufWinEnter * let w:m3 = matchadd("ZenkakuSpace", '　')
 " au WinEnter * let w:m3 = matchadd("ZenkakuSpace", '　')
+augroup HighlightTrailingSpaces
+  autocmd!
+  autocmd VimEnter,WinEnter,ColorScheme * highlight TrailingSpaces term=underline guibg=Red ctermbg=Red
+autocmd VimEnter,WinEnter * match TrailingSpaces /\s\+$/
+augroup END
 
 "勝手に改行しないでね
 set tw=0
