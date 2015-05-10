@@ -2,7 +2,7 @@
 " ちゃんとそのうちやるんだぞ。
 " がんばれよ
 
-" Basic Configuration 
+" Basic Configuration
 set nu
 set title " display filename (not Thank you for using Vim.)
 syntax on
@@ -17,7 +17,7 @@ set showcmd " show inputting key
 set clipboard=unnamed " sharing clipboard
 "set linebreak "auto linebreak
 
-    
+
 "tab関係
 set shiftwidth=4
 "softtabstop is equal to tabstop in defalut
@@ -38,7 +38,7 @@ au BufWinEnter * let w:m3 = matchadd("ZenkakuSpace", '　')
 " au WinEnter * let w:m3 = matchadd("ZenkakuSpace", '　')
 augroup HighlightTrailingSpaces
   autocmd!
-  autocmd VimEnter,WinEnter,ColorScheme * highlight TrailingSpaces term=underline guibg=Red ctermbg=Red
+  autocmd VimEnter,WinEnter,ColorScheme * highlight TrailingSpaces term=underline guibg=Yellow ctermbg=Yellow
 autocmd VimEnter,WinEnter * match TrailingSpaces /\s\+$/
 augroup END
 
