@@ -36,3 +36,7 @@ fi
 if [ ! -e ~/.gvimrc ]; then
     ln -is ~/dotfiles/gvimrc ~/.gvimrc
 fi
+
+if [ ! -e ~/.tmux.conf ]; then
+    ln -is ~/dotfiles/tmux.conf ~/.tmux.conf
+fi
