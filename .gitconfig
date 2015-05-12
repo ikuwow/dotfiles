@@ -26,3 +26,5 @@
 
 # このconfig fileはdotfilesのconfigでもあり、
 # でもあり、PC用グローバル.gitconfigでもある
+[credential]
+	helper = cache
