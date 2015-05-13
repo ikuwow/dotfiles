@@ -6,9 +6,15 @@ else
     alias ls='ls -G'
 fi
 
+if [ `uname | grep 'Linux'` ]; then
+    alias ls='ls --color'
+fi
+
 # bash-completion
-if [ -f `brew --prefix`/etc/bash_completion ]; then
-    . `brew --prefix`/etc/bash_completion
+if [ `uname | grep Darwin` ]; then
+    if [ -f `brew --prefix`/etc/bash_completion ]; then
+        . `brew --prefix`/etc/bash_completion
+    fi
 fi
 
 complete -C aws_completer aws

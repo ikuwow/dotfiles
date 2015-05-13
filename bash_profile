@@ -12,7 +12,9 @@ fi
 
 # Rubyは全てrbenvで管理する（homebrewでは入れない）
 # export PATH="$HOME/.rbenv/shims:$PATH"
-eval "$(rbenv init -)"
+if [ `uname | grep Darwin` ]; then
+    eval "$(rbenv init -)"
+fi
 
 # git autocomplete
 if [ -f ~/dotfiles/git-completion.bash ]; then
