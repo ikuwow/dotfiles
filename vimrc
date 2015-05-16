@@ -2,6 +2,8 @@
 " ちゃんとそのうちやるんだぞ。
 " がんばれよ
 
+
+
 " Basic Configuration
 set nu
 set title " display filename (not Thank you for using Vim.)
@@ -48,10 +50,6 @@ set formatoptions=q
 "t:本文を整形、c:コメントを整形
 "o:'o','O'の時にコメント開始文字列を自動で挿入
 "r:挿入モードでenterを打ち込むとコメント開始文字を自動で挿入
-
-
-" don't automatically continue comment line
-autocmd FileType * setlocal formatoptions-=ro
 
 
 "文法チェック
@@ -125,5 +123,6 @@ command! Nt NERDTree
 " NeoBundle Configulation End 
 "========================================
 
-
+" don't automatically continue comment line
+autocmd FileType * setlocal formatoptions-=ro
 
