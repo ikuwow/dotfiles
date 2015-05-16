@@ -26,6 +26,7 @@ alias less='less -iM'
 alias grep='grep --color=auto'
 alias bye='exit'
 alias hosts='sudo vim /etc/hosts'
+alias teratail='open https://teratail.com'
 
 alias be='bundle exec'
 alias vag='vagrant'
