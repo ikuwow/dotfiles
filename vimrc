@@ -94,6 +94,7 @@ NeoBundle 'terryma/vim-multiple-cursors'
 " NeoBundle 'vim-scripts/taglist.vim'
 " NeoBundle 'AndrewRadev/switch.vim' " toggle some string (true<=>false etc.)
 NeoBundle 'tomtom/tcomment_vim'
+NeoBundle 'taglist.vim'
 
 call neobundle#end()
 filetype plugin indent on
@@ -115,12 +116,12 @@ augroup PrevimSettings
 augroup END
 
 " launch NERDTree automatically at opening files
-" autocmd VimEnter * NERDTree 
+" autocmd VimEnter * NERDTree
 
 " alias for each plugin
 command! Nt NERDTree
 
-" NeoBundle Configulation End 
+" NeoBundle Configulation End
 "========================================
 
 " don't automatically continue comment line
