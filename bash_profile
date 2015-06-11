@@ -5,6 +5,8 @@ export LANG=ja_JP.UTF-8
 export LESSCHARSET=utf-8
 export EDITOR=vim
 export HOMEBREW_CASK_OPTS="--appdir=/Applications"
+export HISTTIMEFORMAT='%y-%m-%d %H:%M:%S '
+export HISTSIZE=3000
 
 if [ -f ~/.brew_api_token ];then
     source ~/.brew_api_token
