@@ -35,3 +35,4 @@ alias ='echo "Stay hungly, stay foolish."'
 alias saying='while (true) do f=$(fortune); echo "$f"; echo ""; say "$f"; sleep 5; done'
 
 
+alias ssh=~/bin/ssh-host-color

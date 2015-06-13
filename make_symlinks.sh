@@ -40,3 +40,7 @@ fi
 if [ ! -e ~/.tmux.conf ]; then
     ln -is ~/dotfiles/tmux.conf ~/.tmux.conf
 fi
+
+if [ ! -d ~/bin ]; then
+    ln -is ~/dotfiles/bin ~/bin
+fi
