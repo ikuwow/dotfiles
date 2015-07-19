@@ -95,6 +95,7 @@ NeoBundle 'terryma/vim-multiple-cursors'
 " NeoBundle 'AndrewRadev/switch.vim' " toggle some string (true<=>false etc.)
 NeoBundle 'tomtom/tcomment_vim'
 NeoBundle 'taglist.vim'
+NeoBundle 'kchmck/vim-coffee-script'
 
 call neobundle#end()
 filetype plugin indent on
