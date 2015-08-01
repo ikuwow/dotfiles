@@ -44,3 +44,7 @@ fi
 if [ ! -d ~/bin ]; then
     ln -is ~/dotfiles/bin ~/bin
 fi
+
+if [ ! -e ~/.gitconfig ]; then
+    ln -is ~/dotfiles/.gitconfig ~/.gitconfig
+fi
