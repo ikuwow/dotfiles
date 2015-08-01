@@ -48,3 +48,7 @@ fi
 if [ ! -e ~/.gitconfig ]; then
     ln -is ~/dotfiles/.gitconfig ~/.gitconfig
 fi
+
+if [ ! -e ~/.gitignore ]; then
+    ln -is ~/dotfiles/gitignore_global ~/.gitignore
+fi
