@@ -17,6 +17,7 @@ EOF
 
 case $@ in
     "prod" ) set_term_bgcolor 40 0 0;;
+    "db" ) set_term_bgcolor 40 0 0;;
 esac
 
 ssh $@
