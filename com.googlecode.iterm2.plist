@@ -2794,18 +2794,16 @@
 	<integer>8</integer>
 	<key>RightOption</key>
 	<integer>3</integer>
-	<key>SUAutomaticallyUpdate</key>
-	<true/>
 	<key>SUEnableAutomaticChecks</key>
-	<false/>
+	<true/>
 	<key>SUFeedURL</key>
 	<string>http://iterm2.com/appcasts/final.xml</string>
 	<key>SUHasLaunchedBefore</key>
 	<true/>
 	<key>SULastCheckTime</key>
-	<date>2015-02-25T19:40:41Z</date>
+	<date>2015-08-27T00:59:24Z</date>
 	<key>SUSkippedVersion</key>
-	<string>2.0.0.20141103</string>
+	<string>2.1.1</string>
 	<key>SavePasteHistory</key>
 	<false/>
 	<key>Secure Input</key>
@@ -2813,6 +2811,8 @@
 	<key>Show Toolbelt</key>
 	<false/>
 	<key>ShowBookmarkName</key>
+	<false/>
+	<key>ShowFullScreenTabBar</key>
 	<false/>
 	<key>ShowPaneTitles</key>
 	<true/>
@@ -2863,7 +2863,7 @@
 	<key>TripleClickSelectsFullWrappedLines</key>
 	<false/>
 	<key>UKCrashReporterLastCrashReportDate</key>
-	<real>1421927424</real>
+	<real>1438925952</real>
 	<key>URLHandlers</key>
 	<dict/>
 	<key>URLHandlersByGuid</key>
@@ -2889,6 +2889,6 @@
 	<key>findRegex_iTerm</key>
 	<false/>
 	<key>iTerm Version</key>
-	<string>2.0</string>
+	<string>2.1.1</string>
 </dict>
 </plist>
