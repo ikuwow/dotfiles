@@ -3,7 +3,6 @@
 " がんばれよ
 
 
-
 " Basic Configuration
 set nu
 set title " display filename (not Thank you for using Vim.)
@@ -96,6 +95,7 @@ NeoBundle 'terryma/vim-multiple-cursors'
 NeoBundle 'tomtom/tcomment_vim'
 NeoBundle 'taglist.vim'
 NeoBundle 'kchmck/vim-coffee-script'
+NeoBundle 'wakatime/vim-wakatime'
 
 call neobundle#end()
 filetype plugin indent on
