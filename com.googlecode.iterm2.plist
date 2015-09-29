@@ -1207,7 +1207,7 @@
 	<key>MaxVertically</key>
 	<true/>
 	<key>NSNavLastRootDirectory</key>
-	<string>~/dotfiles</string>
+	<string>~</string>
 	<key>NSQuotedKeystrokeBinding</key>
 	<string></string>
 	<key>NSRepeatCountBinding</key>
@@ -1232,15 +1232,17 @@
 	<key>NSTableView Sort Ordering KeyBingingTable</key>
 	<array/>
 	<key>NSWindow Frame Preferences</key>
-	<string>954 362 924 485 0 0 2560 1417 </string>
+	<string>233 202 924 485 0 0 1280 777 </string>
 	<key>NSWindow Frame UKCrashReporter</key>
-	<string>1264 655 592 584 0 0 2560 1417 </string>
+	<string>83 184 592 584 0 0 1280 777 </string>
 	<key>NSWindow Frame iTerm Window 0</key>
-	<string>0 4 570 1413 0 0 2560 1417 </string>
+	<string>-570 4 570 773 0 0 1280 777 </string>
 	<key>NSWindow Frame iTerm Window 1</key>
-	<string>65 194 815 1102 0 0 2560 1417 </string>
+	<string>746 806 864 1051 -309 800 1920 1057 </string>
 	<key>NSWindow Frame iTerm Window 2</key>
-	<string>1724 149 780 1136 0 0 2560 1417 </string>
+	<string>935 923 633 864 -309 800 1920 1057 </string>
+	<key>NSWindow Frame iTerm Window 3</key>
+	<string>708 15 570 762 0 0 1280 777 </string>
 	<key>New Bookmarks</key>
 	<array>
 		<dict>
@@ -1556,7 +1558,7 @@
 			<key>Minimum Contrast</key>
 			<real>0.43559896945953369</real>
 			<key>Mouse Reporting</key>
-			<true/>
+			<false/>
 			<key>Name</key>
 			<string>Gray</string>
 			<key>Non Ascii Font</key>
@@ -2731,8 +2733,10 @@
 			<string>/Users/degawaikuo</string>
 		</dict>
 	</array>
-	<key>NoSyncNeverRemindPrefsChangesCopy</key>
-	<true/>
+	<key>NoSyncTimeOfLastPromo</key>
+	<real>455015301.08451802</real>
+	<key>NoSyncTimeOfLastPromoDownload</key>
+	<real>465217250.61360598</real>
 	<key>OnlyWhenMoreTabs</key>
 	<false/>
 	<key>OpenArrangementAtStartup</key>
@@ -2781,7 +2785,7 @@
 		</dict>
 	</dict>
 	<key>PrefsCustomFolder</key>
-	<string>/Users/degawaikuo/dotfiles</string>
+	<string>/Users/ikuo.degawa/dotfiles</string>
 	<key>PromptOnClose</key>
 	<true/>
 	<key>PromptOnQuit</key>
@@ -2801,7 +2805,7 @@
 	<key>SUHasLaunchedBefore</key>
 	<true/>
 	<key>SULastCheckTime</key>
-	<date>2015-08-27T00:59:24Z</date>
+	<date>2015-09-29T10:56:14Z</date>
 	<key>SUSkippedVersion</key>
 	<string>2.1.1</string>
 	<key>SavePasteHistory</key>
