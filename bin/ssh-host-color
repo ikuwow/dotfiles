@@ -18,6 +18,7 @@ EOF
 case $@ in
     "prod" ) set_term_bgcolor 40 0 0;;
     "db" ) set_term_bgcolor 40 0 0;;
+    "cdn" ) set_term_bgcolor 40 0 0;;
     "macmini" ) set_term_bgcolor 0 30 0;;
 esac
 
