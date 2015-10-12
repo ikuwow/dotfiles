@@ -16,10 +16,9 @@ if [ -f ~/.brew_api_token ];then
     source ~/.brew_api_token
 fi
 
-# Rubyは全てrbenvで管理する（homebrewでは入れない）
-# export PATH="$HOME/.rbenv/shims:$PATH"
 if [ `uname | grep Darwin` ]; then
-    eval "$(rbenv init -)"
+    eval "$(rbenv init - --no-rehash)"
+    # adding --no-rehash makes this faster
 fi
 
 # git autocomplete

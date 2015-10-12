@@ -10,12 +10,15 @@ if [ `uname | grep 'Linux'` ]; then
     alias ls='ls --color'
 fi
 
+## It's slow, so removed temporary
 # bash-completion
-if [ `uname | grep Darwin` ]; then
-    if [ -f `brew --prefix`/etc/bash_completion ]; then
-        . `brew --prefix`/etc/bash_completion
-    fi
-fi
+# if [ `uname | grep Darwin` ]; then
+#     BREW_PREFIX=`brew --prefix`
+#     if [ -f ${BREW_PREFIX}/etc/bash_completion ]; then
+#         . ${BREW_PREFIX}/etc/bash_completion
+#         # TODO: it's slow.
+#     fi
+# fi
 
 complete -C aws_completer aws
 
