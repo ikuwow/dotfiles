@@ -4,3 +4,6 @@
 [submodule "XVim"]
 	path = XVim
 	url = https://github.com/XVimProject/XVim
+[submodule "submodules/trash"]
+	path = submodules/trash
+	url = git@github.com:ikuwow/trash.git
