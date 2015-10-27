@@ -1,9 +1,6 @@
 [submodule ".vim/bundle/neobundle.vim"]
 	path = vim/bundle/neobundle.vim
 	url = https://github.com/Shougo/neobundle.vim
-[submodule "XVim"]
-	path = XVim
-	url = https://github.com/XVimProject/XVim
 [submodule "submodules/trash"]
 	path = submodules/trash
 	url = git@github.com:ikuwow/trash.git
