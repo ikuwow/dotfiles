@@ -52,3 +52,8 @@ fi
 if [ ! -e ~/.gitignore ]; then
     ln -is ~/dotfiles/gitignore_global ~/.gitignore
 fi
+
+if [ ! -e ~/bin/trash ]; then
+    ln -is ~/dotfiles/submodules/trash/trash ~/bin/trash
+fi
+

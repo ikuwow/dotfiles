@@ -4,6 +4,8 @@
 *.swo
 /.vim/.netrwhist
 /bin/mlint
+/bin/trash
+
 
 # bundles
 /vim/bundle/*
