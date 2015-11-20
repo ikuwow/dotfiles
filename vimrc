@@ -95,7 +95,10 @@ NeoBundle 'terryma/vim-multiple-cursors'
 NeoBundle 'tomtom/tcomment_vim'
 NeoBundle 'taglist.vim'
 NeoBundle 'kchmck/vim-coffee-script'
-NeoBundle 'wakatime/vim-wakatime'
+let hostname = substitute(system('hostname'), '\n', '', '')
+if hostname != 'ikuwow.local'
+    NeoBundle 'wakatime/vim-wakatime'
+endif
 
 call neobundle#end()
 filetype plugin indent on
