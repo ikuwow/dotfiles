@@ -1,14 +1,16 @@
 
 # ls color options
-if [ `uname | grep 'CYGWIN'` ]; then
-    alias ls='ls --color'
-else
-    alias ls='ls -G'
-fi
-
-if [ `uname | grep 'Linux'` ]; then
-    alias ls='ls --color'
-fi
+case `uname` in
+    "CYGWIN" )
+        alias ls='ls --color';;
+    "Linux" )
+        alias ls='ls --color';;
+    "Darwin" )
+        alias ls='ls -G'
+        alias postgres='postgres -D /usr/local/var/postgres';;
+    * )
+        # do nothing
+esac
 
 ## It's slow, so removed temporary
 # bash-completion
