@@ -17,8 +17,7 @@ if [ -f ~/.brew_api_token ];then
 fi
 
 if [ `uname | grep Darwin` ]; then
-    eval "$(rbenv init - --no-rehash)"
-    # adding --no-rehash makes this faster
+    eval "$(rbenv init - --no-rehash)" # adding --no-rehash makes this faster
 fi
 
 # git autocomplete
@@ -31,4 +30,3 @@ if [ -e ~/.bashrc ]; then
     source ~/.bashrc
 fi
 
-alias ='echo "Stay hungry, stay foolish."'
