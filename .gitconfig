@@ -4,6 +4,7 @@
 [core]
 	excludesfile = ~/.gitignore
     editor = vim
+	quotepath = false
 [color]
 	ui = true
 [grep]
