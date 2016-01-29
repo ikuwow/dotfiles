@@ -133,3 +133,6 @@ autocmd FileType * setlocal formatoptions-=ro
 
 let g:syntastic_eruby_ruby_quiet_messages =
     \ {'regex': 'possibly useless use of a variable in void context'}
+
+au BufRead,BufNewFile *.html set shiftwidth=2 tabstop=2
+au BufRead,BufNewFile *.ctp set shiftwidth=2 tabstop=2
