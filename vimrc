@@ -133,3 +133,8 @@ autocmd FileType * setlocal formatoptions-=ro
 
 let g:syntastic_eruby_ruby_quiet_messages =
     \ {'regex': 'possibly useless use of a variable in void context'}
+
+" for AngularJS
+let g:syntastic_html_tidy_ignore_errors=[
+    \'proprietary attribute "ng-'
+\]
