@@ -8,6 +8,7 @@ export HOMEBREW_CASK_OPTS="--appdir=/Applications"
 export HISTTIMEFORMAT='%y-%m-%d %H:%M:%S '
 export HISTSIZE=3000
 export ANSIBLE_COW_SELECTION=random
+export PGDATA=/usr/local/var/postgres
 
 if [ `hostname` = 'teratail.com' ];then
     export PS1="\e[1;31m${PS1}\e[m"
