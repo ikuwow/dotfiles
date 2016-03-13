@@ -64,60 +64,63 @@ inoremap {<Enter> {}<Left><CR><ESC><S-o>
 "=============================================
 "  NeoBundle Configulation Section (2014/7/12)
 "=============================================
+if isdirectory(expand("~/.vim/bundle/neobundle.vim/"))
+    " if neobundle exists:
 
-if has('vim_starting') " at launching vim only
-    set runtimepath+=~/.vim/bundle/neobundle.vim/
+    if has('vim_starting') " at launching vim only
+        set runtimepath+=~/.vim/bundle/neobundle.vim/
+    endif
+
+    call neobundle#begin(expand('~/.vim/bundle/')) "required
+    NeoBundleFetch 'Shougo/neobundle.vim' " Let NeoBundle manage NeoBundle (Required)
+    call neobundle#end()
+
+    " ~ My Bundles Here... ~
+    NeoBundle 'scrooloose/nerdtree' " Filer plugin
+    NeoBundle 'tpope/vim-fugitive' "git commands on vim
+    NeoBundle 'scrooloose/syntastic.git' " syntax checker
+    NeoBundle 'toyamarinyon/vim-swift' " swift support
+    " NeoBundle 'plasticboy/vim-markdown'
+    NeoBundle 'tyru/open-browser.vim'
+    NeoBundle 'kannokanno/previm' " preview markdown
+    NeoBundle 'thinca/vim-quickrun' " enable trying
+    NeoBundle 'mhinz/vim-startify' " startpage of vim
+    NeoBundle 'terryma/vim-multiple-cursors'
+    " NeoBundle 'vim-scripts/taglist.vim'
+    " NeoBundle 'AndrewRadev/switch.vim' " toggle some string (true<=>false etc.)
+    NeoBundle 'tomtom/tcomment_vim'
+    NeoBundle 'taglist.vim'
+    NeoBundle 'kchmck/vim-coffee-script'
+    let hostname = substitute(system('hostname'), '\n', '', '')
+    if hostname != 'ikuwow.local'
+        NeoBundle 'wakatime/vim-wakatime'
+    endif
+
+    call neobundle#end()
+    filetype plugin indent on
+
+    " phpmdやphpcsはキツすぎるので使わない
+    let g:syntastic_php_checkers = ['php']
+
+    " If there are uninstalled bundles found on startup,
+    " this will conveniently prompt you to install them.
+    NeoBundleCheck
+
+    " configuration for each plugin
+    let NERDTreeShowHidden = 1 " Display hidden files and folders on NERDTree
+    " let g:startify_custom_header = "Done is better than perfect." " startify custom header
+    " .mdファイルをmarkdownとして認識させる
+    augroup PrevimSettings
+        autocmd!
+        autocmd BufNewFile,BufRead *.{md,mdwn,mkd,mkdn,mark*} set filetype=markdown
+    augroup END
+
+    " launch NERDTree automatically at opening files
+    " autocmd VimEnter * NERDTree
+
+    " alias for each plugin
+    command! Nt NERDTree
 endif
-
-call neobundle#begin(expand('~/.vim/bundle/')) "required
-NeoBundleFetch 'Shougo/neobundle.vim' " Let NeoBundle manage NeoBundle (Required)
-call neobundle#end()
-
-" ~ My Bundles Here... ~
-NeoBundle 'scrooloose/nerdtree' " Filer plugin
-NeoBundle 'tpope/vim-fugitive' "git commands on vim
-NeoBundle 'scrooloose/syntastic.git' " syntax checker
-NeoBundle 'toyamarinyon/vim-swift' " swift support
-" NeoBundle 'plasticboy/vim-markdown'
-NeoBundle 'tyru/open-browser.vim'
-NeoBundle 'kannokanno/previm' " preview markdown
-NeoBundle 'thinca/vim-quickrun' " enable trying
-NeoBundle 'mhinz/vim-startify' " startpage of vim
-NeoBundle 'terryma/vim-multiple-cursors'
-" NeoBundle 'vim-scripts/taglist.vim'
-" NeoBundle 'AndrewRadev/switch.vim' " toggle some string (true<=>false etc.)
-NeoBundle 'tomtom/tcomment_vim'
-NeoBundle 'taglist.vim'
-NeoBundle 'kchmck/vim-coffee-script'
-let hostname = substitute(system('hostname'), '\n', '', '')
-if hostname != 'ikuwow.local'
-    NeoBundle 'wakatime/vim-wakatime'
-endif
-
-call neobundle#end()
-filetype plugin indent on
-
-" phpmdやphpcsはキツすぎるので使わない
-let g:syntastic_php_checkers = ['php']
-
-" If there are uninstalled bundles found on startup,
-" this will conveniently prompt you to install them.
-NeoBundleCheck
-
-" configuration for each plugin
-let NERDTreeShowHidden = 1 " Display hidden files and folders on NERDTree
-" let g:startify_custom_header = "Done is better than perfect." " startify custom header
-" .mdファイルをmarkdownとして認識させる
-augroup PrevimSettings
-    autocmd!
-    autocmd BufNewFile,BufRead *.{md,mdwn,mkd,mkdn,mark*} set filetype=markdown
-augroup END
-
-" launch NERDTree automatically at opening files
-" autocmd VimEnter * NERDTree
-
-" alias for each plugin
-command! Nt NERDTree
 
 " NeoBundle Configulation End
 "========================================
