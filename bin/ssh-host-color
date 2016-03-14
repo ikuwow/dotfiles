@@ -23,4 +23,4 @@ case $@ in
     "macmini" ) set_term_bgcolor 0 30 0;;
 esac
 
-ssh $@
+sshrc $@
