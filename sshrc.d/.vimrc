@@ -1,1 +1,1 @@
-/Users/degawaikuo/dotfiles/vimrc
+../.vimrc
