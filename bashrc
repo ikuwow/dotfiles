@@ -1,28 +1,4 @@
-
-# ls color options
-case `uname` in
-    "CYGWIN" )
-        alias ls='ls --color';;
-    "Linux" )
-        alias ls='ls --color';;
-    "Darwin" )
-        alias ls='ls -G'
-        alias postgres='postgres -D /usr/local/var/postgres';;
-    * )
-        # do nothing
-esac
-
-## It's slow, so removed temporary
-# bash-completion
-# if [ `uname | grep Darwin` ]; then
-#     BREW_PREFIX=`brew --prefix`
-#     if [ -f ${BREW_PREFIX}/etc/bash_completion ]; then
-#         . ${BREW_PREFIX}/etc/bash_completion
-#         # TODO: it's slow.
-#     fi
-# fi
-
-complete -C aws_completer aws
+## Aliases
 
 alias ll='ls -l'
 alias la='ls -A'
@@ -42,3 +18,44 @@ alias saying='while (true) do f=$(fortune); echo "$f"; echo ""; say "$f"; sleep 
 alias ssh=~/bin/ssh-host-color
 
 alias docker-quickstart="bash --login '/Applications/Docker/Docker Quickstart Terminal.app/Contents/Resources/Scripts/start.sh'"
+
+case `uname` in
+    "CYGWIN" )
+        alias ls='ls --color';;
+    "Linux" )
+        alias ls='ls --color';;
+    "Darwin" )
+        alias ls='ls -G'
+        alias postgres='postgres -D /usr/local/var/postgres';;
+    * )
+        # do nothing
+esac
+
+## Auto complete
+
+complete -C aws_completer aws
+
+if [ -f ~/dotfiles/git-completion.bash ]; then
+    . ~/dotfiles/git-completion.bash
+fi
+
+_complete_ssh_hosts ()
+{
+        COMPREPLY=()
+        cur="${COMP_WORDS[COMP_CWORD]}"
+        comp_ssh_hosts=`cat ~/.ssh/known_hosts | \
+                        cut -f 1 -d ' ' | \
+                        sed -e s/,.*//g | \
+                        grep -v ^# | \
+                        uniq | \
+                        grep -v "\[" ;
+                cat ~/.ssh/config | \
+                        grep "^Host " | \
+                        awk '{print $2}'
+                `
+        COMPREPLY=( $(compgen -W "${comp_ssh_hosts}" -- $cur))
+        return 0
+}
+complete -F _complete_ssh_hosts ssh
+
+

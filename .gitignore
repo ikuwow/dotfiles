@@ -2,9 +2,9 @@
 *~
 *.swp
 *.swo
-/.vim/.netrwhist
 /bin/mlint
 /bin/trash
+/vim/.netrwhist
 
 
 # bundles
