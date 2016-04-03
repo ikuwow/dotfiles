@@ -1,2 +1,4 @@
 export VIMINIT="let \$MYVIMRC='$SSHHOME/.sshrc.d/.vimrc' | source \$MYVIMRC"
 
+source $SSHHOME/.sshrc.d/.bashrc
+
