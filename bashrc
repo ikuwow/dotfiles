@@ -15,7 +15,9 @@ alias vag='vagrant'
 alias ='echo "Stay hungly, stay foolish."'
 alias saying='while (true) do f=$(fortune); echo "$f"; echo ""; say "$f"; sleep 5; done'
 
-alias ssh=~/bin/ssh-host-color
+if [ -f ~/bin/ssh-host-color ]; then
+    alias ssh=~/bin/ssh-host-color
+fi
 
 alias docker-quickstart="bash --login '/Applications/Docker/Docker Quickstart Terminal.app/Contents/Resources/Scripts/start.sh'"
 
