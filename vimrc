@@ -37,7 +37,6 @@ set tabstop=4 " spaces number of tab
 " 全角スペースの表示
 highlight ZenkakuSpace ctermbg=red guibg=#ff0000
 au BufWinEnter * let w:m3 = matchadd("ZenkakuSpace", '　')
-" au WinEnter * let w:m3 = matchadd("ZenkakuSpace", '　')
 augroup HighlightTrailingSpaces
   autocmd!
   autocmd VimEnter,WinEnter,ColorScheme * highlight TrailingSpaces term=underline guibg=green ctermbg=green
@@ -93,6 +92,7 @@ if isdirectory(expand("~/.vim/bundle/neobundle.vim/"))
     NeoBundle 'tomtom/tcomment_vim'
     NeoBundle 'taglist.vim'
     NeoBundle 'kchmck/vim-coffee-script'
+    NeoBundle 'mattn/emmet-vim'
     let hostname = substitute(system('hostname'), '\n', '', '')
     if hostname != 'ikuwow.local'
         NeoBundle 'wakatime/vim-wakatime'
