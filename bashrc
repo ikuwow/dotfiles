@@ -19,6 +19,10 @@ if [ -f ~/bin/ssh-host-color ]; then
     alias ssh=~/bin/ssh-host-color
 fi
 
+if [ `which fuck` ]; then
+    eval "$(thefuck --alias)"
+fi
+
 alias docker-quickstart="bash --login '/Applications/Docker/Docker Quickstart Terminal.app/Contents/Resources/Scripts/start.sh'"
 
 case `uname` in
