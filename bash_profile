@@ -18,8 +18,12 @@ if [ -f ~/.brew_api_token ];then
     source ~/.brew_api_token
 fi
 
-if [ `uname | grep Darwin` ]; then
+if [ `which rbenv` ]; then
     eval "$(rbenv init - --no-rehash)" # adding --no-rehash makes this faster
+fi
+
+if [ `which pyenv` ]; then
+    eval "$(pyenv init - --no-rehash)" # adding --no-rehash makes this faster
 fi
 
 ## load .bashrc
