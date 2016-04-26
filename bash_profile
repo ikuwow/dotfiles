@@ -1,4 +1,3 @@
-
 # Environment Variables
 export PATH=~/bin:/usr/local/heroku/bin:/usr/local/bin:/usr/local/sbin:$PATH
 export LANG=ja_JP.UTF-8
@@ -26,7 +25,12 @@ if [ `which pyenv` ]; then
     eval "$(pyenv init - --no-rehash)" # adding --no-rehash makes this faster
 fi
 
+if [ `which fuck` ]; then
+    eval "$(thefuck --alias)"
+fi
+
 ## load .bashrc
 if [ -e ~/.bashrc ]; then
     source ~/.bashrc
 fi
+
