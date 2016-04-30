@@ -17,6 +17,10 @@ if [ -f ~/.brew_api_token ];then
     source ~/.brew_api_token
 fi
 
+if [ -f ~/.phpbrew/bashrc ]; then
+    source ~/.phpbrew/bashrc
+fi
+
 if [ `which rbenv` ]; then
     eval "$(rbenv init - --no-rehash)" # adding --no-rehash makes this faster
 fi
