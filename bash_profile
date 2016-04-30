@@ -33,6 +33,8 @@ if [ `which fuck` ]; then
     eval "$(thefuck --alias)"
 fi
 
+alias brew="env PATH=${PATH/${HOME}\/\.pyenv\/shims:/} brew"
+
 ## load .bashrc
 if [ -e ~/.bashrc ]; then
     source ~/.bashrc
