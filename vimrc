@@ -91,10 +91,7 @@ if isdirectory(expand("~/.vim/bundle/neobundle.vim/"))
     NeoBundle 'tomtom/tcomment_vim'
     NeoBundle 'kchmck/vim-coffee-script'
     NeoBundle 'mattn/emmet-vim'
-    let hostname = substitute(system('hostname'), '\n', '', '')
-    if hostname != 'ikuwow.local'
-        NeoBundle 'wakatime/vim-wakatime'
-    endif
+    NeoBundle 'wakatime/vim-wakatime'
 
     call neobundle#end()
     filetype plugin indent on
