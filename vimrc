@@ -87,10 +87,8 @@ if isdirectory(expand("~/.vim/bundle/neobundle.vim/"))
     NeoBundle 'thinca/vim-quickrun' " enable trying
     NeoBundle 'mhinz/vim-startify' " startpage of vim
     NeoBundle 'terryma/vim-multiple-cursors'
-    " NeoBundle 'vim-scripts/taglist.vim'
     " NeoBundle 'AndrewRadev/switch.vim' " toggle some string (true<=>false etc.)
     NeoBundle 'tomtom/tcomment_vim'
-    NeoBundle 'taglist.vim'
     NeoBundle 'kchmck/vim-coffee-script'
     NeoBundle 'mattn/emmet-vim'
     let hostname = substitute(system('hostname'), '\n', '', '')
