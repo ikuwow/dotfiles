@@ -33,7 +33,11 @@ if [ `which fuck` ]; then
     eval "$(thefuck --alias)"
 fi
 
-alias brew="env PATH=${PATH/${HOME}\/\.pyenv\/shims:/} brew"
+PHPVERSION=$(php -r 'echo phpversion();');
+BREWPATH=$PATH
+BREWPATH=${BREWPATH/${HOME}\/\.pyenv\/shims:/}
+BREWPATH=${BREWPATH/${HOME}\/.phpbrew\/php\/php-${PHPVERSION}\/bin/}
+alias brew="env PATH=${BREWPATH} brew"
 
 ## load .bashrc
 if [ -e ~/.bashrc ]; then
