@@ -42,6 +42,11 @@ if [ -f ~/dotfiles/git-completion.bash ]; then
     . ~/dotfiles/git-completion.bash
 fi
 
+if [ -n "$SSH_CLIENT" ]; then
+    PS1="\[\e[36m\e[33m\][ssh]\[\e[0m\]${PS1}"
+    # PS1="\[\e[36m\e[33m\]${PS1}\[\e[0m\]"
+fi
+
 _complete_ssh_hosts ()
 {
         COMPREPLY=()
