@@ -29,7 +29,8 @@ case `uname` in
         alias ls='ls --color';;
     "Darwin" )
         alias ls='ls -G'
-        alias postgres='postgres -D /usr/local/var/postgres';;
+        alias postgres='postgres -D /usr/local/var/postgres'
+        ;;
     * )
         # do nothing
 esac
@@ -45,6 +46,10 @@ fi
 if [ -n "$SSH_CLIENT" ]; then
     PS1="\[\e[36m\e[33m\][ssh]\[\e[0m\]${PS1}"
     # PS1="\[\e[36m\e[33m\]${PS1}\[\e[0m\]"
+fi
+
+if [ -n "$DOCKER_MACHINE_NAME" ]; then
+    PS1="\[\e[36m\e[33m\][docker] \[\e[0m\]${PS1}"
 fi
 
 _complete_ssh_hosts ()
