@@ -52,6 +52,12 @@ if [ -n "$DOCKER_MACHINE_NAME" ]; then
     PS1="\[\e[36m\e[33m\][docker] \[\e[0m\]${PS1}"
 fi
 
+# ssh-agent start
+if [ ! -n "$SSH_AUTH_SOCK" ]; then
+    eval `ssh-agent -s`
+    ssh-add
+fi
+
 _complete_ssh_hosts ()
 {
         COMPREPLY=()
