@@ -39,8 +39,8 @@ esac
 
 complete -C aws_completer aws
 
-if [ -f ~/dotfiles/git-completion.bash ]; then
-    . ~/dotfiles/git-completion.bash
+if [ -f /usr/local/etc/bash_completion ]; then
+    . /usr/local/etc/bash_completion
 fi
 
 if [ -n "$SSH_CLIENT" ]; then
