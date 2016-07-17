@@ -26,4 +26,4 @@ esac
 
 sshrc $@
 
-set_term_bgcolor 28 28 28
+set_term_bgcolor 30 30 30
