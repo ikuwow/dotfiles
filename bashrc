@@ -53,10 +53,10 @@ if [ -n "$DOCKER_MACHINE_NAME" ]; then
 fi
 
 # ssh-agent start
-if [ ! -n "$SSH_AUTH_SOCK" ]; then
-    eval `ssh-agent -s`
-    ssh-add
-fi
+# if [ ! -n "$SSH_AUTH_SOCK" ]; then
+#     eval `ssh-agent -s`
+#     ssh-add
+# fi
 
 _complete_ssh_hosts ()
 {
