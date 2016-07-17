@@ -58,6 +58,16 @@ fi
 #     ssh-add
 # fi
 
+if [ -f ~/.ssh-agent ]; then
+    . ~/.ssh-agent > /dev/null
+fi
+if [ -z "$SSH_AGENT_PID" ] || ! kill -0 $SSH_AGENT_PID; then
+    ssh-agent > ~/.ssh-agent
+    . ~/.ssh-agent > /dev/null
+fi
+ssh-add -l >& /dev/null || ssh-add
+
+
 _complete_ssh_hosts ()
 {
         COMPREPLY=()
