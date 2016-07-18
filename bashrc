@@ -49,7 +49,7 @@ if [ -n "$SSH_CLIENT" ]; then
 fi
 
 if [ -n "$DOCKER_MACHINE_NAME" ]; then
-    PS1="\[\e[36m\e[33m\][docker] \[\e[0m\]${PS1}"
+    PS1="\[\e[36m\e[33m\][docker]\[\e[0m\]${PS1}"
 fi
 
 # ssh-agent start
