@@ -20,7 +20,7 @@ if [ -f ~/bin/ssh-host-color ]; then
     alias ssh=~/bin/ssh-host-color
 fi
 
-alias docker-quickstart="bash --login '/Applications/Docker/Docker Quickstart Terminal.app/Contents/Resources/Scripts/start.sh'"
+alias docker-quickstart="bash --login docker-quickstart.sh"
 
 case `uname` in
     "CYGWIN" )
