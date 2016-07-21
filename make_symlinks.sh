@@ -56,3 +56,7 @@ if [ ! -e ~/bin/trash ]; then
     ln -is ~/dotfiles/submodules/trash/trash ~/bin/trash
 fi
 
+if [ ! -e ~/.jshintrc ]; then
+    ln -is ~/dotfiles/jshintrc ~/.jshintrc
+fi
+

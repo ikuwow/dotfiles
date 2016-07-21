@@ -98,6 +98,13 @@ if isdirectory(expand("~/.vim/bundle/neobundle.vim/"))
 
     " phpmdやphpcsはキツすぎるので使わない
     let g:syntastic_php_checkers = ['php']
+    let g:syntastic_eruby_ruby_quiet_messages =
+        \ {'regex': 'possibly useless use of a variable in void context'}
+    let g:syntastic_html_tidy_ignore_errors=[
+        \'proprietary attribute "ng-'
+    \]
+    let g:syntastic_javascript_checkers = ['jshint']
+    " let g:syntastic_javascript_jshint_args = [ expand('~/.jshintrc') ]
 
     " If there are uninstalled bundles found on startup,
     " this will conveniently prompt you to install them.
@@ -125,10 +132,3 @@ endif
 " don't automatically continue comment line
 autocmd FileType * setlocal formatoptions-=ro
 
-let g:syntastic_eruby_ruby_quiet_messages =
-    \ {'regex': 'possibly useless use of a variable in void context'}
-
-" for AngularJS
-let g:syntastic_html_tidy_ignore_errors=[
-    \'proprietary attribute "ng-'
-\]
