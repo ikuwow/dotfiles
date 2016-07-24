@@ -19,6 +19,15 @@ alias saying='while (true) do f=$(fortune); echo "$f"; echo ""; say "$f"; sleep 
 if [ -f ~/bin/ssh-host-color ]; then
     alias ssh=~/bin/ssh-host-color
 fi
+if [ `uname` = "Darwin" ];then
+    vimexec=(mvim mview)
+    macvim=/Applications/MacVim.app/Contents/MacOS/
+    for vimexec in ${vimexec[@]}; do
+        if [ -e ${macvim}${vimexec} ]; then
+            alias $vimexec=${macvim}${vimexec}
+        fi
+    done
+fi
 
 alias docker-quickstart="bash --login docker-quickstart.sh"
 
