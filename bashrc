@@ -19,15 +19,6 @@ alias saying='while (true) do f=$(fortune); echo "$f"; echo ""; say "$f"; sleep 
 if [ -f ~/bin/ssh-host-color ]; then
     alias ssh=~/bin/ssh-host-color
 fi
-if [ `uname` = "Darwin" ];then
-    vimexec=(mvim mview)
-    macvim=/Applications/MacVim.app/Contents/MacOS/
-    for vimexec in ${vimexec[@]}; do
-        if [ -e ${macvim}${vimexec} ]; then
-            alias $vimexec=${macvim}${vimexec}
-        fi
-    done
-fi
 
 alias docker-quickstart="bash --login docker-quickstart.sh"
 
@@ -39,6 +30,22 @@ case `uname` in
     "Darwin" )
         alias ls='ls -G'
         alias postgres='postgres -D /usr/local/var/postgres'
+
+        commands=(awk sed)
+        for c in ${commands[@]}; do
+            if [ -x `which g$c` ]; then
+                alias $c=g$c
+            fi
+        done
+
+        vimexec=(mvim mview)
+        macvim=/Applications/MacVim.app/Contents/MacOS/
+        for vimexec in ${vimexec[@]}; do
+            if [ -e ${macvim}${vimexec} ]; then
+                alias $vimexec=${macvim}${vimexec}
+            fi
+        done
+
         ;;
     * )
         # do nothing
