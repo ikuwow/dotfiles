@@ -104,6 +104,7 @@ if isdirectory(expand("~/.vim/bundle/neobundle.vim/"))
         \'proprietary attribute "ng-'
     \]
     let g:syntastic_javascript_checkers = ['jshint']
+    let g:syntastic_html_tidy_exec = 'tidy5'
     " let g:syntastic_javascript_jshint_args = [ expand('~/.jshintrc') ]
 
     " If there are uninstalled bundles found on startup,
