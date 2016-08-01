@@ -44,7 +44,7 @@ case `uname` in
 
         commands=(awk sed)
         for c in ${commands[@]}; do
-            if [ `type g$c > /dev/null 2>&1` ]; then
+            if `type g$c > /dev/null 2>&1`; then
                 alias $c=g$c
             fi
         done
