@@ -22,15 +22,15 @@ if [ -f ~/.brew_api_token ];then
     source ~/.brew_api_token
 fi
 
-if [ `which rbenv` ]; then
+if [ `type rbenv > /dev/null 2>&1` ]; then
     eval "$(rbenv init - --no-rehash)" # adding --no-rehash makes this faster
 fi
 
-if [ `which pyenv` ]; then
+if [ `type pyenv > /dev/null 2>&1` ]; then
     eval "$(pyenv init - --no-rehash)" # adding --no-rehash makes this faster
 fi
 
-if [ `which fuck` ]; then
+if [ `type fuck > /dev/null 2>&1` ]; then
     eval "$(thefuck --alias)"
 fi
 
