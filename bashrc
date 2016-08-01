@@ -20,6 +20,17 @@ if [ -f ~/bin/ssh-host-color ]; then
     alias ssh=~/bin/ssh-host-color
 fi
 
+function altgit {
+    cmd=$1
+    shift
+    extra=""
+    if [ "$cmd" == "clone" ]; then
+        extra="--recursive"
+    fi
+    git $cmd $extra $@
+}
+alias git='altgit'
+
 alias docker-quickstart="bash --login docker-quickstart.sh"
 
 case `uname` in
