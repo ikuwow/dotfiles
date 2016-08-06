@@ -2,7 +2,7 @@ export PATH=~/bin:~/.phpbrew/bin:/usr/local/heroku/bin:/usr/local/bin:/usr/local
 if [ -f ~/.phpbrew/bashrc ]; then
     source ~/.phpbrew/bashrc
 fi
-
+export PATH=~/.phpbrew/bin:$PATH
 
 # Environment Variables
 export LANG=ja_JP.UTF-8
