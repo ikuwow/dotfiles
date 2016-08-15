@@ -66,6 +66,19 @@ esac
 
 complete -C aws_completer aws
 
+DOCKER_ETC=/Applications/Docker.app/Contents/Resources/etc
+DOCKER_COMPLETIONS=(
+    docker
+    docker-machine
+    docker-compose
+)
+for docker in ${DOCKER_COMPLETIONS[@]}; do
+    if [ -e ${DOCKER_ETC}/${docker}.bash-completion ]; then
+        ln -fs ${DOCKER_ETC}/${docker}.bash-completion \
+            /usr/local/etc/bash_completion.d/${docker}.bash-completion
+    fi
+done
+
 if [ -f /usr/local/etc/bash_completion ]; then
     . /usr/local/etc/bash_completion
 fi
