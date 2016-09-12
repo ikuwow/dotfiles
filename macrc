@@ -1,0 +1,57 @@
+if [ `uname` != Darwin ]; then
+    return 0
+fi
+
+## Homebrew
+if [ -f ~/.brew_api_token ];then
+    source ~/.brew_api_token
+fi
+
+PHPVERSION=$(php -r 'echo phpversion();');
+BREWPATH=$PATH
+BREWPATH=${BREWPATH/${HOME}\/\.pyenv\/shims:/}
+BREWPATH=${BREWPATH/${HOME}\/.phpbrew\/php\/php-${PHPVERSION}\/bin/}
+alias brew="env PATH=${BREWPATH} brew"
+
+export PGDATA=/usr/local/var/postgres
+alias postgres='postgres -D /usr/local/var/postgres'
+
+alias ls='ls -G'
+
+commands=(awk sed)
+for c in ${commands[@]}; do
+    if `type g$c > /dev/null 2>&1`; then
+        alias $c=g$c
+    fi
+done
+
+## MacVim
+vimexec=(mvim mview)
+macvim=/Applications/MacVim.app/Contents/MacOS/
+for vimexec in ${vimexec[@]}; do
+    if [ -e ${macvim}${vimexec} ]; then
+        alias $vimexec=${macvim}${vimexec}
+    fi
+done
+
+## Docker Machine
+alias docker-quickstart="bash --login docker-quickstart.sh"
+if [ -n "$DOCKER_MACHINE_NAME" ]; then
+    PS1="\[\e[36m\e[33m\][docker]\[\e[0m\]${PS1}"
+fi
+
+## Docker for Mac
+DOCKER_ETC=/Applications/Docker.app/Contents/Resources/etc
+DOCKER_COMPLETIONS=(
+    docker
+    docker-machine
+    docker-compose
+)
+for docker in ${DOCKER_COMPLETIONS[@]}; do
+    if [ -e ${DOCKER_ETC}/${docker}.bash-completion ]; then
+        ln -fs ${DOCKER_ETC}/${docker}.bash-completion \
+            /usr/local/etc/bash_completion.d/${docker}.bash-completion
+    fi
+done
+
+
