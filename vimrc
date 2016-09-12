@@ -19,7 +19,6 @@ set showcmd " show inputting key
 set clipboard=unnamed " sharing clipboard
 "set linebreak "auto linebreak
 
-
 "tab関係
 set shiftwidth=4
 "softtabstop is equal to tabstop in defalut
@@ -110,7 +109,7 @@ if isdirectory(expand("~/.vim/bundle/neobundle.vim/"))
     function! CurrentBranch()
         try
             if &ft !~? 'vimfiler\|gundo' && exists('*fugitive#head') && strlen(fugitive#head())
-            return 'branch: ' . fugitive#head()
+            return "\u2B60: " . fugitive#head()
             endif
         catch
         endtry
