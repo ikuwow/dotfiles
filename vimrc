@@ -93,6 +93,30 @@ if isdirectory(expand("~/.vim/bundle/neobundle.vim/"))
     NeoBundle 'mattn/emmet-vim'
     NeoBundle 'wakatime/vim-wakatime'
 
+    "lightline
+    NeoBundle 'itchyny/lightline.vim'
+    set laststatus=2 "ステータスラインを常時表示させる
+    set t_Co=256
+    let g:lightline = {
+        \ 'active': {
+        \     'left': [
+        \     ['mode', 'current_branch', 'paste'],
+        \     [ 'modified', 'filename', 'readonly'] ]
+        \ },
+        \ 'component_function': {
+        \     'current_branch': 'CurrentBranch'
+        \ }
+    \ }
+    function! CurrentBranch()
+        try
+            if &ft !~? 'vimfiler\|gundo' && exists('*fugitive#head') && strlen(fugitive#head())
+            return 'branch: ' . fugitive#head()
+            endif
+        catch
+        endtry
+        return ''
+    endfunction
+
     call neobundle#end()
     filetype plugin indent on
 
@@ -132,4 +156,5 @@ endif
 
 " don't automatically continue comment line
 autocmd FileType * setlocal formatoptions-=ro
+
 
