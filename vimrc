@@ -95,14 +95,19 @@ if isdirectory(expand("~/.vim/bundle/neobundle.vim/"))
     set laststatus=2 "ステータスラインを常時表示させる
     set t_Co=256
     let g:lightline = {
+        \ 'colorscheme': 'jellybeans',
         \ 'active': {
         \     'left': [
         \         ['mode', 'current_branch', 'paste'],
         \         [ 'modified', 'filename', 'readonly']
         \     ]
         \ },
+        \ 'component': {
+        \     'readonly': '%{&readonly?"⭤":""}'
+        \ },
         \ 'component_function': {
-        \     'current_branch': 'CurrentBranch'
+        \     'current_branch': 'CurrentBranch',
+        \     'mode': 'MultiMode'
         \ }
     \ }
     function! CurrentBranch()
@@ -113,6 +118,10 @@ if isdirectory(expand("~/.vim/bundle/neobundle.vim/"))
         catch
         endtry
         return ''
+    endfunction
+    function! MultiMode()
+        let fname = expand('%:t')
+        return fname =~ 'NERD_tree' ? 'NERDTree' : lightline#mode()
     endfunction
 
     call neobundle#end()
@@ -154,5 +163,6 @@ endif
 
 " don't automatically continue comment line
 autocmd FileType * setlocal formatoptions-=ro
+
 
 
