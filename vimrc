@@ -80,13 +80,11 @@ if isdirectory(expand("~/.vim/bundle/neobundle.vim/"))
     NeoBundle 'tpope/vim-fugitive' "git commands on vim
     NeoBundle 'scrooloose/syntastic.git' " syntax checker
     NeoBundle 'toyamarinyon/vim-swift' " swift support
-    " NeoBundle 'plasticboy/vim-markdown'
     NeoBundle 'tyru/open-browser.vim'
     NeoBundle 'kannokanno/previm' " preview markdown
     NeoBundle 'thinca/vim-quickrun' " enable trying
     NeoBundle 'mhinz/vim-startify' " startpage of vim
     NeoBundle 'terryma/vim-multiple-cursors'
-    " NeoBundle 'AndrewRadev/switch.vim' " toggle some string (true<=>false etc.)
     NeoBundle 'tomtom/tcomment_vim'
     NeoBundle 'kchmck/vim-coffee-script'
     NeoBundle 'mattn/emmet-vim'
@@ -99,8 +97,9 @@ if isdirectory(expand("~/.vim/bundle/neobundle.vim/"))
     let g:lightline = {
         \ 'active': {
         \     'left': [
-        \     ['mode', 'current_branch', 'paste'],
-        \     [ 'modified', 'filename', 'readonly'] ]
+        \         ['mode', 'current_branch', 'paste'],
+        \         [ 'modified', 'filename', 'readonly']
+        \     ]
         \ },
         \ 'component_function': {
         \     'current_branch': 'CurrentBranch'
@@ -109,7 +108,7 @@ if isdirectory(expand("~/.vim/bundle/neobundle.vim/"))
     function! CurrentBranch()
         try
             if &ft !~? 'vimfiler\|gundo' && exists('*fugitive#head') && strlen(fugitive#head())
-            return "\u2B60: " . fugitive#head()
+            return "\u2B60 " . fugitive#head()
             endif
         catch
         endtry
