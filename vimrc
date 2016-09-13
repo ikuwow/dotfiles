@@ -26,6 +26,7 @@ set shiftwidth=4
 set autoindent
 set expandtab "convert tab to spaces
 set tabstop=4 " spaces number of tab
+set breakindent
 
 " ファイルごとにtab幅を変える。
 " 動かない、詳細を確認すべし
