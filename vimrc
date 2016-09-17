@@ -93,6 +93,7 @@ NeoBundle 'tomtom/tcomment_vim'
 NeoBundle 'kchmck/vim-coffee-script'
 NeoBundle 'mattn/emmet-vim'
 NeoBundle 'wakatime/vim-wakatime'
+NeoBundle 'Shougo/unite.vim'
 
 "lightline
 NeoBundle 'itchyny/lightline.vim'
