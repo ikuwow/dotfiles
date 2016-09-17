@@ -96,7 +96,9 @@ NeoBundle 'mattn/emmet-vim'
 NeoBundle 'wakatime/vim-wakatime'
 NeoBundle 'Shougo/unite.vim'
 
-"lightline
+NeoBundle 'Shougo/neocomplete'
+let g:neocomplete#enable_at_startup = 1
+
 NeoBundle 'itchyny/lightline.vim'
 set laststatus=2 "ステータスラインを常時表示させる
 set t_Co=256
