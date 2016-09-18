@@ -16,3 +16,5 @@ au WinEnter * let w:m3 = matchadd("ZenkakuSpace", '　')
 source $VIMRUNTIME/delmenu.vim
 set langmenu=none
 source $VIMRUNTIME/menu.vim
+
+set cmdheight=1
