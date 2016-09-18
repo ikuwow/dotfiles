@@ -1,7 +1,3 @@
-" vimtutorというコマンドの存在を忘れるな。
-" ちゃんとそのうちやるんだぞ。
-" がんばれよ
-
 " Basic Configuration
 set nu
 set title " display filename (not Thank you for using Vim.)
