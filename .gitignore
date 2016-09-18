@@ -5,7 +5,7 @@
 /bin/mlint
 /bin/trash
 /vim/.netrwhist
-
+vim-powerline
 
 # bundles
 /vim/bundle/*
