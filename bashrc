@@ -78,3 +78,13 @@ _complete_ssh_hosts ()
 }
 complete -F _complete_ssh_hosts ssh
 
+gclconf ()
+{
+    if [ -z $1 ]; then
+        confname=$(gcloud config configurations list | awk 'NR>1' | peco | awk '{print $1}')
+    else
+        confname=$1
+    fi
+    gcloud config configurations activate $confname
+}
+
