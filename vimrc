@@ -23,6 +23,7 @@ set autoindent
 set expandtab "convert tab to spaces
 set tabstop=4 " spaces number of tab
 set breakindent
+set backupskip=/tmp/*,/private/tmp/*
 
 " ファイルごとにtab幅を変える。
 " 動かない、詳細を確認すべし
