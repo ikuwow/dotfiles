@@ -10,6 +10,8 @@ alias bye='exit'
 alias hosts='sudo vim /etc/hosts'
 
 alias be='bundle exec'
+alias de='docker exec'
+alias ke='kubectl exec'
 alias vag='vagrant'
 
 alias ='echo "Stay hungly, stay foolish."'
