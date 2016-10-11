@@ -22,7 +22,9 @@ set shiftwidth=4
 set autoindent
 set expandtab "convert tab to spaces
 set tabstop=4 " spaces number of tab
-set breakindent
+if version >=800
+    set breakindent
+endif
 set backupskip=/tmp/*,/private/tmp/*
 
 " ファイルごとにtab幅を変える。
