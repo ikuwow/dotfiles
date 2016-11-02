@@ -27,7 +27,7 @@ function altgit {
     if [ "$cmd" == "clone" ]; then
         extra="--recursive"
     fi
-    git $cmd $extra $@
+    \git $cmd $extra $@
 }
 alias git='altgit'
 
