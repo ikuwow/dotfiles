@@ -49,7 +49,9 @@ if [ -f /usr/local/etc/bash_completion ]; then
 fi
 
 if [ -n "$SSH_CLIENT" ]; then
-    PS1="\[\e[36m\e[33m\][ssh]\[\e[0m\]${PS1}"
+    if [[ $PS1 != *"ssh"* ]]; then
+        PS1="\[\e[36m\e[33m\][ssh]\[\e[0m\]${PS1}"
+    fi
 fi
 
 ## Temporary stopping... (no ssh-agent working)
