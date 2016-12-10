@@ -95,6 +95,7 @@ NeoBundle 'mattn/emmet-vim'
 NeoBundle 'wakatime/vim-wakatime'
 NeoBundle 'Shougo/unite.vim'
 NeoBundle 'airblade/vim-gitgutter'
+NeoBundle 'editorconfig/editorconfig-vim'
 
 NeoBundle 'Shougo/neocomplete'
 let g:neocomplete#enable_at_startup = 1
