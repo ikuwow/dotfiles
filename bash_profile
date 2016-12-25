@@ -1,3 +1,5 @@
+# STARTTIME=$(gdate +%s%N)
+
 ## TODO: it must be in .macrc (specific to homebrew)
 export PATH=~/bin:~/.phpbrew/bin:/usr/local/heroku/bin:/usr/local/bin:/usr/local/sbin:$PATH
 if [ -f ~/.phpbrew/bashrc ]; then
@@ -13,20 +15,12 @@ export HISTTIMEFORMAT='%y-%m-%d %H:%M:%S '
 export HISTSIZE=5000
 export ANSIBLE_COW_SELECTION=random
 
-if [ `hostname` = 'teratail.com' ];then
-    export PS1="\e[1;31m${PS1}\e[m"
-fi
-
 if `type rbenv > /dev/null 2>&1`; then
   eval "$(rbenv init - --no-rehash)" # adding --no-rehash makes this faster
 fi
 
 if `type pyenv > /dev/null 2>&1`; then
     eval "$(pyenv init - --no-rehash)" # adding --no-rehash makes this faster
-fi
-
-if `type fuck > /dev/null 2>&1`; then
-    eval "$(thefuck --alias)"
 fi
 
 OTHER=(.bashrc .macrc)
@@ -36,3 +30,6 @@ for rcfile in ${OTHER[@]}; do
     fi
 done
 
+# ENDTIME=$(gdate +%s%N)
+# ELAPSED=`echo "scale=3; (${ENDTIME} - ${STARTTIME})/1000000000" | bc`
+# echo "It took ${ELAPSED} sec"
