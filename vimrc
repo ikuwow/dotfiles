@@ -14,11 +14,7 @@ set showcmd " show inputting key
 " set mouse=a " enable mouse control (select, scroll etc.)
 set clipboard=unnamed " sharing clipboard
 "set linebreak "auto linebreak
-
-" color schemes
-syntax enable
 colorscheme desert
-set background=dark
 
 "tab関係
 set shiftwidth=4

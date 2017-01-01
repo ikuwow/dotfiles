@@ -13,3 +13,7 @@ set langmenu=none
 source $VIMRUNTIME/menu.vim
 
 set cmdheight=1
+
+" color schemes
+syntax enable
+set background=dark
