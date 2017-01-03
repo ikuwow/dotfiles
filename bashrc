@@ -55,16 +55,6 @@ if [ -n "$SSH_CLIENT" ]; then
     fi
 fi
 
-## Temporary stopping... (no ssh-agent working)
-# if [ -f ~/.ssh-agent ]; then
-#     ssh-add -l >& /dev/null || ssh-add
-#     . ~/.ssh-agent > /dev/null
-# fi
-# if [ -z "$SSH_AGENT_PID" ] || ! kill -0 $SSH_AGENT_PID; then
-#     ssh-agent > ~/.ssh-agent
-#     . ~/.ssh-agent > /dev/null
-# fi
-
 _complete_ssh_hosts ()
 {
         COMPREPLY=()
