@@ -99,6 +99,7 @@ NeoBundle 'airblade/vim-gitgutter'
 NeoBundle 'editorconfig/editorconfig-vim'
 NeoBundle 'nathanaelkane/vim-indent-guides'
 let g:indent_guides_enable_on_vim_startup=1
+NeoBundle 'hashivim/vim-terraform'
 
 NeoBundle 'glidenote/memolist.vim'
 let g:memolist_path = expand("~/Documents/Memos")
