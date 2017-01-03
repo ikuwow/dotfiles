@@ -14,6 +14,7 @@ set showcmd " show inputting key
 " set mouse=a " enable mouse control (select, scroll etc.)
 set clipboard=unnamed " sharing clipboard
 "set linebreak "auto linebreak
+colorscheme desert
 
 "tab関係
 set shiftwidth=4
@@ -96,6 +97,12 @@ NeoBundle 'wakatime/vim-wakatime'
 NeoBundle 'Shougo/unite.vim'
 NeoBundle 'airblade/vim-gitgutter'
 NeoBundle 'editorconfig/editorconfig-vim'
+NeoBundle 'nathanaelkane/vim-indent-guides'
+let g:indent_guides_enable_on_vim_startup=1
+
+NeoBundle 'glidenote/memolist.vim'
+let g:memolist_path = expand("~/Documents/Memos")
+let g:memolist_suffix = "md"
 
 NeoBundle 'Shougo/neocomplete'
 let g:neocomplete#enable_at_startup = 1
