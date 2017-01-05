@@ -53,6 +53,8 @@ set formatoptions=q
 "文法チェック
 nmap ,l :call PHPLint()
 
+let g:php_folding = 1
+
 function! PHPLint() " exclamation mark means overriding the definition of function
     let result = system( &ft . ' -l ' . bufname(""))
     echo result
