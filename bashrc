@@ -7,7 +7,6 @@ alias less='less -iM'
 alias tree='tree -NC'
 alias grep='grep --color=auto'
 alias bye='exit'
-alias hosts='sudo vim /etc/hosts'
 
 alias be='bundle exec'
 alias de='docker exec'
