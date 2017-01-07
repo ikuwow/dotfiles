@@ -126,7 +126,7 @@ let g:lightline = {
     \     ]
     \ },
     \ 'component': {
-    \     'readonly': '%{&readonly?"⭤":""}'
+    \     'readonly': '%{&readonly?"[RO]":""}'
     \ },
     \ 'component_function': {
     \     'current_branch': 'CurrentBranch',
@@ -141,7 +141,7 @@ let g:lightline = {
 function! CurrentBranch()
     try
         if &ft !~? 'nerdtree' && exists('*fugitive#head') && strlen(fugitive#head())
-            return "\u2B60 " . fugitive#head()
+            return "ト " . fugitive#head()
         endif
     catch
     endtry
