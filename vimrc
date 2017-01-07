@@ -1,41 +1,42 @@
-" Basic Configuration
+"=========================="
+"-- Basic Configurations --"
+"=========================="
+set nocompatible " do not use vi compatible mode
+
 set nu
 set title " display filename (not Thank you for using Vim.)
-set guifont=Osaka-Mono:h14
-syntax on
-set nocompatible " do not use vi compatible mode
-set nobackup "チルダつきのファイルが邪魔
-set ic " ignore case, 検索時に大文字小文字を区別しない
-if version >= 703
-    set noundofile " .un~ファイルを作らない
-endif
 set ruler " display ruler (60,7 13%)
-set hlsearch " highlight the search word
 set showcmd " show inputting key
-" set mouse=a " enable mouse control (select, scroll etc.)
+syntax on
+filetype  plugin indent on
+
+set hlsearch " highlight the search word
+set ic " ignore case
+
 set clipboard=unnamed " sharing clipboard
-"set linebreak "auto linebreak
+
+set guifont=Osaka-Mono:h14
 colorscheme desert
 
-"tab関係
+" indents and tabs
 set shiftwidth=4
-"softtabstop is equal to tabstop in defalut
-"set softtabstop=4
 set autoindent
-set expandtab "convert tab to spaces
+set expandtab " convert tab to spaces
 set tabstop=4 " spaces number of tab
+set tw=0 " text width
 if version >=800
     set breakindent
 endif
+set formatoptions=q
+autocmd FileType * setlocal formatoptions-=ro
+
+set nobackup " do not create *~ files
+if version >= 703
+    set noundofile " do not create *.un~ files
+endif
 set backupskip=/tmp/*,/private/tmp/*
 
-" ファイルごとにtab幅を変える。
-" 動かない、詳細を確認すべし
-" augroup vimrc
-" autocmd! FileType html setlocal shiftwidth=2 tabstop=2 softtabstop=2
-" augroup END
-
-" 全角スペースの表示
+" Display evil full-width space
 highlight ZenkakuSpace ctermbg=red guibg=#ff0000
 au BufWinEnter * let w:m3 = matchadd("ZenkakuSpace", '　')
 augroup HighlightTrailingSpaces
@@ -44,67 +45,61 @@ augroup HighlightTrailingSpaces
 autocmd VimEnter,WinEnter * match TrailingSpaces /\s\+$/
 augroup END
 
-"勝手に改行しないでね
-set tw=0
-set formatoptions=q
-"t:本文を整形、c:コメントを整形
-"o:'o','O'の時にコメント開始文字列を自動で挿入
-"r:挿入モードでenterを打ち込むとコメント開始文字を自動で挿入
-
-"文法チェック
-nmap ,l :call PHPLint()
-
-function! PHPLint() " exclamation mark means overriding the definition of function
-    let result = system( &ft . ' -l ' . bufname(""))
-    echo result
-endfunction
-
 " complement { after Enter
 inoremap {<Enter> {}<Left><CR><ESC><S-o>
 
-" don't automatically continue comment line
-autocmd FileType * setlocal formatoptions-=ro
-
-"=============================================
-"  NeoBundle Configulation Section (2014/7/12)
-"=============================================
+"=====================================
+"-- NeoBundle Configulation Section --
+"=====================================
 if !isdirectory(expand("~/.vim/bundle/neobundle.vim/"))
     finish
 endif
-" if neobundle exists:
 
-if has('vim_starting') " at launching vim only
+if has('vim_starting')
     set runtimepath+=~/.vim/bundle/neobundle.vim/
 endif
-
 call neobundle#begin(expand('~/.vim/bundle/')) "required
 NeoBundleFetch 'Shougo/neobundle.vim' " Let NeoBundle manage NeoBundle (Required)
 call neobundle#end()
 
-" ~ My Bundles Here... ~
-NeoBundle 'scrooloose/nerdtree' " Filer plugin
-NeoBundle 'tpope/vim-fugitive' "git commands on vim
+NeoBundle 'scrooloose/nerdtree'
+let NERDTreeShowHidden = 1
+command! Nt NERDTree
+
 NeoBundle 'scrooloose/syntastic.git' " syntax checker
-NeoBundle 'toyamarinyon/vim-swift' " swift support
-NeoBundle 'tyru/open-browser.vim'
+let g:syntastic_php_checkers = ['php'] " do not use phpmd and phpcs
+let g:syntastic_javascript_checkers = ['jshint']
+let g:syntastic_html_tidy_exec = 'tidy5'
+let g:syntastic_eruby_ruby_quiet_messages =
+    \ {'regex': 'possibly useless use of a variable in void context'}
+let g:syntastic_html_tidy_ignore_errors=[
+    \'proprietary attribute "ng-'
+\]
+
 NeoBundle 'kannokanno/previm' " preview markdown
-NeoBundle 'thinca/vim-quickrun' " enable trying
+let g:previm_open_cmd="open -a Safari"
+augroup PrevimSettings
+    autocmd!
+    autocmd BufNewFile,BufRead *.{md,mdwn,mkd,mkdn,mark*} set filetype=markdown
+augroup END
+
+NeoBundle 'tpope/vim-fugitive' "git commands on vim
 NeoBundle 'mhinz/vim-startify' " startpage of vim
+let g:startify_custom_header = "Done is better than perfect."
 NeoBundle 'terryma/vim-multiple-cursors'
 NeoBundle 'tomtom/tcomment_vim'
-NeoBundle 'kchmck/vim-coffee-script'
 NeoBundle 'mattn/emmet-vim'
 NeoBundle 'wakatime/vim-wakatime'
 NeoBundle 'Shougo/unite.vim'
 NeoBundle 'airblade/vim-gitgutter'
 NeoBundle 'editorconfig/editorconfig-vim'
+NeoBundle 'hashivim/vim-terraform'
+
 NeoBundle 'nathanaelkane/vim-indent-guides'
 let g:indent_guides_enable_on_vim_startup=1
 let g:indent_guides_start_level=2
 let g:indent_guides_color_change_percent =5
 let g:indent_guides_guide_size = 1
-
-NeoBundle 'hashivim/vim-terraform'
 
 NeoBundle 'glidenote/memolist.vim'
 let g:memolist_path = expand("~/Documents/Memos")
@@ -138,6 +133,7 @@ let g:lightline = {
     \ }
 \ }
 
+"-- lightline functions --"
 function! CurrentBranch()
     try
         if &ft !~? 'nerdtree' && exists('*fugitive#head') && strlen(fugitive#head())
@@ -173,37 +169,6 @@ function! FileEncoding()
 endfunction
 
 call neobundle#end()
-filetype plugin indent on
 
-" phpmdやphpcsはキツすぎるので使わない
-let g:syntastic_php_checkers = ['php']
-let g:syntastic_eruby_ruby_quiet_messages =
-    \ {'regex': 'possibly useless use of a variable in void context'}
-let g:syntastic_html_tidy_ignore_errors=[
-    \'proprietary attribute "ng-'
-\]
-let g:syntastic_javascript_checkers = ['jshint']
-let g:syntastic_html_tidy_exec = 'tidy5'
-" let g:syntastic_javascript_jshint_args = [ expand('~/.jshintrc') ]
-
-" If there are uninstalled bundles found on startup,
-" this will conveniently prompt you to install them.
 NeoBundleCheck
 
-" configuration for each plugin
-let NERDTreeShowHidden = 1 " Display hidden files and folders on NERDTree
-" let g:startify_custom_header = "Done is better than perfect." " startify custom header
-" .mdファイルをmarkdownとして認識させる
-augroup PrevimSettings
-    autocmd!
-    autocmd BufNewFile,BufRead *.{md,mdwn,mkd,mkdn,mark*} set filetype=markdown
-augroup END
-
-" launch NERDTree automatically at opening files
-" autocmd VimEnter * NERDTree
-
-" alias for each plugin
-command! Nt NERDTree
-
-" NeoBundle Configulation End
-"========================================
