@@ -1,6 +1,7 @@
 " Basic Configuration
 set nu
 set title " display filename (not Thank you for using Vim.)
+set guifont=Osaka-Mono:h14
 syntax on
 set nocompatible " do not use vi compatible mode
 set nobackup "チルダつきのファイルが邪魔
