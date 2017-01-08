@@ -85,7 +85,6 @@ augroup END
 
 NeoBundle 'tpope/vim-fugitive' "git commands on vim
 NeoBundle 'mhinz/vim-startify' " startpage of vim
-let g:startify_custom_header = "Done is better than perfect."
 NeoBundle 'terryma/vim-multiple-cursors'
 NeoBundle 'tomtom/tcomment_vim'
 NeoBundle 'mattn/emmet-vim'
