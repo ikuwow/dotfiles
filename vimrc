@@ -7,15 +7,12 @@ set nu
 set title " display filename (not Thank you for using Vim.)
 set ruler " display ruler (60,7 13%)
 set showcmd " show inputting key
-syntax on
 filetype  plugin indent on
 
 set hlsearch " highlight the search word
 set ic " ignore case
 
 set clipboard=unnamed " sharing clipboard
-
-set guifont=Osaka-Mono:h14
 colorscheme desert
 
 " indents and tabs
@@ -35,10 +32,8 @@ if version >= 703
     set noundofile " do not create *.un~ files
 endif
 set backupskip=/tmp/*,/private/tmp/*
+set cmdheight=1
 
-" Display evil full-width space
-highlight ZenkakuSpace ctermbg=red guibg=#ff0000
-au BufWinEnter * let w:m3 = matchadd("ZenkakuSpace", '　')
 augroup HighlightTrailingSpaces
   autocmd!
   autocmd VimEnter,WinEnter,ColorScheme * highlight TrailingSpaces term=underline guibg=green ctermbg=green
@@ -61,6 +56,8 @@ endif
 call neobundle#begin(expand('~/.vim/bundle/')) "required
 NeoBundleFetch 'Shougo/neobundle.vim' " Let NeoBundle manage NeoBundle (Required)
 call neobundle#end()
+
+syntax on " なぜかこの辺に書かないと動かない
 
 NeoBundle 'scrooloose/nerdtree'
 let NERDTreeShowHidden = 1
@@ -93,6 +90,13 @@ NeoBundle 'Shougo/unite.vim'
 NeoBundle 'airblade/vim-gitgutter'
 NeoBundle 'editorconfig/editorconfig-vim'
 NeoBundle 'hashivim/vim-terraform'
+
+NeoBundle 'thinca/vim-zenspace' " hightlight full-width space like this 　
+let g:zenspace#default_mode = 'on'
+augroup vimrc-highlight
+    autocmd!
+    autocmd ColorScheme * highlight ZenSpace ctermbg=Red guibg=Red
+augroup END
 
 NeoBundle 'nathanaelkane/vim-indent-guides'
 let g:indent_guides_enable_on_vim_startup=1
