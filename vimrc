@@ -91,6 +91,7 @@ NeoBundle 'airblade/vim-gitgutter'
 NeoBundle 'editorconfig/editorconfig-vim'
 NeoBundle 'hashivim/vim-terraform'
 NeoBundle 'vim-scripts/phpfolding.vim'
+NeoBundle 'vim-scripts/taglist.vim'
 
 NeoBundle 'thinca/vim-zenspace' " hightlight full-width space like this 　
 let g:zenspace#default_mode = 'on'
