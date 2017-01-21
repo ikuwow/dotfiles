@@ -7,7 +7,7 @@ set nu
 set title " display filename (not Thank you for using Vim.)
 set ruler " display ruler (60,7 13%)
 set showcmd " show inputting key
-filetype plugin indent on
+filetype  plugin indent on
 
 set hlsearch " highlight the search word
 set ic " ignore case
@@ -90,7 +90,6 @@ NeoBundle 'Shougo/unite.vim'
 NeoBundle 'airblade/vim-gitgutter'
 NeoBundle 'editorconfig/editorconfig-vim'
 NeoBundle 'hashivim/vim-terraform'
-NeoBundle 'vim-scripts/phpfolding.vim'
 NeoBundle 'vim-scripts/taglist.vim'
 
 NeoBundle 'thinca/vim-zenspace' " hightlight full-width space like this 　
