@@ -58,6 +58,8 @@ endif
 
 if dein#load_state(s:dein_dir)
     call dein#begin(s:dein_dir)
+    call dein#load_toml(s:dein_dir . '/rc/dein.toml')
+
     call dein#add('scrooloose/nerdtree')
     call dein#add('scrooloose/syntastic.git')
     call dein#add('kannokanno/previm')
@@ -85,7 +87,7 @@ if dein#check_install()
     call dein#install()
 endif
 
-syntax on " なぜかこの辺に書かないと動かない
+syntax enable " なぜかこの辺に書かないと動かない
 
 " NERDTree
 let NERDTreeShowHidden = 1
