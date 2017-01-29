@@ -48,8 +48,11 @@ inoremap {<Enter> {}<Left><CR><ESC><S-o>
 "=====================================
 let s:dein_dir = expand('~/.vim/dein')
 let s:dein_repo = s:dein_dir . '/repos/github.com/Shougo/dein.vim'
+let s:dein_toml = s:dein_dir . '/rc/dein.toml'
+let s:dein_toml_lazy = s:dein_dir . '/rc/dein_lazy.toml'
+
 if !isdirectory(s:dein_repo)
-    finish
+    call system('git clone https://github.com/Shougo/dein.vim ' . shellescape(s:dein_repo))
 endif
 
 if has('vim_starting')
@@ -58,12 +61,12 @@ endif
 
 if dein#load_state(s:dein_dir)
     call dein#begin(s:dein_dir)
-    call dein#load_toml(s:dein_dir . '/rc/dein.toml')
-    call dein#load_toml(s:dein_dir . '/rc/dein_lazy.toml')
+    call dein#load_toml(s:dein_toml)
+    call dein#load_toml(s:dein_toml_lazy, {'lazy': 1})
     call dein#end()
     call dein#save_state()
 endif
-if dein#check_install()
+if has('vim_starting') && dein#check_install()
     call dein#install()
 endif
 
