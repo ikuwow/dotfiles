@@ -79,6 +79,7 @@ if dein#load_state(s:dein_dir)
     call dein#add('itchyny/lightline.vim')
     call dein#add('nathanaelkane/vim-indent-guides')
     call dein#end()
+    call dein#save_state()
 endif
 if dein#check_install()
     call dein#install()
