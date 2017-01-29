@@ -5,9 +5,8 @@
 /bin/mlint
 /bin/trash
 /vim/.netrwhist
-vim-powerline
 
-# bundles
-/vim/bundle/*
-!/vim/bundle/bundles_are_managed_by_neobundle
-!/vim/bundle/neobundle.vim
+/vim/dein/repos
+/vim/dein/state_vim.vim
+/vim/dein/cache_vim
+/vim/dein/.cache

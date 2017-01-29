@@ -1,0 +1,137 @@
+[[plugins]]
+repo = 'Shougo/dein.vim'
+
+[[plugins]]
+repo = 'mhinz/vim-startify'
+
+[[plugins]]
+repo = 'cespare/vim-toml'
+
+[[plugins]]
+repo = 'scrooloose/syntastic.git'
+hook_add = '''
+    let g:syntastic_php_checkers = ['php'] " do not use phpmd and phpcs
+    let g:syntastic_javascript_checkers = ['jshint']
+    let g:syntastic_html_tidy_exec = 'tidy5'
+    let g:syntastic_eruby_ruby_quiet_messages =
+        \ {'regex': 'possibly useless use of a variable in void context'}
+    let g:syntastic_html_tidy_ignore_errors=[
+        \'proprietary attribute "ng-'
+    \]
+'''
+
+[[plugins]]
+repo = 'airblade/vim-gitgutter'
+
+[[plugins]]
+repo = 'thinca/vim-zenspace')
+hook_add = '''
+    let g:zenspace#default_mode = 'on'
+    augroup vimrc-highlight
+        autocmd!
+        autocmd ColorScheme * highlight ZenSpace ctermbg=Red guibg=Red
+    augroup END
+'''
+
+[[plugins]]
+repo = 'scrooloose/nerdtree'
+hook_add = '''
+    let NERDTreeShowHidden = 1
+    command! Nt NERDTree
+'''
+
+[[plugins]]
+repo = 'tpope/vim-fugitive'
+
+[[plugins]]
+repo = 'itchyny/lightline.vim'
+depends = ['nerdtree', 'vim-fugitive']
+hook_add = '''
+    let g:lightline = {
+        \ 'colorscheme': 'jellybeans',
+        \ 'active': {
+        \     'left': [
+        \         ['mode', 'current_branch', 'paste'],
+        \         [ 'modified', 'filename', 'readonly']
+        \     ]
+        \ },
+        \ 'component': {
+        \     'readonly': '%{&readonly?"[RO]":""}'
+        \ },
+        \ 'component_function': {
+        \     'current_branch': 'CurrentBranch',
+        \     'filename': 'FileName',
+        \     'mode': 'MultiMode',
+        \     'fileformat': 'FileFormat',
+        \     'filetype': 'FileType',
+        \     'fileencoding': 'FileEncoding'
+        \ }
+    \ }
+
+    "-- lightline functions --"
+    function! CurrentBranch()
+        try
+            if &ft !~? 'nerdtree' && exists('*fugitive#head') && strlen(fugitive#head())
+                return "ト " . fugitive#head()
+            endif
+        catch
+        endtry
+        return ''
+    endfunction
+
+    function! FileName()
+        if &ft !~? 'nerdtree'
+            return expand('%:t')
+        endif
+        return ''
+    endfunction
+
+    function! MultiMode()
+        let fname = expand('%:t')
+        return fname =~ 'NERD_tree' ? 'NERDTree' : lightline#mode()
+    endfunction
+
+    function! FileFormat()
+        return winwidth(0) > 70 ? &fileformat : ''
+    endfunction
+
+    function! FileType()
+        return winwidth(0) > 70 ? (&filetype !=# '' ? &filetype : 'no ft') : ''
+    endfunction
+
+    function! FileEncoding()
+        return winwidth(0) > 70 ? (&fenc !=# '' ? &fenc : &enc) : ''
+    endfunction
+'''
+
+[[plugins]]
+repo = 'nathanaelkane/vim-indent-guides'
+hook_add = '''
+    let g:indent_guides_enable_on_vim_startup=1
+    let g:indent_guides_start_level=2
+    let g:indent_guides_color_change_percent =5
+    let g:indent_guides_guide_size = 1
+'''
+
+[[plugins]]
+repo = 'terryma/vim-multiple-cursors'
+
+[[plugins]]
+repo = 'Shougo/unite.vim'
+
+[[plugins]]
+repo = 'wakatime/vim-wakatime'
+
+[[plugins]]
+repo = 'hashivim/vim-terraform'
+
+[[plugins]]
+repo = 'editorconfig/editorconfig-vim'
+
+[[plugins]]
+repo = 'tomtom/tcomment_vim'
+
+[[plugins]]
+repo = 'vim-scripts/taglist.vim'
+
+

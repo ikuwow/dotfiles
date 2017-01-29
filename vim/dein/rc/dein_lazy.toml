@@ -1,0 +1,31 @@
+[[plugins]]
+repo = 'Shougo/neocomplete'
+on_event = ['InsertEnter']
+hook_add = '''
+    let g:neocomplete#enable_at_startup = 1
+'''
+
+[[plugins]]
+repo = 'glidenote/memolist.vim'
+depends = ['nerdtree']
+on_event = ['CmdwinEnter']
+hook_add = '''
+    let g:memolist_path = expand("~/Documents/Memos")
+    let g:memolist_memo_suffix = "md"
+    let g:memolist_ex_cmd = 'NERDTree'
+'''
+
+[[plugins]]
+repo = 'mattn/emmet-vim'
+on_event = ['InsertEnter']
+
+[[plugins]]
+repo = 'kannokanno/previm'
+on_ft = ['markdown']
+hook_add = '''
+    let g:previm_open_cmd="open -a Safari"
+    augroup PrevimSettings
+        autocmd!
+        autocmd BufNewFile,BufRead *.{md,mdwn,mkd,mkdn,mark*} set filetype=markdown
+    augroup END
+'''
