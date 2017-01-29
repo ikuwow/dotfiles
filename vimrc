@@ -58,131 +58,132 @@ endif
 
 if dein#load_state(s:dein_dir)
     call dein#begin(s:dein_dir)
+    call dein#add('scrooloose/nerdtree')
+    call dein#add('scrooloose/syntastic.git')
+    call dein#add('kannokanno/previm')
+    call dein#add('scrooloose/nerdtree')
+    call dein#add('tpope/vim-fugitive') "git commands on vim
+    call dein#add('mhinz/vim-startify') " startpage of vim
+    call dein#add('terryma/vim-multiple-cursors')
+    call dein#add('tomtom/tcomment_vim')
+    call dein#add('mattn/emmet-vim')
+    call dein#add('wakatime/vim-wakatime')
+    call dein#add('Shougo/unite.vim')
+    call dein#add('airblade/vim-gitgutter')
+    call dein#add('editorconfig/editorconfig-vim')
+    call dein#add('hashivim/vim-terraform')
+    call dein#add('vim-scripts/taglist.vim')
+    call dein#add('thinca/vim-zenspace') " hightlight full-width space like this 　
+    call dein#add('glidenote/memolist.vim')
+    call dein#add('Shougo/neocomplete')
+    call dein#add('itchyny/lightline.vim')
+    call dein#add('nathanaelkane/vim-indent-guides')
     call dein#end()
 endif
 if dein#check_install()
     call dein#install()
 endif
-" call neobundle#begin(expand('~/.vim/bundle/')) "required
-" NeoBundleFetch 'Shougo/neobundle.vim' " Let NeoBundle manage NeoBundle (Required)
-" call neobundle#end()
 
 syntax on " なぜかこの辺に書かないと動かない
 
-" NeoBundle 'scrooloose/nerdtree'
-" let NERDTreeShowHidden = 1
-" command! Nt NERDTree
-" 
-" NeoBundle 'scrooloose/syntastic.git' " syntax checker
-" let g:syntastic_php_checkers = ['php'] " do not use phpmd and phpcs
-" let g:syntastic_javascript_checkers = ['jshint']
-" let g:syntastic_html_tidy_exec = 'tidy5'
-" let g:syntastic_eruby_ruby_quiet_messages =
-"     \ {'regex': 'possibly useless use of a variable in void context'}
-" let g:syntastic_html_tidy_ignore_errors=[
-"     \'proprietary attribute "ng-'
-" \]
-" 
-" NeoBundle 'kannokanno/previm' " preview markdown
-" let g:previm_open_cmd="open -a Safari"
-" augroup PrevimSettings
-"     autocmd!
-"     autocmd BufNewFile,BufRead *.{md,mdwn,mkd,mkdn,mark*} set filetype=markdown
-" augroup END
-" 
-" NeoBundle 'tpope/vim-fugitive' "git commands on vim
-" NeoBundle 'mhinz/vim-startify' " startpage of vim
-" NeoBundle 'terryma/vim-multiple-cursors'
-" NeoBundle 'tomtom/tcomment_vim'
-" NeoBundle 'mattn/emmet-vim'
-" NeoBundle 'wakatime/vim-wakatime'
-" NeoBundle 'Shougo/unite.vim'
-" NeoBundle 'airblade/vim-gitgutter'
-" NeoBundle 'editorconfig/editorconfig-vim'
-" NeoBundle 'hashivim/vim-terraform'
-" NeoBundle 'vim-scripts/taglist.vim'
-" 
-" NeoBundle 'thinca/vim-zenspace' " hightlight full-width space like this 　
-" let g:zenspace#default_mode = 'on'
-" augroup vimrc-highlight
-"     autocmd!
-"     autocmd ColorScheme * highlight ZenSpace ctermbg=Red guibg=Red
-" augroup END
-" 
-" NeoBundle 'nathanaelkane/vim-indent-guides'
-" let g:indent_guides_enable_on_vim_startup=1
-" let g:indent_guides_start_level=2
-" let g:indent_guides_color_change_percent =5
-" let g:indent_guides_guide_size = 1
-" 
-" NeoBundle 'glidenote/memolist.vim'
-" let g:memolist_path = expand("~/Documents/Memos")
-" let g:memolist_memo_suffix = "md"
-" let g:memolist_ex_cmd = 'NERDTree'
-" 
-" NeoBundle 'Shougo/neocomplete'
-" let g:neocomplete#enable_at_startup = 1
-" 
-" NeoBundle 'itchyny/lightline.vim'
-" set laststatus=2 "ステータスラインを常時表示させる
-" set t_Co=256
-" let g:lightline = {
-"     \ 'colorscheme': 'jellybeans',
-"     \ 'active': {
-"     \     'left': [
-"     \         ['mode', 'current_branch', 'paste'],
-"     \         [ 'modified', 'filename', 'readonly']
-"     \     ]
-"     \ },
-"     \ 'component': {
-"     \     'readonly': '%{&readonly?"[RO]":""}'
-"     \ },
-"     \ 'component_function': {
-"     \     'current_branch': 'CurrentBranch',
-"     \     'filename': 'FileName',
-"     \     'mode': 'MultiMode',
-"     \     'fileformat': 'FileFormat',
-"     \     'filetype': 'FileType',
-"     \     'fileencoding': 'FileEncoding'
-"     \ }
-" \ }
-" 
-" "-- lightline functions --"
-" function! CurrentBranch()
-"     try
-"         if &ft !~? 'nerdtree' && exists('*fugitive#head') && strlen(fugitive#head())
-"             return "ト " . fugitive#head()
-"         endif
-"     catch
-"     endtry
-"     return ''
-" endfunction
-" 
-" function! FileName()
-"     if &ft !~? 'nerdtree'
-"         return expand('%:t')
-"     endif
-"     return ''
-" endfunction
-" 
-" function! MultiMode()
-"     let fname = expand('%:t')
-"     return fname =~ 'NERD_tree' ? 'NERDTree' : lightline#mode()
-" endfunction
-" 
-" function! FileFormat()
-"     return winwidth(0) > 70 ? &fileformat : ''
-" endfunction
-" 
-" function! FileType()
-"     return winwidth(0) > 70 ? (&filetype !=# '' ? &filetype : 'no ft') : ''
-" endfunction
-" 
-" function! FileEncoding()
-"     return winwidth(0) > 70 ? (&fenc !=# '' ? &fenc : &enc) : ''
-" endfunction
-" 
-" call neobundle#end()
-" 
-" NeoBundleCheck
+" NERDTree
+let NERDTreeShowHidden = 1
+command! Nt NERDTree
+
+" syntastic
+let g:syntastic_php_checkers = ['php'] " do not use phpmd and phpcs
+let g:syntastic_javascript_checkers = ['jshint']
+let g:syntastic_html_tidy_exec = 'tidy5'
+let g:syntastic_eruby_ruby_quiet_messages =
+    \ {'regex': 'possibly useless use of a variable in void context'}
+let g:syntastic_html_tidy_ignore_errors=[
+    \'proprietary attribute "ng-'
+\]
+
+" previm
+let g:previm_open_cmd="open -a Safari"
+augroup PrevimSettings
+    autocmd!
+    autocmd BufNewFile,BufRead *.{md,mdwn,mkd,mkdn,mark*} set filetype=markdown
+augroup END
+
+" zenspace
+let g:zenspace#default_mode = 'on'
+augroup vimrc-highlight
+    autocmd!
+    autocmd ColorScheme * highlight ZenSpace ctermbg=Red guibg=Red
+augroup END
+
+" indent guides
+let g:indent_guides_enable_on_vim_startup=1
+let g:indent_guides_start_level=2
+let g:indent_guides_color_change_percent =5
+let g:indent_guides_guide_size = 1
+
+" memolist
+let g:memolist_path = expand("~/Documents/Memos")
+let g:memolist_memo_suffix = "md"
+let g:memolist_ex_cmd = 'NERDTree'
+
+" neocomplete
+let g:neocomplete#enable_at_startup = 1
+
+" lightline
+set laststatus=2 "ステータスラインを常時表示させる
+set t_Co=256
+let g:lightline = {
+    \ 'colorscheme': 'jellybeans',
+    \ 'active': {
+    \     'left': [
+    \         ['mode', 'current_branch', 'paste'],
+    \         [ 'modified', 'filename', 'readonly']
+    \     ]
+    \ },
+    \ 'component': {
+    \     'readonly': '%{&readonly?"[RO]":""}'
+    \ },
+    \ 'component_function': {
+    \     'current_branch': 'CurrentBranch',
+    \     'filename': 'FileName',
+    \     'mode': 'MultiMode',
+    \     'fileformat': 'FileFormat',
+    \     'filetype': 'FileType',
+    \     'fileencoding': 'FileEncoding'
+    \ }
+\ }
+
+"-- lightline functions --"
+function! CurrentBranch()
+    try
+        if &ft !~? 'nerdtree' && exists('*fugitive#head') && strlen(fugitive#head())
+            return "ト " . fugitive#head()
+        endif
+    catch
+    endtry
+    return ''
+endfunction
+
+function! FileName()
+    if &ft !~? 'nerdtree'
+        return expand('%:t')
+    endif
+    return ''
+endfunction
+
+function! MultiMode()
+    let fname = expand('%:t')
+    return fname =~ 'NERD_tree' ? 'NERDTree' : lightline#mode()
+endfunction
+
+function! FileFormat()
+    return winwidth(0) > 70 ? &fileformat : ''
+endfunction
+
+function! FileType()
+    return winwidth(0) > 70 ? (&filetype !=# '' ? &filetype : 'no ft') : ''
+endfunction
+
+function! FileEncoding()
+    return winwidth(0) > 70 ? (&fenc !=# '' ? &fenc : &enc) : ''
+endfunction
 
