@@ -59,6 +59,7 @@ endif
 if dein#load_state(s:dein_dir)
     call dein#begin(s:dein_dir)
     call dein#load_toml(s:dein_dir . '/rc/dein.toml')
+    call dein#load_toml(s:dein_dir . '/rc/dein_lazy.toml')
     call dein#end()
     call dein#save_state()
 endif

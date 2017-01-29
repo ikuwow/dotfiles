@@ -1,12 +1,11 @@
 [[plugins]]
-repo = 'cespare/vim-toml'
+repo = 'Shougo/dein.vim'
 
 [[plugins]]
-repo = 'scrooloose/nerdtree'
-hook_add = '''
-    let NERDTreeShowHidden = 1
-    command! Nt NERDTree
-'''
+repo = 'mhinz/vim-startify'
+
+[[plugins]]
+repo = 'cespare/vim-toml'
 
 [[plugins]]
 repo = 'scrooloose/syntastic.git'
@@ -22,28 +21,7 @@ hook_add = '''
 '''
 
 [[plugins]]
-repo = 'mhinz/vim-startify'
-
-[[plugins]]
-repo = 'tomtom/tcomment_vim'
-
-[[plugins]]
-repo = 'mattn/emmet-vim'
-
-[[plugins]]
-repo = 'wakatime/vim-wakatime'
-
-[[plugins]]
 repo = 'airblade/vim-gitgutter'
-
-[[plugins]]
-repo = 'editorconfig/editorconfig-vim'
-
-[[plugins]]
-repo = 'hashivim/vim-terraform'
-
-[[plugins]]
-repo = 'vim-scripts/taglist.vim'
 
 [[plugins]]
 repo = 'thinca/vim-zenspace')
@@ -55,23 +33,16 @@ hook_add = '''
     augroup END
 '''
 
-
 [[plugins]]
-repo = 'glidenote/memolist.vim'
+repo = 'scrooloose/nerdtree'
 hook_add = '''
-    let g:memolist_path = expand("~/Documents/Memos")
-    let g:memolist_memo_suffix = "md"
-    let g:memolist_ex_cmd = 'NERDTree'
-'''
-
-[[plugins]]
-repo = 'Shougo/neocomplete'
-hook_add = '''
-    let g:neocomplete#enable_at_startup = 1
+    let NERDTreeShowHidden = 1
+    command! Nt NERDTree
 '''
 
 [[plugins]]
 repo = 'itchyny/lightline.vim'
+depends = ['NERDTree']
 hook_add = '''
     let g:lightline = {
         \ 'colorscheme': 'jellybeans',
@@ -141,25 +112,21 @@ hook_add = '''
 
 [[plugins]]
 repo = 'terryma/vim-multiple-cursors'
-hook_add = '''
-'''
-
-[[plugins]]
-repo = 'tpope/vim-fugitive'
-hook_add = '''
-'''
 
 [[plugins]]
 repo = 'Shougo/unite.vim'
-hook_add = '''
-'''
 
 [[plugins]]
-repo = 'kannokanno/previm'
-hook_add = '''
-    let g:previm_open_cmd="open -a Safari"
-    augroup PrevimSettings
-        autocmd!
-        autocmd BufNewFile,BufRead *.{md,mdwn,mkd,mkdn,mark*} set filetype=markdown
-    augroup END
-'''
+repo = 'wakatime/vim-wakatime'
+
+[[plugins]]
+repo = 'hashivim/vim-terraform'
+
+[[plugins]]
+repo = 'editorconfig/editorconfig-vim'
+
+[[plugins]]
+repo = 'tomtom/tcomment_vim'
+
+[[plugins]]
+repo = 'vim-scripts/taglist.vim'
