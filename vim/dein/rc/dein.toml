@@ -41,8 +41,11 @@ hook_add = '''
 '''
 
 [[plugins]]
+repo = 'tpope/vim-fugitive'
+
+[[plugins]]
 repo = 'itchyny/lightline.vim'
-depends = ['NERDTree']
+depends = ['nerdtree', 'vim-fugitive']
 hook_add = '''
     let g:lightline = {
         \ 'colorscheme': 'jellybeans',
@@ -130,3 +133,14 @@ repo = 'tomtom/tcomment_vim'
 
 [[plugins]]
 repo = 'vim-scripts/taglist.vim'
+
+[[plugins]]
+repo = 'kannokanno/previm'
+hook_add = '''
+    let g:previm_open_cmd="open -a Safari"
+    augroup PrevimSettings
+        autocmd!
+        autocmd BufNewFile,BufRead *.{md,mdwn,mkd,mkdn,mark*} set filetype=markdown
+    augroup END
+'''
+
