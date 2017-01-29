@@ -24,7 +24,7 @@ hook_add = '''
 repo = 'airblade/vim-gitgutter'
 
 [[plugins]]
-repo = 'thinca/vim-zenspace')
+repo = 'thinca/vim-zenspace'
 hook_add = '''
     let g:zenspace#default_mode = 'on'
     augroup vimrc-highlight
