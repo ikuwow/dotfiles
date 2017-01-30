@@ -1,13 +1,15 @@
 "=========================="
 "-- Basic Configurations --"
 "=========================="
+
+autocmd!
 set nocompatible " do not use vi compatible mode
 
 set nu
 set title " display filename (not Thank you for using Vim.)
 set ruler " display ruler (60,7 13%)
 set showcmd " show inputting key
-filetype  plugin indent on
+filetype plugin indent on
 
 set hlsearch " highlight the search word
 set ic " ignore case
@@ -74,3 +76,9 @@ syntax enable " なぜかこの辺に書かないと動かない
 
 set laststatus=2
 set t_Co=256
+
+" quickly edit .vimrc
+command! Ev edit $MYVIMRC
+command! Eg edit $MYGVIMRC
+command! Sv source $MYVIMRC
+command! Sg source $MYGVIMRC
