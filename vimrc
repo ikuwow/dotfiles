@@ -82,3 +82,16 @@ command! Ev edit $MYVIMRC
 command! Eg edit $MYGVIMRC
 command! Sv source $MYVIMRC
 command! Sg source $MYGVIMRC
+
+" automatically apply .vimrc changes
+
+augroup MyAutoCmd
+    autocmd!
+augroup END
+
+if has('gui_running')
+    autocmd MyAutoCmd BufWritePost $MYVIMRC source $MYVIMRC | if has('gui_running') | source $MYGVIMRC
+    autocmd MyAutoCmd BufWritePost $MYGVIMRC if has ('gui_running') | source $MYGVIMRC
+else
+    autocmd MyAutoCmd BufWritePost $MYVIMRC nested source $MYVIMRC
+endif
