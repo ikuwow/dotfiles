@@ -135,6 +135,6 @@ repo = 'tomtom/tcomment_vim'
 repo = 'vim-scripts/taglist.vim'
 hook_add = '''
     let g:Tlist_Use_Right_Window = 1
+    let g:Tlist_WinWidth = 40
 '''
-
 
