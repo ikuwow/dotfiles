@@ -84,8 +84,15 @@ command! Eg edit $MYGVIMRC
 command! Sv source $MYVIMRC
 command! Sg source $MYGVIMRC
 
-" automatically apply .vimrc changes
+" quickly remove trailing whitespaces
+fun! TrimTrailingWhitespaces()
+    let l:save = winsaveview()
+    %s/\s\+$//e
+    call winrestview(l:save)
+endfun
+command! TrimTrailingWhitespaces call TrimTrailingWhitespaces()
 
+" automatically apply .vimrc changes
 augroup MyAutoCmd
     autocmd!
 augroup END
