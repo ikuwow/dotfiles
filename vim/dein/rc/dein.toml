@@ -8,6 +8,9 @@ repo = 'mhinz/vim-startify'
 repo = 'cespare/vim-toml'
 
 [[plugins]]
+repo = 'othree/yajs.vim'
+
+[[plugins]]
 repo = 'scrooloose/syntastic.git'
 hook_add = '''
     let g:syntastic_php_checkers = ['php', 'phpcs']
