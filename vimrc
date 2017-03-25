@@ -64,8 +64,12 @@ endif
 
 if dein#load_state(s:dein_dir)
     call dein#begin(s:dein_dir)
-    call dein#load_toml(s:dein_toml)
-    call dein#load_toml(s:dein_toml_lazy, {'lazy': 1})
+    if filereadable(s:dein_toml)
+        call dein#load_toml(s:dein_toml)
+    endif
+    if filereadable(s:dein_toml_lazy)
+        call dein#load_toml(s:dein_toml_lazy, {'lazy': 1})
+    endif
     call dein#end()
     call dein#save_state()
 endif
