@@ -12,6 +12,7 @@ export EDITOR=vim
 export HISTTIMEFORMAT='%y-%m-%d %H:%M:%S '
 export HISTSIZE=5000
 export ANSIBLE_COW_SELECTION=random
+export XDG_CONFIG_HOME=~/.config
 
 if `type rbenv > /dev/null 2>&1`; then
   eval "$(rbenv init - --no-rehash)"
