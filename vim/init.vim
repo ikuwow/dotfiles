@@ -1,0 +1,1 @@
+/Users/degawaikuo/.vimrc
