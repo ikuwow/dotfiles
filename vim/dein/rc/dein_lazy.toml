@@ -6,15 +6,6 @@ hook_add = '''
 '''
 
 [[plugins]]
-repo = 'Shougo/vimproc.vim'
-build = 'make'
-on_source = ['unite.vim']
-
-[[plugins]]
-repo = 'Shougo/unite.vim'
-on_cmd = ['Unite']
-
-[[plugins]]
 repo = 'glidenote/memolist.vim'
 depends = ['nerdtree']
 on_event = ['CmdwinEnter']

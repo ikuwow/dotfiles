@@ -11,6 +11,22 @@ repo = 'cespare/vim-toml'
 repo = 'othree/yajs.vim'
 
 [[plugins]]
+repo = 'Shougo/vimproc.vim'
+build = 'make'
+
+[[plugins]]
+repo = 'Shougo/unite.vim'
+on_cmd = ['Unite']
+hook_add = '''
+    let g:unite_enable_start_insert = 1
+    let g:unite_enable_ignore_case = 1
+    let g:unite_enable_smart_case = 1
+    nmap <Space> [unite]
+    nnoremap <silent> [unite]f :<C-u>Unite<Space>file<CR>
+    nnoremap <silent> [unite]g :<C-u>Unite<Space>file_rec/git<CR>
+'''
+
+[[plugins]]
 repo = 'scrooloose/syntastic.git'
 hook_add = '''
     let g:syntastic_php_checkers = ['php', 'phpcs']
