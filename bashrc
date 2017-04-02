@@ -20,17 +20,6 @@ if [ -f ~/bin/ssh-host-color ]; then
     alias ssh=~/bin/ssh-host-color
 fi
 
-function altgit {
-    cmd=$1
-    shift
-    extra=""
-    if [ "$cmd" == "clone" ]; then
-        extra="--recursive"
-    fi
-    \git $cmd $extra $@
-}
-alias git='altgit'
-
 case `uname` in
     "CYGWIN" )
         alias ls='ls --color';;
