@@ -126,9 +126,6 @@ hook_add = '''
 repo = 'terryma/vim-multiple-cursors'
 
 [[plugins]]
-repo = 'Shougo/unite.vim'
-
-[[plugins]]
 repo = 'wakatime/vim-wakatime'
 
 [[plugins]]
