@@ -21,9 +21,15 @@ hook_add = '''
     let g:unite_enable_start_insert = 1
     let g:unite_enable_ignore_case = 1
     let g:unite_enable_smart_case = 1
+
     nmap <Space> [unite]
-    nnoremap <silent> [unite]f :<C-u>Unite<Space>file<CR>
+    nnoremap <silent> [unite]f :<C-u>Unite<Space>file_rec/async<CR>
     nnoremap <silent> [unite]g :<C-u>Unite<Space>file_rec/git<CR>
+'''
+hook_post_source = '''
+    let s:unite_ignore_patterns='\.\(gif\|jpe\?g\|png\|webp\)$'
+    call unite#custom#source('file_rec/async', 'ignore_pattern', s:unite_ignore_patterns)
+    call unite#custom#source('file_rec/git', 'ignore_pattern', s:unite_ignore_patterns)
 '''
 
 [[plugins]]
