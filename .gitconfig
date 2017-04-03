@@ -1,17 +1,17 @@
 [user]
-	name = Ikuo Degawa
-	email = degawa@ikuwow.com
+    name = Ikuo Degawa
+    email = degawa@ikuwow.com
 [core]
-	excludesfile = ~/.gitignore
+    excludesfile = ~/.gitignore
     editor = vim
-	quotepath = false
+    quotepath = false
 [color]
-	ui = true
+    ui = true
 [grep]
     lineNumber = true
 [filter "media"]
-	clean = git-media-clean %f
-	smudge = git-media-smudge %f
+    clean = git-media-clean %f
+    smudge = git-media-smudge %f
 [alias]
     s = status
     b = branch
@@ -24,12 +24,13 @@
     ru = remote update
     bl = blame
     gr = grep
+    clone = clone --recursive
 
 # このconfig fileはdotfilesのconfigでもあり、
 # でもあり、PC用グローバル.gitconfigでもある
 [credential]
-	helper = cache
+    helper = cache
 [filter "lfs"]
-	clean = git-lfs clean %f
-	smudge = git-lfs smudge %f
-	required = true
+    clean = git-lfs clean %f
+    smudge = git-lfs smudge %f
+    required = true

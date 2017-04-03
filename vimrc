@@ -15,6 +15,7 @@ set hlsearch " highlight the search word
 set ic " ignore case
 
 set clipboard=unnamed " sharing clipboard
+set termguicolors
 colorscheme desert
 
 " indents and tabs

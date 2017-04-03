@@ -20,17 +20,6 @@ if [ -f ~/bin/ssh-host-color ]; then
     alias ssh=~/bin/ssh-host-color
 fi
 
-function altgit {
-    cmd=$1
-    shift
-    extra=""
-    if [ "$cmd" == "clone" ]; then
-        extra="--recursive"
-    fi
-    \git $cmd $extra $@
-}
-alias git='altgit'
-
 case `uname` in
     "CYGWIN" )
         alias ls='ls --color';;
@@ -48,6 +37,8 @@ if [ -f /usr/local/etc/bash_completion ]; then
     . /usr/local/etc/bash_completion
 fi
 
+OLDPS1="$PS1"
+PS1=$(echo "$OLDPS1" | sed -e 's/\\\$/\\[\\e\[33m\\$\\e\[0m\\]/')
 if [ -n "$SSH_CLIENT" ]; then
     if [[ $PS1 != *"ssh"* ]]; then
         PS1="\[\e[36m\e[33m\][ssh]\[\e[0m\]${PS1}"
