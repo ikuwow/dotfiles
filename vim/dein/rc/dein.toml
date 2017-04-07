@@ -34,6 +34,12 @@ hook_post_source = '''
 
 [[plugins]]
 repo = 'w0rp/ale'
+hook_add = '''
+    let g:ale_linters = {
+    \    'php': ['php', 'phpcs'],
+    \    'javascript': ['jshint']
+    \}
+'''
 
 [[plugins]]
 repo = 'airblade/vim-gitgutter'
