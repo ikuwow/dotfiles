@@ -36,6 +36,7 @@ hook_post_source = '''
 repo = 'w0rp/ale'
 hook_add = '''
     let g:ale_linters = {
+    \    'html': ['htmlhint'],
     \    'php': ['php', 'phpcs'],
     \    'javascript': ['jshint']
     \}
