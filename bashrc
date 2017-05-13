@@ -33,11 +33,8 @@ esac
 
 complete -C aws_completer aws
 
-if [ -f /usr/local/etc/bash_completion ]; then
-    . /usr/local/etc/bash_completion
-fi
+[ -f /usr/local/etc/bash_completion ] && . /usr/local/etc/bash_completion
 
-# PS1 '\h:\W \u\$ ' => '\h:\W \u\[\e[33m\]\$\[\e[0m\] '
 OLDPS1="$PS1"
 PS1=$(echo "$OLDPS1" | sed -e 's/\\\$/\\\[\\e\[33m\\\]\\$\\\[\\e\[0m\\\]/')
 
