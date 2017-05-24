@@ -13,6 +13,7 @@ alias de='docker exec'
 alias ke='kubectl exec'
 alias vag='vagrant'
 alias gccg='gcloud container clusters get-credentials'
+alias wkc='watch -n 5 kubectl get po -o wide'
 
 alias ='echo "Stay hungly, stay foolish."'
 
