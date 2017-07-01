@@ -1,5 +1,5 @@
 ## TODO: it must be in .macrc (specific to homebrew)
-export PATH=~/bin:/usr/local/heroku/bin:/usr/local/bin:/usr/local/sbin:$PATH
+export PATH=~/.nodebrew/current/bin:~/bin:/usr/local/heroku/bin:/usr/local/bin:/usr/local/sbin:$PATH
 if [ -f ~/.phpbrew/bashrc ]; then
     . ~/.phpbrew/bashrc
 fi
