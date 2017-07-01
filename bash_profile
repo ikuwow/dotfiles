@@ -1,9 +1,8 @@
 ## TODO: it must be in .macrc (specific to homebrew)
-export PATH=~/bin:~/.phpbrew/bin:/usr/local/heroku/bin:/usr/local/bin:/usr/local/sbin:$PATH
+export PATH=~/bin:/usr/local/heroku/bin:/usr/local/bin:/usr/local/sbin:$PATH
 if [ -f ~/.phpbrew/bashrc ]; then
     . ~/.phpbrew/bashrc
 fi
-export PATH=~/.phpbrew/bin:$PATH
 
 # Environment Variables
 export LANG=ja_JP.UTF-8
