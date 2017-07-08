@@ -14,6 +14,8 @@ alias ke='kubectl exec'
 alias vag='vagrant'
 alias gccg='gcloud container clusters get-credentials'
 alias wkc='watch -n 5 kubectl get po -o wide'
+alias dr='docker run -it --rm'
+alias drv='docker run -it --rm -w /tmp -v $(pwd):/tmp'
 
 alias ='echo "Stay hungly, stay foolish."'
 
