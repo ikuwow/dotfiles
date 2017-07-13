@@ -30,3 +30,9 @@ fi
 
 # NeoVim
 mkdir -p ${XDG_CONFIG_HOME:=$HOME/.config}
+if [ ! -d $XDG_CONFIG_HOME/nvim ]; then
+    ln -is ~/.vim $XDG_CONFIG_HOME/nvim
+fi
+if [ ! -e $XDG_CONFIG_HOME/nvim/init.vim ]; then
+    ln -is ~/.vimrc $XDG_CONFIG_HOME/nvim/init.vim
+fi
