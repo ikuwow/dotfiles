@@ -31,6 +31,22 @@ hook_post_source = '''
     call unite#custom#source('file_rec/async', 'ignore_pattern', s:unite_ignore_patterns)
     call unite#custom#source('file_rec/git', 'ignore_pattern', s:unite_ignore_patterns)
 '''
+if = "!has('nvim')"
+
+[[plugins]]
+repo = 'Shougo/denite.nvim'
+on_cmd = ['Denite']
+hook_add = '''
+    nmap <Space> [unite]
+    nnoremap <silent> [unite]f :<C-u>Denite<Space>file_rec<CR>
+    nnoremap <silent> [unite]g :<C-u>Denite<Space>file_rec/git<CR>
+'''
+hook_post_source = '''
+    call denite#custom#alias('source', 'file_rec/git', 'file_rec')
+    call denite#custom#var('file_rec/git', 'command',
+	      \ ['git', 'ls-files', '-co', '--exclude-standard'])
+'''
+if = "has('nvim')"
 
 [[plugins]]
 repo = 'w0rp/ale'
