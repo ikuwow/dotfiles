@@ -15,6 +15,10 @@ repo = 'Shougo/vimproc.vim'
 build = 'make'
 
 [[plugins]]
+repo = 'kassio/neoterm'
+if = 'has("nvim")'
+
+[[plugins]]
 repo = 'Shougo/unite.vim'
 on_cmd = ['Unite']
 hook_add = '''
