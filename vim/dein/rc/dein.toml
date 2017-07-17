@@ -2,9 +2,6 @@
 repo = 'Shougo/dein.vim'
 
 [[plugins]]
-repo = 'mhinz/vim-startify'
-
-[[plugins]]
 repo = 'cespare/vim-toml'
 
 [[plugins]]
