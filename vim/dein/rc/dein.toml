@@ -81,7 +81,7 @@ hook_add = '''
 [[plugins]]
 repo = 'scrooloose/nerdtree'
 hook_add = '''
-    let NERDTreeShowHidden = 1
+    let g:NERDTreeShowHidden = 1
     command! Nt NERDTree
 '''
 
