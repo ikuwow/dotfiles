@@ -16,6 +16,7 @@ alias gccg='gcloud container clusters get-credentials'
 alias wkc='watch -n 5 kubectl get po -o wide'
 alias dr='docker run -it --rm'
 alias drv='docker run -it --rm -w /tmp -v $(pwd):/tmp'
+alias mysql='mysql --pager="less -S -n -i -F -X"'
 
 alias ='echo "Stay hungly, stay foolish."'
 
