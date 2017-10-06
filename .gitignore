@@ -4,6 +4,7 @@
 *.swo
 /bin/mlint
 /bin/trash
+/bin/vimr
 /vim/.netrwhist
 
 /vim/dein/repos
