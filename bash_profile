@@ -1,5 +1,7 @@
+export JAVA_HOME=$(/usr/libexec/java_home -v 1.8) # default java version is 8
+
 ## TODO: it must be in .macrc (specific to homebrew)
-export PATH=~/.nodebrew/current/bin:~/bin:/usr/local/heroku/bin:/usr/local/bin:/usr/local/sbin:$PATH
+export PATH=$JAVA_HOME:~/.nodebrew/current/bin:~/bin:/usr/local/heroku/bin:/usr/local/bin:/usr/local/sbin:$PATH
 if [ -f ~/.phpbrew/bashrc ]; then
     . ~/.phpbrew/bashrc
 fi
