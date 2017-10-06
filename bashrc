@@ -8,6 +8,7 @@ alias tree='tree -NC'
 alias grep='grep --color=auto'
 alias bye='exit'
 
+alias vim='nvim'
 alias be='bundle exec'
 alias de='docker exec'
 alias ke='kubectl exec'
