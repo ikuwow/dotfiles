@@ -1,5 +1,5 @@
 ## TODO: it must be in .macrc (specific to homebrew)
-export PATH=~/.nodebrew/current/bin:~/bin:/usr/local/heroku/bin:/usr/local/bin:/usr/local/sbin:$PATH
+export PATH=~/.jenv/bin:~/.nodebrew/current/bin:~/bin:/usr/local/heroku/bin:/usr/local/bin:/usr/local/sbin:$PATH
 if [ -f ~/.phpbrew/bashrc ]; then
     . ~/.phpbrew/bashrc
 fi
@@ -19,6 +19,10 @@ fi
 
 if `type pyenv > /dev/null 2>&1`; then
     eval "$(pyenv init - --no-rehash)" # adding --no-rehash makes this faster
+fi
+
+if $(type jenv > /dev/null 2>&1); then
+    eval "$(jenv init - --no-rehash)"
 fi
 
 OTHER=(.bashrc .macrc)
