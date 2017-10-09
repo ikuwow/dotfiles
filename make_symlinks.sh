@@ -31,6 +31,9 @@ fi
 if [ ! -e ~/.ssh/config ]; then
     ln -is ~/iCloud\ Drive/CloudDocs/ssh/config ~/.ssh/config
 fi
+if [ ! -e ~/.ssh/config.d ]; then
+    ln -is ~/iCloud\ Drive/CloudDocs/ssh/config.d ~/.ssh/config.d
+fi
 
 # NeoVim
 mkdir -p ${XDG_CONFIG_HOME:=$HOME/.config}
