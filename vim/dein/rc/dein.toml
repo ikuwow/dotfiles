@@ -46,6 +46,8 @@ hook_post_source = '''
     call denite#custom#alias('source', 'file_rec/git', 'file_rec')
     call denite#custom#var('file_rec/git', 'command',
 	      \ ['git', 'ls-files', '-co', '--exclude-standard'])
+    call denite#custom#map('insert', '<C-n>', '<denite:move_to_next_line>', 'noremap')
+    call denite#custom#map('insert', '<C-p>', '<denite:move_to_previous_line>', 'noremap')
 '''
 if = "has('nvim')"
 
@@ -79,7 +81,7 @@ hook_add = '''
 [[plugins]]
 repo = 'scrooloose/nerdtree'
 hook_add = '''
-    let NERDTreeShowHidden = 1
+    let g:NERDTreeShowHidden = 1
     command! Nt NERDTree
 '''
 

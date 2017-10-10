@@ -7,7 +7,7 @@ fi
 # Environment Variables
 export LANG=ja_JP.UTF-8
 export LESSCHARSET=utf-8
-export EDITOR=vim
+export EDITOR=nvim
 export HISTTIMEFORMAT='%y-%m-%d %H:%M:%S '
 export HISTSIZE=5000
 export ANSIBLE_COW_SELECTION=random

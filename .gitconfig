@@ -3,7 +3,7 @@
     email = degawa@ikuwow.com
 [core]
     excludesfile = ~/.gitignore
-    editor = vim
+    editor = nvim
     quotepath = false
 [color]
     ui = true
