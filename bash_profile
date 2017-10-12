@@ -34,6 +34,6 @@ done
 
 ssh-add -K > /dev/null 2>&1
 if [ $? != 0 ]; then
-    echo "ERROR: 'sh-add -K' failed!"
+    echo "ERROR: 'ssh-add -K' failed!"
     exit 1
 fi
