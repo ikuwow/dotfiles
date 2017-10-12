@@ -31,3 +31,9 @@ for rcfile in ${OTHER[@]}; do
         source ~/$rcfile
     fi
 done
+
+ssh-add -K > /dev/null 2>&1
+if [ $? != 0 ]; then
+    echo "ERROR: 'sh-add -K' failed!"
+    exit 1
+fi
