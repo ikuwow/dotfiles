@@ -37,3 +37,7 @@ if [ $? != 0 ]; then
     echo "ERROR: 'ssh-add -K' failed!"
     exit 1
 fi
+
+if $(type fuck > /dev/null 2>&1); then
+    eval $(thefuck --alias)
+fi
