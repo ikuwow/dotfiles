@@ -25,6 +25,10 @@ if $(type jenv > /dev/null 2>&1); then
     eval "$(jenv init - --no-rehash)"
 fi
 
+if $(type fuck > /dev/null 2>&1); then
+    eval "$(thefuck --alias)"
+fi
+
 OTHER=(.bashrc .macrc)
 for rcfile in ${OTHER[@]}; do
     if [ -e ~/$rcfile ]; then
