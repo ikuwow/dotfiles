@@ -30,6 +30,8 @@ case `uname` in
         alias ls='ls --color';;
     "Linux" )
         alias ls='ls --color';;
+    "Darwin" )
+        bind "set completion-ignore-case on";;
     * )
         # do nothing
 esac
