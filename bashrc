@@ -42,6 +42,9 @@ complete -C aws_completer aws
 
 [ -f /usr/local/etc/bash_completion ] && . /usr/local/etc/bash_completion
 
+if [ ! -n "$SSH_CLIENT" ]; then
+    PS1='\h: \W\$ '
+fi
 OLDPS1="$PS1"
 PS1=$(echo "$OLDPS1" | sed -e 's/\\\$/\\\[\\e\[33m\\\]\\$\\\[\\e\[0m\\\]/')
 
@@ -79,4 +82,3 @@ gclconf ()
     fi
     gcloud config configurations activate $confname
 }
-
