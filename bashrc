@@ -8,7 +8,6 @@ alias tree='tree -NC'
 alias grep='grep --color=auto'
 alias bye='exit'
 
-alias vim='nvim'
 alias be='bundle exec'
 alias de='docker exec'
 alias ke='kubectl exec'
@@ -82,3 +81,5 @@ gclconf ()
     fi
     gcloud config configurations activate $confname
 }
+
+alias fumpo='slack-cli -d times_ikuwow'
