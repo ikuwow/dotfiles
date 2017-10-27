@@ -1,4 +1,5 @@
-export VIMINIT="let \$MYVIMRC='$SSHHOME/.sshrc.d/.vimrc' | source \$MYVIMRC"
+#export VIMINIT="let \$MYVIMRC='$SSHHOME/.sshrc.d/.vimrc' | source \$MYVIMRC"
+# do not use it! or you will setup all of vim plugins with dein.vim when type vim
 
 source $SSHHOME/.sshrc.d/.bashrc
 
