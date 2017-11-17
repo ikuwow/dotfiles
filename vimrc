@@ -28,7 +28,7 @@ set autoindent
 set expandtab " convert tab to spaces
 set tabstop=4 " spaces number of tab
 set tw=0 " text width
-if version >=800
+if version >=800 || has("nvim")
     set breakindent
 endif
 set formatoptions=q
