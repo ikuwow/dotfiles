@@ -17,6 +17,7 @@ alias wkc='watch -n 5 kubectl get po -o wide'
 alias dr='docker run -it --rm'
 alias drv='docker run -it --rm -w /tmp -v $(pwd):/tmp'
 alias mysql='mysql --pager="less -S -n -i -F -X"'
+alias ssid=$'/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -I | awk \'/ SSID/ {print substr($0, index($0, $2))}\''
 
 alias ='echo "Stay hungly, stay foolish."'
 
