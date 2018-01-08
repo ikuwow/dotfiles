@@ -18,6 +18,13 @@ alias dr='docker run -it --rm'
 alias drv='docker run -it --rm -w /tmp -v $(pwd):/tmp'
 alias mysql='mysql --pager="less -S -n -i -F -X"'
 
+if [ $(which networksetup) ]; then
+    function wifireset {
+        networksetup -setairportpower en0 off
+        networksetup -setairportpower en0 on
+    }
+fi
+
 alias ='echo "Stay hungly, stay foolish."'
 
 if [ -f ~/bin/ssh-host-color ]; then
