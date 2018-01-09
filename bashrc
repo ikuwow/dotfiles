@@ -19,6 +19,13 @@ alias drv='docker run -it --rm -w /tmp -v $(pwd):/tmp'
 alias mysql='mysql --pager="less -S -n -i -F -X"'
 alias ssid=$'/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -I | awk \'/ SSID/ {print substr($0, index($0, $2))}\''
 
+if [ $(which networksetup) ]; then
+    function wifireset {
+        networksetup -setairportpower en0 off
+        networksetup -setairportpower en0 on
+    }
+fi
+
 alias ='echo "Stay hungly, stay foolish."'
 
 if [ -f ~/bin/ssh-host-color ]; then
@@ -42,17 +49,24 @@ complete -C aws_completer aws
 
 [ -f /usr/local/etc/bash_completion ] && . /usr/local/etc/bash_completion
 
-if [ ! -n "$SSH_CLIENT" ]; then
-    PS1='\h: \W\$ '
-fi
-OLDPS1="$PS1"
-PS1=$(echo "$OLDPS1" | sed -e 's/\\\$/\\\[\\e\[33m\\\]\\$\\\[\\e\[0m\\\]/')
+function prompts {
+    local WHITE="\[\e[0m\]"
+    local YELLOW="\[\e[33m\]"
 
-if [ -n "$SSH_CLIENT" ]; then
-    if [[ $PS1 != *"ssh"* ]]; then
-        PS1="\[\e[36m\e[33m\][ssh]\[\e[0m\]${PS1}"
+    if [ ! -n "$SSH_CLIENT" ]; then
+        PS1='\h: \W\$ '
     fi
-fi
+    local OLDPS1="$PS1"
+    PS1=$(echo "$OLDPS1" | sed -e 's/\\\$/\\\[\\e\[33m\\\]$\\\[\\e\[0m\\\]/')
+
+    if [ -n "$SSH_CLIENT" ]; then
+        if [[ $PS1 != *"ssh"* ]]; then
+            PS1="$YELLOW[ssh]$WHITE$PS1"
+        fi
+    fi
+}
+
+prompts
 
 _complete_ssh_hosts ()
 {
