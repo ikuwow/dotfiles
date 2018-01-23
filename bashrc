@@ -19,7 +19,7 @@ alias drv='docker run -it --rm -w /tmp -v $(pwd):/tmp'
 alias mysql='mysql --pager="less -S -n -i -F -X"'
 alias ssid=$'/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -I | awk \'/ SSID/ {print substr($0, index($0, $2))}\''
 
-if [ $(which networksetup) ]; then
+if [ $(command -v networksetup) ]; then
     function wifireset {
         networksetup -setairportpower en0 off
         networksetup -setairportpower en0 on
