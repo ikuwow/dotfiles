@@ -183,3 +183,8 @@ hook_add = '''
     let g:Tlist_WinWidth = 40
 '''
 
+[[plugins]]
+repo = 'junegunn/vim-easy-align'
+
+[[plugins]]
+repo = 'KazuakiM/vim-sqlfix'
