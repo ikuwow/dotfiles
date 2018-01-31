@@ -38,3 +38,11 @@ hook_add = '''
         autocmd BufNewFile,BufRead *.{md,mdwn,mkd,mkdn,mark*} set filetype=markdown
     augroup END
 '''
+
+[[plugins]]
+repo = 'junegunn/vim-easy-align'
+on_event = ['CmdwinEnter']
+
+[[plugins]]
+repo = 'KazuakiM/vim-sqlfix'
+on_event = ['CmdwinEnter']
