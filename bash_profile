@@ -1,5 +1,5 @@
 ## TODO: it must be in .macrc (specific to homebrew)
-PATH=~/.nodebrew/current/bin:~/bin:/usr/local/bin:/usr/local/sbin:$PATH
+PATH=~/bin:/usr/local/bin:/usr/local/sbin:$PATH
 if [ -f ~/.phpbrew/bashrc ]; then
     . ~/.phpbrew/bashrc
 fi
