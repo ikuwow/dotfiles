@@ -9,6 +9,8 @@ if $(type anyenv > /dev/null 2>&1); then
     eval "$(anyenv init - --no-rehash)"
 fi
 export PATH
+# java home setting
+export JAVA_HOME=$(/usr/libexec/java_home -v $(cat ~/.anyenv/envs/jenv/version))
 
 # Environment Variables
 export LANG=ja_JP.UTF-8
