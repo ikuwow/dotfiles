@@ -21,10 +21,6 @@ export HISTSIZE=5000
 export ANSIBLE_COW_SELECTION=random
 export XDG_CONFIG_HOME=~/.config
 
-if $(type fuck > /dev/null 2>&1); then
-    eval "$(thefuck --alias)"
-fi
-
 OTHER=(.bashrc .macrc)
 for rcfile in ${OTHER[@]}; do
     if [ -e ~/$rcfile ]; then
