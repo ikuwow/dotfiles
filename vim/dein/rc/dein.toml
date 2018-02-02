@@ -2,9 +2,6 @@
 repo = 'Shougo/dein.vim'
 
 [[plugins]]
-repo = 'othree/yajs.vim'
-
-[[plugins]]
 repo = 'Shougo/vimproc.vim'
 build = 'make'
 

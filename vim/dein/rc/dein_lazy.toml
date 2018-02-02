@@ -62,3 +62,7 @@ on_ft = ['toml']
 [[plugins]]
 repo = 'hashivim/vim-terraform'
 on_ft = ['terraform']
+
+[[plugins]]
+repo = 'othree/yajs.vim'
+on_ft = ['javascript', 'html']
