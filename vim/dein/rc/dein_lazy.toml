@@ -46,3 +46,7 @@ on_event = ['CmdwinEnter']
 [[plugins]]
 repo = 'KazuakiM/vim-sqlfix'
 on_event = ['CmdwinEnter']
+
+[[plugins]]
+repo = 'cespare/vim-toml'
+on_ft = ['toml']
