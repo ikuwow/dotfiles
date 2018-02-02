@@ -2,12 +2,6 @@
 repo = 'Shougo/dein.vim'
 
 [[plugins]]
-repo = 'cespare/vim-toml'
-
-[[plugins]]
-repo = 'othree/yajs.vim'
-
-[[plugins]]
 repo = 'Shougo/vimproc.vim'
 build = 'make'
 
@@ -66,9 +60,6 @@ hook_add = '''
 repo = 'airblade/vim-gitgutter'
 
 [[plugins]]
-repo = 'tpope/vim-abolish'
-
-[[plugins]]
 repo = 'thinca/vim-zenspace'
 hook_add = '''
     let g:zenspace#default_mode = 'on'
@@ -76,13 +67,6 @@ hook_add = '''
         autocmd!
         autocmd ColorScheme * highlight ZenSpace ctermbg=Red guibg=Red
     augroup END
-'''
-
-[[plugins]]
-repo = 'scrooloose/nerdtree'
-hook_add = '''
-    let g:NERDTreeShowHidden = 1
-    command! Nt NERDTree
 '''
 
 [[plugins]]
@@ -159,13 +143,7 @@ hook_add = '''
 '''
 
 [[plugins]]
-repo = 'terryma/vim-multiple-cursors'
-
-[[plugins]]
 repo = 'wakatime/vim-wakatime'
-
-[[plugins]]
-repo = 'hashivim/vim-terraform'
 
 [[plugins]]
 repo = 'editorconfig/editorconfig-vim'
