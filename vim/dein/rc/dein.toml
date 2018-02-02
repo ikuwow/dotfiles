@@ -152,9 +152,6 @@ hook_add = '''
 repo = 'wakatime/vim-wakatime'
 
 [[plugins]]
-repo = 'hashivim/vim-terraform'
-
-[[plugins]]
 repo = 'editorconfig/editorconfig-vim'
 hook_add = '''
     let g:EditorConfig_core_mode = 'python_external'
