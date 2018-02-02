@@ -76,13 +76,6 @@ hook_add = '''
 '''
 
 [[plugins]]
-repo = 'scrooloose/nerdtree'
-hook_add = '''
-    let g:NERDTreeShowHidden = 1
-    command! Nt NERDTree
-'''
-
-[[plugins]]
 repo = 'tpope/vim-fugitive'
 
 [[plugins]]
