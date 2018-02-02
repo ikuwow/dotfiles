@@ -97,4 +97,11 @@ gclconf ()
     gcloud config configurations activate $confname
 }
 
-alias fumpo='slack-cli -d times_ikuwow'
+fumpo ()
+{
+    eval "slack chat send '$@' '#times_ikuwow'" 1> /dev/null
+    if [ $? != 0 ]; then
+        echo 'Error: exiting'
+        return 1
+    fi
+}
