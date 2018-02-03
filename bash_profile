@@ -1,3 +1,5 @@
+# vim: set filetype=sh :
+
 ## TODO: it must be in .macrc (specific to homebrew)
 PATH=~/bin:/usr/local/bin:/usr/local/sbin:$PATH
 if [ -f ~/.phpbrew/bashrc ]; then

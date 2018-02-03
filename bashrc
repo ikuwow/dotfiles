@@ -1,5 +1,6 @@
-## Aliases
+# vim: filetype=sh :
 
+## Aliases
 alias ls='ls --color'
 alias ll='ls -l'
 alias la='ls -A'
