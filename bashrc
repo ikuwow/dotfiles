@@ -1,5 +1,6 @@
 ## Aliases
 
+alias ls='ls --color'
 alias ll='ls -l'
 alias la='ls -A'
 alias rm='rm -i'
@@ -17,31 +18,12 @@ alias wkc='watch -n 5 kubectl get po -o wide'
 alias dr='docker run -it --rm'
 alias drv='docker run -it --rm -w /tmp -v $(pwd):/tmp'
 alias mysql='mysql --pager="less -S -n -i -F -X"'
-alias ssid=$'/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -I | awk \'/ SSID/ {print substr($0, index($0, $2))}\''
-
-if [ $(command -v networksetup) ]; then
-    function wifireset {
-        networksetup -setairportpower en0 off
-        networksetup -setairportpower en0 on
-    }
-fi
 
 alias ='echo "Stay hungly, stay foolish."'
 
 if [ -f ~/bin/ssh-host-color ]; then
     alias ssh=~/bin/ssh-host-color
 fi
-
-case `uname` in
-    "CYGWIN" )
-        alias ls='ls --color';;
-    "Linux" )
-        alias ls='ls --color';;
-    "Darwin" )
-        bind "set completion-ignore-case on";;
-    * )
-        # do nothing
-esac
 
 ## Auto complete
 
