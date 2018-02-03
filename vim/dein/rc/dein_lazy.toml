@@ -1,12 +1,4 @@
 [[plugins]]
-repo = 'scrooloose/nerdtree'
-hook_add = '''
-    let g:NERDTreeShowHidden = 1
-    command! Nt NERDTree
-'''
-on_event = ['CmdwinEnter']
-
-[[plugins]]
 repo = 'Shougo/neocomplete'
 on_event = ['InsertEnter']
 hook_add = '''
