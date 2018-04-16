@@ -22,6 +22,7 @@ export HISTTIMEFORMAT='%y-%m-%d %H:%M:%S '
 export HISTSIZE=5000
 export ANSIBLE_COW_SELECTION=random
 export XDG_CONFIG_HOME=~/.config
+export PROMPT_COMMAND='echo -ne "\033]0;${PWD}\007"'
 
 OTHER=(.bashrc .macrc)
 for rcfile in ${OTHER[@]}; do
