@@ -44,7 +44,7 @@ function prompts {
     PS1=$(echo "$OLDPS1" | sed -e 's/\\\$/\\\[\\e\[33m\\\]$\\\[\\e\[0m\\\]/')
 
     if [ -n "$SSH_CLIENT" ]; then
-        if [[ $PS1 != *"ssh"* ]]; then
+        if [ "$PS1" = "${PS1/ssh/}" ]; then
             PS1="$YELLOW[ssh]$WHITE$PS1"
         fi
     fi
