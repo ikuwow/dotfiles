@@ -24,6 +24,14 @@ export ANSIBLE_COW_SELECTION=random
 export XDG_CONFIG_HOME=~/.config
 export PROMPT_COMMAND='echo -ne "\033]0;${PWD}\007"'
 
+gcloudpath=$(dirname $(dirname $(readlink $(which gcloud))))
+if [ -f $gcloudpath/path.bash.inc ]; then
+    source $gcloudpath/path.bash.inc
+fi
+if [ -f $gcloudpath/completion.bash.inc ]; then
+    source $gcloudpath/completion.bash.inc
+fi
+
 OTHER=(.bashrc .macrc)
 for rcfile in ${OTHER[@]}; do
     if [ -e ~/$rcfile ]; then
