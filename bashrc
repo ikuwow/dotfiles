@@ -31,7 +31,9 @@ fi
 
 complete -C aws_completer aws
 
-[ -f $(brew --prefix)/etc/bash_completion ] && . $(brew --prefix)/etc/bash_completion
+if [ "${BASH_VERSINFO}" -ge 4 ] && [ -f /usr/local/share/bash-completion/bash_completion ]; then
+  . /usr/local/share/bash-completion/bash_completion
+fi
 
 function prompts {
     local WHITE="\[\e[0m\]"
