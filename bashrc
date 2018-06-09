@@ -31,7 +31,7 @@ fi
 
 complete -C aws_completer aws
 
-[ -f /usr/local/etc/bash_completion ] && . /usr/local/etc/bash_completion
+[ -f $(brew --prefix)/etc/bash_completion ] && . $(brew --prefix)/etc/bash_completion
 
 function prompts {
     local WHITE="\[\e[0m\]"
