@@ -23,9 +23,7 @@ alias mysql='mysql --pager="less -S -n -i -F -X"'
 
 alias ='echo "Stay hungly, stay foolish."'
 
-if [ -f ~/bin/ssh-host-color ]; then
-    alias ssh=~/bin/ssh-host-color
-fi
+command -v sshrc > /dev/null 2>&1 && alias ssh=sshrc
 
 ## Auto complete
 
