@@ -8,7 +8,7 @@ fi
 
 PATH="$HOME/.anyenv/bin:$PATH"
 if $(type anyenv > /dev/null 2>&1); then
-    eval "$(anyenv init - --no-rehash)"
+    eval "$(anyenv init -)"
 fi
 export PATH
 
