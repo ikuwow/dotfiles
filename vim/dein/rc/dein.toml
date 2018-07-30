@@ -59,7 +59,7 @@ hook_add = '''
     let g:ale_linters = {
     \    'html': ['htmlhint'],
     \    'php': ['php', 'phpcs'],
-    \    'javascript': ['jshint']
+    \    'javascript': ['eslint']
     \}
     let g:ale_lint_on_text_changed = 'never'
 '''
