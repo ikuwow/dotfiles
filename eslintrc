@@ -1,0 +1,13 @@
+{
+  "env": {
+    "node": true
+  },
+  "globals": {},
+  "rules": {
+    "strict": [
+      2,
+      "function"
+    ],
+    "no-unused-vars": 2
+  }
+}
