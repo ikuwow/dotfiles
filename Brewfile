@@ -41,16 +41,23 @@ brew "graphviz"
 brew "universal-ctags", args: ["HEAD"]
 
 cask "iterm2"
+cask "karabiner-elements"
+cask "dropbox"
+cask "box-sync"
+cask "docker"
+cask "istat-menus"
 cask "vimr"
 cask "xquartz"
 cask "google-cloud-sdk"
 cask "franz"
 cask "boostnote"
-cask "istat-menus"
 cask "java"
 cask "java8"
 cask "java6"
 cask "vagrant"
+cask "keybase"
+cask "rescuetime"
+cask "lastfm"
 
 mas "Xcode", id: 497799835
 mas "Numbers", id: 409203825
