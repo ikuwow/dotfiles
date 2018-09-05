@@ -1,18 +1,6 @@
 # vim: set filetype=sh :
 
-## TODO: it must be in .macrc (specific to homebrew)
-PATH=~/bin:/usr/local/bin:/usr/local/sbin:$PATH
-if [ -f ~/.phpbrew/bashrc ]; then
-    . ~/.phpbrew/bashrc
-fi
-
-PATH="$HOME/.anyenv/bin:$PATH"
-if $(type anyenv > /dev/null 2>&1); then
-    eval "$(anyenv init -)"
-fi
-export PATH
-
-# Environment Variables
+export PATH=~/bin:/usr/local/bin:/usr/local/sbin:$PATH
 export LANG=ja_JP.UTF-8
 export LESSCHARSET=utf-8
 export EDITOR=nvim
