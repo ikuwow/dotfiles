@@ -1,0 +1,56 @@
+# vim: filetype=sh
+
+if [ $BASH_VERSINFO -le 3 ]; then
+    echo "WARNING: Your bash version is ${BASH_VERSINFO}!"
+    echo "Please use bash 4.0 ~ by these commands:"
+    echo "sudo bash -c 'echo /usr/local/bin/bash >> /etc/shells'"
+    echo "chsh -s /usr/local/bin/bash"
+fi
+
+if [ `uname` != Darwin ]; then
+    return 0
+fi
+
+## Homebrew
+if [ -f ~/.brew_api_token ];then
+    source ~/.brew_api_token
+fi
+
+export PGDATA=/usr/local/var/postgres
+alias postgres='postgres -D /usr/local/var/postgres'
+
+alias ls='ls -G'
+
+commands=(awk sed)
+for c in ${commands[@]}; do
+    if `type g$c > /dev/null 2>&1`; then
+        alias $c=g$c
+    fi
+done
+
+alias ssid=$'/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -I | awk \'/ SSID/ {print substr($0, index($0, $2))}\''
+if [ $(command -v networksetup) ]; then
+    function wifireset {
+        ssid=$(ssid)
+        interface='en0'
+        networksetup -setairportpower "$interface" off
+        echo 'Re-enabling Wi-Fi...'
+        networksetup -setairportpower "$interface" on
+        if [ "$1" != '-x' ]; then
+            echo "Reconnecting ${ssid}..."
+            networksetup -setairportnetwork "$interface" "$ssid"
+        fi
+        echo 'Done.'
+    }
+fi
+bind "set completion-ignore-case on"
+
+export GOPATH=$HOME/.go
+
+# Java
+if [ -e $HOME/.java-version ]; then
+    java_version=$(cat $HOME/.java-version)
+else
+    java_version=1.8
+fi
+export JAVA_HOME=$(/usr/libexec/java_home -v $java_version)
