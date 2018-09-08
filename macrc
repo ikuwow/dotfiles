@@ -19,8 +19,6 @@ fi
 export PGDATA=/usr/local/var/postgres
 alias postgres='postgres -D /usr/local/var/postgres'
 
-alias ls='ls -G'
-
 commands=(awk sed)
 for c in ${commands[@]}; do
     if `type g$c > /dev/null 2>&1`; then
