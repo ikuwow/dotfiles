@@ -7,7 +7,7 @@ if [ $BASH_VERSINFO -le 3 ]; then
     echo "chsh -s /usr/local/bin/bash"
 fi
 
-if [ `uname` != Darwin ]; then
+if [ $(uname) != Darwin ]; then
     return 0
 fi
 
@@ -21,7 +21,7 @@ alias postgres='postgres -D /usr/local/var/postgres'
 
 commands=(awk sed)
 for c in ${commands[@]}; do
-    if `type g$c > /dev/null 2>&1`; then
+    if $(type g$c > /dev/null 2>&1); then
         alias $c=g$c
     fi
 done

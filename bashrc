@@ -1,7 +1,7 @@
 # vim: filetype=sh :
 
 ## Aliases
-if [ `uname` = Darwin ]; then
+if [ $(uname) = Darwin ]; then
     alias ls='ls -G'
 else
     alias ls='ls --color'
