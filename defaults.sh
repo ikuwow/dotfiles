@@ -1,10 +1,15 @@
 #!/bin/bash
 
+set -e
+
 echo "Configuring..."
 defaults write com.apple.AppleMultitouchTrackpad Clicking -bool true
 defaults write com.apple.CrashReporter UseUNC -bool true
 defaults write KeyRepeat -int 2
 defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
+
+defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false
+defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false
 
 echo "Configuring Dock..."
 defaults write com.apple.dock show-recents -bool false
@@ -36,6 +41,10 @@ defaults write com.apple.Safari ShowFullURLInSmartSearchField -bool true
 defaults write com.apple.Safari IncludeInternalDebugMenu -bool true
 defaults write com.apple.Safari ShowStatusBar -bool true
 defaults write com.apple.Safari AutoFillPasswords -bool false
+
+echo ""
+echo "Configure Complete!"
+echo "Please restart Mac to make sure settings are reflected."
 
 ## Deprecated
 # defaults write com.apple.dock autohide -bool true
