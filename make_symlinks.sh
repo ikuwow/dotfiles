@@ -20,6 +20,19 @@ if [ ! -e ~/.gitconfig ]; then
     ln -is ~/dotfiles/.gitconfig ~/.gitconfig
 fi
 
+# iCloud
+mkdir -p ~/iCloud\ Drive
+
+DIRS=(
+  Keynote Numbers Pages Automator Notes
+  Preview TextEdit QuickTimePlayerX ScriptEditor2
+)
+for dir in ${DIRS[@]}; do
+    ln -Ffhvs ~/Library/Mobile\ Documents/com~apple~${dir}/Documents ~/iCloud\ Drive/${dir}
+done
+
+ln -Ffhvs ~/Library/Mobile\ Documents/com~apple~CloudDocs ~/iCloud\ Drive/CloudDocs
+
 if [ ! -e ~/.ssh/config ]; then
     ln -is ~/iCloud\ Drive/CloudDocs/ssh/config ~/.ssh/config
 fi
@@ -44,3 +57,4 @@ fi
 if [ ! -e $XDG_CONFIG_HOME/karabiner ]; then
     ln -ihs ~/Dropbox/dotconfig/karabiner $XDG_CONFIG_HOME/karabiner
 fi
+
