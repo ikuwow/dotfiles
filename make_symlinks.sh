@@ -27,7 +27,7 @@ if [ ! -e ~/.ssh/config.d ]; then
     ln -is ~/iCloud\ Drive/CloudDocs/ssh/config.d ~/.ssh/config.d
 fi
 if [ ! -e ~/.ideavimrc ]; then
-    ln -is ~/dotfiles/vimrc ~/.ideavimrc
+    ln -is ~/dotfiles/.vimrc ~/.ideavimrc
 fi
 
 mkdir -p ${XDG_CONFIG_HOME:=$HOME/.config}
@@ -41,4 +41,6 @@ if [ ! -e $XDG_CONFIG_HOME/nvim/init.vim ]; then
 fi
 
 # Karabiner Elements
-ln -is ~/Dropbox/dotconfig/karabiner $XDG_CONFIG_HOME/karabiner
+if [ ! -e $XDG_CONFIG_HOME/karabiner ]; then
+    ln -ihs ~/Dropbox/dotconfig/karabiner $XDG_CONFIG_HOME/karabiner
+fi
