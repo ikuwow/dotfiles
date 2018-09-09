@@ -28,11 +28,9 @@ defaults write com.apple.AppleMultitouchMouse MouseOneFingerDoubleTapGesture -in
 defaults write com.apple.AppleMultitouchMouse MouseTwoFingerDoubleTapGesture -int 3
 defaults write com.apple.AppleMultitouchMouse MouseTwoFingerHorizSwipeGesture -int 2
 
-## Finder
 echo "Configuring Finder..."
 defaults write com.apple.finder ShowHardDrivesOnDesktop -bool true
 
-## Safari
 echo "Configuring Safari..."
 defaults write com.apple.Safari ShowFullURLInSmartSearchField -bool true
 defaults write com.apple.Safari IncludeInternalDebugMenu -bool true
