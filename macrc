@@ -46,8 +46,8 @@ bind "set completion-ignore-case on"
 export GOPATH=$HOME/.go
 
 # Java
-if [ -e $HOME/.java-version ]; then
-    java_version=$(cat $HOME/.java-version)
+if [ -e $HOME/.java_version ]; then
+    java_version=$(cat $HOME/.java_version)
 else
     java_version=1.8
 fi
