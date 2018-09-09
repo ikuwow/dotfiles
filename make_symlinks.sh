@@ -8,7 +8,7 @@ if [ ! -e ~/dotfiles ]; then
 fi
 
 RCFILES=(\
-    .vimrc .gvimrc .vim .bash_profile .bashrc .macrc .sshrc .sshrc.d .tmux.conf .eslintrc .gemrc .atom .inputrc
+    .vimrc .gvimrc .vim .bash_profile .bashrc .macrc .sshrc .sshrc.d .tmux.conf .eslintrc .gemrc .atom .inputrc .gitignore
 )
 for file in ${RCFILES[@]}; do
     if [ ! -e ~/$file ]; then
@@ -22,10 +22,6 @@ fi
 
 if [ ! -e ~/.gitconfig ]; then
     ln -is ~/dotfiles/.gitconfig ~/.gitconfig
-fi
-
-if [ ! -e ~/.gitignore ]; then
-    ln -is ~/dotfiles/gitignore_global ~/.gitignore
 fi
 
 if [ ! -e ~/.ssh/config ]; then
