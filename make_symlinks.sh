@@ -36,5 +36,4 @@ fi
 
 mkdir -p ${XDG_CONFIG_HOME:=$HOME/.config}
 ln -fhvs ~/.vim $XDG_CONFIG_HOME/nvim
-ln -fhvs ~/.vimrc $XDG_CONFIG_HOME/nvim/init.vim
 ln -fhvs ~/Dropbox/dotconfig/karabiner $XDG_CONFIG_HOME/karabiner
