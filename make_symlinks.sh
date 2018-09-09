@@ -16,10 +16,6 @@ for file in ${RCFILES[@]}; do
     fi
 done
 
-if [ ! -d ~/bin ]; then
-    ln -is ~/dotfiles/bin ~/bin
-fi
-
 if [ ! -e ~/.gitconfig ]; then
     ln -is ~/dotfiles/.gitconfig ~/.gitconfig
 fi
@@ -34,11 +30,15 @@ if [ ! -e ~/.ideavimrc ]; then
     ln -is ~/dotfiles/vimrc ~/.ideavimrc
 fi
 
-# NeoVim
 mkdir -p ${XDG_CONFIG_HOME:=$HOME/.config}
+
+# NeoVim
 if [ ! -d $XDG_CONFIG_HOME/nvim ]; then
     ln -is ~/.vim $XDG_CONFIG_HOME/nvim
 fi
 if [ ! -e $XDG_CONFIG_HOME/nvim/init.vim ]; then
     ln -is ~/.vimrc $XDG_CONFIG_HOME/nvim/init.vim
 fi
+
+# Karabiner Elements
+ln -is ~/Dropbox/dotconfig/karabiner $XDG_CONFIG_HOME/karabiner
