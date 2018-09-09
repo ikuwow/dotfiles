@@ -8,11 +8,11 @@ if [ ! -e ~/dotfiles ]; then
 fi
 
 RCFILES=(\
-    vimrc gvimrc vim bash_profile bashrc macrc sshrc sshrc.d tmux.conf eslintrc gemrc atom inputrc
+    .vimrc .gvimrc .vim .bash_profile .bashrc .macrc .sshrc .sshrc.d .tmux.conf .eslintrc .gemrc .atom .inputrc
 )
 for file in ${RCFILES[@]}; do
-    if [ ! -e ~/.$file ]; then
-        ln -is ~/dotfiles/$file ~/.$file
+    if [ ! -e ~/$file ]; then
+        ln -is ~/dotfiles/$file ~/$file
     fi
 done
 

@@ -7,11 +7,11 @@
 /bin/vimr
 /vim/.netrwhist
 
-/vim/dein/repos
-/vim/dein/state_vi.vim
-/vim/dein/state_vim.vim
-/vim/dein/state_nvim.vim
-/vim/dein/cache_vi
-/vim/dein/cache_vim
-/vim/dein/cache_nvim
-/vim/dein/.cache
+/.vim/dein/repos
+/.vim/dein/state_vi.vim
+/.vim/dein/state_vim.vim
+/.vim/dein/state_nvim.vim
+/.vim/dein/cache_vi
+/.vim/dein/cache_vim
+/.vim/dein/cache_nvim
+/.vim/dein/.cache
