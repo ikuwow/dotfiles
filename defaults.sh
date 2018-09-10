@@ -33,6 +33,10 @@ defaults write com.apple.AppleMultitouchMouse MouseOneFingerDoubleTapGesture -in
 defaults write com.apple.AppleMultitouchMouse MouseTwoFingerDoubleTapGesture -int 3
 defaults write com.apple.AppleMultitouchMouse MouseTwoFingerHorizSwipeGesture -int 2
 
+echo "Configuring Trackpad..."
+defaults write com.apple.AppleMultitouchTrackpad TrackpadRightClick -bool true
+defaults write com.apple.AppleMultitouchTrackpad Clicking -bool true
+
 echo "Configuring Keyboard..."
 defaults write NSGlobalDomain InitialKeyRepeat -int 35
 defaults write NSGlobalDomain KeyRepeat -int 2
