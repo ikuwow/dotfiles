@@ -44,7 +44,7 @@ echo "Configuring Safari..."
 defaults write com.apple.Safari ShowFullURLInSmartSearchField -bool true
 defaults write com.apple.Safari IncludeInternalDebugMenu -bool true
 defaults write com.apple.Safari ShowStatusBar -bool true
-defaults write com.apple.Safari AutoFillPasswords -bool false
+defaults write com.apple.Safari AutoFillPasswords -bool true
 
 echo ""
 echo "Configure Complete!"
