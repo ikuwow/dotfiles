@@ -1,5 +1,12 @@
 # vim: filetype=sh :
 
+if [ $BASH_VERSINFO -le 3 ]; then
+    echo "WARNING: Your bash version is ${BASH_VERSINFO}!"
+    echo "Please use bash 4.0 ~ by these commands: (Mac)"
+    echo "sudo bash -c 'echo /usr/local/bin/bash >> /etc/shells'"
+    echo "chsh -s /usr/local/bin/bash"
+fi
+
 ## Aliases
 if [ $(uname) = Darwin ]; then
     alias ls='ls -G'
@@ -25,16 +32,42 @@ alias dr='docker run -it --rm'
 alias drv='docker run -it --rm -w /tmp -v $(pwd):/tmp'
 alias mysql='mysql --pager="less -S -n -i -F -X"'
 
+if [ $(uname) = Darwin ]; then
+    commands=(awk sed)
+    for c in ${commands[@]}; do
+        if $(type g$c > /dev/null 2>&1); then
+            alias $c=g$c
+        fi
+    done
+fi
+
 command -v sshrc > /dev/null 2>&1 && alias ssh=sshrc
 
 ## Auto complete
-
 complete -C aws_completer aws
 
 if [ "${BASH_VERSINFO}" -ge 4 ] && [ -f /usr/local/share/bash-completion/bash_completion ]; then
   . /usr/local/share/bash-completion/bash_completion
 fi
 
+## Homebrew
+if [ -f ~/.brew_api_token ];then
+    source ~/.brew_api_token
+fi
+
+bind "set completion-ignore-case on"
+
+## Language Specific configs
+export GOPATH=$HOME/.go
+
+if [ -e $HOME/.java_version ]; then
+    java_version=$(cat $HOME/.java_version)
+else
+    java_version=1.8
+fi
+export JAVA_HOME=$(/usr/libexec/java_home -v $java_version)
+
+## Functions
 function prompts {
     local WHITE="\[\e[0m\]"
     local YELLOW="\[\e[33m\]"
@@ -53,6 +86,16 @@ function prompts {
 }
 
 prompts
+
+if [ $(command -v networksetup) ]; then
+    function wifireset {
+        interface='en0'
+        networksetup -setairportpower "$interface" off
+        echo 'Re-enabling Wi-Fi...'
+        networksetup -setairportpower "$interface" on
+        echo 'Done.'
+    }
+fi
 
 gclconf ()
 {
