@@ -18,12 +18,7 @@ if [ -f $gcloudpath/completion.bash.inc ]; then
     source $gcloudpath/completion.bash.inc
 fi
 
-OTHER=(.bashrc .macrc)
-for rcfile in ${OTHER[@]}; do
-    if [ -e ~/$rcfile ]; then
-        source ~/$rcfile
-    fi
-done
+[[ -e ~/.bashrc ]] && . ~/.bashrc
 
 ssh-add -K > /dev/null 2>&1
 if [ $? != 0 ]; then

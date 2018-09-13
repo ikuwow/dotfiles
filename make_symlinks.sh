@@ -8,7 +8,7 @@ if [ ! -e ~/dotfiles ]; then
 fi
 
 RCFILES=(
-    .vimrc .gvimrc .vim .bash_profile .bashrc .macrc .sshrc .sshrc.d
+    .vimrc .gvimrc .vim .bash_profile .bashrc .sshrc .sshrc.d
     .tmux.conf .eslintrc .gemrc .atom .inputrc .gitignore .gitconfig
 )
 for file in ${RCFILES[@]}; do
