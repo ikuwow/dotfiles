@@ -32,15 +32,6 @@ alias dr='docker run -it --rm'
 alias drv='docker run -it --rm -w /tmp -v $(pwd):/tmp'
 alias mysql='mysql --pager="less -S -n -i -F -X"'
 
-if [ $(uname) = Darwin ]; then
-    commands=(awk sed)
-    for c in ${commands[@]}; do
-        if $(type g$c > /dev/null 2>&1); then
-            alias $c=g$c
-        fi
-    done
-fi
-
 command -v sshrc > /dev/null 2>&1 && alias ssh=sshrc
 
 ## Auto complete

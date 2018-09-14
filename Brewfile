@@ -31,7 +31,7 @@ brew "trash"
 brew "tree"
 brew "wget"
 brew "watch"
-brew "gnu-sed"
+brew "gnu-sed", args: ["with-default-names"]
 brew "gawk"
 brew "fontforge"
 brew "tfenv"
