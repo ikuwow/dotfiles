@@ -60,12 +60,14 @@ bind "set completion-ignore-case on"
 ## Language Specific configs
 export GOPATH=$HOME/.go
 
-if [ -e $HOME/.java_version ]; then
-    java_version=$(cat $HOME/.java_version)
-else
-    java_version=1.8
+if [ $(uname) = Darwin ]; then
+    if [ -e $HOME/.java_version ]; then
+        java_version=$(cat $HOME/.java_version)
+    else
+        java_version=1.8
+    fi
+    export JAVA_HOME=$(/usr/libexec/java_home -v $java_version)
 fi
-export JAVA_HOME=$(/usr/libexec/java_home -v $java_version)
 
 ## Functions
 function prompts {
