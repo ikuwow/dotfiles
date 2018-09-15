@@ -23,9 +23,9 @@ DIRS=(
   Preview TextEdit QuickTimePlayerX ScriptEditor2
 )
 for dir in ${DIRS[@]}; do
-    ln -fhvs ~/Library/MobileDocuments/com~apple~${dir}/Documents ~/iCloudDrive/${dir}
+    ln -fhvs ~/Library/Mobile\ Documents/com~apple~${dir}/Documents ~/iCloudDrive/${dir}
 done
-ln -fhvs ~/Library/MobileDocuments/com~apple~CloudDocs ~/iCloudDrive/CloUdDocs
+ln -fhvs ~/Library/Mobile\ Documents/com~apple~CloudDocs ~/iCloudDrive/CloUdDocs
 
 if [ ! -e ~/.ssh/config ]; then
     ln -is ~/iCloudDrive/CloudDocs/ssh/config ~/.ssh/config
