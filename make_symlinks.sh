@@ -26,14 +26,6 @@ for dir in "${DIRS[@]}"; do
 done
 ln -fhvs "$HOME/Library/Mobile Documents/com~apple~CloudDocs" "${ICLOUD_DIR}/CloudDocs"
 
-# ssh config
-sshs=(config config.d)
-for s in "${sshs[@]}"; do
-    if [ ! -e "$HOME/.ssh/$s" ]; then
-        ln -hvs "${ICLOUD_DIR}/CloudDocs/ssh/$s" "$HOME/.ssh/$s"
-    fi
-done
-
 mkdir -p "${XDG_CONFIG_HOME:=$HOME/.config}"
 ln -fhvs "$HOME/.vim" "$XDG_CONFIG_HOME/nvim"
 ln -fhvs "${ICLOUD_DIR}/CloudDocs/dotconfig/karabiner" "$XDG_CONFIG_HOME/karabiner"
