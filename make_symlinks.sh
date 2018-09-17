@@ -14,6 +14,9 @@ for file in .??*; do
     ln -fhvs "$HOME/dotfiles/$file" "$HOME/$file"
 done
 
+mkdir -p "${XDG_CONFIG_HOME:=$HOME/.config}"
+ln -fhvs "$HOME/.vim" "$XDG_CONFIG_HOME/nvim"
+
 # iCloud
 ICLOUD_DIR="$HOME/iCloudDrive"
 mkdir -p "$ICLOUD_DIR"
@@ -25,6 +28,3 @@ for dir in "${DIRS[@]}"; do
     ln -fhvs "$HOME/Library/Mobile Documents/com~apple~${dir}/Documents" "${ICLOUD_DIR}/${dir}"
 done
 ln -fhvs "$HOME/Library/Mobile Documents/com~apple~CloudDocs" "${ICLOUD_DIR}/CloudDocs"
-
-mkdir -p "${XDG_CONFIG_HOME:=$HOME/.config}"
-ln -fhvs "$HOME/.vim" "$XDG_CONFIG_HOME/nvim"
