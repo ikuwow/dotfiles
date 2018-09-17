@@ -39,6 +39,7 @@ brew "vim", args: ["with-lua", "with-python3"]
 brew "neovim"
 brew "graphviz"
 brew "universal-ctags", args: ["HEAD"]
+brew "shellcheck"
 
 cask "iterm2"
 cask "karabiner-elements"
