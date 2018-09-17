@@ -4,6 +4,7 @@ tap "caskroom/cask"
 tap "caskroom/versions"
 
 brew "mas"
+brew "mackup"
 brew "bash"
 brew "telnet"
 brew "coreutils"
