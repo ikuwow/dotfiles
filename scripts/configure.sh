@@ -8,6 +8,7 @@ if ! command -v defaults > /dev/null 2>&1; then
 fi
 
 echo "Configuring..."
+defaults write -g AppleLanguages '( "en-JP", "ja-JP")'
 defaults write com.apple.AppleMultitouchTrackpad Clicking -bool true
 defaults write com.apple.CrashReporter UseUNC -bool true
 defaults write KeyRepeat -int 2
