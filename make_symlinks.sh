@@ -13,6 +13,7 @@ for file in .??*; do
     [[ "$file" = ".travis.yml" ]] && continue
     ln -fhvs "$HOME/dotfiles/$file" "$HOME/$file"
 done
+
 ln -fhvs ~/dotfiles/.vimrc ~/.ideavimrc
 
 # iCloud
@@ -24,7 +25,7 @@ DIRS=(
 for dir in "${DIRS[@]}"; do
     ln -fhvs "$HOME/Library/Mobile Documents/com~apple~${dir}/Documents" "$HOME/iCloudDrive/${dir}"
 done
-ln -fhvs ~/Library/Mobile\ Documents/com~apple~CloudDocs ~/iCloudDrive/CloUdDocs
+ln -fhvs ~/Library/Mobile\ Documents/com~apple~CloudDocs ~/iCloudDrive/CloudDocs
 
 if [ ! -e ~/.ssh/config ]; then
     ln -is ~/iCloudDrive/CloudDocs/ssh/config ~/.ssh/config
