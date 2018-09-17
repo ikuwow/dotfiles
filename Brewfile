@@ -43,6 +43,7 @@ brew "graphviz"
 brew "universal-ctags", args: ["HEAD"]
 brew "shellcheck"
 
+cask "google-japanese-ime"
 cask "iterm2"
 cask "dropbox"
 cask "box-sync"
