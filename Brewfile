@@ -1,5 +1,4 @@
 tap "universal-ctags/universal-ctags"
-tap "homebrew/versions"
 tap "caskroom/cask"
 tap "caskroom/versions"
 
