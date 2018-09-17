@@ -28,4 +28,3 @@ ln -fhvs "$HOME/Library/Mobile Documents/com~apple~CloudDocs" "${ICLOUD_DIR}/Clo
 
 mkdir -p "${XDG_CONFIG_HOME:=$HOME/.config}"
 ln -fhvs "$HOME/.vim" "$XDG_CONFIG_HOME/nvim"
-ln -fhvs "${ICLOUD_DIR}/CloudDocs/dotconfig/karabiner" "$XDG_CONFIG_HOME/karabiner"
