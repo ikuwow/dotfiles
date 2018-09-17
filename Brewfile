@@ -68,7 +68,6 @@ mas "Things 3", id: 904280696
 mas "LINE", id: 539883307
 mas "Evernote", id: 406056744
 mas "1Blocker", id: 1107421413
-mas "Network Radar", id: 507659816
 mas "Skitch", id: 425955336
 mas "ActivityTimer", id: 808647808
 mas "1Password 7", id: 1333542190
@@ -79,6 +78,4 @@ mas "Bear", id: 1091189122
 mas "Pomodoro-Tracker", id: 1396146802
 mas "Slack", id: 803453959
 mas "EdgeView 2", id: 1206246482
-mas "Pocket", id: 568494494
-mas "Shazam", id: 897118787
 mas "Xcode", id: 497799835
