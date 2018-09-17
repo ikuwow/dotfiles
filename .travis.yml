@@ -1,6 +1,6 @@
 language: bash
 sudo: false
 script:
-  - bash -c 'shellcheck *.sh'
+  - bash -c 'shopt -s globstar; shellcheck **/*.sh'
   - bash -c 'shellcheck -s bash .bash_profile'
   - bash -c 'shellcheck -s bash .bashrc'
