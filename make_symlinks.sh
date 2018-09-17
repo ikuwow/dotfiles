@@ -17,21 +17,21 @@ done
 ln -fhvs ~/dotfiles/.vimrc ~/.ideavimrc
 
 # iCloud
-mkdir -p ~/iCloud\ Drive
+mkdir -p ~/iCloudDrive
 DIRS=(
   Keynote Numbers Pages Automator Notes
   Preview TextEdit QuickTimePlayerX ScriptEditor2
 )
 for dir in ${DIRS[@]}; do
-    ln -fhvs ~/Library/Mobile\ Documents/com~apple~${dir}/Documents ~/iCloud\ Drive/${dir}
+    ln -fhvs ~/Library/Mobile\ Documents/com~apple~${dir}/Documents ~/iCloudDrive/${dir}
 done
-ln -fhvs ~/Library/Mobile\ Documents/com~apple~CloudDocs ~/iCloud\ Drive/CloudDocs
+ln -fhvs ~/Library/Mobile\ Documents/com~apple~CloudDocs ~/iCloudDrive/CloUdDocs
 
 if [ ! -e ~/.ssh/config ]; then
-    ln -is ~/iCloud\ Drive/CloudDocs/ssh/config ~/.ssh/config
+    ln -is ~/iCloudDrive/CloudDocs/ssh/config ~/.ssh/config
 fi
 if [ ! -e ~/.ssh/config.d ]; then
-    ln -is ~/iCloud\ Drive/CloudDocs/ssh/config.d ~/.ssh/config.d
+    ln -is ~/iCloudDrive/CloudDocs/ssh/config.d ~/.ssh/config.d
 fi
 
 mkdir -p ${XDG_CONFIG_HOME:=$HOME/.config}
