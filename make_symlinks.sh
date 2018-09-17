@@ -7,11 +7,10 @@ if [ ! -e ~/dotfiles ]; then
     exit 1
 fi
 
-RCFILES=(
-    .vimrc .gvimrc .vim .bash_profile .bashrc .sshrc .sshrc.d
-    .tmux.conf .eslintrc .gemrc .atom .inputrc .gitignore .gitconfig
-)
-for file in "${RCFILES[@]}"; do
+for file in .??*; do
+    [[ "$file" = ".git" ]] && continue
+    [[ "$file" = ".DS_Store" ]] && continue
+    [[ "$file" = ".travis.yml" ]] && continue
     ln -fhvs "$HOME/dotfiles/$file" "$HOME/$file"
 done
 ln -fhvs ~/dotfiles/.vimrc ~/.ideavimrc
