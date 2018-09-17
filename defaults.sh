@@ -2,6 +2,11 @@
 
 set -e
 
+if ! command -v defaults > /dev/null 2>&1; then
+    echo "\`defaults\` not found. Nothing to do."
+    exit 0
+fi
+
 echo "Configuring..."
 defaults write com.apple.AppleMultitouchTrackpad Clicking -bool true
 defaults write com.apple.CrashReporter UseUNC -bool true
