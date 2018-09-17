@@ -23,9 +23,7 @@ fi
 # shellcheck source=/dev/null
 [[ -e ~/.bashrc ]] && . ~/.bashrc
 
-ssh-add -K > /dev/null 2>&1 && status=$?
+ssh-add -K > /dev/null 2>&1; status=$?
 if [ $status != 0 ]; then
-    echo "ERROR: 'ssh-add -K' failed!"
-    exit 1
+    echo "Warning: 'ssh-add -K' failed!"
 fi
-
