@@ -61,7 +61,6 @@ cask "keybase"
 cask "rescuetime"
 cask "lastfm"
 
-mas "Xcode", id: 497799835
 mas "Numbers", id: 409203825
 mas "Keynote", id: 409183694
 mas "Pages", id: 409201541
@@ -82,3 +81,4 @@ mas "Slack", id: 803453959
 mas "EdgeView 2", id: 1206246482
 mas "Pocket", id: 568494494
 mas "Shazam", id: 897118787
+mas "Xcode", id: 497799835
