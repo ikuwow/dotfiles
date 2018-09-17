@@ -14,8 +14,6 @@ for file in .??*; do
     ln -fhvs "$HOME/dotfiles/$file" "$HOME/$file"
 done
 
-ln -fhvs ~/dotfiles/.vimrc ~/.ideavimrc
-
 # iCloud
 ICLOUD_DIR="$HOME/iCloudDrive"
 mkdir -p "$ICLOUD_DIR"
