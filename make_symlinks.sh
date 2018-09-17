@@ -25,7 +25,7 @@ DIRS=(
 for dir in "${DIRS[@]}"; do
     ln -fhvs "$HOME/Library/Mobile Documents/com~apple~${dir}/Documents" "$HOME/iCloudDrive/${dir}"
 done
-ln -fhvs ~/Library/Mobile\ Documents/com~apple~CloudDocs ~/iCloudDrive/CloudDocs
+ln -fhvs "$HOME/Library/Mobile Documents/com~apple~CloudDocs" ~/iCloudDrive/CloudDocs
 
 if [ ! -e ~/.ssh/config ]; then
     ln -is ~/iCloudDrive/CloudDocs/ssh/config ~/.ssh/config
