@@ -17,23 +17,25 @@ done
 ln -fhvs ~/dotfiles/.vimrc ~/.ideavimrc
 
 # iCloud
-mkdir -p ~/iCloudDrive
+ICLOUD_DIR="$HOME/iCloudDrive"
+mkdir -p "$ICLOUD_DIR"
 DIRS=(
   Keynote Numbers Pages Automator Notes
   Preview TextEdit QuickTimePlayerX ScriptEditor2
 )
 for dir in "${DIRS[@]}"; do
-    ln -fhvs "$HOME/Library/Mobile Documents/com~apple~${dir}/Documents" "$HOME/iCloudDrive/${dir}"
+    ln -fhvs "$HOME/Library/Mobile Documents/com~apple~${dir}/Documents" "${ICLOUD_DIR}/${dir}"
 done
-ln -fhvs "$HOME/Library/Mobile Documents/com~apple~CloudDocs" ~/iCloudDrive/CloudDocs
+ln -fhvs "$HOME/Library/Mobile Documents/com~apple~CloudDocs" "${ICLOUD_DIR}/CloudDocs"
 
-if [ ! -e ~/.ssh/config ]; then
-    ln -is ~/iCloudDrive/CloudDocs/ssh/config ~/.ssh/config
-fi
-if [ ! -e ~/.ssh/config.d ]; then
-    ln -is ~/iCloudDrive/CloudDocs/ssh/config.d ~/.ssh/config.d
-fi
+# ssh config
+sshs=(config config.d)
+for s in "${sshs[@]}"; do
+    if [ ! -e "$HOME/.ssh/$s" ]; then
+        ln -hvs "${ICLOUD_DIR}/CloudDocs/ssh/$s" "$HOME/.ssh/$s"
+    fi
+done
 
 mkdir -p "${XDG_CONFIG_HOME:=$HOME/.config}"
 ln -fhvs "$HOME/.vim" "$XDG_CONFIG_HOME/nvim"
-ln -fhvs "$HOME/Dropbox/dotconfig/karabiner" "$XDG_CONFIG_HOME/karabiner"
+ln -fhvs "${ICLOUD_DIR}/CloudDocs/dotconfig/karabiner" "$XDG_CONFIG_HOME/karabiner"
