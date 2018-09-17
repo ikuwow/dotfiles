@@ -10,18 +10,21 @@ export ANSIBLE_COW_SELECTION=random
 export XDG_CONFIG_HOME=~/.config
 export PROMPT_COMMAND='echo -ne "\033]0;${PWD}\007"'
 
-gcloudpath=$(dirname $(dirname $(readlink $(which gcloud))))
-if [ -f $gcloudpath/path.bash.inc ]; then
-    source $gcloudpath/path.bash.inc
+gcloudpath="$(dirname "$(dirname "$(readlink "$(command -v gcloud)")")")"
+if [ -f "$gcloudpath/path.bash.inc" ]; then
+    # shellcheck source=/dev/null
+    source "$gcloudpath/path.bash.inc"
 fi
-if [ -f $gcloudpath/completion.bash.inc ]; then
-    source $gcloudpath/completion.bash.inc
+if [ -f "$gcloudpath/completion.bash.inc" ]; then
+    # shellcheck source=/dev/null
+    source "$gcloudpath/completion.bash.inc"
 fi
 
+# shellcheck source=/dev/null
 [[ -e ~/.bashrc ]] && . ~/.bashrc
 
-ssh-add -K > /dev/null 2>&1
-if [ $? != 0 ]; then
+ssh-add -K > /dev/null 2>&1 && status=$?
+if [ $status != 0 ]; then
     echo "ERROR: 'ssh-add -K' failed!"
     exit 1
 fi
