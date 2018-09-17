@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # A shellscript that creates symlinks of dotfiles
 
