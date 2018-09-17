@@ -37,8 +37,10 @@ command -v sshrc > /dev/null 2>&1 && alias ssh=sshrc
 ## Auto complete
 complete -C aws_completer aws
 
-if [ "${BASH_VERSINFO[0]}" -ge 4 ] && [ -f /usr/local/share/bash-completion/bash_completion ]; then
-  . /usr/local/share/bash-completion/bash_completion
+BASH_COMPLETION_PATH=/usr/local/share/bash-completion/bash_completion
+if [ "${BASH_VERSINFO[0]}" -ge 4 ] && [ -f "$BASH_COMPLETION_PATH" ]; then
+    # shellcheck source=/dev/null
+    . "$BASH_COMPLETION_PATH"
 fi
 
 ## Homebrew
