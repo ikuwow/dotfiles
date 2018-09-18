@@ -1,17 +1,19 @@
 #!/usr/bin/env bash
 
-# A shellscript that creates symlinks of dotfiles
+DOTPATH="$HOME/dotfiles"
 
-if [ ! -e ~/dotfiles ]; then
-    echo 'Error: A directory named "dotfiles" must be on your home directory.'
+if [ ! -e "$DOTPATH" ]; then
+    echo "Error: Directory $DOTPATH does not exist."
     exit 1
 fi
+
+cd "$DOTPATH" || exit 1
 
 for file in .??*; do
     [[ "$file" = ".git" ]] && continue
     [[ "$file" = ".DS_Store" ]] && continue
     [[ "$file" = ".travis.yml" ]] && continue
-    ln -fhvs "$HOME/dotfiles/$file" "$HOME/$file"
+    ln -fhvs "$DOTPATH/$file" "$HOME/$file"
 done
 
 mkdir -p "${XDG_CONFIG_HOME:=$HOME/.config}"
