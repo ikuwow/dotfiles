@@ -44,6 +44,7 @@ brew "universal-ctags", args: ["HEAD"]
 brew "shellcheck"
 
 cask "google-japanese-ime"
+cask "bartender"
 cask "iterm2"
 cask "dropbox"
 cask "box-sync"
