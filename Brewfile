@@ -64,6 +64,7 @@ cask "vagrant"
 cask "keybase"
 cask "rescuetime"
 cask "lastfm"
+cask "intel-power-gadget"
 
 mas "WiFi Signal", id: 525912054
 mas "Things 3", id: 904280696
