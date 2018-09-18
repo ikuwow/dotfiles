@@ -63,6 +63,7 @@ cask "keybase"
 cask "rescuetime"
 cask "lastfm"
 
+mas "WiFi Signal", id: 525912054
 mas "Things 3", id: 904280696
 mas "LINE", id: 539883307
 mas "Evernote", id: 406056744
