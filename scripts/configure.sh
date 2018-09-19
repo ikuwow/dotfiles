@@ -9,13 +9,14 @@ fi
 
 echo "Configuring..."
 defaults write -g AppleLanguages '( "en-JP", "ja-JP")'
+defaults write -g AppleShowScrollBars -string "WhenScrolling"
+defaults write -g NSAutomaticQuoteSubstitutionEnabled -bool false
+defaults write -g NSAutomaticDashSubstitutionEnabled -bool false
 defaults write com.apple.AppleMultitouchTrackpad Clicking -bool true
 defaults write com.apple.CrashReporter UseUNC -bool true
 defaults write KeyRepeat -int 2
 defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
 
-defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false
-defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false
 
 # spotlight shortcut command + space
 defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 64 "<dict><key>enabled</key><true/><key>value</key><dict><key>parameters</key><array><integer>65535</integer><integer>49</integer><integer>262144</integer></array><key>type</key><string>standard</string></dict></dict>"

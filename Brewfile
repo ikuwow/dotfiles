@@ -44,6 +44,7 @@ brew "universal-ctags", args: ["HEAD"]
 brew "shellcheck"
 
 cask "google-japanese-ime"
+cask "bartender"
 cask "iterm2"
 cask "dropbox"
 cask "box-sync"
@@ -51,6 +52,8 @@ cask "docker"
 cask "istat-menus"
 cask "vimr"
 cask "xquartz"
+cask "google-chrome"
+cask "firefox"
 cask "google-cloud-sdk"
 cask "franz"
 cask "java"
@@ -61,7 +64,9 @@ cask "vagrant"
 cask "keybase"
 cask "rescuetime"
 cask "lastfm"
+cask "intel-power-gadget"
 
+mas "WiFi Signal", id: 525912054
 mas "Things 3", id: 904280696
 mas "LINE", id: 539883307
 mas "Evernote", id: 406056744
