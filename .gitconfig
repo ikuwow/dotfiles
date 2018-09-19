@@ -1,6 +1,6 @@
 [user]
-    name = Ikuo Degawa
-    email = degawa@ikuwow.com
+	name = Ikuo Degawa
+	email = degawa@ikuwow.com
 [core]
     excludesfile = ~/.gitignore
     editor = nvim
@@ -31,8 +31,9 @@
 [credential]
     helper = cache
 [filter "lfs"]
-    clean = git-lfs clean %f
-    smudge = git-lfs smudge %f
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
     required = true
+	process = git-lfs filter-process
 [include]
     path = ~/.gitconfig.secrets
