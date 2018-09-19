@@ -67,10 +67,8 @@ fi
 ## Functions
 function prompts {
 
-    # shellcheck disable=SC1117
-    local WHITE="\[\e[0m\]"
-    # shellcheck disable=SC1117
-    local YELLOW="\[\e[33m\]"
+    local WHITE='\e[0m'
+    local YELLOW='\e[33m'
 
     if [ ! -n "$SSH_CLIENT" ]; then
         PS1='\h: \W\$ '
