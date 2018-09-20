@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+# vim: filetype=sh
+
+SSHHOME=${SSHHOME:=~}
+
+ssh -t "$1" "
+    export SSHHOME=\$(mktemp -d -t .$(whoami).sshrc.XXXX)
+    export SSHRCCLEANUP=\$SSHHOME
+    trap \"rm -rf \$SSHRCCLEANUP; exit\" 0
+    bash
+"
