@@ -42,6 +42,7 @@ brew "neovim"
 brew "graphviz"
 brew "universal-ctags", args: ["HEAD"]
 brew "shellcheck"
+brew "slackcat"
 
 cask "google-japanese-ime"
 cask "bartender"
