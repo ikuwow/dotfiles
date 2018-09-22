@@ -20,4 +20,7 @@ fi
 [[ -f ~/.ssh/id_rsa ]] && ssh-add -K 2> /dev/null
 
 # shellcheck source=/dev/null
+[[ -f ~/.brew_api_token ]] && . ~/.brew_api_token
+
+# shellcheck source=/dev/null
 [[ -f ~/.bashrc ]] && . ~/.bashrc

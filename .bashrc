@@ -43,24 +43,17 @@ if [ "${BASH_VERSINFO[0]}" -ge 4 ] && [ -f "$BASH_COMPLETION_PATH" ]; then
     . "$BASH_COMPLETION_PATH"
 fi
 
-## Homebrew
-if [ -f ~/.brew_api_token ];then
-    # shellcheck source=/dev/null
-    source ~/.brew_api_token
-fi
-
 bind "set completion-ignore-case on"
 
 ## Language Specific configs
 export GOPATH=$HOME/.go
 
 if [ "$(uname)" = Darwin ]; then
+    java_version=1.8
     if [ -e "$HOME/.java_version" ]; then
         java_version="$(cat "$HOME/.java_version")"
-    else
-        java_version=1.8
     fi
-    JAVA_HOME=$(/usr/libexec/java_home -v $java_version)
+    JAVA_HOME=$(/usr/libexec/java_home -v "$java_version")
     export JAVA_HOME
 fi
 
