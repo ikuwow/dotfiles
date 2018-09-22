@@ -98,3 +98,10 @@ gclconf ()
     gcloud config configurations activate "$confname"
 }
 
+fumpo () {
+    if ! command -v slackcat > /dev/null 2>&1; then
+        echo "Error: \`slackcat\` not found."
+        return 1
+    fi
+    echo -n "$@" | slackcat -s
+}
