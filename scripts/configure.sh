@@ -54,6 +54,7 @@ defaults write NSGlobalDomain KeyRepeat -int 2
 
 echo "Configuring Finder..."
 defaults write com.apple.finder ShowHardDrivesOnDesktop -bool true
+defaults write com.apple.finder ShowStatusBar -bool true
 
 echo "Configuring Safari..."
 defaults write com.apple.Safari ShowFullURLInSmartSearchField -bool true
