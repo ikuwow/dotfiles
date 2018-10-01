@@ -48,6 +48,7 @@ defaults write com.apple.systemuiserver menuExtras -array \
     "/System/Library/CoreServices/Menu Extras/Clock.menu" \
     "/System/Library/CoreServices/Menu Extras/AirPort.menu" \
     "/System/Library/CoreServices/Menu Extras/Eject.menu"
+defaults write com.apple.menuextra.clock isAnalog -bool true
 killall SystemUIServer
 
 echo "Configuring Dock..."
