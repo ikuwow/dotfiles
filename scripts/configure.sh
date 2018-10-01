@@ -65,8 +65,14 @@ defaults write com.apple.Safari IncludeInternalDebugMenu -bool true
 defaults write com.apple.Safari ShowStatusBar -bool true
 defaults write com.apple.Safari AutoFillPasswords -bool true
 
+echo "Killing affected applications..."
+affectedApps=(Safari Finder Dock SystemUIServer)
+for app in "${affectedApps[@]}"; do
+    killall "$app"
+done
+
 echo ""
-echo "Configure Complete!"
+echo "Configuration Complete!"
 echo "Please restart Mac to make sure settings are reflected."
 
 ## Deprecated
