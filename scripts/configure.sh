@@ -12,6 +12,7 @@ defaults write -g AppleLanguages '( "en-JP", "ja-JP")'
 defaults write -g AppleShowScrollBars -string "WhenScrolling"
 defaults write -g NSAutomaticQuoteSubstitutionEnabled -bool false
 defaults write -g NSAutomaticDashSubstitutionEnabled -bool false
+defaults write -g AppleShowAllExtensions -bool true
 defaults write com.apple.AppleMultitouchTrackpad Clicking -bool true
 defaults write com.apple.CrashReporter UseUNC -bool true
 defaults write KeyRepeat -int 2
