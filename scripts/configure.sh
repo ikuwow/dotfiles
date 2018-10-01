@@ -57,6 +57,7 @@ echo "Configuring Finder..."
 defaults write com.apple.finder ShowHardDrivesOnDesktop -bool true
 defaults write com.apple.finder ShowStatusBar -bool true
 /usr/libexec/PlistBuddy -c "Set :DesktopViewSettings:IconViewSettings:showItemInfo true" ~/Library/Preferences/com.apple.finder.plist
+defaults write com.apple.finder FXRemoveOldTrashItems -bool true
 
 echo "Configuring Safari..."
 defaults write com.apple.Safari ShowFullURLInSmartSearchField -bool true
