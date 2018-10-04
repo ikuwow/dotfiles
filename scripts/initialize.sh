@@ -8,6 +8,8 @@ pip3 install neovim
 pip2 install --upgrade pip
 pip2 install neovim
 
+pip install virtualenv
+
 gem update
 gem install neovim
 
