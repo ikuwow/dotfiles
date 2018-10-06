@@ -67,6 +67,7 @@ cask "rescuetime"
 cask "lastfm"
 cask "intel-power-gadget"
 cask "kindle"
+cask "virtualbox"
 
 mas "WiFi Signal", id: 525912054
 mas "Things 3", id: 904280696
