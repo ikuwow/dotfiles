@@ -44,6 +44,7 @@ brew "universal-ctags", args: ["HEAD"]
 brew "shellcheck"
 brew "slackcat"
 brew "circleci"
+brew "masutaka/github-nippou/github-nippou"
 
 cask "google-japanese-ime"
 cask "bartender"
