@@ -21,6 +21,11 @@ defaults write com.apple.menuextra.battery ShowPercent -string "YES"
 # spotlight shortcut command + space
 defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 64 "<dict><key>enabled</key><true/><key>value</key><dict><key>parameters</key><array><integer>65535</integer><integer>49</integer><integer>262144</integer></array><key>type</key><string>standard</string></dict></dict>"
 
+defaults write -g NSAutomaticQuoteSubstitutionEnabled -bool false
+defaults write -g NSAutomaticDashSubstitutionEnabled -bool false
+defaults write com.apple.messageshelper.MessageController SOInputLineSettings -dict-add "automaticEmojiSubstitutionEnablediMessage" -bool false
+defaults write com.apple.messageshelper.MessageController SOInputLineSettings -dict-add "automaticQuoteSubstitutionEnabled" -bool false
+
 echo "Configuring Mouse..."
 defaults write com.apple.AppleMultitouchMouse MouseButtonDivision -int 55
 defaults write com.apple.AppleMultitouchMouse MouseButtonMode -string TwoButton
