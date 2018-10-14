@@ -61,6 +61,7 @@ defaults write com.apple.dock wvous-br-corner -int 10 # Put display to sleep
 defaults write com.apple.dock wvous-br-modifier -int 0
 defaults write com.apple.dock wvous-tr-corner -int 12 # Notification Center
 defaults write com.apple.dock wvous-tr-modifier -int 0
+defaults write com.apple.dock mru-spaces -bool false # Disable automatically rearrange spacet 
 killall Dock
 
 echo "Configuring Finder..."
