@@ -31,7 +31,7 @@ alias wkc='watch -n 5 kubectl get po -o wide'
 alias dr='docker run -it --rm'
 alias drv='docker run -it --rm -w /tmp -v $(pwd):/tmp'
 alias mysql='mysql --pager="less -S -n -i -F -X"'
-eval "$(hub alias -s)"
+[[ "$(command -v hub)" ]] && eval "$(hub alias -s)"
 
 command -v sshrc > /dev/null 2>&1 && alias ssh=sshrc
 
