@@ -45,6 +45,7 @@ brew "shellcheck"
 brew "slackcat"
 brew "circleci"
 brew "masutaka/github-nippou/github-nippou"
+brew "hub"
 
 cask "google-japanese-ime"
 cask "bartender"
