@@ -68,7 +68,6 @@ cask "vagrant"
 cask "keybase"
 cask "rescuetime"
 cask "lastfm"
-cask "intel-power-gadget"
 cask "kindle"
 cask "virtualbox"
 
