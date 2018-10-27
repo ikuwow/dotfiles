@@ -40,6 +40,7 @@ if version >= 703
 endif
 set backupskip=/tmp/*,/private/tmp/*
 set cmdheight=1
+set virtualedit=block
 
 augroup HighlightTrailingSpaces
   autocmd!
