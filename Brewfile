@@ -85,7 +85,6 @@ mas "Tweetbot", id: 1384080005
 mas "VirusScannerPlus", id: 595374522
 mas "Bear", id: 1091189122
 mas "Pomodoro-Tracker", id: 1396146802
-mas "Slack", id: 803453959
 mas "EdgeView 2", id: 1206246482
 mas "Numbers", id: 409203825
 mas "Keynote", id: 409183694
