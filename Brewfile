@@ -49,6 +49,7 @@ brew "hub"
 brew "ruby"
 brew "python"
 brew "node"
+brew "gpg"
 
 cask "google-japanese-ime"
 cask "bartender"
