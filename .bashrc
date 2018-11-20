@@ -50,9 +50,10 @@ bind "set completion-ignore-case on"
 export GOPATH=$HOME/.go
 
 if [ "$(uname)" = Darwin ]; then
+    java_version_file="$HOME/.java-version"
     java_version=1.8
-    if [ -e "$HOME/.java_version" ]; then
-        java_version="$(cat "$HOME/.java_version")"
+    if [ -e "$java_version_file" ]; then
+        java_version="$(cat "$java_version_file")"
     fi
     JAVA_HOME=$(/usr/libexec/java_home -v "$java_version")
     export JAVA_HOME
