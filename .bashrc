@@ -32,6 +32,7 @@ alias dr='docker run -it --rm'
 alias drv='docker run -it --rm -w /tmp -v $(pwd):/tmp'
 alias mysql='mysql --pager="less -S -n -i -F -X"'
 [[ "$(command -v hub)" ]] && eval "$(hub alias -s)"
+alias remotehost="cat ~/.ssh/config ~/.ssh/config.d/* | grep -e '^Host' | sed -e 's/^Host //g'"
 
 command -v sshrc > /dev/null 2>&1 && alias ssh=sshrc
 
