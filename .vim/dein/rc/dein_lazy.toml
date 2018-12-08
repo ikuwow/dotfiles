@@ -15,6 +15,11 @@ hook_add = '''
 if = 'has("nvim") && has("python3")'
 
 [[plugins]]
+repo = 'tbodt/deoplete-tabnine'
+on_event = ['InsertEnter']
+build = './install.sh'
+
+[[plugins]]
 repo = 'glidenote/memolist.vim'
 depends = ['nerdtree']
 on_event = ['CmdwinEnter']
