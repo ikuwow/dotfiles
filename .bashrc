@@ -29,7 +29,7 @@ alias vag='vagrant'
 alias gccg='gcloud container clusters get-credentials'
 alias wkc='watch -n 5 kubectl get po -o wide'
 alias dr='docker run -it --rm'
-alias drv='docker run -it --rm -w /tmp -v $(pwd):/tmp'
+alias drv='docker run -it --rm -w /tmp/workspace -v $(pwd):/tmp/workspace'
 alias mysql='mysql --pager="less -S -n -i -F -X"'
 [[ "$(command -v hub)" ]] && eval "$(hub alias -s)"
 alias remotehost="cat ~/.ssh/config ~/.ssh/config.d/* | grep -e '^Host' | sed -e 's/^Host //g'"
