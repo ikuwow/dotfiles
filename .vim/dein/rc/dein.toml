@@ -157,6 +157,7 @@ repo = 'wakatime/vim-wakatime'
 repo = 'editorconfig/editorconfig-vim'
 hook_add = '''
     let g:EditorConfig_core_mode = 'python_external'
+    let g:EditorConfig_max_line_indicator = "exceeding"
 '''
 
 [[plugins]]
