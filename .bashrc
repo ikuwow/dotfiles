@@ -69,6 +69,7 @@ function prompts {
     if [ ! -n "$SSH_CLIENT" ]; then
         PS1='\h: \W\$ '
     fi
+
     local OLDPS1="$PS1"
     PS1=${OLDPS1//\\\$/\\\[\\e\[33m\\\]$\\\[\\e\[0m\\\]}
 
