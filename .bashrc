@@ -63,9 +63,6 @@ fi
 ## Functions
 function prompts {
 
-    local WHITE='\e[0m'
-    local YELLOW='\e[33m'
-
     if [ ! -n "$SSH_CLIENT" ]; then
         PS1='\h: \W\$ '
     fi
@@ -75,7 +72,7 @@ function prompts {
 
     if [ -n "$SSH_CLIENT" ]; then
         if [ "$PS1" = "${PS1/ssh/}" ]; then
-            PS1="${YELLOW}[ssh]${WHITE}${PS1}"
+            PS1='\[\e[33m\][ssh]\[\e[0m\]'"${PS1}"
         fi
     fi
 }
