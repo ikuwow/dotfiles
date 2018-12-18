@@ -63,7 +63,7 @@ fi
 ## Functions
 function prompts {
 
-    if [ ! -n "$SSH_CLIENT" ]; then
+    if [ -z "$SSH_CLIENT" ]; then
         PS1='\h: \W\$ '
     fi
 
