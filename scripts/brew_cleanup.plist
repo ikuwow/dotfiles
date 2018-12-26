@@ -17,6 +17,6 @@
         <integer>33</integer>
     </dict>
     <key>StandardErrorPath</key>
-    <string>__USERNAME__/Desktop/brew_cleanup.err</string>
+    <string>~/Desktop/brew_cleanup.err</string>
 </dict>
 </plist>
