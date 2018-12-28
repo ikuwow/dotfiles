@@ -16,8 +16,16 @@ for file in .??*; do
     ln -fhvs "$DOTPATH/$file" "$HOME/$file"
 done
 
-mkdir -p "${XDG_CONFIG_HOME:=$HOME/.config}"
+[[ -z $XDG_CONFIG_HOME ]] && XDG_CONFIG_HOME=$HOME/.config
+mkdir -p "$XDG_CONFIG_HOME"
+
 ln -fhvs "$HOME/.vim" "$XDG_CONFIG_HOME/nvim"
+
+# kyrat
+mkdir -p "$XDG_CONFIG_HOME/kyrat"
+ln -fhvs "$HOME/.bashrc" "$XDG_CONFIG_HOME/kyrat/bashrc"
+ln -fhvs "$HOME/.vimrc" "$XDG_CONFIG_HOME/kyrat/vimrc"
+ln -fhvs "$HOME/.inputrc" "$XDG_CONFIG_HOME/kyrat/inputrc"
 
 # iCloud
 ICLOUD_DIR="$HOME/iCloudDrive"
