@@ -7,6 +7,7 @@ if [ "${BASH_VERSINFO[0]}" -le 3 ]; then
     echo "chsh -s /usr/local/bin/bash"
 fi
 
+# shellcheck disable=SC1091
 [[ -f /etc/bashrc ]] && . /etc/bashrc
 
 ## Aliases
