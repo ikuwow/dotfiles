@@ -24,7 +24,6 @@ ln -fhvs "$HOME/.vim" "$XDG_CONFIG_HOME/nvim"
 # kyrat
 mkdir -p "$XDG_CONFIG_HOME/kyrat"
 ln -fhvs "$HOME/.bashrc" "$XDG_CONFIG_HOME/kyrat/bashrc"
-ln -fhvs "$HOME/.vimrc" "$XDG_CONFIG_HOME/kyrat/vimrc"
 ln -fhvs "$HOME/.inputrc" "$XDG_CONFIG_HOME/kyrat/inputrc"
 
 # iCloud
