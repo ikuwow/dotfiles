@@ -7,6 +7,8 @@ if [ "${BASH_VERSINFO[0]}" -le 3 ]; then
     echo "chsh -s /usr/local/bin/bash"
 fi
 
+[[ -f /etc/bashrc ]] && . /etc/bashrc
+
 ## Aliases
 if [ "$(uname)" = Darwin ]; then
     alias ls='ls -G'
