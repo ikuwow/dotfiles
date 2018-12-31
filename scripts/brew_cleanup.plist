@@ -16,6 +16,8 @@
         <key>Minute</key>
         <integer>33</integer>
     </dict>
+    <key>UserName</key>
+    <string>__USERNAME__</string>
     <key>StandardErrorPath</key>
     <string>~/Desktop/brew_cleanup.err</string>
 </dict>
