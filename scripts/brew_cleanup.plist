@@ -19,6 +19,6 @@
     <key>UserName</key>
     <string>__USERNAME__</string>
     <key>StandardErrorPath</key>
-    <string>/Users/__USERNAME__/Desktop/brew_cleanup.err</string>
+    <string>/Users/__USERNAME__/logs/brew_cleanup.err</string>
 </dict>
 </plist>
