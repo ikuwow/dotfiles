@@ -5,7 +5,7 @@
 autocmd!
 set nocompatible " do not use vi compatible mode
 
-lang en_US.UTF-8
+lang C
 set nu
 set title " display filename (not Thank you for using Vim.)
 set ruler " display ruler (60,7 13%)
