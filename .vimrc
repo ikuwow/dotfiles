@@ -62,6 +62,9 @@ let s:dein_toml_lazy = s:dein_dir . '/rc/dein_lazy.toml'
 if !isdirectory(s:dein_repo)
     echo "Cloning dein.vim..."
     call system('git clone https://github.com/Shougo/dein.vim ' . shellescape(s:dein_repo))
+    if v:shell_error != 0
+        echo "Error while cloning dein.vim."
+    end
 endif
 
 if has('vim_starting')
