@@ -72,7 +72,7 @@ cask "keybase"
 cask "rescuetime"
 cask "kindle"
 cask "virtualbox"
-cask "dynamic-dark-mode"
+cask "nightowl"
 
 mas "WiFi Signal", id: 525912054
 mas "Things 3", id: 904280696
