@@ -1,6 +1,7 @@
 # vim: set filetype=sh :
 
-export PATH=~/bin:/usr/local/opt/ruby/bin:/usr/local/bin:/usr/local/sbin:$PATH
+export PATH="$HOME/bin:/usr/local/opt/coreutils/libexec/gnubin:/usr/local/opt/ruby/bin:/usr/local/bin:/usr/local/sbin:$PATH"
+export MANPATH="/usr/local/opt/coreutils/libexec/gnuman:$MANPATH"
 export LANG=en_US.UTF-8
 export LESSCHARSET=utf-8
 export EDITOR=nvim
