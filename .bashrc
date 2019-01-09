@@ -11,10 +11,11 @@ fi
 [[ -f /etc/bashrc ]] && . /etc/bashrc
 
 ## Aliases
-if [ "$(uname)" = Darwin ]; then
-    alias ls='ls -G'
+# shellcheck disable=2012
+if ls --version > /dev/null 2>&1 && ls --version | head -n 1 | grep GNU > /dev/null; then
+    alias ls='ls --color=auto'
 else
-    alias ls='ls --color'
+    alias ls='ls -G'
 fi
 alias ll='ls -l'
 alias la='ls -A'
@@ -37,6 +38,7 @@ alias mysql='mysql --pager="less -S -n -i -F -X"'
 [[ "$(command -v hub)" ]] && eval "$(hub alias -s)"
 [[ "$(command -v nvim)" ]] && alias vim='nvim'
 alias remotehost="cat ~/.ssh/config ~/.ssh/config.d/* | grep -e '^Host' | sed -e 's/^Host //g'"
+alias pt-query-digest='/usr/local/Cellar/percona-toolkit/3.0.12/libexec/bin/pt-query-digest'
 
 command -v sshrc > /dev/null 2>&1 && alias ssh=sshrc
 
