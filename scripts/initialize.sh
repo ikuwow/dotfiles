@@ -15,12 +15,6 @@ gem install neovim
 
 npm i -g neovim
 
-launchctl unload ~/Library/LaunchAgents/brew_cleanup.plist
-cp "$SCRIPT_DIR/brew_cleanup.plist" ~/Library/LaunchAgents/
-sed -i "s/__USERNAME__/$(whoami)/" ~/Library/LaunchAgents/brew_cleanup.plist
-launchctl load ~/Library/LaunchAgents/brew_cleanup.plist
-mkdir -p ~/logs
-
 KYRAT_PATH=~/.local/share/kyrat
 mkdir -p "$(dirname ~/.local/share)"
 if [ ! -d $KYRAT_PATH ]; then
