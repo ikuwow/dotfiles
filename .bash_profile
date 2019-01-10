@@ -9,6 +9,7 @@ export HISTTIMEFORMAT='%y-%m-%d %H:%M:%S '
 export HISTSIZE=5000
 export XDG_CONFIG_HOME=~/.config
 export PROMPT_COMMAND='echo -ne "\033]0;${PWD}\007"'
+export HOMEBREW_INSTALL_CLEANUP=1 # default behaviour from homebrew 2.0.0
 
 if [ "$(command -v gcloud)" ]; then
     gcloudpath="$(dirname "$(dirname "$(readlink "$(command -v gcloud)")")")"
