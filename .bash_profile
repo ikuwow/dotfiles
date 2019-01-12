@@ -5,11 +5,13 @@ PATH="$HOME/bin:/usr/local/opt/ruby/bin:/usr/local/bin:/usr/local/sbin:$PATH"
 PATH="$(brew --prefix coreutils)/libexec/gnubin:$PATH"
 PATH="$(brew --prefix binutils)/bin:$PATH"
 PATH="$(brew --prefix findutils)/libexec/gnubin:$PATH"
+PATH="$(brew --prefix gnu-sed)/libexec/gnubin:$PATH"
 export PATH
 
 MANPATH="$(brew --prefix coreutils)/libexec/gnuman:$MANPATH"
 MANPATH="$(brew --prefix binutils)/share/man:$MANPATH"
 MANPATH="$(brew --prefix findutils))/libexec/gnuman:$MANPATH"
+MANPATH="$(brew --prefix gnu-sed))/libexec/gnuman:$MANPATH"
 export MANPATH
 
 export LANG=en_US.UTF-8
