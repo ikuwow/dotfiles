@@ -12,6 +12,7 @@ cask "karabiner-elements"
 brew "binutils"
 brew "coreutils"
 brew "diffutils"
+brew "findutils"
 brew "gnu-sed"
 
 brew "telnet"
