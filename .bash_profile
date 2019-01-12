@@ -1,10 +1,15 @@
 # vim: set filetype=sh :
 
 PATH="$HOME/bin:/usr/local/opt/ruby/bin:/usr/local/bin:/usr/local/sbin:$PATH"
+
 PATH="$(brew --prefix coreutils)/libexec/gnubin:$PATH"
+PATH="$(brew --prefix binutils)/bin:$PATH"
 export PATH
 
-export MANPATH="/usr/local/opt/coreutils/libexec/gnuman:$MANPATH"
+MANPATH="$(brew --prefix coreutils)/libexec/gnuman:$MANPATH"
+MANPATH="$(brew --prefix binutils)/share/man:$MANPATH"
+export MANPATH
+
 export LANG=en_US.UTF-8
 export LESSCHARSET=utf-8
 export EDITOR=nvim

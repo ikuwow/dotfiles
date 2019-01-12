@@ -9,6 +9,7 @@ brew "mackup"
 brew "bash"
 cask "karabiner-elements"
 
+brew "binutils"
 brew "coreutils"
 brew "gnu-sed"
 
