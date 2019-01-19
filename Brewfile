@@ -80,7 +80,7 @@ cask "nightowl"
 
 mas "WiFi Signal", id: 525912054
 mas "Quests", id: 1447415753
-mas "Things 3", id: 904280696
+mas "Things3", id: 904280696
 mas "Dark Reader for Safari", id: 1438243180
 mas "Evernote", id: 406056744
 mas "1Blocker", id: 1107421413
