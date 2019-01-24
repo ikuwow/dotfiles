@@ -13,7 +13,8 @@ set showcmd " show inputting key
 filetype plugin indent on
 
 set hlsearch " highlight the search word
-set ic " ignore case
+set ignorecase
+set smartcase
 
 set clipboard=unnamed " sharing clipboard
 if has('termguicolors')
