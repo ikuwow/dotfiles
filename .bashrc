@@ -38,7 +38,7 @@ alias mysql='mysql --pager="less -S -n -i -F -X"'
 [[ "$(command -v hub)" ]] && eval "$(hub alias -s)"
 [[ "$(command -v nvim)" ]] && alias vim='nvim'
 alias remotehost="cat ~/.ssh/config ~/.ssh/config.d/* | grep -e '^Host' | sed -e 's/^Host //g'"
-alias pt-query-digest='/usr/local/Cellar/percona-toolkit/3.0.12/libexec/bin/pt-query-digest'
+alias pt-query-digest='$(find /usr/local/Cellar/percona-toolkit -maxdepth 1 -type d | sort -r | head -n 1)/libexec/bin/pt-query-digest'
 
 command -v sshrc > /dev/null 2>&1 && alias ssh=sshrc
 
