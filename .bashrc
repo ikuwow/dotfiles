@@ -28,10 +28,6 @@ alias bye='exit'
 
 alias be='bundle exec'
 alias de='docker exec'
-alias ke='kubectl exec'
-alias vag='vagrant'
-alias gccg='gcloud container clusters get-credentials'
-alias wkc='watch -n 5 kubectl get po -o wide'
 alias dr='docker run -it --rm'
 alias drv='docker run -it --rm -w /tmp/workspace -v $(pwd):/tmp/workspace'
 alias mysql='mysql --pager="less -S -n -i -F -X"'
@@ -94,16 +90,6 @@ if [ "$(command -v networksetup)" ]; then
         echo 'Done.'
     }
 fi
-
-gclconf ()
-{
-    if [ -z "$1" ]; then
-        confname=$(gcloud config configurations list | awk 'NR>1' | peco | awk '{print $1}')
-    else
-        confname=$1
-    fi
-    gcloud config configurations activate "$confname"
-}
 
 fumpo () {
     if ! command -v slackcat > /dev/null 2>&1; then
