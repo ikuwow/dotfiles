@@ -24,7 +24,6 @@ alias less='less -iM'
 alias tree='tree -NC'
 alias grep='grep --color=auto'
 alias man='LANG=C man'
-alias bye='exit'
 
 alias be='bundle exec'
 alias de='docker exec'
