@@ -29,7 +29,6 @@ brew "git"
 brew "git-secrets"
 brew "highlight"
 brew "jq"
-brew "libdvdcss" # needed by handbrake
 brew "nkf"
 brew "nmap"
 brew "pwgen"
