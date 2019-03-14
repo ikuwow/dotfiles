@@ -16,6 +16,7 @@ brew "findutils"
 brew "gnu-sed"
 brew "gawk"
 
+brew "asdf"
 brew "telnet"
 brew "awscli"
 brew "bash-completion@2"

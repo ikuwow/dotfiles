@@ -23,6 +23,11 @@ export XDG_CONFIG_HOME=~/.config
 export PROMPT_COMMAND='echo -ne "\033]0;${PWD}\007"'
 export QUOTING_STYLE=literal # for GNU ls
 
+asdfini=/usr/local/opt/asdf/asdf.sh
+if [ -e "$asdfini" ]; then
+    . /usr/local/opt/asdf/asdf.sh
+fi
+
 if [ "$(command -v gcloud)" ]; then
     gcloudpath="$(dirname "$(dirname "$(readlink "$(command -v gcloud)")")")"
     # shellcheck source=/dev/null
