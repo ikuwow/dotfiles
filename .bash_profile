@@ -25,7 +25,8 @@ export QUOTING_STYLE=literal # for GNU ls
 
 asdfini=/usr/local/opt/asdf/asdf.sh
 if [ -e "$asdfini" ]; then
-    . /usr/local/opt/asdf/asdf.sh
+    # shellcheck source=/dev/null
+    . "$asdfini"
 fi
 
 if [ "$(command -v gcloud)" ]; then
