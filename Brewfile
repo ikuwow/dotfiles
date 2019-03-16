@@ -40,7 +40,6 @@ brew "tree"
 brew "wget"
 brew "watch"
 brew "fontforge"
-brew "tfenv"
 brew "vim", args: ["with-lua", "with-python3"]
 brew "neovim"
 brew "graphviz"
