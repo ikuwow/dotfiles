@@ -5,7 +5,7 @@
       "one-light-ui"
       "one-light-syntax"
     ]
-    useCustomTitleBar: true
+    titleBar: "custom"
   editor: {}
   "exception-reporting":
     userId: "00f313a3-024d-107d-4458-72598b0be02f"
