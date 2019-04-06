@@ -51,14 +51,9 @@ bind "set completion-ignore-case on"
 ## Language Specific configs
 export GOPATH=$HOME/.go
 
-if [ "$(uname)" = Darwin ]; then
-    java_version_file="$HOME/.java-version"
-    java_version=1.8
-    if [ -e "$java_version_file" ]; then
-        java_version="$(cat "$java_version_file")"
-    fi
-    JAVA_HOME=$(/usr/libexec/java_home -v "$java_version")
-    export JAVA_HOME
+if [ -e "$HOME/.asdf/plugins/java/asdf-java-wrapper.bash" ]; then
+    # shellcheck source=/dev/null
+    . "$HOME/.asdf/plugins/java/asdf-java-wrapper.bash"
 fi
 
 ## Functions
