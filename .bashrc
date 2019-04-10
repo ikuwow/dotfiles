@@ -56,7 +56,13 @@ if [ -e "$HOME/.asdf/plugins/java/asdf-java-wrapper.bash" ]; then
 fi
 
 asdf_update_java_home() {
-    asdf current java > /dev/null && JAVA_HOME=$(asdf where java) && export JAVA_HOME && return
+    local asdf_path
+    if asdf_path="$(asdf where java)"; then
+        JAVA_HOME="$asdf_path"
+        export JAVA_HOME
+        return
+    fi
+
     # shellcheck disable=SC2016
     echo 'No java version set. Type `asdf list-all java` for all versions.'
 }
