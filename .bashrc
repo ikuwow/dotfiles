@@ -34,7 +34,6 @@ alias mysql='mysql --pager="less -S -n -i -F -X"'
 [[ "$(command -v nvim)" ]] && alias vim='nvim'
 alias remotehost="cat ~/.ssh/config ~/.ssh/config.d/* | grep -e '^Host' | sed -e 's/^Host //g'"
 alias pt-query-digest='$(find /usr/local/Cellar/percona-toolkit -maxdepth 1 -type d | sort -r | head -n 1)/libexec/bin/pt-query-digest'
-
 command -v sshrc > /dev/null 2>&1 && alias ssh=sshrc
 
 ## Auto complete
@@ -55,6 +54,13 @@ if [ -e "$HOME/.asdf/plugins/java/asdf-java-wrapper.bash" ]; then
     # shellcheck source=/dev/null
     . "$HOME/.asdf/plugins/java/asdf-java-wrapper.bash"
 fi
+
+asdf_update_java_home() {
+    asdf current java > /dev/null && JAVA_HOME=$(asdf where java) && export JAVA_HOME && return
+    # shellcheck disable=SC2016
+    echo 'No java version set. Type `asdf list-all java` for all versions.'
+}
+asdf_update_java_home
 
 ## Functions
 function prompts {
