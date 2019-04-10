@@ -56,6 +56,8 @@ if [ -e "$HOME/.asdf/plugins/java/asdf-java-wrapper.bash" ]; then
 fi
 
 asdf_update_java_home() {
+    command -v asdf > /dev/null || return
+
     local asdf_path
     if asdf_path="$(asdf where java)"; then
         JAVA_HOME="$asdf_path"
