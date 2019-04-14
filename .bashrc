@@ -39,10 +39,10 @@ command -v sshrc > /dev/null 2>&1 && alias ssh=sshrc
 ## Auto complete
 complete -C aws_completer aws
 
-BASH_COMPLETION_PATH=/usr/local/share/bash-completion/bash_completion
-if [ "${BASH_VERSINFO[0]}" -ge 4 ] && [ -f "$BASH_COMPLETION_PATH" ]; then
+if [ "${BASH_VERSINFO[0]}" -ge 4 ]; then
+    BASH_COMPLETION_PATH=/usr/local/share/bash-completion/bash_completion
     # shellcheck source=/dev/null
-    . "$BASH_COMPLETION_PATH"
+    [[ -f "$BASH_COMPLETION_PATH" ]] && . "$BASH_COMPLETION_PATH"
 fi
 
 bind "set completion-ignore-case on"
@@ -50,10 +50,9 @@ bind "set completion-ignore-case on"
 ## Language Specific configs
 export GOPATH=$HOME/.go
 
-if [ -e "$HOME/.asdf/plugins/java/asdf-java-wrapper.bash" ]; then
-    # shellcheck source=/dev/null
-    . "$HOME/.asdf/plugins/java/asdf-java-wrapper.bash"
-fi
+ASDF_JAVA_WRAPPER="$HOME/.asdf/plugins/java/asdf-java-wrapper.bash"
+# shellcheck source=/dev/null
+[[ -e "$ASDF_JAVA_WRAPPER" ]] && . "$ASDF_JAVA_WRAPPER"
 
 asdf_update_java_home() {
     command -v asdf > /dev/null || return
