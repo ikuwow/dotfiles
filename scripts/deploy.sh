@@ -13,19 +13,19 @@ for file in .??*; do
     [[ "$file" = ".git" ]] && continue
     [[ "$file" = ".DS_Store" ]] && continue
     [[ "$file" = ".travis.yml" ]] && continue
-    ln -fhvs "$DOTPATH/$file" "$HOME/$file"
+    ln -fvs "$DOTPATH/$file" "$HOME/$file"
 done
 
 [[ -z $XDG_CONFIG_HOME ]] && XDG_CONFIG_HOME=$HOME/.config
 mkdir -p "$XDG_CONFIG_HOME"
 
-ln -fhvs "$HOME/.vim" "$XDG_CONFIG_HOME/nvim"
+ln -fvs "$HOME/.vim" "$XDG_CONFIG_HOME/nvim"
 
 # kyrat
 mkdir -p "$XDG_CONFIG_HOME/kyrat"
-ln -fhvs "$HOME/.bashrc" "$XDG_CONFIG_HOME/kyrat/bashrc"
-ln -fhvs "$HOME/.inputrc" "$XDG_CONFIG_HOME/kyrat/inputrc"
-ln -fhvs "$HOME/.vimrc" "$XDG_CONFIG_HOME/kyrat/vimrc"
+ln -fvs "$HOME/.bashrc" "$XDG_CONFIG_HOME/kyrat/bashrc"
+ln -fvs "$HOME/.inputrc" "$XDG_CONFIG_HOME/kyrat/inputrc"
+ln -fvs "$HOME/.vimrc" "$XDG_CONFIG_HOME/kyrat/vimrc"
 
 # iCloud
 ICLOUD_DIR="$HOME/iCloudDrive"
@@ -35,6 +35,6 @@ DIRS=(
   Preview TextEdit QuickTimePlayerX ScriptEditor2
 )
 for dir in "${DIRS[@]}"; do
-    ln -fhvs "$HOME/Library/Mobile Documents/com~apple~${dir}/Documents" "${ICLOUD_DIR}/${dir}"
+    ln -fvs "$HOME/Library/Mobile Documents/com~apple~${dir}/Documents" "${ICLOUD_DIR}/${dir}"
 done
-ln -fhvs "$HOME/Library/Mobile Documents/com~apple~CloudDocs" "${ICLOUD_DIR}/CloudDocs"
+ln -fvs "$HOME/Library/Mobile Documents/com~apple~CloudDocs" "${ICLOUD_DIR}/CloudDocs"
