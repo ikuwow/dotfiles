@@ -58,14 +58,10 @@ asdf_update_java_home() {
     command -v asdf > /dev/null || return
 
     local asdf_path
-    if asdf_path="$(asdf where java)"; then
+    if asdf_path="$(asdf where java 2> /dev/null)"; then
         JAVA_HOME="$asdf_path"
         export JAVA_HOME
-        return
     fi
-
-    # shellcheck disable=SC2016
-    echo 'No java version set. Type `asdf list-all java` for all versions.'
 }
 asdf_update_java_home
 
