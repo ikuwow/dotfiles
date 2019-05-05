@@ -29,6 +29,7 @@ alias be='bundle exec'
 alias de='docker exec'
 alias dr='docker run -it --rm'
 alias drv='docker run -it --rm -w /workspace -v $(pwd):workspace'
+alias dcr='docker-compose run'
 alias mysql='mysql --pager="less -S -n -i -F -X"'
 [[ "$(command -v hub)" ]] && eval "$(hub alias -s)"
 [[ "$(command -v nvim)" ]] && alias vim='nvim'
