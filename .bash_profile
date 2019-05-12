@@ -37,7 +37,7 @@ if [ "$(command -v gcloud)" ]; then
     [[ -f "$gcloudpath/completion.bash.inc" ]] && . "$gcloudpath/completion.bash.inc"
 fi
 
-if [ -n "$SSH_CLIENT" ]; then
+if [ -z "$SSH_CLIENT" ]; then
     secretkeys="$(find ~/.ssh -name id_rsa)"
     for secretkey in $secretkeys; do
         ssh-add -K "$secretkey" 2> /dev/null
