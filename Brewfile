@@ -49,6 +49,7 @@ brew "circleci"
 brew "masutaka/github-nippou/github-nippou"
 brew "hub"
 brew "gpg"
+brew "sqlparse"
 
 cask "google-japanese-ime"
 cask "bartender"

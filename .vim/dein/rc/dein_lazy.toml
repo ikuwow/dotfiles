@@ -63,3 +63,7 @@ on_ft = ['terraform']
 [[plugins]]
 repo = 'othree/yajs.vim'
 on_ft = ['javascript', 'html']
+
+[[plugins]]
+repo = 'mattn/vim-sqlfmt'
+on_ft = ['sql']
