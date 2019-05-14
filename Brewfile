@@ -72,7 +72,6 @@ cask "keybase"
 cask "rescuetime"
 cask "kindle"
 cask "virtualbox"
-cask "nightowl"
 
 mas "WiFi Signal", id: 525912054
 mas "Quests", id: 1447415753
