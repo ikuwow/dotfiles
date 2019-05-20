@@ -16,6 +16,7 @@ brew "findutils"
 brew "gnu-sed"
 brew "gawk"
 
+brew "python" # required by denite.nvim etc.
 brew "asdf"
 brew "telnet"
 brew "awscli"
