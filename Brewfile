@@ -15,6 +15,7 @@ brew "findutils"
 brew "gnu-sed"
 brew "gawk"
 
+brew "zlib"
 brew "asdf"
 brew "telnet"
 brew "awscli"
