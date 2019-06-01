@@ -52,6 +52,11 @@ augroup END
 " complement { after Enter
 inoremap {<Enter> {}<Left><CR><ESC><S-o>
 
+if has("nvim")
+    let g:python_host_prog  = '/usr/local/bin/python2'
+    let g:python3_host_prog = '/usr/local/bin/python3'
+endif
+
 "=====================================
 "-- dein.vim Configulation Section --
 "=====================================
