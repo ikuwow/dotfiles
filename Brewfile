@@ -9,7 +9,6 @@ brew "mackup"
 brew "bash"
 cask "karabiner-elements"
 
-brew "binutils"
 brew "coreutils"
 brew "diffutils"
 brew "findutils"
@@ -17,6 +16,7 @@ brew "gnu-sed"
 brew "gawk"
 
 brew "python" # required by denite.nvim etc.
+brew "zlib"
 brew "asdf"
 brew "telnet"
 brew "awscli"
