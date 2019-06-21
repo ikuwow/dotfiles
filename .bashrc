@@ -94,3 +94,14 @@ if [ "$(command -v networksetup)" ]; then
         echo 'Done.'
     }
 fi
+
+if [ "$(command -v github-nippou)" ]; then
+    function shuho {
+        since=$(date "+%Y%m%d" --date '7 day ago')
+        until=$(date "+%Y%m%d" --date '1 day ago')
+
+        echo "Fetching contributions during $since ~ $until..."
+
+        github-nippou -u "$until" -s "$since"
+    }
+fi
