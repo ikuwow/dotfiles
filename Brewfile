@@ -15,7 +15,10 @@ brew "findutils"
 brew "gnu-sed"
 brew "gawk"
 
-brew "python" # required by denite.nvim etc.
+# required by denite.nvim etc.
+brew "python"
+brew "ruby"
+
 brew "zlib"
 brew "asdf"
 brew "telnet"
