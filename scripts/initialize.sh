@@ -2,16 +2,16 @@
 
 set -e
 
-pip3 install --upgrade pip
-pip3 install neovim
+/usr/local/bin/pip3 install --upgrade pip
+/usr/local/bin/pip3 install neovim
 
-pip2 install --upgrade pip
-pip2 install neovim
+/usr/local/bin/pip2 install --upgrade pip
+/usr/local/bin/pip2 install neovim
 
-gem update
-gem install neovim
+/usr/local/opt/ruby/bin/gem update
+/usr/local/opt/ruby/bin/gem install neovim
 
-npm i -g neovim
+/usr/local/bin/npm i -g neovim
 
 KYRAT_PATH=~/.local/share/kyrat
 mkdir -p "$(dirname ~/.local/share)"
