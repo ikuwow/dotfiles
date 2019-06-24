@@ -8,7 +8,6 @@ set -e
 /usr/local/bin/pip2 install --upgrade pip
 /usr/local/bin/pip2 install neovim
 
-/usr/local/opt/ruby/bin/gem update
 /usr/local/opt/ruby/bin/gem install neovim
 
 /usr/local/bin/npm i -g neovim
