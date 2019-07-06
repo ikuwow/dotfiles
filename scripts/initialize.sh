@@ -23,4 +23,4 @@ else
     git pull origin master
 fi
 mkdir -p ~/bin
-ln -s "$KYRAT_PATH/bin/kyrat" ~/bin/kyrat
+ln -fs "$KYRAT_PATH/bin/kyrat" ~/bin/kyrat
