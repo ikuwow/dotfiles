@@ -2,6 +2,11 @@
 
 set -eu
 
+if [ ! -s ./Vagrantfile ]; then
+    echo 'Error: No Vagrantfile in current directory.'
+    exit 1
+fi
+
 ssh_config_path=./ssh-config
 hostname=default
 
