@@ -1,0 +1,23 @@
+#!/bin/bash
+
+set -eu
+
+if [ ! -s ./Vagrantfile ]; then
+    echo 'Error: No Vagrantfile in current directory.'
+    exit 1
+fi
+
+ssh_config_path=./ssh-config
+hostname=default
+
+if [ ! -s $ssh_config_path ]; then
+    echo "Creating ssh-config file..."
+    vagrant ssh-config > $ssh_config_path
+    echo "Done."
+fi
+
+if [ ! $# -eq 0 ]; then
+    hostname=$1
+fi
+
+ssh -F "$ssh_config_path" "$hostname"

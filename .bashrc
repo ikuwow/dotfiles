@@ -35,6 +35,7 @@ alias mysql='mysql --pager="less -S -n -i -F -X"'
 [[ "$(command -v nvim)" ]] && alias vim='nvim'
 alias remotehost="cat ~/.ssh/config ~/.ssh/config.d/* | grep -e '^Host' | sed -e 's/^Host //g'"
 alias pt-query-digest='$(find /usr/local/Cellar/percona-toolkit -maxdepth 1 -type d | sort -r | head -n 1)/libexec/bin/pt-query-digest'
+alias tmux='[[ -n "$TMUX_CONF" ]] && tmux -f "$TMUX_CONF" || tmux'
 command -v kyrat > /dev/null 2>&1 && alias ssh=kyrat
 
 ## Auto complete
@@ -45,8 +46,6 @@ if [ "${BASH_VERSINFO[0]}" -ge 4 ]; then
     # shellcheck source=/dev/null
     [[ -f "$BASH_COMPLETION_PATH" ]] && . "$BASH_COMPLETION_PATH"
 fi
-
-bind "set completion-ignore-case on"
 
 ## Language Specific configs
 export GOPATH=$HOME/.go
@@ -105,3 +104,4 @@ if [ "$(command -v github-nippou)" ]; then
         github-nippou -u "$until" -s "$since"
     }
 fi
+

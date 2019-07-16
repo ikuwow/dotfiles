@@ -26,6 +26,11 @@ mkdir -p "$XDG_CONFIG_HOME/kyrat"
 ln -fvns "$HOME/.bashrc" "$XDG_CONFIG_HOME/kyrat/bashrc"
 ln -fvns "$HOME/.inputrc" "$XDG_CONFIG_HOME/kyrat/inputrc"
 ln -fvns "$HOME/.vimrc" "$XDG_CONFIG_HOME/kyrat/vimrc"
+ln -fvns "$HOME/.tmux.conf" "$XDG_CONFIG_HOME/kyrat/tmux.conf"
+
+# bin
+mkdir -p ~/bin
+find "$DOTPATH/bin/" -type f -executable -exec ln -fvns {} ~/bin/ \;
 
 # iCloud
 ICLOUD_DIR="$HOME/iCloudDrive"
