@@ -20,4 +20,9 @@ if [ ! $# -eq 0 ]; then
     hostname=$1
 fi
 
-ssh -F "$ssh_config_path" "$hostname"
+SSH=ssh
+if [[ "$(command -v kyrat)" ]]; then
+    SSH=kyrat
+fi
+
+$SSH -F "$ssh_config_path" "$hostname"
