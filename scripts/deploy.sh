@@ -20,7 +20,7 @@ done
 mkdir -p "$XDG_CONFIG_HOME"
 
 ln -fvns "$DOTPATH/.config/git" "$XDG_CONFIG_HOME/"
-ln -fvns "$HOME/.vim" "$XDG_CONFIG_HOME/nvim"
+ln -fvns "$DOTPATH/.config/nvim" "$XDG_CONFIG_HOME/"
 
 # kyrat
 mkdir -p "$XDG_CONFIG_HOME/kyrat"
