@@ -16,12 +16,10 @@ for file in .??*; do
     ln -fvns "$DOTPATH/$file" "$HOME/$file"
 done
 
+# XDG Base Directory
 [[ -z $XDG_CONFIG_HOME ]] && XDG_CONFIG_HOME=$HOME/.config
 mkdir -p "$XDG_CONFIG_HOME"
-
-ln -fvns "$DOTPATH/.config/git" "$XDG_CONFIG_HOME/"
-ln -fvns "$DOTPATH/.config/nvim" "$XDG_CONFIG_HOME/"
-ln -fvns "$DOTPATH/.config/kyrat" "$XDG_CONFIG_HOME/"
+find "$DOTPATH/.config" -maxdepth 1 -mindepth 1 -exec ln -fvns {} "$XDG_CONFIG_HOME/" \;
 
 # bin
 mkdir -p ~/bin
