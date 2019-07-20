@@ -19,6 +19,7 @@ done
 [[ -z $XDG_CONFIG_HOME ]] && XDG_CONFIG_HOME=$HOME/.config
 mkdir -p "$XDG_CONFIG_HOME"
 
+ln -fvns "$DOTPATH/.config/git" "$XDG_CONFIG_HOME/git"
 ln -fvns "$HOME/.vim" "$XDG_CONFIG_HOME/nvim"
 
 # kyrat

@@ -10,6 +10,7 @@ set -e
 
 /usr/local/opt/ruby/bin/gem install neovim
 
+/usr/local/bin/npm i -g npm
 /usr/local/bin/npm i -g neovim
 
 KYRAT_PATH=~/.local/share/kyrat
