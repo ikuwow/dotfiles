@@ -21,13 +21,7 @@ mkdir -p "$XDG_CONFIG_HOME"
 
 ln -fvns "$DOTPATH/.config/git" "$XDG_CONFIG_HOME/"
 ln -fvns "$DOTPATH/.config/nvim" "$XDG_CONFIG_HOME/"
-
-# kyrat
-mkdir -p "$XDG_CONFIG_HOME/kyrat"
-ln -fvns "$HOME/.bashrc" "$XDG_CONFIG_HOME/kyrat/bashrc"
-ln -fvns "$HOME/.inputrc" "$XDG_CONFIG_HOME/kyrat/inputrc"
-ln -fvns "$HOME/.vimrc" "$XDG_CONFIG_HOME/kyrat/vimrc"
-ln -fvns "$HOME/.tmux.conf" "$XDG_CONFIG_HOME/kyrat/tmux.conf"
+ln -fvns "$DOTPATH/.config/kyrat" "$XDG_CONFIG_HOME/"
 
 # bin
 mkdir -p ~/bin
