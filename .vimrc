@@ -10,7 +10,6 @@ set nu
 set title " display filename (not Thank you for using Vim.)
 set ruler " display ruler (60,7 13%)
 set showcmd " show inputting key
-filetype plugin indent on
 
 set hlsearch " highlight the search word
 set ignorecase
@@ -91,7 +90,9 @@ if isdirectory(s:dein_repo)
     endif
 endif
 
-syntax enable " なぜかこの辺に書かないと動かない
+" https://github.com/Shougo/dein.vim
+filetype plugin indent on
+syntax enable
 
 set laststatus=2
 set t_Co=256
