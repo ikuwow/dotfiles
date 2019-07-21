@@ -71,23 +71,24 @@ if !isdirectory(s:dein_repo) && strlen($SSH_CLIENT) == 0
     end
 endif
 
-if has('vim_starting')
-    execute "set runtimepath+=" . s:dein_repo
-endif
-
-if dein#load_state(s:dein_dir)
-    call dein#begin(s:dein_dir)
-    if filereadable(s:dein_toml)
-        call dein#load_toml(s:dein_toml)
+if isdirectory(s:dein_repo)
+    if has('vim_starting')
+        execute "set runtimepath+=" . s:dein_repo
     endif
-    if filereadable(s:dein_toml_lazy)
-        call dein#load_toml(s:dein_toml_lazy, {'lazy': 1})
+    if dein#load_state(s:dein_dir)
+        call dein#begin(s:dein_dir)
+        if filereadable(s:dein_toml)
+            call dein#load_toml(s:dein_toml)
+        endif
+        if filereadable(s:dein_toml_lazy)
+            call dein#load_toml(s:dein_toml_lazy, {'lazy': 1})
+        endif
+        call dein#end()
+        call dein#save_state()
     endif
-    call dein#end()
-    call dein#save_state()
-endif
-if has('vim_starting') && dein#check_install()
-    call dein#install()
+    if has('vim_starting') && dein#check_install()
+        call dein#install()
+    endif
 endif
 
 syntax enable " なぜかこの辺に書かないと動かない
