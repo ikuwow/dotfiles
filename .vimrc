@@ -63,7 +63,7 @@ let s:dein_repo = s:dein_dir . '/repos/github.com/Shougo/dein.vim'
 let s:dein_toml = s:dein_dir . '/rc/dein.toml'
 let s:dein_toml_lazy = s:dein_dir . '/rc/dein_lazy.toml'
 
-if !isdirectory(s:dein_repo)
+if !isdirectory(s:dein_repo) && strlen($SSH_CLIENT) == 0
     echo "Cloning dein.vim..."
     call system('git clone https://github.com/Shougo/dein.vim ' . shellescape(s:dein_repo))
     if v:shell_error != 0
