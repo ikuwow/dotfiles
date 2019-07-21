@@ -44,9 +44,9 @@ set cmdheight=1
 set virtualedit=block
 
 augroup HighlightTrailingSpaces
-  autocmd!
-  autocmd VimEnter,WinEnter,ColorScheme * highlight TrailingSpaces term=underline guibg=green ctermbg=green
-autocmd VimEnter,WinEnter * match TrailingSpaces /\s\+$/
+    autocmd!
+    autocmd VimEnter,WinEnter,ColorScheme * highlight TrailingSpaces term=underline guibg=green ctermbg=green
+    autocmd VimEnter,WinEnter * match TrailingSpaces /\s\+$/
 augroup END
 
 " complement { after Enter
