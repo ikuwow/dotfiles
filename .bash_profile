@@ -20,6 +20,7 @@ export EDITOR=nvim
 export HISTTIMEFORMAT='%y-%m-%d %H:%M:%S '
 export HISTSIZE=5000
 export XDG_CONFIG_HOME=~/.config
+export XDG_DATA_HOME=~/.local/share
 export PROMPT_COMMAND='echo -ne "\033]0;${PWD}\007"'
 export QUOTING_STYLE=literal # for GNU ls
 
