@@ -11,6 +11,7 @@ cd "$DOTPATH" || exit 1
 
 for file in .??*; do
     [[ "$file" = ".git" ]] && continue
+    [[ "$file" = ".gitignore" ]] && continue
     [[ "$file" = ".DS_Store" ]] && continue
     [[ "$file" = ".travis.yml" ]] && continue
     ln -fvns "$DOTPATH/$file" "$HOME/$file"
