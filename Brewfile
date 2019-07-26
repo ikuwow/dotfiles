@@ -58,6 +58,7 @@ brew "imagemagick"
 
 cask "google-japanese-ime"
 cask "bartender"
+cask "pastebot"
 cask "iterm2"
 cask "docker"
 cask "istat-menus"
