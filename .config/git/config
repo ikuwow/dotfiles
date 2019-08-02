@@ -24,9 +24,6 @@
     bl = blame
     gr = grep
     clone = clone --recursive
-
-# このconfig fileはdotfilesのconfigでもあり、
-# でもあり、PC用グローバル.gitconfigでもある
 [credential]
     helper = cache
 [filter "lfs"]
