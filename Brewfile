@@ -56,6 +56,7 @@ brew "gpg"
 brew "sqlparse"
 brew "imagemagick"
 brew "thefuck"
+brew "shfmt"
 
 cask "google-japanese-ime"
 cask "bartender"
