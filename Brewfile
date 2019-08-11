@@ -68,15 +68,17 @@ cask "xquartz"
 cask "google-chrome"
 cask "firefox"
 cask "google-cloud-sdk"
-cask "java"
-cask "java8"
-cask "zulu7"
-cask "java6"
 cask "vagrant"
 cask "keybase"
 cask "rescuetime"
 cask "kindle"
 cask "virtualbox"
+
+# Languages
+cask "java"
+cask "java8"
+cask "zulu7"
+cask "java6"
 
 mas "WiFi Signal", id: 525912054
 mas "Quests", id: 1447415753
