@@ -2,9 +2,9 @@
 
 set -e
 
-if ! command -v defaults > /dev/null 2>&1; then
-    echo "\`defaults\` not found. Nothing to do."
-    exit 0
+if ! command -v defaults >/dev/null 2>&1; then
+  echo "\`defaults\` not found. Nothing to do."
+  exit 0
 fi
 
 echo "Configuring..."
@@ -47,11 +47,11 @@ defaults write NSGlobalDomain KeyRepeat -int 2
 
 echo "Configuring SystemUIServer..."
 defaults write com.apple.systemuiserver menuExtras -array \
-    "/System/Library/CoreServices/Menu Extras/TimeMachine.menu" \
-    "/System/Library/CoreServices/Menu Extras/Bluetooth.menu" \
-    "/System/Library/CoreServices/Menu Extras/TextInput.menu" \
-    "/System/Library/CoreServices/Menu Extras/Clock.menu" \
-    "/System/Library/CoreServices/Menu Extras/AirPort.menu"
+  "/System/Library/CoreServices/Menu Extras/TimeMachine.menu" \
+  "/System/Library/CoreServices/Menu Extras/Bluetooth.menu" \
+  "/System/Library/CoreServices/Menu Extras/TextInput.menu" \
+  "/System/Library/CoreServices/Menu Extras/Clock.menu" \
+  "/System/Library/CoreServices/Menu Extras/AirPort.menu"
 defaults write com.apple.menuextra.clock isAnalog -bool true
 killall SystemUIServer
 
@@ -66,7 +66,7 @@ defaults write com.apple.dock wvous-br-corner -int 10 # Put display to sleep
 defaults write com.apple.dock wvous-br-modifier -int 0
 defaults write com.apple.dock wvous-tr-corner -int 12 # Notification Center
 defaults write com.apple.dock wvous-tr-modifier -int 0
-defaults write com.apple.dock mru-spaces -bool false # Disable automatically rearrange spacet 
+defaults write com.apple.dock mru-spaces -bool false # Disable automatically rearrange spacet
 killall Dock
 
 echo "Configuring Finder..."
@@ -86,7 +86,6 @@ defaults write com.apple.Safari IncludeInternalDebugMenu -bool true
 defaults write com.apple.Safari ShowStatusBar -bool true
 defaults write com.apple.Safari AutoFillPasswords -bool true
 killall Safari
-
 
 echo ""
 echo "Configuration Complete!"
