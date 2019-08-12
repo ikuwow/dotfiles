@@ -21,8 +21,4 @@ if [ ! $# -eq 0 ]; then
 fi
 
 SSH=ssh
-if [[ "$(command -v kyrat)" ]]; then
-  SSH=kyrat
-fi
-
 $SSH -F "$ssh_config_path" "$hostname"
