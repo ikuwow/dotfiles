@@ -35,7 +35,7 @@ alias mysql='mysql --pager="less -S -n -i -F -X"'
 [[ "$(command -v nvim)" ]] && alias vim='nvim'
 alias remotehost="cat ~/.ssh/config ~/.ssh/config.d/* | grep -e '^Host' | sed -e 's/^Host //g'"
 alias pt-query-digest='$(find /usr/local/Cellar/percona-toolkit -maxdepth 1 -type d | sort -r | head -n 1)/libexec/bin/pt-query-digest'
-alias tmux='[[ -n "$TMUX_CONF" ]] && tmux -f "$TMUX_CONF" || tmux'
+[[ -n "$TMUX_CONF" ]] && alias tmux='tmux -f "$TMUX_CONF"'
 command -v kyrat > /dev/null 2>&1 && alias ssh=kyrat
 command -v thefuck > /dev/null 2>&1 && eval "$(thefuck --alias)"
 
