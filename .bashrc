@@ -105,3 +105,10 @@ if [ "$(command -v github-nippou)" ]; then
     github-nippou -u "$until" -s "$since"
   }
 fi
+
+if [ "$(command -v terminal-notifier)" ]; then
+  function tn() {
+    local message="$1"
+    terminal-notifier -sound default -message "$message"
+  }
+fi
