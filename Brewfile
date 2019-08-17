@@ -57,6 +57,7 @@ brew "sqlparse"
 brew "imagemagick"
 brew "thefuck"
 brew "shfmt"
+brew "terminal-notifier"
 
 cask "google-japanese-ime"
 cask "bartender"
