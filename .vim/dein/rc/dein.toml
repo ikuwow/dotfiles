@@ -174,3 +174,6 @@ repo = 'chr4/nginx.vim'
 
 [[plugins]]
 repo = 'glench/vim-jinja2-syntax'
+
+[[plugins]]
+repo = 'pearofducks/ansible-vim'
