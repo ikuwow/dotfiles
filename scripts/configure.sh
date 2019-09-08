@@ -2,6 +2,13 @@
 
 set -e
 
+function condkillall() {
+  local -r process="$1"
+  if pgrep "^${process}$" >/dev/null 2>&1; then
+    killall "${process}"
+  fi
+}
+
 if ! command -v defaults >/dev/null 2>&1; then
   echo "\`defaults\` not found. Nothing to do."
   exit 0
@@ -53,7 +60,7 @@ defaults write com.apple.systemuiserver menuExtras -array \
   "/System/Library/CoreServices/Menu Extras/Clock.menu" \
   "/System/Library/CoreServices/Menu Extras/AirPort.menu"
 defaults write com.apple.menuextra.clock isAnalog -bool true
-killall SystemUIServer
+condkillall SystemUIServer
 
 echo "Configuring Dock..."
 defaults write com.apple.dock show-recents -bool false
@@ -67,7 +74,7 @@ defaults write com.apple.dock wvous-br-modifier -int 0
 defaults write com.apple.dock wvous-tr-corner -int 12 # Notification Center
 defaults write com.apple.dock wvous-tr-modifier -int 0
 defaults write com.apple.dock mru-spaces -bool false # Disable automatically rearrange spacet
-killall Dock
+condkillall Dock
 
 echo "Configuring Finder..."
 defaults write com.apple.finder ShowHardDrivesOnDesktop -bool true
@@ -78,14 +85,14 @@ defaults write com.apple.finder ShowStatusBar -bool true
 /usr/libexec/PlistBuddy -c "Set :DesktopViewSettings:IconViewSettings:showItemInfo true" ~/Library/Preferences/com.apple.finder.plist
 /usr/libexec/PlistBuddy -c "Set :DesktopViewSettings:IconViewSettings:arrangeBy grid" ~/Library/Preferences/com.apple.finder.plist
 defaults write com.apple.finder FXRemoveOldTrashItems -bool true
-killall Finder
+condkillall Finder
 
 echo "Configuring Safari..."
 defaults write com.apple.Safari ShowFullURLInSmartSearchField -bool true
 defaults write com.apple.Safari IncludeInternalDebugMenu -bool true
 defaults write com.apple.Safari ShowStatusBar -bool true
 defaults write com.apple.Safari AutoFillPasswords -bool true
-killall Safari
+condkillall Safari
 
 echo ""
 echo "Configuration Complete!"
