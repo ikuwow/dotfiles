@@ -177,3 +177,6 @@ repo = 'glench/vim-jinja2-syntax'
 
 [[plugins]]
 repo = 'pearofducks/ansible-vim'
+
+[[plugins]]
+repo = 'posva/vim-vue'
