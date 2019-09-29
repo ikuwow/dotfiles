@@ -58,6 +58,7 @@ brew "imagemagick"
 brew "thefuck"
 brew "shfmt"
 brew "terminal-notifier"
+brew "ccat"
 
 cask "google-japanese-ime"
 cask "bartender"
