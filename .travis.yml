@@ -1,7 +1,0 @@
-language: bash
-sudo: false
-script:
-  - bash -c 'shopt -s globstar; shellcheck **/*.sh'
-  - bash -c 'shellcheck -s bash bin/vssh'
-  - bash -c 'shellcheck -s bash .bash_profile'
-  - bash -c 'shellcheck -s bash .bashrc'
