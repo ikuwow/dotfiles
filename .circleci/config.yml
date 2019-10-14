@@ -13,5 +13,7 @@ workflows:
           pattern: '*'
       - shellcheck/check:
           pattern: '.bash_profile'
+          ignore: 'SC2148' # Ignore "Add shebang to the top of your script"
       - shellcheck/check:
           pattern: '.bashrc'
+          ignore: 'SC2148'
