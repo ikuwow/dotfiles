@@ -9,7 +9,7 @@ workflows:
       - shellcheck/check:
           pattern: '*.sh'
       - shellcheck/check:
-          pattern: 'bin/vssh'
+          pattern: 'bin/*'
       - shellcheck/check:
           pattern: '.bash_profile'
       - shellcheck/check:
