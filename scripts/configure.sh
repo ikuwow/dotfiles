@@ -49,8 +49,8 @@ defaults write com.apple.AppleMultitouchTrackpad Clicking -bool true
 defaults write com.apple.AppleMultitouchTrackpad TrackpadThreeFingerDrag -bool true
 
 echo "Configuring Keyboard..."
-defaults write NSGlobalDomain InitialKeyRepeat -int 35
-defaults write NSGlobalDomain KeyRepeat -int 2
+defaults write -g InitialKeyRepeat -int 35
+defaults write -g KeyRepeat -int 2
 
 echo "Configuring SystemUIServer..."
 defaults write com.apple.systemuiserver menuExtras -array \
