@@ -4,3 +4,7 @@
 *.swo
 .*.un~
 .tool-versions
+
+# IntelliJ
+.idea
+*.iml
