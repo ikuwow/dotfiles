@@ -89,13 +89,10 @@ mas "Quests", id: 1447415753
 mas "Things3", id: 904280696
 mas "Dark Reader for Safari", id: 1438243180
 mas "1Blocker", id: 1107421413
-mas "Skitch", id: 425955336
-mas "ActivityTimer", id: 808647808
 mas "The Unarchiver", id: 425424353
 mas "Tweetbot", id: 1384080005
 mas "VirusScannerPlus", id: 595374522
 mas "Bear", id: 1091189122
-mas "Pomodoro-Tracker", id: 1396146802
 mas "Numbers", id: 409203825
 mas "Keynote", id: 409183694
 mas "Pages", id: 409201541
