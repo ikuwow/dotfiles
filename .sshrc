@@ -5,5 +5,4 @@
 
 . "$SSHHOME/.sshrc.d/.bashrc"
 
-# This edits ~/.gitconfig
-# [ "$(command -v git)" ] && git config --global include.path "$SSHHOME/.sshrc.d/.gitconfig"
+export XDG_CONFIG_HOME="$SSHHOME/.sshrc.d/.config"
