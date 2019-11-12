@@ -45,11 +45,7 @@ if [ -z "$SSH_CLIENT" ]; then
   done
 fi
 
-# shellcheck source=/dev/null
-[[ -f ~/.brew_api_token ]] && . ~/.brew_api_token
-
-# shellcheck source=/dev/null
-[[ -f ~/.bashrc ]] && . ~/.bashrc
-
-# shellcheck source=/dev/null
-[[ -f ~/.aliases ]] && . ~/.aliases
+for file in ~/.{bashrc,aliase,brew_api_token}; do
+  # shellcheck source=/dev/null
+  [[ -r "$file" ]] && [[ -f "$file" ]] && . "$file"
+done
