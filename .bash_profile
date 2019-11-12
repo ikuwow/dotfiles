@@ -50,3 +50,6 @@ fi
 
 # shellcheck source=/dev/null
 [[ -f ~/.bashrc ]] && . ~/.bashrc
+
+# shellcheck source=/dev/null
+[[ -f ~/.aliases ]] && . ~/.aliases
