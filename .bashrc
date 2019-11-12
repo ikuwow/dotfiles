@@ -10,35 +10,6 @@ fi
 # shellcheck disable=SC1091
 [[ -f /etc/bashrc ]] && . /etc/bashrc
 
-## Aliases
-# shellcheck disable=2012
-if ls --version >/dev/null 2>&1 && ls --version | head -n 1 | grep GNU >/dev/null; then
-  alias ls='ls --color=auto'
-else
-  alias ls='ls -G'
-fi
-alias ll='ls -l'
-alias la='ls -A'
-alias rm='rm -i'
-alias less='less -iM'
-alias tree='tree -NC'
-alias grep='grep --color=auto'
-alias man='LANG=C man'
-
-alias be='bundle exec'
-alias de='docker exec'
-alias dr='docker run -it --rm'
-alias drv='docker run -it --rm -w /workspace -v $(pwd):/workspace'
-alias dcr='docker-compose run'
-alias mysql='mysql --pager="less -S -n -i -F -X"'
-[[ "$(command -v hub)" ]] && eval "$(hub alias -s)"
-[[ "$(command -v nvim)" ]] && alias vim='nvim'
-alias remotehost="cat ~/.ssh/config ~/.ssh/config.d/* | grep -e '^Host' | sed -e 's/^Host //g'"
-alias pt-query-digest='$(find /usr/local/Cellar/percona-toolkit -maxdepth 1 -type d | sort -r | head -n 1)/libexec/bin/pt-query-digest'
-[[ -n "$TMUX_CONF" ]] && alias tmux='tmux -f "$TMUX_CONF"'
-command -v kyrat >/dev/null 2>&1 && alias ssh=kyrat
-command -v thefuck >/dev/null 2>&1 && eval "$(thefuck --alias)"
-
 ## Auto complete
 complete -C aws_completer aws
 
