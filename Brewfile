@@ -1,6 +1,7 @@
 tap "universal-ctags/universal-ctags"
 tap "caskroom/cask"
 tap "caskroom/versions"
+tap "ikuwow/ikuwow-sshrc"
 
 # First required
 brew "mas"
