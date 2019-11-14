@@ -4,5 +4,7 @@
 # do not use it! or you will setup all of vim plugins with dein.vim when type vim
 
 . "$SSHHOME/.sshrc.d/.bashrc"
+. "$SSHHOME/.sshrc.d/.aliases"
 
 export XDG_CONFIG_HOME="$SSHHOME/.sshrc.d/.config"
+export TMUX_CONF="$SSHHOME/.sshrc.d/.tmux.conf"
