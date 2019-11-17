@@ -83,3 +83,11 @@ if [ "$(command -v terminal-notifier)" ]; then
     terminal-notifier -sound default -message "$message"
   }
 fi
+
+if [ ! "$(command -v trash)" ]; then
+  trash (){
+    # shellcheck disable=2016
+    echo 'Warning: `trash` is redirected to `rm`.'
+    rm "$@"
+  }
+fi
