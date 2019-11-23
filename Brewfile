@@ -60,6 +60,7 @@ brew "thefuck"
 brew "shfmt"
 brew "terminal-notifier"
 brew "ccat"
+brew "fzf"
 
 cask "google-japanese-ime"
 cask "bartender"
