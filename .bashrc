@@ -14,6 +14,7 @@ fi
 complete -C aws_completer aws
 
 if [ "${BASH_VERSINFO[0]}" -ge 4 ]; then
+  export BASH_COMPLETION_COMPAT_DIR="/usr/local/etc/bash_completion.d"
   BASH_COMPLETION_PATH=/usr/local/etc/profile.d/bash_completion.sh
   # shellcheck source=/dev/null
   [[ -f "$BASH_COMPLETION_PATH" ]] && . "$BASH_COMPLETION_PATH"
