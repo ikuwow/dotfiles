@@ -32,4 +32,5 @@ alias drv='docker run -it --rm -w /workspace -v $(pwd):/workspace'
 alias dcr='docker-compose run'
 alias mysql='mysql --pager="less -S -n -i -F -X"'
 alias remotehost="cat ~/.ssh/config ~/.ssh/config.d/* | grep -e '^Host' | sed -e 's/^Host //g'"
+alias tf='terraform'
 alias pt-query-digest='$(find /usr/local/Cellar/percona-toolkit -maxdepth 1 -type d | sort -r | head -n 1)/libexec/bin/pt-query-digest'
