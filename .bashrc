@@ -42,7 +42,7 @@ asdf_update_java_home
 function prompts() {
 
   if [ -z "$SSH_CLIENT" ]; then
-    PS1='\h: \W\$ '
+    PS1='localhost: \W\$ '
   fi
 
   local OLDPS1="$PS1"
