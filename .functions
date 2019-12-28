@@ -15,8 +15,6 @@ prompts() {
   fi
 }
 
-prompts
-
 if [ "$(command -v networksetup)" ]; then
   wifireset() {
     interface='en0'

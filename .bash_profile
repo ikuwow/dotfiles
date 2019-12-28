@@ -43,3 +43,4 @@ for file in ~/.{bashrc,aliases,functions,brew_api_token}; do
   # shellcheck source=/dev/null
   [[ -r "$file" ]] && [[ -f "$file" ]] && . "$file"
 done
+[[ "$(command -v prompts)" ]] && prompts
