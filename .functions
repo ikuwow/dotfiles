@@ -1,0 +1,55 @@
+# vim: filetype=sh :
+
+function prompts() {
+
+  if [ -z "$SSH_CLIENT" ]; then
+    PS1='localhost: \W\$ '
+  fi
+
+  local OLDPS1="$PS1"
+  PS1=${OLDPS1//\\\$/\\\[\\e\[33m\\\]$\\\[\\e\[0m\\\]}
+
+  if [ -n "$SSH_CLIENT" ]; then
+    if [ "$PS1" = "${PS1/ssh/}" ]; then
+      PS1='\[\e[33m\][ssh]\[\e[0m\]'"${PS1}"
+    fi
+  fi
+}
+
+prompts
+
+if [ "$(command -v networksetup)" ]; then
+  function wifireset() {
+    interface='en0'
+    networksetup -setairportpower "$interface" off
+    echo 'Re-enabling Wi-Fi...'
+    networksetup -setairportpower "$interface" on
+    echo 'Done.'
+  }
+fi
+
+if [ "$(command -v github-nippou)" ]; then
+  function shuho() {
+    since=$(date "+%Y%m%d" --date '7 day ago')
+    until=$(date "+%Y%m%d" --date '1 day ago')
+
+    echo "Fetching contributions during $since ~ $until..."
+
+    github-nippou -u "$until" -s "$since"
+  }
+fi
+
+if [ "$(command -v terminal-notifier)" ]; then
+  function tn() {
+    local message="$1"
+    terminal-notifier -sound default -message "$message"
+  }
+fi
+
+if [ ! "$(command -v trash)" ]; then
+  trash (){
+    # shellcheck disable=2016
+    echo 'Warning: `trash` is redirected to `rm`.'
+    rm "$@"
+  }
+fi

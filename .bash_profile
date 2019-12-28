@@ -39,7 +39,7 @@ if [ "$(command -v gcloud)" ]; then
   [[ -f "$gcloudpath/completion.bash.inc" ]] && . "$gcloudpath/completion.bash.inc"
 fi
 
-for file in ~/.{bashrc,aliases,brew_api_token}; do
+for file in ~/.{bashrc,aliases,functions,brew_api_token}; do
   # shellcheck source=/dev/null
   [[ -r "$file" ]] && [[ -f "$file" ]] && . "$file"
 done
