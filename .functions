@@ -1,7 +1,6 @@
 # vim: filetype=sh :
 
-function prompts() {
-
+prompts() {
   if [ -z "$SSH_CLIENT" ]; then
     PS1='localhost: \W\$ '
   fi
@@ -19,7 +18,7 @@ function prompts() {
 prompts
 
 if [ "$(command -v networksetup)" ]; then
-  function wifireset() {
+  wifireset() {
     interface='en0'
     networksetup -setairportpower "$interface" off
     echo 'Re-enabling Wi-Fi...'
@@ -29,7 +28,7 @@ if [ "$(command -v networksetup)" ]; then
 fi
 
 if [ "$(command -v github-nippou)" ]; then
-  function shuho() {
+  shuho() {
     since=$(date "+%Y%m%d" --date '7 day ago')
     until=$(date "+%Y%m%d" --date '1 day ago')
 
@@ -40,7 +39,7 @@ if [ "$(command -v github-nippou)" ]; then
 fi
 
 if [ "$(command -v terminal-notifier)" ]; then
-  function tn() {
+  tn() {
     local message="$1"
     terminal-notifier -sound default -message "$message"
   }
