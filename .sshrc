@@ -9,6 +9,8 @@ export XDG_CONFIG_HOME="$SSHHOME/.sshrc.d/.config"
 
 . "$SSHHOME/.sshrc.d/.bashrc"
 . "$SSHHOME/.sshrc.d/.aliases"
+. "$SSHHOME/.sshrc.d/.functions"
+[[ "$(command -v prompts)" ]] && prompts
 
 tmuxrc() {
   local TMUXDIR=/tmp/.ikuwow-tmux-server
