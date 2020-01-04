@@ -18,6 +18,7 @@
     a = add
     c = commit
     ch = checkout
+    sw = switch
     l = log
     r = remote
     ru = remote update
