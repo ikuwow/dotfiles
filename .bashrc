@@ -22,18 +22,6 @@ fi
 
 ## Language Specific configs
 export GOPATH=$HOME/.go
-
-ASDF_JAVA_WRAPPER="$HOME/.asdf/plugins/java/asdf-java-wrapper.bash"
-# shellcheck source=/dev/null
-[[ -e "$ASDF_JAVA_WRAPPER" ]] && . "$ASDF_JAVA_WRAPPER"
-
-asdf_update_java_home() {
-  command -v asdf >/dev/null || return
-
-  local asdf_path
-  if asdf_path="$(asdf where java 2>/dev/null)"; then
-    JAVA_HOME="$asdf_path"
-    export JAVA_HOME
-  fi
-}
-asdf_update_java_home
+# shellcheck disable=SC2155
+export JAVA_HOME=$(/usr/libexec/java_home -v 1.8)
+# DO NOT USE asdf FOR Java
