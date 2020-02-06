@@ -20,7 +20,7 @@ if [ ! $# -eq 0 ]; then
   hostname=$1
 fi
 
-SSH=ssh
+SSH=sshrc
 
 if ! $SSH -F "$ssh_config_path" "$hostname" ; then
   echo 'Error: ssh failed. Is vagrant machine up?'

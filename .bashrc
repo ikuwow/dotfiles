@@ -23,5 +23,7 @@ fi
 ## Language Specific configs
 export GOPATH=$HOME/.go
 # shellcheck disable=SC2155
-export JAVA_HOME=$(/usr/libexec/java_home -v 1.8)
+if [ "$(command -v /usr/libexec/java_home)" ]; then
+  export JAVA_HOME=$(/usr/libexec/java_home -v 1.8)
+fi
 # DO NOT USE asdf FOR Java
