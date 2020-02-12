@@ -79,6 +79,7 @@ cask "keybase"
 cask "rescuetime"
 cask "kindle"
 cask "virtualbox"
+cask "intel-power-gadget"
 
 # Languages
 cask "java"
