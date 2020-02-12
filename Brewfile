@@ -1,6 +1,6 @@
 tap "universal-ctags/universal-ctags"
-tap "caskroom/cask"
-tap "caskroom/versions"
+tap "homebrew/cask-cask"
+tap "homebrew/cask-versions"
 tap "ikuwow/ikuwow-sshrc"
 
 # First required
