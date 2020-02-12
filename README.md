@@ -4,6 +4,14 @@
 
 My dear dotfiles.
 
+## Set up your new Mac
+
+* ☑️ Set language and reboot (System Preferences => Language and Region => Click plus button => ...)
+* ☑️ Connect to internet
+* ☑️ Sign in Apple ID (System Preferences => Click "Sign in" => ...)
+* ☑️ Set password of login user (System Preferences => Users and Groups => ...)
+* ☑️ Install Developer Tools: `xcode-select --install`
+
 ## Boostrapping
 
 ```
