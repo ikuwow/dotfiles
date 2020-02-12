@@ -82,7 +82,7 @@ cask "virtualbox"
 
 # Languages
 cask "java"
-cask "java8"
+cask "adoptopenjdk8"
 cask "zulu7"
 cask "java6"
 
