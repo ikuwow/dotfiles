@@ -1,6 +1,6 @@
+tap "homebrew/cask"
+tap "homebrew/cask-versions"
 tap "universal-ctags/universal-ctags"
-tap "caskroom/cask"
-tap "caskroom/versions"
 tap "ikuwow/ikuwow-sshrc"
 
 # First required
@@ -79,10 +79,11 @@ cask "keybase"
 cask "rescuetime"
 cask "kindle"
 cask "virtualbox"
+cask "intel-power-gadget"
 
 # Languages
 cask "java"
-cask "java8"
+cask "adoptopenjdk8"
 cask "zulu7"
 cask "java6"
 

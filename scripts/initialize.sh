@@ -4,11 +4,11 @@ set -e
 
 /usr/local/bin/pip3 install --upgrade pip
 /usr/local/bin/pip3 uninstall neovim
-/usr/local/bin/pip3 install pynvim
+/usr/local/bin/pip3 install --upgrade pynvim
 
 /usr/local/bin/pip2 install --upgrade pip
 /usr/local/bin/pip2 uninstall neovim
-/usr/local/bin/pip2 install pynvim
+/usr/local/bin/pip2 install --upgrade pynvim
 
 [[ -z $XDG_DATA_HOME ]] && XDG_DATA_HOME=$HOME/.local/share
 mkdir -p "$XDG_DATA_HOME"
