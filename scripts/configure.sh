@@ -37,6 +37,10 @@ defaults -currentHost write com.apple.screensaver idleTime -int 0
 defaults write com.apple.messageshelper.MessageController SOInputLineSettings -dict-add "automaticEmojiSubstitutionEnablediMessage" -bool false
 defaults write com.apple.messageshelper.MessageController SOInputLineSettings -dict-add "automaticQuoteSubstitutionEnabled" -bool false
 
+# activity monitor:
+defaults write com.apple.ActivityMonitor UpdatePeriod -int 2
+defaults write com.apple.ActivityMonitor ShowCategory -int 100
+
 echo "Configuring Mouse..."
 defaults write com.apple.AppleMultitouchMouse MouseButtonDivision -int 55
 defaults write com.apple.AppleMultitouchMouse MouseButtonMode -string TwoButton
