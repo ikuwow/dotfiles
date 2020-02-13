@@ -44,9 +44,20 @@ if [ "$(command -v terminal-notifier)" ]; then
 fi
 
 if [ ! "$(command -v trash)" ]; then
-  trash (){
+  trash () {
     # shellcheck disable=2016
     echo 'Warning: `trash` is redirected to `rm`.'
     rm "$@"
+  }
+fi
+
+if [ "$(command -v ghq)" ] && [ "$(command -v fzf)" ]; then
+  ghqp() {
+    repo=$(ghq list | fzf)
+    if [ -z "$repo" ]; then
+      return
+    fi
+    echo "Changing directory to $(ghq root)/$repo"
+    cd "$(ghq root)/$repo" || exit 1
   }
 fi
