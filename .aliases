@@ -34,3 +34,9 @@ alias mysql='mysql --pager="less -S -n -i -F -X"'
 alias remotehost="cat ~/.ssh/config ~/.ssh/config.d/* | grep -e '^Host' | sed -e 's/^Host //g'"
 alias tf='terraform'
 alias pt-query-digest='$(find /usr/local/Cellar/percona-toolkit -maxdepth 1 -type d | sort -r | head -n 1)/libexec/bin/pt-query-digest'
+
+ghqp() {
+  repo=$(ghq list | fzf)
+  echo "Changing directory to $(ghq root)/$repo"
+  cd "$(ghq root)/$repo" || exit 1
+}
