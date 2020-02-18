@@ -64,6 +64,7 @@ brew "ccat"
 brew "ghq"
 brew "fzf"
 brew "awslogs"
+brew "percona-toolkit"
 
 cask "google-japanese-ime"
 cask "bartender"
