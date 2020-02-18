@@ -63,6 +63,7 @@ brew "terminal-notifier"
 brew "ccat"
 brew "ghq"
 brew "fzf"
+brew "awslogs"
 
 cask "google-japanese-ime"
 cask "bartender"
