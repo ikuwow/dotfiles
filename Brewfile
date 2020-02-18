@@ -9,6 +9,7 @@ mas "1Password 7", id: 1333542190
 brew "mackup"
 brew "bash"
 cask "karabiner-elements"
+cask "authy"
 
 brew "coreutils"
 brew "diffutils"
