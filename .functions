@@ -53,11 +53,18 @@ fi
 
 if [ "$(command -v ghq)" ] && [ "$(command -v fzf)" ]; then
   ghqp() {
-    repo=$(ghq list | fzf)
+    query="$1"
+    if [ -n "$query" ]; then
+      repo=$(ghq list | fzf --filter "$query" | head -n 1)
+    else
+      repo=$(ghq list | fzf)
+    fi
+
     if [ -z "$repo" ]; then
+      echo "No repos are selected."
       return
     fi
     echo "Changing directory to $(ghq root)/$repo"
-    cd "$(ghq root)/$repo" || exit 1
+    cd "$(ghq root)/$repo" || return 1
   }
 fi
