@@ -65,6 +65,7 @@ brew "ghq"
 brew "fzf"
 brew "awslogs"
 brew "percona-toolkit"
+brew "noti"
 
 cask "google-japanese-ime"
 cask "bartender"
