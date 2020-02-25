@@ -3,8 +3,11 @@
 *.swp
 *.swo
 .*.un~
-.tool-versions
 
 # IntelliJ
 .idea
 *.iml
+
+# myconf
+.tool-versions
+ikuwowfiles
