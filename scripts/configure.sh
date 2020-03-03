@@ -26,6 +26,7 @@ defaults write com.apple.CrashReporter UseUNC -bool true
 defaults write KeyRepeat -int 2
 defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
 defaults write com.apple.menuextra.battery ShowPercent -string "YES"
+defaults write com.apple.Siri HotkeyTag -int 3 # Hold Option Space
 
 # Disable shortcut (this conflicts spotlight shortcut)
 defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 60 "<dict><key>enabled</key><false/></dict>"
