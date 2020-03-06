@@ -85,6 +85,8 @@ cask "rescuetime"
 cask "kindle"
 cask "virtualbox"
 cask "intel-power-gadget"
+cask "postgresql"
+cask "mysql"
 
 # Languages
 cask "java"
