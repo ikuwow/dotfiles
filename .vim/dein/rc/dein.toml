@@ -180,3 +180,6 @@ repo = 'pearofducks/ansible-vim'
 
 [[plugins]]
 repo = 'posva/vim-vue'
+
+[[plugins]]
+repo = 'bfontaine/Brewfile.vim'
