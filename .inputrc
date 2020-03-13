@@ -1,2 +1,3 @@
 set colored-stats on
 set completion-ignore-case on
+set mark-symlinked-directories on
