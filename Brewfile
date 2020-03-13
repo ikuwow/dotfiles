@@ -66,6 +66,8 @@ brew "fzf"
 brew "awslogs"
 brew "percona-toolkit"
 brew "noti"
+brew "postgresql"
+brew "mysql"
 
 cask "google-japanese-ime"
 cask "bartender"
@@ -85,8 +87,6 @@ cask "rescuetime"
 cask "kindle"
 cask "virtualbox"
 cask "intel-power-gadget"
-cask "postgresql"
-cask "mysql"
 
 # Languages
 cask "java"
