@@ -38,6 +38,7 @@ defaults -currentHost write com.apple.screensaver idleTime -int 0
 defaults write com.apple.messageshelper.MessageController SOInputLineSettings -dict-add "automaticEmojiSubstitutionEnablediMessage" -bool false
 defaults write com.apple.messageshelper.MessageController SOInputLineSettings -dict-add "automaticQuoteSubstitutionEnabled" -bool false
 
+
 # activity monitor:
 defaults write com.apple.ActivityMonitor UpdatePeriod -int 2
 defaults write com.apple.ActivityMonitor ShowCategory -int 100
@@ -102,6 +103,11 @@ defaults write com.apple.Safari IncludeInternalDebugMenu -bool true
 defaults write com.apple.Safari ShowStatusBar -bool true
 defaults write com.apple.Safari AutoFillPasswords -bool true
 condkillall Safari
+
+echo "Configuring Notes..."
+defaults write com.apple.Notes ShouldContinuouslyCheckSpelling -bool false
+defaults write com.apple.Notes ShouldCorrectSpellingAutomatically -bool false
+condkillall Notes
 
 echo ""
 echo "Configuration Complete!"
