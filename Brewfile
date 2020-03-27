@@ -15,6 +15,7 @@ brew "coreutils"
 brew "diffutils"
 brew "findutils"
 brew "gnu-sed"
+brew "gnu-which"
 brew "gawk"
 
 # required by denite.nvim etc.

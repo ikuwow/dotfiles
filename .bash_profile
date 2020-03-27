@@ -6,12 +6,14 @@ PATH="/usr/local/opt/coreutils/libexec/gnubin:$PATH"
 PATH="/usr/local/opt/binutils/bin:$PATH"
 PATH="/usr/local/opt/findutils/libexec/gnubin:$PATH"
 PATH="/usr/local/opt/gnu-sed/libexec/gnubin:$PATH"
+PATH="/usr/local/opt/gnu-which/libexec/gnubin:$PATH"
 export PATH
 
 MANPATH="/usr/local/opt/coreutils/libexec/gnuman:$MANPATH"
 MANPATH="/usr/local/opt/binutils/share/man:$MANPATH"
-MANPATH="/usr/local/opt/findutils/libexec/gnubin:$MANPATH"
+MANPATH="/usr/local/opt/findutils/libexec/gnuman:$MANPATH"
 MANPATH="/usr/local/opt/gnu-sed/libexec/gnuman:$MANPATH"
+MANPATH="/usr/local/opt/gnu-which/libexec/gnuman:$MANPATH"
 export MANPATH
 
 export LANG=en_US.UTF-8
