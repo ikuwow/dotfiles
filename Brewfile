@@ -6,6 +6,7 @@ tap "ikuwow/ikuwow-sshrc"
 # First required
 brew "mas"
 mas "1Password 7", id: 1333542190
+mas "NextDNS", id: 1464122853
 brew "mackup"
 brew "bash"
 cask "karabiner-elements"
