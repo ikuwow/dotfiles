@@ -26,6 +26,7 @@ alias man='LANG=C man'
 
 ## Aliases for convenience
 alias be='bundle exec'
+alias pir='pipenv run'
 alias de='docker exec'
 alias dr='docker run -it --rm'
 alias drv='docker run -it --rm -w /workspace -v $(pwd):/workspace'
