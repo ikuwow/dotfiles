@@ -111,3 +111,4 @@ mas "Pages", id: 409201541
 mas "Save to Pocket", id: 1477385213
 mas "Fantastical", id: 975937182
 mas "Day One", id: 1055511498
+mas "Habitify", id: 1140787122
