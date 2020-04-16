@@ -34,3 +34,4 @@ alias dcr='docker-compose run'
 alias mysql='mysql --pager="less -S -n -i -F -X"'
 alias remotehost="cat ~/.ssh/config ~/.ssh/config.d/* | grep -e '^Host' | sed -e 's/^Host //g'"
 alias tf='terraform'
+alias updatedots='git -C ~/dotfiles sync'
