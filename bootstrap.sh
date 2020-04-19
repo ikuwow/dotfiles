@@ -31,7 +31,7 @@ if ! command -v brew >/dev/null 2>&1; then
   echo
 fi
 
-if [ -n "$GITHUB_ACTIONS" ]; then
+if [ -z "$GITHUB_ACTIONS" ]; then
   brew bundle
   echo
   mackup restore
