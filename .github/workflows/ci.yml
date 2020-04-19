@@ -12,12 +12,7 @@ jobs:
           shellcheck **/*.sh
           shellcheck bin/*
           shellcheck --exclude SC2148 .bash_profile .bashrc
-  testrun:
+  bootstrap:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Run scripts
-        run: |
-          for script in $(ls scripts/*.sh); do
-            "$script"
-          done
+      - run: bash -c "$(curl -L https://raw.githubusercontent.com/ikuwow/dotfiles/master/bootstrap.sh)"
