@@ -30,11 +30,13 @@ if ! command -v brew >/dev/null 2>&1; then
   /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
   echo
 fi
-brew bundle
-echo
 
-mackup restore
-echo
+if [ -n "$GITHUB_ACTIONS" ]; then
+  brew bundle
+  echo
+  mackup restore
+  echo
+fi
 
 scripts/initialize.sh
 echo
