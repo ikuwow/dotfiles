@@ -2,10 +2,13 @@ name: CI
 on: push
 jobs:
   shellcheck:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Install packages
-        run: brew install shellcheck
-      - name: shellcheck
+      - name: Display shellcheck version
         run: shellcheck --version
+      - name: shellcheck
+        run: |
+          shellcheck **/*.sh
+          shellcheck bin/*
+          shellcheck --exclude SC2148 .bash_profile .bashrc
