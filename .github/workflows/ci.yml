@@ -12,3 +12,8 @@ jobs:
           shellcheck **/*.sh
           shellcheck bin/*
           shellcheck --exclude SC2148 .bash_profile .bashrc
+  bootstrap:
+    runs-on: macos-latest
+    steps:
+      - name: Bootstrap
+        run: bash -c "$(curl -L https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${GITHUB_SHA}/bootstrap.sh)"
