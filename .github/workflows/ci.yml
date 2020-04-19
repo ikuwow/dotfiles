@@ -12,3 +12,12 @@ jobs:
           shellcheck **/*.sh
           shellcheck bin/*
           shellcheck --exclude SC2148 .bash_profile .bashrc
+  testrun:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run scripts
+        run: |
+          for script in $(ls scripts/*.sh); do
+            "$script"
+          done
