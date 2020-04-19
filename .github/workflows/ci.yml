@@ -12,7 +12,3 @@ jobs:
           shellcheck **/*.sh
           shellcheck bin/*
           shellcheck --exclude SC2148 .bash_profile .bashrc
-  bootstrap:
-    runs-on: macos-latest
-    steps:
-      - run: bash -c "$(curl -L https://raw.githubusercontent.com/ikuwow/dotfiles/master/bootstrap.sh)"
