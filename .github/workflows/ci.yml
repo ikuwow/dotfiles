@@ -1,0 +1,11 @@
+name: CI
+on: push
+jobs:
+  shellcheck:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install packages
+        run: brew install shellcheck
+      - name: shellcheck
+        run: shellcheck --version
