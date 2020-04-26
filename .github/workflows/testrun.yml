@@ -5,4 +5,6 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v2
-      - run: ./bootstrap.sh
+      - run: ./scripts/configure.sh
+      - run: ./scripts/deploy.sh
+      - run: ./scripts/initialize.sh
