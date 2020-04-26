@@ -12,7 +12,7 @@ for file in .??*; do
   [[ "$file" == ".DS_Store" ]] && continue
   [[ "$file" == ".travis.yml" ]] && continue
   [[ "$file" == ".config" ]] && continue
-  ln -fvns "$DOTPATH/$file" "$HOME/$file"
+  ln -fvns "$(readlink -f "$file")" "$HOME/$file"
 done
 
 mkdir -p "$XDG_CONFIG_HOME"
