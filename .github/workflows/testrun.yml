@@ -8,3 +8,4 @@ jobs:
       - run: ./scripts/configure.sh
       - run: ./scripts/deploy.sh
       - run: ./scripts/initialize.sh
+      - run: source ~/.bash_profile
