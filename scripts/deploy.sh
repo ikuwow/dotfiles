@@ -1,11 +1,6 @@
 #!/usr/bin/env bash
 
-DOTPATH="$HOME/dotfiles"
-
-if [ ! -e "$DOTPATH" ]; then
-  echo "Error: Directory $DOTPATH does not exist."
-  exit 1
-fi
+DOTPATH="$(dirname "$(dirname "$(readlink -f "$0")")")"
 
 cd "$DOTPATH" || exit 1
 
