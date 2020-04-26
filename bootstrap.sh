@@ -2,7 +2,9 @@
 
 set -eu
 
-DOTPATH=$HOME/dotfiles
+if [ -z "$DOTPATH" ]; then
+  export DOTPATH=$HOME/dotfiles
+fi
 
 if [ ! -d "$DOTPATH" ]; then
   git clone https://github.com/ikuwow/dotfiles.git "$DOTPATH"
