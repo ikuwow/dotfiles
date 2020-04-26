@@ -2,6 +2,8 @@
 
 set -e
 
+brew install python
+
 /usr/local/bin/pip3 install --upgrade pip
 /usr/local/bin/pip3 uninstall neovim
 /usr/local/bin/pip3 install --upgrade pynvim
