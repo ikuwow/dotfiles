@@ -34,3 +34,5 @@
 	process = git-lfs filter-process
 [include]
     path = ~/.gitconfig.secrets
+[push]
+	default = current
