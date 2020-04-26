@@ -1,0 +1,9 @@
+name: testrun
+on: push
+jobs:
+  testrun:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          path: ..
