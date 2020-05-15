@@ -88,6 +88,7 @@ cask "keybase"
 cask "rescuetime"
 cask "kindle"
 cask "virtualbox"
+cask "virtualbox-extension-pack"
 cask "intel-power-gadget"
 
 # Languages
