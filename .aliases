@@ -36,3 +36,4 @@ alias remotehost="cat ~/.ssh/config ~/.ssh/config.d/* | grep -e '^Host' | sed -e
 alias tf='terraform'
 alias updatedots='git -C ~/dotfiles sync'
 alias today='date +%Y%m%d'
+alias now='date +%Y%m%d%H%I%S'
