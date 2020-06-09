@@ -36,3 +36,5 @@
     path = ~/.gitconfig.secrets
 [push]
 	default = current
+[pull]
+	rebase = false
