@@ -2,6 +2,7 @@ tap "homebrew/cask"
 tap "homebrew/cask-versions"
 tap "universal-ctags/universal-ctags"
 tap "ikuwow/ikuwow-sshrc"
+tap "domt4/autoupdate"
 
 # First required
 brew "mas"
@@ -68,6 +69,7 @@ brew "fzf"
 brew "awslogs"
 brew "percona-toolkit"
 brew "noti"
+brew "terminal-notifier"
 brew "postgresql"
 brew "mysql"
 
