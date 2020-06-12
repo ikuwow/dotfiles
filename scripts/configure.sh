@@ -110,6 +110,9 @@ defaults write com.apple.Notes ShouldContinuouslyCheckSpelling -bool false
 defaults write com.apple.Notes ShouldCorrectSpellingAutomatically -bool false
 condkillall Notes
 
+echo "Configuring brew autoupdate..."
+brew autoupdate --upgrade --cleanup --enable-notificationn --start
+
 echo ""
 echo "Configuration Complete!"
 echo "Please restart Mac to make sure settings are reflected."
