@@ -85,6 +85,7 @@ defaults write com.apple.dock wvous-br-modifier -int 0
 defaults write com.apple.dock wvous-tr-corner -int 12 # Notification Center
 defaults write com.apple.dock wvous-tr-modifier -int 0
 defaults write com.apple.dock mru-spaces -bool false # Disable automatically rearrange spacet
+defaults write com.apple.dock expose-group-apps -int 0 # Disable Mission Control's "Group windows by application"
 condkillall Dock
 
 echo "Configuring Finder..."
