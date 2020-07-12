@@ -26,6 +26,7 @@ brew "ruby"
 
 brew "zlib"
 brew "asdf"
+brew "openssl"
 brew "telnet"
 brew "awscli"
 brew "bash-completion@2"
