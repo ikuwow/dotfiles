@@ -93,6 +93,7 @@ cask "kindle"
 cask "virtualbox"
 cask "virtualbox-extension-pack"
 cask "intel-power-gadget"
+cask "valentina-studio"
 
 # Languages
 cask "java"
