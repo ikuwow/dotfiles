@@ -93,7 +93,6 @@ cask "kindle"
 cask "virtualbox"
 cask "virtualbox-extension-pack"
 cask "intel-power-gadget"
-cask "valentina-studio"
 
 # Languages
 cask "java"
@@ -114,3 +113,4 @@ mas "Pages", id: 409201541
 mas "Save to Pocket", id: 1477385213
 mas "Day One", id: 1055511498
 mas "Habitify", id: 1140787122
+mas "Valentina Studio", id: 604825918
