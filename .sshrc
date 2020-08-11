@@ -13,7 +13,7 @@ export XDG_CONFIG_HOME="$SSHHOME/.sshrc.d/.config"
 [[ "$(command -v prompts)" ]] && prompts
 
 tmuxrc() {
-  local TMUXDIR=/tmp/.ikuwow-tmux-server
+  local TMUXDIR=/tmp/.$(whoami)-tmux-server
   if ! [ -d $TMUXDIR ]; then
     rm -rf $TMUXDIR
     mkdir -m 700 $TMUXDIR
