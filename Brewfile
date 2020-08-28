@@ -59,7 +59,7 @@ brew "masutaka/github-nippou/github-nippou"
 brew "hub"
 brew "gpg"
 brew "sqlparse"
-brew "imagemagick@6", link: true
+brew "imagemagick"
 brew "thefuck"
 brew "shfmt"
 brew "terminal-notifier"
