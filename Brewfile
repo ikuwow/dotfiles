@@ -115,3 +115,4 @@ mas "Habitify", id: 1140787122
 mas "Valentina Studio", id: 604825918
 mas "Focus To-Do", id: 1258530160
 mas "Spark", id: 1176895641
+mas "New File Menu", id: 1064959555
