@@ -8,6 +8,7 @@
 # IntelliJ
 .idea
 *.iml
+.generators
 
 # myconf
 .tool-versions
