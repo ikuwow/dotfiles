@@ -7,11 +7,11 @@ PATH="/usr/local/opt/binutils/bin:$PATH"
 PATH="/usr/local/opt/findutils/libexec/gnubin:$PATH"
 PATH="/usr/local/opt/gnu-sed/libexec/gnubin:$PATH"
 PATH="/usr/local/opt/gnu-which/libexec/gnubin:$PATH"
-PATH="/usr/local/opt/openssl@1.1/bin:$PATH"
+PATH="/usr/local/opt/openssl/bin:$PATH"
 export PATH
 
-export LDFLAGS="-L/usr/local/opt/openssl@1.1/lib"
-export CPPFLAGS="-I/usr/local/opt/openssl@1.1/include"
+export LDFLAGS="-L/usr/local/opt/openssl/lib"
+export CPPFLAGS="-I/usr/local/opt/openssl/include"
 
 MANPATH="/usr/local/opt/coreutils/libexec/gnuman:$MANPATH"
 MANPATH="/usr/local/opt/binutils/share/man:$MANPATH"
