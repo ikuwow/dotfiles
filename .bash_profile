@@ -1,5 +1,7 @@
 # vim: set filetype=sh :
 
+# shellcheck source=/dev/null
+
 PATH="$HOME/bin:/usr/local/opt/ruby/bin:/usr/local/bin:/usr/local/sbin:$PATH"
 
 PATH="/usr/local/opt/coreutils/libexec/gnubin:$PATH"
@@ -33,20 +35,26 @@ export HOMEBREW_BUNDLE_NO_LOCK=true
 
 asdfini=/usr/local/opt/asdf/asdf.sh
 if [ -e "$asdfini" ]; then
-  # shellcheck source=/dev/null
   . "$asdfini"
 fi
 
 if [ "$(command -v gcloud)" ]; then
   gcloudpath="$(dirname "$(dirname "$(readlink "$(command -v gcloud)")")")"
-  # shellcheck source=/dev/null
   [[ -f "$gcloudpath/path.bash.inc" ]] && . "$gcloudpath/path.bash.inc"
-  # shellcheck source=/dev/null
   [[ -f "$gcloudpath/completion.bash.inc" ]] && . "$gcloudpath/completion.bash.inc"
 fi
 
 for file in ~/.{bashrc,aliases,functions,brew_api_token}; do
-  # shellcheck source=/dev/null
   [[ -r "$file" ]] && [[ -f "$file" ]] && . "$file"
 done
 [[ "$(command -v prompts)" ]] && prompts
+
+
+shell_integration_path=~/.iterm2_shell_integration.bash
+if [[ -e  "$shell_integration_path" ]]; then
+  source "$shell_integration_path"
+else
+  echo "iTerm2 shell integration is not installed!"
+  echo "Please place ${shell_integration_path}."
+  echo "See: https://iterm2.com/documentation-shell-integration.html"
+fi
