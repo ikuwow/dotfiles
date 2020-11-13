@@ -73,7 +73,6 @@ brew "terminal-notifier"
 brew "postgresql"
 brew "mysql"
 
-cask "google-japanese-ime"
 cask "bartender"
 cask "pastebot"
 cask "iterm2"
