@@ -9,6 +9,7 @@
 .idea
 *.iml
 .generators
+.rakeTasks
 
 # myconf
 .tool-versions
