@@ -111,6 +111,10 @@ defaults write com.apple.Notes ShouldContinuouslyCheckSpelling -bool false
 defaults write com.apple.Notes ShouldCorrectSpellingAutomatically -bool false
 condkillall Notes
 
+echo "Configuring Pastebot..."
+defaults write com.tapbots.Pastebot2Mac UIVisibilityState 10
+condkillall Pastebot
+
 echo "Configuring brew autoupdate..."
 brew autoupdate --upgrade --cleanup --enable-notificationn --start
 
