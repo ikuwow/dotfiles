@@ -73,7 +73,6 @@ brew "terminal-notifier"
 brew "postgresql"
 brew "mysql"
 
-cask "bartender"
 cask "pastebot"
 cask "iterm2"
 cask "docker"
