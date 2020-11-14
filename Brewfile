@@ -1,3 +1,5 @@
+# rubocop:disable all
+
 tap "homebrew/cask"
 tap "homebrew/cask-versions"
 tap "universal-ctags/universal-ctags"
