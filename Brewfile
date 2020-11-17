@@ -98,6 +98,7 @@ cask "zulu7"
 cask "java6"
 
 mas "WiFi Signal", id: 525912054
+mas "NextDNS", id: 1464122853
 mas "Things3", id: 904280696
 mas "Dark Reader for Safari", id: 1438243180
 mas "1Blocker", id: 1107421413
