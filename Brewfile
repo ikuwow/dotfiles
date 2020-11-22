@@ -86,7 +86,6 @@ cask "firefox"
 cask "google-cloud-sdk"
 cask "vagrant"
 cask "rescuetime"
-cask "kindle"
 cask "virtualbox"
 cask "virtualbox-extension-pack"
 cask "intel-power-gadget"
@@ -115,3 +114,4 @@ mas "Habitify", id: 1140787122
 mas "Valentina Studio", id: 604825918
 mas "Spark", id: 1176895641
 mas "New File Menu", id: 1064959555
+mas "Kindle", id: 405399194
