@@ -39,4 +39,6 @@ echo
 scripts/initialize.sh
 echo
 
+scripts/configure_brew.sh
+
 echo "Bootstrapping DONE!"
