@@ -88,7 +88,6 @@ cask "vagrant"
 cask "rescuetime"
 cask "virtualbox"
 cask "virtualbox-extension-pack"
-cask "intel-power-gadget"
 cask "vanilla"
 cask "jasper"
 
