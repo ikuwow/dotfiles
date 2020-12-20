@@ -8,6 +8,11 @@ echo
 scripts/deploy.sh
 echo
 
+# Install Rosetta 2 when ARM
+if [ "$(uname -m)" = "arm64" ]; then
+  softwareupdate --install-rosetta --agree-to-license
+fi
+
 # install homebrew
 if ! command -v brew >/dev/null 2>&1; then
   prefix=""
