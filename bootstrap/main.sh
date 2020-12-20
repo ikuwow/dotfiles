@@ -21,7 +21,7 @@ if ! command -v brew >/dev/null 2>&1; then
     prefix="arch -arch x86_64"
   fi
   # Install homebrew: https://brew.sh/
-  "${prefix}" /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+  $prefix /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
 fi
 brew bundle
 echo
