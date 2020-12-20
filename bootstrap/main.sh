@@ -2,7 +2,6 @@
 
 set -eu
 
-# Mac basic settings
 scripts/configure.sh
 echo
 
