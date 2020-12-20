@@ -31,7 +31,7 @@ if [ "$(uname -m)" = "arm64" ] && (! command -v /opt/homebrew/bin/brew > /dev/nu
   curl -L https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C /opt/homebrew
 fi
 
-export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
+# export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 
 brew bundle
 echo
