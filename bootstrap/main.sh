@@ -4,7 +4,8 @@ set -eu
 
 if ! command -v xcodebuild; then
   echo 'Xcode is not installed.'
-  echo 'Please install the latest version of Xcode from App Store.'
+  echo 'mas requires Xcode. Please install the latest version of Xcode from App Store.'
+  echo 'For more info, see https://github.com/mas-cli/mas.'
   exit 1
 fi
 
