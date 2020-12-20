@@ -4,41 +4,20 @@ set -eu
 
 DOTPATH=$HOME/dotfiles
 
+BRANCH="${1:-master}"
+echo "Bootstrap with branch '${BRANCH}'"
+
 if [ ! -d "$DOTPATH" ]; then
-  git clone https://github.com/ikuwow/dotfiles.git "$DOTPATH"
+  git clone -b "$BRANCH" https://github.com/ikuwow/dotfiles.git "$DOTPATH"
 else
   echo "$DOTPATH already downloaded. Updating..."
   cd "$DOTPATH"
   git stash
-  git checkout master
-  git pull origin master
+  git checkout "$BRANCH"
+  git pull origin "$BRANCH"
   echo
 fi
 
 cd "$DOTPATH"
 
-# Mac basic settings
-scripts/configure.sh
-echo
-
-scripts/deploy.sh
-echo
-
-# install homebrew
-if ! command -v brew >/dev/null 2>&1; then
-  # Install homebrew: https://brew.sh/
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
-  echo
-fi
-brew bundle
-echo
-
-mackup restore
-echo
-
-scripts/initialize.sh
-echo
-
-scripts/configure_brew.sh
-
-echo "Bootstrapping DONE!"
+./bootstrap/main.sh
