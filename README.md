@@ -24,3 +24,13 @@ When you want to bootstrap specific branch:
 ```
 curl -L https://raw.githubusercontent.com/ikuwow/dotfiles/master/bootstrap.sh | bash -s -- branchname
 ```
+
+## Notes
+
+### Create key pair
+
+```
+ssh-keygen -t rsa -b 4096 -C "ikuwow@gmail.com"
+```
+
+Be sure to set passphrase.
