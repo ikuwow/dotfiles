@@ -15,5 +15,11 @@ My dear dotfiles.
 ## Boostrapping
 
 ```
-bash -c "$(curl -L https://raw.githubusercontent.com/ikuwow/dotfiles/master/bootstrap.sh)"
+curl -L https://raw.githubusercontent.com/ikuwow/dotfiles/master/bootstrap.sh | bash -s
+```
+
+When you want to bootstrap specific branch:
+
+```
+curl -L https://raw.githubusercontent.com/ikuwow/dotfiles/master/bootstrap.sh | bash -s -- branchname
 ```
