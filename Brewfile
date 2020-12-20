@@ -88,15 +88,8 @@ cask "vagrant"
 cask "rescuetime"
 cask "virtualbox"
 cask "virtualbox-extension-pack"
-cask "intel-power-gadget"
 cask "vanilla"
 cask "jasper"
-
-# Languages
-cask "java"
-cask "adoptopenjdk8"
-cask "zulu7"
-cask "java6"
 
 mas "WiFi Signal", id: 525912054
 mas "NextDNS", id: 1464122853
