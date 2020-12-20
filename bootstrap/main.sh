@@ -2,6 +2,12 @@
 
 set -eu
 
+if ! command -v xcodebuild; then
+  echo 'Xcode is not installed.'
+  echo 'Please install the latest version of Xcode from App Store.'
+  exit 1
+fi
+
 scripts/configure.sh
 echo
 
