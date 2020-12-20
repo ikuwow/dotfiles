@@ -4,12 +4,8 @@ set -eu
 
 DOTPATH=$HOME/dotfiles
 
-BRANCH="$1"
-if [ -n "$BRANCH" ]; then
-  echo "Branch specified: $BRANCH"
-else
-  BRANCH="master"
-fi
+BRANCH="${1:-master}"
+echo "Bootstrap with branch '${BRANCH}'"
 
 if [ ! -d "$DOTPATH" ]; then
   git clone -b "$BRANCH" https://github.com/ikuwow/dotfiles.git "$DOTPATH"
