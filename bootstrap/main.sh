@@ -13,8 +13,8 @@ if [ "$(uname -m)" = "arm64" ]; then
   softwareupdate --install-rosetta --agree-to-license
 fi
 
-# install homebrew
-if ! command -v brew >/dev/null 2>&1; then
+# Install homebrew for Intel
+if ! command -v /usr/local/bin/brew >/dev/null 2>&1; then
   prefix=""
   if [ "$(uname -m)" = "arm64" ]; then
     # Install on Rosetta 2
@@ -23,6 +23,14 @@ if ! command -v brew >/dev/null 2>&1; then
   # Install homebrew: https://brew.sh/
   $prefix /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
 fi
+
+# Install homebrew for ARM
+if [ "$(uname -m)" = "arm64" ] && (! command -v /opt/homebrew/bin/brew > /dev/null); then
+  sudo mkdir /opt/homebrew
+  sudo chown "$(whoami)" /opt/homebrew
+  curl -L https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C /opt/homebrew
+fi
+
 brew bundle
 echo
 

@@ -10,6 +10,7 @@ PATH="/usr/local/opt/findutils/libexec/gnubin:$PATH"
 PATH="/usr/local/opt/gnu-sed/libexec/gnubin:$PATH"
 PATH="/usr/local/opt/gnu-which/libexec/gnubin:$PATH"
 PATH="/usr/local/opt/openssl/bin:$PATH"
+PATH="/opt/homebrew/bin:$PATH"
 export PATH
 
 export LDFLAGS="-L/usr/local/opt/openssl/lib"
