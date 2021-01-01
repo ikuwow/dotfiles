@@ -38,3 +38,5 @@
 	default = current
 [pull]
 	rebase = false
+[init]
+	templateDir = /Users/ikuwow/.config/git/template
