@@ -5,8 +5,7 @@ prompts() {
     PS1='localhost: \W\$ '
   fi
 
-  local OLDPS1="$PS1"
-  PS1=${OLDPS1//\\\$/\\\[\\e\[33m\\\]$\\\[\\e\[0m\\\]}
+  PS1="$(echo "${PS1}" | sed 's/\\\$ /\\e\[33m\\\]\\\$\\\[\\e\[0m\\\] /')"
 
   if [ -n "$SSH_CLIENT" ]; then
     if [ "$PS1" = "${PS1/ssh/}" ]; then
