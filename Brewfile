@@ -88,7 +88,6 @@ cask "rescuetime"
 cask "virtualbox"
 cask "virtualbox-extension-pack"
 cask "vanilla"
-cask "jasper"
 
 mas "WiFi Signal", id: 525912054
 mas "NextDNS", id: 1464122853
