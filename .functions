@@ -9,7 +9,7 @@ prompts() {
     # shellcheck disable=2016
     PS1="$(echo "${PS1}" | sed 's/\\\$ /$(__git_ps1)\\\$ /')"
   fi
-  PS1="$(echo "${PS1}" | sed 's/\\\$ /\\e\[33m\\\]\\\$\\\[\\e\[0m\\\] /')"
+  PS1="$(echo "${PS1}" | sed 's/\\\$ /\\\[\\e\[33m\\\]\\\$\\\[\\e\[0m\\\] /')"
 
   if [ -n "$SSH_CLIENT" ]; then
     if [ "$PS1" = "${PS1/ssh/}" ]; then
