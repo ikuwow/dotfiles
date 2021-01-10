@@ -39,4 +39,4 @@
 [pull]
 	rebase = false
 [init]
-	templateDir = /Users/ikuwow/.config/git/template
+	templateDir = ~/.config/git/template
