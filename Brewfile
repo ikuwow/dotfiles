@@ -73,6 +73,7 @@ brew "noti"
 brew "terminal-notifier"
 brew "postgresql"
 brew "mysql"
+brew "pre-commit"
 
 cask "pastebot"
 cask "iterm2"
