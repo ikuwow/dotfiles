@@ -14,7 +14,9 @@ fi
 complete -C aws_completer aws
 
 if [ "${BASH_VERSINFO[0]}" -ge 4 ]; then
-  [[ -r "/usr/local/etc/profile.d/bash_completion.sh" ]] && . "/usr/local/etc/profile.d/bash_completion.sh"
+  BASH_COMPLETION="/usr/local/etc/profile.d/bash_completion.sh"
+  # shellcheck disable=SC1090
+  [[ -r "$BASH_COMPLETION" ]] && . "$BASH_COMPLETION"
 fi
 
 ## Language Specific configs
