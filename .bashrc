@@ -14,10 +14,16 @@ fi
 complete -C aws_completer aws
 
 if [ "${BASH_VERSINFO[0]}" -ge 4 ]; then
-  export BASH_COMPLETION_COMPAT_DIR="/usr/local/etc/bash_completion.d"
-  BASH_COMPLETION_PATH=/usr/local/etc/profile.d/bash_completion.sh
-  # shellcheck source=/dev/null
-  [[ -f "$BASH_COMPLETION_PATH" ]] && . "$BASH_COMPLETION_PATH"
+  HOMEBREW_PREFIX="$(brew --prefix)"
+  if [[ -r "${HOMEBREW_PREFIX}/etc/profile.d/bash_completion.sh" ]]; then
+    # shellcheck disable=SC1090
+    source "${HOMEBREW_PREFIX}/etc/profile.d/bash_completion.sh"
+  else
+    for COMPLETION in "${HOMEBREW_PREFIX}/etc/bash_completion.d/"*; do
+      # shellcheck disable=SC1090
+      [[ -r "$COMPLETION" ]] && source "$COMPLETION"
+    done
+  fi
 fi
 
 ## Language Specific configs
