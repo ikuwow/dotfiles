@@ -1,3 +1,4 @@
+# shellcheck disable=SC2148
 # vim: filetype=sh :
 
 if [ "${BASH_VERSINFO[0]}" -le 3 ]; then
@@ -13,11 +14,9 @@ fi
 ## Auto complete
 complete -C aws_completer aws
 
-if [ "${BASH_VERSINFO[0]}" -ge 4 ]; then
-  BASH_COMPLETION="/usr/local/etc/profile.d/bash_completion.sh"
-  # shellcheck disable=SC1090
-  [[ -r "$BASH_COMPLETION" ]] && . "$BASH_COMPLETION"
-fi
+BASH_COMPLETION="/usr/local/etc/profile.d/bash_completion.sh"
+# shellcheck disable=SC1090
+[[ -r "$BASH_COMPLETION" ]] && . "$BASH_COMPLETION"
 
 ## Language Specific configs
 export GOPATH=$HOME/.go
