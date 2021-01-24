@@ -61,6 +61,7 @@ hook_add = '''
     \    'javascript': ['eslint']
     \}
     let g:ale_lint_on_text_changed = 'never'
+    let g:ale_statusline_format = ['E%d', 'W%d', 'ok']
 '''
 
 [[plugins]]
@@ -88,7 +89,8 @@ hook_add = '''
         \ 'active': {
         \     'left': [
         \         ['mode', 'current_branch', 'paste'],
-        \         [ 'modified', 'filename', 'readonly']
+        \         ['modified', 'filename', 'readonly'],
+        \         ['linter_checking', 'linter_errors', 'linter_warnings', 'linter_ok']
         \     ]
         \ },
         \ 'component': {
@@ -138,6 +140,26 @@ hook_add = '''
     function! FileEncoding()
         return winwidth(0) > 70 ? (&fenc !=# '' ? &fenc : &enc) : ''
     endfunction
+'''
+
+[[plugins]]
+repo = 'maximbaz/lightline-ale'
+depends = ['lightline.vim', 'ale']
+hook_add = '''
+    let g:lightline.component_expand = {
+      \  'linter_checking': 'lightline#ale#checking',
+      \  'linter_infos': 'lightline#ale#infos',
+      \  'linter_warnings': 'lightline#ale#warnings',
+      \  'linter_errors': 'lightline#ale#errors',
+      \  'linter_ok': 'lightline#ale#ok',
+      \ }
+    let g:lightline.component_type = {
+      \     'linter_checking': 'right',
+      \     'linter_infos': 'right',
+      \     'linter_warnings': 'warning',
+      \     'linter_errors': 'error',
+      \     'linter_ok': 'right',
+      \ }
 '''
 
 [[plugins]]
