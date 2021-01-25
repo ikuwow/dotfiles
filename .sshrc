@@ -12,15 +12,17 @@ export XDG_CONFIG_HOME="$SSHHOME/.sshrc.d/.config"
 . "$SSHHOME/.sshrc.d/.functions"
 [[ "$(command -v prompts)" ]] && prompts
 
-tmuxrc() {
-  local TMUXDIR=/tmp/.$(whoami)-tmux-server
-  if ! [ -d $TMUXDIR ]; then
-    rm -rf $TMUXDIR
-    mkdir -m 700 $TMUXDIR
-  fi
-  rm -rf $TMUXDIR/.sshrc.d
-  cp -r "$SSHHOME/.sshrc" "$SSHHOME/bashsshrc" "$SSHHOME/sshrc" "$SSHHOME/.sshrc.d" "$TMUXDIR"
-  SSHHOME="$TMUXDIR" SHELL="$TMUXDIR/bashsshrc" /usr/bin/tmux -S "$TMUXDIR/tmuxserver" -f "$TMUXDIR/.sshrc.d/.tmux.conf" "$@"
-}
-export SHELL=$(which bash)
-alias tmux=tmuxrc
+if [[ "$(command -v tmux)" ]]; then
+  tmuxrc() {
+    local TMUXDIR=/tmp/.$(whoami)-tmux-server
+    if ! [ -d $TMUXDIR ]; then
+      rm -rf $TMUXDIR
+      mkdir -m 700 $TMUXDIR
+    fi
+    rm -rf $TMUXDIR/.sshrc.d
+    cp -r "$SSHHOME/.sshrc" "$SSHHOME/bashsshrc" "$SSHHOME/sshrc" "$SSHHOME/.sshrc.d" "$TMUXDIR"
+    SSHHOME="$TMUXDIR" SHELL="$TMUXDIR/bashsshrc" /usr/bin/tmux -S "$TMUXDIR/tmuxserver" -f "$TMUXDIR/.sshrc.d/.tmux.conf" "$@"
+  }
+  export SHELL=$(which bash)
+  alias tmux=tmuxrc
+fi
