@@ -50,6 +50,7 @@ fi
 # TODO: prioritize ARM homebrew
 # export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 
+export HOMEBREW_BUNDLE_NO_LOCK=1
 $command_prefix brew bundle
 echo
 
