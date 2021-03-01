@@ -7,19 +7,6 @@ hook_add = '''
 if = '!has("nvim")'
 
 [[plugins]]
-repo = 'Shougo/deoplete.nvim'
-on_event = ['InsertEnter']
-hook_add = '''
-    let g:deoplete#enable_at_startup = 1
-'''
-if = 'has("nvim") && has("python3")'
-
-[[plugins]]
-repo = 'tbodt/deoplete-tabnine'
-on_event = ['InsertEnter']
-build = './install.sh'
-
-[[plugins]]
 repo = 'glidenote/memolist.vim'
 depends = ['nerdtree']
 on_event = ['CmdwinEnter']
