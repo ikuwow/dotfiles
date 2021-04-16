@@ -95,7 +95,6 @@ mas "WiFi Signal", id: 525912054
 mas "NextDNS", id: 1464122853
 mas "Things3", id: 904280696
 mas "Dark Reader for Safari", id: 1438243180
-mas "1Blocker", id: 1107421413
 mas "The Unarchiver", id: 425424353
 mas "Tweetbot", id: 1384080005
 mas "Bear", id: 1091189122
