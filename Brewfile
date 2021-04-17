@@ -90,6 +90,7 @@ cask "virtualbox-extension-pack"
 cask "vanilla"
 cask "vlc"
 cask "ferdi"
+cask "adguard"
 
 mas "WiFi Signal", id: 525912054
 mas "NextDNS", id: 1464122853
