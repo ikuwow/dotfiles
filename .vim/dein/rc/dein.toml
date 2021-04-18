@@ -183,3 +183,6 @@ repo = 'posva/vim-vue'
 
 [[plugins]]
 repo = 'bfontaine/Brewfile.vim'
+
+[[plugins]]
+repo = 'okkiroxx/rtx.vim'
