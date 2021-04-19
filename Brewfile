@@ -110,3 +110,4 @@ mas "Spark", id: 1176895641
 mas "New File Menu", id: 1064959555
 mas "Kindle", id: 405399194
 mas "LINE", id: 539883307
+mas "WaterMinder", id: 1415257369
