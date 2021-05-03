@@ -22,7 +22,6 @@ alias man='LANG=C man'
 [[ "$(command -v hub)" ]] && eval "$(hub alias -s)"
 [[ "$(command -v nvim)" ]] && alias vim='nvim'
 [[ "$(command -v sshrc)" ]]  && alias ssh=sshrc
-#[[ "$(command -v kyrat)" ]]  && alias ssh=kyrat
 
 ## Aliases for convenience
 alias be='bundle exec'
