@@ -55,7 +55,7 @@ inoremap {<Enter> {}<Left><CR><ESC><S-o>
 let g:python3_host_prog = '/usr/local/bin/python3'
 if has("nvim")
     let s:pip3 = '/usr/local/bin/pip3'
-    call system(s:pip3 . ' install neovim pynvim')
+    call system(s:pip3 . ' install neovim pynvim') " TODO: It's slow
 endif
 
 " Disable providers except python3
