@@ -12,3 +12,11 @@ jobs:
           shellcheck **/*.sh
           shellcheck bin/*
           shellcheck --exclude SC2148 .bash_profile .bashrc
+  boostrap_on_mac:
+    runs-on: macos-latest
+    env:
+      GITHUB_WORKSPACE: "$HOME/"
+    steps:
+      - run: |
+          BRANCH="$(echo $GITHUB_REF | sed 's/^refs\/heads\///g')"
+          curl -L https://raw.githubusercontent.com/ikuwow/dotfiles/master/bootstrap.sh | bash -s -- $BRANCH
