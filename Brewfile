@@ -91,6 +91,7 @@ cask "vanilla"
 cask "vlc"
 cask "ferdi"
 cask "adguard"
+cask "zoom"
 
 mas "WiFi Signal", id: 525912054
 mas "Things3", id: 904280696
