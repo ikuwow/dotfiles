@@ -12,3 +12,11 @@ jobs:
           shellcheck **/*.sh
           shellcheck bin/*
           shellcheck --exclude SC2148 .bash_profile .bashrc
+  boostrap_on_mac:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+          BRANCH="$(echo $GITHUB_REF | sed 's/^refs\/heads\///g')"
+          export HOMEBREW_BUNDLE_MAS_SKIP="$(cat Brewfile | grep '^mas ' | awk -F 'id: ' '{print $2}')"
+          curl -L https://raw.githubusercontent.com/ikuwow/dotfiles/master/bootstrap.sh | bash -s -- $BRANCH
