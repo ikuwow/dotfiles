@@ -34,10 +34,10 @@ repo = 'mattn/emmet-vim'
 on_event = ['InsertEnter']
 
 [[plugins]]
-repo = 'kannokanno/previm'
+repo = 'previm/previm'
 on_ft = ['markdown']
 hook_add = '''
-    let g:previm_open_cmd="open"
+    let g:previm_open_cmd="open -a Safari"
     augroup PrevimSettings
         autocmd!
         autocmd BufNewFile,BufRead *.{md,mdwn,mkd,mkdn,mark*} set filetype=markdown
