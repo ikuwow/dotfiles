@@ -74,6 +74,13 @@ brew "postgresql"
 brew "mysql"
 brew "pre-commit"
 
+# For PHP
+brew "libsodium"
+brew "bison"
+brew "re2c"
+brew "libiconv"
+brew "libzip"
+
 cask "pastebot"
 cask "iterm2"
 cask "docker"
