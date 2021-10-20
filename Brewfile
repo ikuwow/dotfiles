@@ -20,16 +20,21 @@ brew "findutils"
 brew "gnu-sed"
 brew "gnu-which"
 brew "gawk"
+brew "grep"
 
 # required by denite.nvim etc.
 brew "python"
 brew "ruby"
 
+# For AWS
+brew "awscli"
+brew "awslogs"
+cask "session-manager-plugin", args: {"no-quarantine": ""}
+
 brew "zlib"
 brew "asdf"
 brew "openssl"
 brew "telnet"
-brew "awscli"
 brew "bash-completion@2"
 brew "docker-completion"
 brew "docker-compose-completion"
@@ -66,7 +71,6 @@ brew "shfmt"
 brew "ccat"
 brew "ghq"
 brew "fzf"
-brew "awslogs"
 brew "percona-toolkit"
 brew "noti"
 brew "terminal-notifier"
@@ -100,7 +104,6 @@ cask "ferdi"
 cask "adguard"
 cask "zoom"
 cask "chromedriver"
-cask "session-manager-plugin", args: {"no-quarantine": ""}
 
 mas "WiFi Signal", id: 525912054
 mas "Things3", id: 904280696
