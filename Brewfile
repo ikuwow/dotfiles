@@ -100,6 +100,7 @@ cask "ferdi"
 cask "adguard"
 cask "zoom"
 cask "chromedriver"
+cask "session-manager-plugin", args: {"no-quarantine": ""}
 
 mas "WiFi Signal", id: 525912054
 mas "Things3", id: 904280696
