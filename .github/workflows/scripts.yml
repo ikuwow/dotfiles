@@ -14,5 +14,7 @@ jobs:
       fail-fast: false
     steps:
       - uses: actions/checkout@v2
+      - name: Place dotfiles to home
+        run: ln -s ${GITHUB_WORKSPACE}/dotfiles ~/dotfiles
       - name: Run script
         run: scripts/${{ matrix.script }}
