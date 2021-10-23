@@ -1,0 +1,18 @@
+name: Run scripts
+
+on: push
+
+jobs:
+  run_script:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        script:
+          - configure.sh
+          - configure_brew.sh
+          - deploy.sh
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run script
+        run: scripts/${{ matrix.script }}
