@@ -77,6 +77,7 @@ brew "terminal-notifier"
 brew "postgresql"
 brew "mysql"
 brew "pre-commit"
+brew "act"
 
 # For PHP
 brew "libsodium"
