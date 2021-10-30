@@ -6,13 +6,25 @@ tap "universal-ctags/universal-ctags"
 tap "ikuwow/ikuwow-sshrc"
 tap "domt4/autoupdate"
 
-# First required
 brew "mas"
-mas "1Password 7", id: 1333542190
 brew "mackup"
-brew "bash"
+
+# First required
+mas "Things3", id: 904280696
+mas "Bear", id: 1091189122
+mas "1Password 7", id: 1333542190
+mas "WiFi Signal", id: 525912054
+cask "google-chrome"
 cask "karabiner-elements"
 cask "authy"
+cask "iterm2"
+cask "pastebot"
+cask "istat-menus"
+cask "rescuetime"
+cask "ferdi"
+cask "vanilla"
+cask "adguard"
+brew "bash"
 
 brew "coreutils"
 brew "diffutils"
@@ -86,32 +98,21 @@ brew "re2c"
 brew "libiconv"
 brew "libzip"
 
-cask "pastebot"
-cask "iterm2"
 cask "docker"
-cask "istat-menus"
 cask "vimr"
 cask "xquartz"
-cask "google-chrome"
 cask "firefox"
 cask "google-cloud-sdk"
 cask "vagrant"
-cask "rescuetime"
 cask "virtualbox"
 cask "virtualbox-extension-pack"
-cask "vanilla"
 cask "vlc"
-cask "ferdi"
-cask "adguard"
 cask "zoom"
 cask "chromedriver"
 
-mas "WiFi Signal", id: 525912054
-mas "Things3", id: 904280696
 mas "Dark Reader for Safari", id: 1438243180
 mas "The Unarchiver", id: 425424353
 mas "Tweetbot", id: 1384080005
-mas "Bear", id: 1091189122
 mas "Numbers", id: 409203825
 mas "Keynote", id: 409183694
 mas "Pages", id: 409201541
