@@ -41,7 +41,7 @@ brew "ruby"
 # For AWS
 brew "awscli"
 brew "awslogs"
-cask "session-manager-plugin", args: {"no-quarantine": ""}
+cask "session-manager-plugin"
 
 brew "zlib"
 brew "asdf"
