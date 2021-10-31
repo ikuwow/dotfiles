@@ -90,6 +90,7 @@ brew "postgresql"
 brew "mysql"
 brew "pre-commit"
 brew "act"
+brew "minamijoyo/tfmigrate/tfmigrate"
 
 # For PHP
 brew "libsodium"
