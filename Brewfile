@@ -5,6 +5,7 @@ tap "homebrew/cask-versions"
 tap "universal-ctags/universal-ctags"
 tap "ikuwow/ikuwow-sshrc"
 tap "domt4/autoupdate"
+tap "minamijoyo/tfmigrate"
 
 brew "mas"
 brew "mackup"
@@ -90,7 +91,7 @@ brew "postgresql"
 brew "mysql"
 brew "pre-commit"
 brew "act"
-brew "minamijoyo/tfmigrate/tfmigrate"
+brew "tfmigrate"
 
 # For PHP
 brew "libsodium"
