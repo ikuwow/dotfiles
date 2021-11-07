@@ -5,6 +5,7 @@ tap "homebrew/cask-versions"
 tap "universal-ctags/universal-ctags"
 tap "ikuwow/ikuwow-sshrc"
 tap "domt4/autoupdate"
+tap "minamijoyo/tfmigrate"
 
 brew "mas"
 brew "mackup"
@@ -41,7 +42,7 @@ brew "ruby"
 # For AWS
 brew "awscli"
 brew "awslogs"
-cask "session-manager-plugin", args: {"no-quarantine": ""}
+cask "session-manager-plugin"
 
 brew "zlib"
 brew "asdf"
@@ -89,6 +90,7 @@ brew "postgresql"
 brew "mysql"
 brew "pre-commit"
 brew "act"
+brew "tfmigrate"
 
 # For PHP
 brew "libsodium"
