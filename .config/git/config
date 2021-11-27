@@ -40,3 +40,5 @@
 	rebase = false
 [init]
 	templateDir = ~/.config/git/template
+[rerere]
+	enabled = true
