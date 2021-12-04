@@ -110,6 +110,7 @@ cask "virtualbox-extension-pack"
 cask "vlc"
 cask "zoom"
 cask "chromedriver"
+cask "lastfm"
 
 mas "Dark Reader for Safari", id: 1438243180
 mas "The Unarchiver", id: 425424353
