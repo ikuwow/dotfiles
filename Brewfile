@@ -99,6 +99,12 @@ brew "re2c"
 brew "libiconv"
 brew "libzip"
 
+# k8s
+brew "kubectl"
+brew "kustomize"
+brew "k9s"
+brew "kubectl"
+
 cask "docker"
 cask "vimr"
 cask "xquartz"
