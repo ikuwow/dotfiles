@@ -20,7 +20,3 @@ BASH_COMPLETION="/usr/local/etc/profile.d/bash_completion.sh"
 
 ## Language Specific configs
 export GOPATH=$HOME/.go
-
-# shellcheck disable=SC2155
-[[ "$(command -v /usr/libexec/java_home)" ]] && export JAVA_HOME=$(/usr/libexec/java_home -v 1.8)
-# DO NOT USE asdf FOR Java
