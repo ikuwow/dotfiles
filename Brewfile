@@ -104,6 +104,7 @@ brew "kubectl"
 brew "kustomize"
 brew "k9s"
 brew "kubectl"
+cask "lens"
 
 cask "docker"
 cask "vimr"
