@@ -91,6 +91,7 @@ brew "mysql"
 brew "pre-commit"
 brew "act"
 brew "tfmigrate"
+brew "python-yq" # Not "yq"
 
 # For PHP
 brew "libsodium"
