@@ -37,6 +37,12 @@ export PROMPT_COMMAND='echo -ne "\033]0;${PWD}\007"'
 export QUOTING_STYLE=literal # for GNU ls
 export HOMEBREW_BUNDLE_NO_LOCK=true
 
+# AWS Profile Switcher
+if [ -f ~/.aws/current_profile ]; then
+  AWS_PROFILE="$(cat ~/.aws/current_profile)"
+  export AWS_PROFILE
+fi
+
 asdfini=/usr/local/opt/asdf/asdf.sh
 if [ -e "$asdfini" ]; then
   . "$asdfini"
