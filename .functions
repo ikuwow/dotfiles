@@ -5,13 +5,15 @@ prompts() {
     PS1='localhost: \W\$ '
   fi
 
+  export PROMPT_COMMAND="$PROMPT_COMMAND"';AWS_PROMPT="<AWS:${AWS_PROFILE}>"'
+
   if [ "$(command -v __git_ps1)" ]; then
     # shellcheck disable=2016
     PS1="$(echo "${PS1}" | sed 's/\\\$ /$(__git_ps1)\\\$ /')"
   fi
 
   if [ -n "$AWS_PROFILE" ]; then
-    PS1="$(echo "${PS1}" | sed 's/\\\$ /\(AWS:$AWS_PROFILE\)\\\$ /')"
+    PS1="$(echo "${PS1}" | sed 's/\\\$ / $AWS_PROMPT\\\$ /')"
   fi
 
   # Make dollar yellow
