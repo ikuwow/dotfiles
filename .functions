@@ -2,7 +2,7 @@
 
 prompt_aws() {
   if [[ -n "${AWS_PROFILE}" ]]; then
-    AWS_PROMPT="<AWS:${AWS_PROFILE}>"
+    AWS_PROMPT=" <AWS:${AWS_PROFILE}>"
   else
     AWS_PROMPT=""
   fi
@@ -20,7 +20,7 @@ prompts() {
     PS1="$(echo "${PS1}" | sed 's/\\\$ /$(__git_ps1)\\\$ /')"
   fi
 
-  PS1="$(echo "${PS1}" | sed 's/\\\$ / $AWS_PROMPT\\\$ /')"
+  PS1="$(echo "${PS1}" | sed 's/\\\$ /$AWS_PROMPT\\\$ /')"
 
   # Make dollar yellow
   PS1="$(echo "${PS1}" | sed 's/\\\$ /\\\[\\e\[33m\\\]\\\$\\\[\\e\[0m\\\] /')"
