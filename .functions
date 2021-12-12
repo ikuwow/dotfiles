@@ -95,7 +95,11 @@ if [ ! "$(command -v awsps)" ]; then
     if [ -n "$query" ]; then
       profile="$(sed -n "s/^\[profile \(.*\)\]$/\1/p" < ~/.aws/config | fzf --filter "$query")"
     else
-      profile="$(sed -n "s/^\[profile \(.*\)\]$/\1/p" < ~/.aws/config | fzf)"
+      profiles="$(sed -n "s/^\[profile \(.*\)\]$/\1/p" < ~/.aws/config | sort)"
+      select p in $profiles; do
+        profile=$p
+        break
+      done
     fi
 
     if [ -z "$profile" ]; then
