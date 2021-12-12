@@ -30,7 +30,6 @@ prompts() {
       PS1='\[\e[33m\][ssh]\[\e[0m\]'"${PS1}"
     fi
   fi
-
 }
 
 if [ "$(command -v networksetup)" ]; then
@@ -93,7 +92,7 @@ if [ ! "$(command -v awsps)" ]; then
   awsps() {
     query="$1"
     if [ -n "$query" ]; then
-      profile="$(sed -n "s/^\[profile \(.*\)\]$/\1/p" < ~/.aws/config | fzf --filter "$query")"
+      profile="$(sed -n "s/^\[profile \(.*\)\]$/\1/p" < ~/.aws/config | fzf --filter "$query" | head -n 1)"
     else
       profiles="$(sed -n "s/^\[profile \(.*\)\]$/\1/p" < ~/.aws/config | sort)"
       select p in $profiles; do
