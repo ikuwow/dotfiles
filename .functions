@@ -1,20 +1,26 @@
 # vim: filetype=sh :
 
+prompt_aws() {
+  if [[ -n "${AWS_PROFILE}" ]]; then
+    AWS_PROMPT="<AWS:${AWS_PROFILE}>"
+  else
+    AWS_PROMPT=""
+  fi
+}
+
 prompts() {
   if [ -z "$SSH_CLIENT" ]; then
     PS1='localhost: \W\$ '
   fi
 
-  export PROMPT_COMMAND="$PROMPT_COMMAND"';AWS_PROMPT="<AWS:${AWS_PROFILE}>"'
+  export PROMPT_COMMAND="prompt_aws;$PROMPT_COMMAND"
 
   if [ "$(command -v __git_ps1)" ]; then
     # shellcheck disable=2016
     PS1="$(echo "${PS1}" | sed 's/\\\$ /$(__git_ps1)\\\$ /')"
   fi
 
-  if [ -n "$AWS_PROFILE" ]; then
-    PS1="$(echo "${PS1}" | sed 's/\\\$ / $AWS_PROMPT\\\$ /')"
-  fi
+  PS1="$(echo "${PS1}" | sed 's/\\\$ / $AWS_PROMPT\\\$ /')"
 
   # Make dollar yellow
   PS1="$(echo "${PS1}" | sed 's/\\\$ /\\\[\\e\[33m\\\]\\\$\\\[\\e\[0m\\\] /')"
