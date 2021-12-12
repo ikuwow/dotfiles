@@ -91,6 +91,13 @@ if [ ! "$(command -v awsps)" ]; then
 
   awsps() {
     query="$1"
+
+    if [ "$query" = "--clear" ]; then
+      export AWS_PROFILE=""
+      echo "AWS Profile cleared."
+      return
+    fi
+
     if [ -n "$query" ]; then
       profile="$(sed -n "s/^\[profile \(.*\)\]$/\1/p" < ~/.aws/config | fzf --filter "$query" | head -n 1)"
     else
