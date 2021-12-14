@@ -94,6 +94,7 @@ if [ ! "$(command -v awsps)" ]; then
 
     if [ "$query" = "--clear" ]; then
       export AWS_PROFILE=""
+      rm -f ~/.aws/current_profile
       echo "AWS Profile cleared."
       return
     fi
