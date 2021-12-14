@@ -1,14 +1,28 @@
 # vim: filetype=sh :
 
+prompt_aws() {
+  if [[ -n "${AWS_PROFILE}" ]]; then
+    AWS_PROMPT=" <AWS:${AWS_PROFILE}>"
+  else
+    AWS_PROMPT=""
+  fi
+}
+
 prompts() {
   if [ -z "$SSH_CLIENT" ]; then
     PS1='localhost: \W\$ '
   fi
 
+  export PROMPT_COMMAND="prompt_aws;$PROMPT_COMMAND"
+
   if [ "$(command -v __git_ps1)" ]; then
     # shellcheck disable=2016
     PS1="$(echo "${PS1}" | sed 's/\\\$ /$(__git_ps1)\\\$ /')"
   fi
+
+  PS1="$(echo "${PS1}" | sed 's/\\\$ /$AWS_PROMPT\\\$ /')"
+
+  # Make dollar yellow
   PS1="$(echo "${PS1}" | sed 's/\\\$ /\\\[\\e\[33m\\\]\\\$\\\[\\e\[0m\\\] /')"
 
   if [ -n "$SSH_CLIENT" ]; then
@@ -69,5 +83,38 @@ if [ "$(command -v ghq)" ] && [ "$(command -v fzf)" ]; then
     fi
     echo "Changing directory to $(ghq root)/$repo"
     cd "$(ghq root)/$repo" || return 1
+  }
+fi
+
+# AWS Profile Switcher
+if [ ! "$(command -v awsps)" ]; then
+
+  awsps() {
+    query="$1"
+
+    if [ "$query" = "--clear" ]; then
+      export AWS_PROFILE=""
+      echo "AWS Profile cleared."
+      return
+    fi
+
+    if [ -n "$query" ]; then
+      profile="$(sed -n "s/^\[profile \(.*\)\]$/\1/p" < ~/.aws/config | fzf --filter "$query" | head -n 1)"
+    else
+      profiles="$(sed -n "s/^\[profile \(.*\)\]$/\1/p" < ~/.aws/config | sort)"
+      select p in $profiles; do
+        profile=$p
+        break
+      done
+    fi
+
+    if [ -z "$profile" ]; then
+      echo "No profiles are selected."
+      return
+    fi
+
+    echo "$profile" > ~/.aws/current_profile
+    export AWS_PROFILE="$profile"
+    echo "AWS Profile set: $profile"
   }
 fi
