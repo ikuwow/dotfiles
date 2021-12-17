@@ -102,11 +102,9 @@ brew "libiconv"
 brew "libzip"
 
 # k8s
-brew "kustomize"
 brew "k9s"
-brew "kubectl"
 cask "lens"
-# kubectl should be managed by asdf
+# kubectl and kustomize should be managed by asdf
 
 cask "docker"
 cask "vimr"
