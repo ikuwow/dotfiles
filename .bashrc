@@ -20,3 +20,4 @@ BASH_COMPLETION="/usr/local/etc/profile.d/bash_completion.sh"
 
 ## Language Specific configs
 export GOPATH=$HOME/.go
+[[ -f ~/.asdf/plugions/java/set-java-home.bash ]] && . ~/.asdf/plugions/java/set-java-home.bash
