@@ -20,4 +20,5 @@ BASH_COMPLETION="/usr/local/etc/profile.d/bash_completion.sh"
 
 ## Language Specific configs
 export GOPATH=$HOME/.go
+# shellcheck disable=SC1090
 [[ -f ~/.asdf/plugions/java/set-java-home.bash ]] && . ~/.asdf/plugions/java/set-java-home.bash
