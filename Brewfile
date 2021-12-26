@@ -104,6 +104,7 @@ brew "libzip"
 # k8s
 brew "k9s"
 cask "lens"
+brew "minikube"
 # kubectl and kustomize should be managed by asdf
 
 cask "docker"
