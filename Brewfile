@@ -103,6 +103,7 @@ brew "libzip"
 brew "k9s"
 cask "lens"
 brew "kubectx"
+brew "minikube"
 # kubectl and kustomize should be managed by asdf
 
 cask "docker" # homebrew/cask/docker
