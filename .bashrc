@@ -22,3 +22,6 @@ BASH_COMPLETION="/usr/local/etc/profile.d/bash_completion.sh"
 export GOPATH=$HOME/.go
 # shellcheck disable=SC1090
 [[ -f ~/.asdf/plugions/java/set-java-home.bash ]] && . ~/.asdf/plugions/java/set-java-home.bash
+
+# shellcheck disable=SC1090
+[[ $(command -v kubectl) ]] && source <(kubectl completion bash)
