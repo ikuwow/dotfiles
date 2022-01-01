@@ -74,7 +74,7 @@ if [ "$(command -v ghq)" ] && [ "$(command -v fzf)" ]; then
     if [ -n "$query" ]; then
       repo=$(ghq list | fzf --filter "$query" | head -n 1)
     else
-      repo=$(ghq list | fzf)
+      repo=$(ghq list | fzf --height=30%)
     fi
 
     if [ -z "$repo" ]; then
