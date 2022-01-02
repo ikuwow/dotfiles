@@ -25,3 +25,6 @@ export GOPATH=$HOME/.go
 
 # shellcheck disable=SC1090
 [[ $(command -v kubectl) ]] && source <(kubectl completion bash)
+
+# shellcheck disable=SC1090
+[[ $(command -v gh) ]] && eval "$(gh completion -s bash)"
