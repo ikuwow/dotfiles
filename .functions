@@ -53,13 +53,6 @@ if [ "$(command -v github-nippou)" ]; then
   }
 fi
 
-if [ "$(command -v terminal-notifier)" ]; then
-  tn() {
-    local message="$1"
-    terminal-notifier -sound default -message "$message"
-  }
-fi
-
 if [ ! "$(command -v trash)" ]; then
   trash () {
     # shellcheck disable=2016
