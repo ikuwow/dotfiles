@@ -10,7 +10,7 @@ function condkillall() {
 }
 
 if ! command -v defaults >/dev/null 2>&1; then
-  echo "\`defaults\` not found. Nothing to do."
+  echo "Command \"defaults\" not found. Nothing to do."
   exit 0
 fi
 
@@ -29,6 +29,9 @@ defaults write KeyRepeat -int 2
 defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
 defaults write com.apple.menuextra.battery ShowPercent -string "YES"
 defaults write com.apple.Siri HotkeyTag -int 3 # Hold Option Space
+
+echo "Configuring with sudo..."
+sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate on
 
 # Disable shortcut (this conflicts spotlight shortcut)
 defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 60 "<dict><key>enabled</key><false/></dict>"
