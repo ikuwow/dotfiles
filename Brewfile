@@ -26,6 +26,7 @@ cask "ferdi"
 cask "vanilla"
 cask "adguard"
 brew "bash"
+cask "atok"
 
 brew "coreutils"
 brew "diffutils"
