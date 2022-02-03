@@ -40,5 +40,6 @@
 	rebase = false
 [init]
 	templateDir = ~/.config/git/template
+	defaultBranch = main
 [rerere]
 	enabled = true
