@@ -120,6 +120,7 @@ cask "chromedriver"
 cask "lastfm"
 cask "ears"
 cask "intellij-idea"
+cask "krisp"
 
 mas "Dark Reader for Safari", id: 1438243180
 mas "The Unarchiver", id: 425424353
