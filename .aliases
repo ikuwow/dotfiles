@@ -23,6 +23,11 @@ alias man='LANG=C man'
 [[ "$(command -v nvim)" ]] && alias vim='nvim'
 [[ "$(command -v sshrc)" ]]  && alias ssh=sshrc
 
+## Workaround
+# https://github.com/hashicorp/terraform/issues/27350#issuecomment-751269666
+# Fix after migrated arm terraform
+alias terraform='GODEBUG=asyncpreemptoff=1 terraform'
+
 ## Aliases for convenience
 alias be='bundle exec'
 alias pir='pipenv run'
