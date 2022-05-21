@@ -25,6 +25,13 @@
     bl = blame
     gr = grep
     clone = clone --recursive
+    home = "!f() { \
+        if git rev-parse --verify --quiet main > /dev/null; then branch='main'; \
+        elif git rev-parse --verify --quiet master > /dev/null; then branch='master'; \
+        else echo 'Error: main/master branch does not exist.' && exit 1; \
+        fi; \
+        git switch \"$branch\" && git pull; \
+        }; f"
 [credential]
     helper = cache
 [filter "lfs"]
