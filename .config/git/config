@@ -23,7 +23,7 @@
     r = remote
     ru = remote update
     bl = blame
-    gr = grep
+    grepi = grep --ignore-case
     clone = clone --recursive
     home = "!f() { \
         if git rev-parse --verify --quiet main > /dev/null; then branch='main'; \
