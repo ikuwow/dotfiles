@@ -100,9 +100,9 @@ brew "libiconv"
 brew "libzip"
 
 # k8s
+brew "kubie"
 brew "k9s"
 cask "lens"
-brew "kubectx"
 brew "minikube"
 brew "kind"
 # kubectl and kustomize should be managed by asdf
