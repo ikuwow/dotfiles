@@ -80,9 +80,13 @@ if [ "$(command -v ghq)" ] && [ "$(command -v fzf)" ]; then
 fi
 
 # AWS Profile Switcher
-if [ ! "$(command -v awsps)" ]; then
+if [ ! "$(command -v aps)" ]; then
 
-  awsps() {
+  aps() {
+    if [ ! "$(command -v fzf)" ]; then
+      echo "Error: ${FUNCNAME} requires fzf executable."
+      exit 1
+    fi
     query="$1"
 
     if [ "$query" = "--clear" ]; then
@@ -95,11 +99,7 @@ if [ ! "$(command -v awsps)" ]; then
     if [ -n "$query" ]; then
       profile="$(sed -n "s/^\[profile \(.*\)\]$/\1/p" < ~/.aws/config | fzf --filter "$query" | head -n 1)"
     else
-      profiles="$(sed -n "s/^\[profile \(.*\)\]$/\1/p" < ~/.aws/config | sort)"
-      select p in $profiles; do
-        profile=$p
-        break
-      done
+      profile="$(sed -n "s/^\[profile \(.*\)\]$/\1/p" < ~/.aws/config | fzf)"
     fi
 
     if [ -z "$profile" ]; then
