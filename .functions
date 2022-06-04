@@ -80,9 +80,9 @@ if [ "$(command -v ghq)" ] && [ "$(command -v fzf)" ]; then
 fi
 
 # AWS Profile Switcher
-if [ ! "$(command -v awsps)" ]; then
+if [ ! "$(command -v aps)" ]; then
 
-  awsps() {
+  aps() {
     query="$1"
 
     if [ "$query" = "--clear" ]; then
