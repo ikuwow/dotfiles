@@ -73,7 +73,6 @@ brew "universal-ctags", args: ["HEAD"]
 brew "shellcheck"
 brew "slackcat"
 brew "circleci"
-brew "masutaka/github-nippou/github-nippou"
 brew "gpg"
 brew "sqlparse"
 brew "imagemagick"
