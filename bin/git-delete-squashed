@@ -4,11 +4,13 @@
 
 set -e
 
-git checkout -q master
+default_branch=master
+
+git checkout -q "$default_branch"
 git for-each-ref refs/heads/ "--format=%(refname:short)" | \
   while read -r branch; do
-    mergeBase=$(git merge-base master "$branch")
-    if [[ $(git cherry master "$(git commit-tree "$(git rev-parse "$branch^{tree}")" -p "$mergeBase" -m _)") == "-"* ]]; then
+    mergeBase=$(git merge-base "$default_branch" "$branch")
+    if [[ $(git cherry "$default_branch" "$(git commit-tree "$(git rev-parse "$branch^{tree}")" -p "$mergeBase" -m _)") == "-"* ]]; then
       git branch -D "$branch"
     fi
   done
