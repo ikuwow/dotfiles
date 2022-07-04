@@ -1,6 +1,6 @@
 # dotfiles
 
-[![CircleCI](https://circleci.com/gh/ikuwow/dotfiles.svg?style=svg)](https://circleci.com/gh/ikuwow/dotfiles)
+![CI](https://github.com/ikuwow/dotfiles/actions/workflows/ci.yml/badge.svg)
 
 My dear dotfiles.
 
