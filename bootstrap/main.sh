@@ -39,8 +39,7 @@ else
   echo "Homebrew is already installed."
 fi
 
-# TODO: prioritize ARM homebrew
-# export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
+export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 
 export HOMEBREW_BUNDLE_NO_LOCK=1
 brew bundle
