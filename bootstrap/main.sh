@@ -26,8 +26,10 @@ echo
 scripts/deploy.sh
 echo
 
+archname="$(uname -m)"
+
 # Install Rosetta 2 when ARM
-if [ "$(uname -m)" = "arm64" ]; then
+if [ "${archname}" = "arm64" ]; then
   softwareupdate --install-rosetta --agree-to-license
 fi
 
