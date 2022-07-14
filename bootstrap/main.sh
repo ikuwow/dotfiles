@@ -27,6 +27,7 @@ scripts/deploy.sh
 echo
 
 archname="$(uname -m)"
+echo "Arch: ${archname}"
 
 # Install Rosetta 2 when ARM
 if [ "${archname}" = "arm64" ]; then
@@ -34,11 +35,20 @@ if [ "${archname}" = "arm64" ]; then
 fi
 
 # Install homebrew for Intel
-if ! command -v brew > /dev/null 2>&1; then
-  # Install homebrew: https://brew.sh/
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
-else
-  echo "Homebrew is already installed."
+if [ "${archname}" = "x86_64" ]; then
+  if ! command -v /usr/local/bin/brew > /dev/null 2>&1; then
+    # Install homebrew: https://brew.sh/
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+  else
+    echo "Homebrew is already installed."
+  fi
+elif [ "${archname}" = "arm64" ]; then
+  if ! command -v /opt/homebrew/bin/brew > /dev/null 2>&1; then
+    # Install homebrew: https://brew.sh/
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+  else
+    echo "Homebrew is already installed."
+  fi
 fi
 
 export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
