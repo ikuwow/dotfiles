@@ -3,9 +3,7 @@
 
 if [ "${BASH_VERSINFO[0]}" -le 3 ]; then
   echo "WARNING: Your bash version is ${BASH_VERSINFO[0]}!"
-  echo "Please use bash 4.0 ~ by these commands: (Mac)"
-  echo "sudo bash -c 'echo $BREW_PREFIX/bin/bash >> /etc/shells'"
-  echo "chsh -s $BREW_PREFIX/bin/bash"
+  echo "Please use bash 4.0~"
 fi
 
 # shellcheck disable=SC1091
