@@ -42,6 +42,7 @@ if [ "${archname}" = "x86_64" ]; then
   else
     echo "Homebrew is already installed."
   fi
+  export PATH="/usr/local/bin:$PATH"
 elif [ "${archname}" = "arm64" ]; then
   if ! command -v /opt/homebrew/bin/brew > /dev/null 2>&1; then
     # Install homebrew: https://brew.sh/
@@ -49,9 +50,8 @@ elif [ "${archname}" = "arm64" ]; then
   else
     echo "Homebrew is already installed."
   fi
+  export PATH="/opt/homebrew/bin:$PATH"
 fi
-
-export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 
 export HOMEBREW_BUNDLE_NO_LOCK=1
 brew bundle
