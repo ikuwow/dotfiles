@@ -11,8 +11,17 @@ elif [ "$(arch)" = "i386" ]; then
 fi
 export BREW_PREFIX
 
-PATH="$HOME/bin:$BREW_PREFIX/opt/ruby/bin:$BREW_PREFIX/bin:$BREW_PREFIX/sbin:$PATH"
+# It sets envvars below
+# - HOMEBREW_PREFIX
+# - HOMEBREW_CELLAR
+# - HOMEBREW_REPOSITORY
+# - PATH
+# - MANPAHT
+# - INFOPATH
+# ref: https://github.com/Homebrew/brew/blob/master/Library/Homebrew/cmd/shellenv.sh
+eval "$($BREW_PREFIX/bin/brew shellenv)"
 
+PATH="$BREW_PREFIX/opt/ruby/bin:$PATH"
 PATH="$BREW_PREFIX/opt/coreutils/libexec/gnubin:$PATH"
 PATH="$BREW_PREFIX/opt/binutils/bin:$PATH"
 PATH="$BREW_PREFIX/opt/findutils/libexec/gnubin:$PATH"
@@ -20,6 +29,7 @@ PATH="$BREW_PREFIX/opt/gnu-sed/libexec/gnubin:$PATH"
 PATH="$BREW_PREFIX/opt/gnu-which/libexec/gnubin:$PATH"
 PATH="$BREW_PREFIX/opt/grep/libexec/gnubin:$PATH"
 PATH="$BREW_PREFIX/opt/openssl/bin:$PATH"
+PATH="$HOME/bin:$PATH"
 export PATH
 
 export LDFLAGS="-L$BREW_PREFIX/opt/openssl/lib"
