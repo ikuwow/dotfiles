@@ -4,26 +4,33 @@
 
 # shellcheck source=/dev/null
 
-PATH="$HOME/bin:/usr/local/opt/ruby/bin:/usr/local/bin:/usr/local/sbin:$PATH"
+if [ "$(arch)" = "arm64" ]; then
+  BREW_PREFIX="/opt/homebrew"
+elif [ "$(arch)" = "i386" ]; then
+  BREW_PREFIX="/usr/local"
+fi
+export BREW_PREFIX
 
-PATH="/usr/local/opt/coreutils/libexec/gnubin:$PATH"
-PATH="/usr/local/opt/binutils/bin:$PATH"
-PATH="/usr/local/opt/findutils/libexec/gnubin:$PATH"
-PATH="/usr/local/opt/gnu-sed/libexec/gnubin:$PATH"
-PATH="/usr/local/opt/gnu-which/libexec/gnubin:$PATH"
-PATH="/usr/local/opt/grep/libexec/gnubin:$PATH"
-PATH="/usr/local/opt/openssl/bin:$PATH"
+PATH="$HOME/bin:$BREW_PREFIX/opt/ruby/bin:$BREW_PREFIX/bin:$BREW_PREFIX/sbin:$PATH"
+
+PATH="$BREW_PREFIX/opt/coreutils/libexec/gnubin:$PATH"
+PATH="$BREW_PREFIX/opt/binutils/bin:$PATH"
+PATH="$BREW_PREFIX/opt/findutils/libexec/gnubin:$PATH"
+PATH="$BREW_PREFIX/opt/gnu-sed/libexec/gnubin:$PATH"
+PATH="$BREW_PREFIX/opt/gnu-which/libexec/gnubin:$PATH"
+PATH="$BREW_PREFIX/opt/grep/libexec/gnubin:$PATH"
+PATH="$BREW_PREFIX/opt/openssl/bin:$PATH"
 export PATH
 
-export LDFLAGS="-L/usr/local/opt/openssl/lib"
-export CPPFLAGS="-I/usr/local/opt/openssl/include"
+export LDFLAGS="-L$BREW_PREFIX/opt/openssl/lib"
+export CPPFLAGS="-I$BREW_PREFIX/opt/openssl/include"
 
-MANPATH="/usr/local/opt/coreutils/libexec/gnuman:$MANPATH"
-MANPATH="/usr/local/opt/binutils/share/man:$MANPATH"
-MANPATH="/usr/local/opt/findutils/libexec/gnuman:$MANPATH"
-MANPATH="/usr/local/opt/gnu-sed/libexec/gnuman:$MANPATH"
-MANPATH="/usr/local/opt/gnu-which/libexec/gnuman:$MANPATH"
-MANPATH="/usr/local/opt/grep/libexec/gnuman:$MANPATH"
+MANPATH="$BREW_PREFIX/opt/coreutils/libexec/gnuman:$MANPATH"
+MANPATH="$BREW_PREFIX/opt/binutils/share/man:$MANPATH"
+MANPATH="$BREW_PREFIX/opt/findutils/libexec/gnuman:$MANPATH"
+MANPATH="$BREW_PREFIX/opt/gnu-sed/libexec/gnuman:$MANPATH"
+MANPATH="$BREW_PREFIX/opt/gnu-which/libexec/gnuman:$MANPATH"
+MANPATH="$BREW_PREFIX/opt/grep/libexec/gnuman:$MANPATH"
 export MANPATH
 
 export LANG=en_US.UTF-8
@@ -42,7 +49,7 @@ if [ -f ~/.aws/current_profile ]; then
   export AWS_PROFILE
 fi
 
-asdfini=/usr/local/opt/asdf/asdf.sh
+asdfini=$BREW_PREFIX/opt/asdf/asdf.sh
 if [ -e "$asdfini" ]; then
   . "$asdfini"
 fi
