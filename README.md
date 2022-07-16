@@ -25,6 +25,22 @@ When you want to bootstrap specific branch:
 curl -L https://raw.githubusercontent.com/ikuwow/dotfiles/master/bootstrap.sh | bash -s -- branchname
 ```
 
+## Set login shell after bootstrapping
+
+```
+# Intel
+LOGIN_SHELL="/usr/local/bin/bash"
+sudo sh -c "echo $LOGIN_SHELL >> /etc/shells"
+chsh -s "$LOGIN_SHELL"
+```
+
+```
+# Apple Silicon
+LOGIN_SHELL="/opt/homebrew/bin/bash"
+sudo sh -c "echo $LOGIN_SHELL >> /etc/shells"
+chsh -s "$LOGIN_SHELL"
+```
+
 ## Notes
 
 ### Create key pair
