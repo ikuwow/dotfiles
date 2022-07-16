@@ -26,35 +26,35 @@ echo
 scripts/deploy.sh
 echo
 
-command_prefix=""
-if [ "$(uname -m)" = "arm64" ]; then
-  # Install on Rosetta 2
-  command_prefix="arch -arch x86_64"
-fi
+archname="$(arch)"
+echo "Arch: ${archname}"
 
 # Install Rosetta 2 when ARM
-if [ "$(uname -m)" = "arm64" ]; then
+if [ "${archname}" = "arm64" ]; then
   softwareupdate --install-rosetta --agree-to-license
 fi
 
 # Install homebrew for Intel
-if ! command -v /usr/local/bin/brew >/dev/null 2>&1; then
-  # Install homebrew: https://brew.sh/
-  $command_prefix /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+if [ "${archname}" = "i386" ]; then
+  if ! command -v /usr/local/bin/brew > /dev/null 2>&1; then
+    # Install homebrew: https://brew.sh/
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+  else
+    echo "Homebrew is already installed."
+  fi
+  export PATH="/usr/local/bin:$PATH"
+elif [ "${archname}" = "arm64" ]; then
+  if ! command -v /opt/homebrew/bin/brew > /dev/null 2>&1; then
+    # Install homebrew: https://brew.sh/
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+  else
+    echo "Homebrew is already installed."
+  fi
+  export PATH="/opt/homebrew/bin:$PATH"
 fi
-
-# Install homebrew for ARM
-if [ "$(uname -m)" = "arm64" ] && (! command -v /opt/homebrew/bin/brew > /dev/null); then
-  sudo mkdir /opt/homebrew
-  sudo chown "$(whoami)" /opt/homebrew
-  curl -L https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C /opt/homebrew
-fi
-
-# TODO: prioritize ARM homebrew
-# export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 
 export HOMEBREW_BUNDLE_NO_LOCK=1
-$command_prefix brew bundle
+brew bundle
 echo
 
 mackup restore

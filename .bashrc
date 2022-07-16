@@ -3,9 +3,7 @@
 
 if [ "${BASH_VERSINFO[0]}" -le 3 ]; then
   echo "WARNING: Your bash version is ${BASH_VERSINFO[0]}!"
-  echo "Please use bash 4.0 ~ by these commands: (Mac)"
-  echo "sudo bash -c 'echo /usr/local/bin/bash >> /etc/shells'"
-  echo "chsh -s /usr/local/bin/bash"
+  echo "Please use bash 4.0~"
 fi
 
 # shellcheck disable=SC1091
@@ -14,7 +12,7 @@ fi
 ## Auto complete
 complete -C aws_completer aws
 
-BASH_COMPLETION="/usr/local/etc/profile.d/bash_completion.sh"
+BASH_COMPLETION="$BREW_PREFIX/etc/profile.d/bash_completion.sh"
 # shellcheck disable=SC1090
 [[ -r "$BASH_COMPLETION" ]] && . "$BASH_COMPLETION"
 
