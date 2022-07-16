@@ -26,7 +26,7 @@ echo
 scripts/deploy.sh
 echo
 
-archname="$(uname -m)"
+archname="$(arch)"
 echo "Arch: ${archname}"
 
 # Install Rosetta 2 when ARM
@@ -35,7 +35,7 @@ if [ "${archname}" = "arm64" ]; then
 fi
 
 # Install homebrew for Intel
-if [ "${archname}" = "x86_64" ]; then
+if [ "${archname}" = "i386" ]; then
   if ! command -v /usr/local/bin/brew > /dev/null 2>&1; then
     # Install homebrew: https://brew.sh/
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
