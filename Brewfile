@@ -132,6 +132,7 @@ mas "Numbers", id: 409203825
 mas "Keynote", id: 409183694
 mas "Pages", id: 409201541
 mas "Save to Pocket", id: 1477385213
+mas "Instapaper Save", id: 1481302432
 mas "Day One", id: 1055511498
 mas "Habitify", id: 1111447047
 mas "Spark", id: 1176895641
