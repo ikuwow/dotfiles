@@ -58,10 +58,20 @@ let g:loaded_node_provider = 0
 let g:loaded_perl_provider = 0
 
 " Python3 configurations
-let g:python3_host_prog = '/usr/local/bin/python3'
+let s:ostype = trim(system('uname -m'))
+if s:ostype == 'arm64'
+    let s:bin_prefix = '/opt/homebrew/bin/'
+elseif s:ostype == 'x86_64'
+    let s:bin_prefix = '/usr/local/bin/'
+else
+    echo 'Error: Unsupported ostype'
+endif
+let g:python3_host_prog = s:bin_prefix . 'python3'
 if has("nvim")
-    let s:pip3 = '/usr/local/bin/pip3'
-    call system(s:pip3 . ' install neovim pynvim') " TODO: It's slow
+    let s:pip3 = s:bin_prefix . 'pip3'
+    " TODO: It's slow
+    " TODO: Show message when install
+    call system(s:pip3 . ' install neovim pynvim')
 endif
 
 "=====================================
