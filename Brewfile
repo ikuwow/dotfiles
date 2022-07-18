@@ -74,6 +74,7 @@ brew "universal-ctags", args: ["HEAD"]
 brew "shellcheck"
 brew "slackcat"
 brew "circleci"
+brew "actionlint"
 brew "gpg"
 brew "sqlparse"
 brew "imagemagick"
