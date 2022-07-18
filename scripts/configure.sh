@@ -29,6 +29,7 @@ defaults write KeyRepeat -int 2
 defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
 defaults write com.apple.menuextra.battery ShowPercent -string "YES"
 defaults write com.apple.Siri HotkeyTag -int 3 # Hold Option Space
+defaults -currentHost write com.apple.Spotlight MenuItemHidden -int 1
 
 echo "Configuring with sudo..."
 sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate on
