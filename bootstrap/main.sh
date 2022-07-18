@@ -53,11 +53,12 @@ elif [ "${archname}" = "arm64" ]; then
   export PATH="/opt/homebrew/bin:$PATH"
 fi
 
-export HOMEBREW_BUNDLE_NO_LOCK=1
-brew bundle
+brew install mackup
+mackup restore
 echo
 
-mackup restore
+export HOMEBREW_BUNDLE_NO_LOCK=1
+brew bundle
 echo
 
 scripts/configure_brew.sh
