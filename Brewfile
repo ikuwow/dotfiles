@@ -141,3 +141,4 @@ mas "WaterMinder", id: 1415257369
 mas "Simplified for Twitter", id: 1479307973
 mas "Pomodoro-Tracker", id: 1396146802
 mas "EasyRes", id: 688211836
+mas "Streaks", id: 963034692
