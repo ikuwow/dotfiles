@@ -1,0 +1,7 @@
+---
+
+extends: default
+
+rules:
+  truthy: disable
+  # This matches `on:` of GitHub Actions
