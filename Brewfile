@@ -11,10 +11,10 @@ brew "mas"
 brew "mackup"
 
 # First required
-mas "Slack", id: 803453959
 mas "Things3", id: 904280696
 mas "Bear", id: 1091189122
-mas "1Password 7", id: 1333542190
+cask "1password"
+mas "1Password for Safari", id: 1569813296
 mas "WiFi Signal", id: 525912054
 cask "google-chrome"
 cask "karabiner-elements"
