@@ -26,3 +26,6 @@ export GOPATH=$HOME/.go
 
 # shellcheck disable=SC1090
 [[ $(command -v gh) ]] && eval "$(gh completion -s bash)"
+
+# shellcheck disable=SC1090
+[[ $(command -v akamai) ]] && eval "$(akamai --bash)"
