@@ -91,6 +91,7 @@ brew "mysql"
 brew "pre-commit"
 brew "act"
 brew "tfmigrate"
+brew "tflint"
 brew "python-yq" # Not "yq"
 brew "gh"
 
