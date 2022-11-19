@@ -29,3 +29,5 @@ export GOPATH=$HOME/.go
 
 # shellcheck disable=SC1090
 [[ $(command -v akamai) ]] && eval "$(akamai --bash)"
+
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
