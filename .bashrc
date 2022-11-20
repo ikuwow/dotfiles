@@ -22,6 +22,9 @@ export GOPATH=$HOME/.go
 [[ -f ~/.asdf/plugions/java/set-java-home.bash ]] && . ~/.asdf/plugions/java/set-java-home.bash
 
 # shellcheck disable=SC1090
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
+
+# shellcheck disable=SC1090
 [[ $(command -v kubectl) ]] && source <(kubectl completion bash)
 
 # shellcheck disable=SC1090
@@ -29,5 +32,3 @@ export GOPATH=$HOME/.go
 
 # shellcheck disable=SC1090
 [[ $(command -v akamai) ]] && eval "$(akamai --bash)"
-
-[ -f ~/.fzf.bash ] && source ~/.fzf.bash
