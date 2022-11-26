@@ -25,6 +25,7 @@ cask "istat-menus"
 # cask "ferdium" # FIXME: On M1 Mac, it downloads intel binary.
 cask "vanilla"
 cask "adguard"
+cask "adguard-vpn"
 brew "bash"
 cask "atok"
 
