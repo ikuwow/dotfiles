@@ -95,6 +95,7 @@ brew "tfmigrate"
 brew "tflint"
 brew "python-yq" # Not "yq"
 brew "gh"
+brew "kafka"
 
 # For PHP
 brew "libsodium"
