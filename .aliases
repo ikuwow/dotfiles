@@ -15,6 +15,7 @@ alias less='less -iM'
 alias tree='tree -NC'
 alias grep='grep --color=auto'
 alias man='LANG=C man'
+alias watch='watch --color'
 [[ "$(command -v tmux)" ]] && [[ -n "$TMUX_CONF" ]] && alias tmux='tmux -f "$TMUX_CONF"'
 [[ "$(command -v thefuck)" ]] && eval "$(thefuck --alias)"
 
