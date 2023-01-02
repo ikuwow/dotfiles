@@ -19,7 +19,7 @@ export BREW_PREFIX
 # - MANPAHT
 # - INFOPATH
 # ref: https://github.com/Homebrew/brew/blob/master/Library/Homebrew/cmd/shellenv.sh
-eval "$($BREW_PREFIX/bin/brew shellenv)"
+eval "$("$BREW_PREFIX/bin/brew" shellenv)"
 
 PATH="$BREW_PREFIX/opt/ruby/bin:$PATH"
 PATH="$BREW_PREFIX/opt/coreutils/libexec/gnubin:$PATH"
@@ -60,10 +60,10 @@ if [ -f ~/.aws/current_profile ]; then
   export AWS_PROFILE
 fi
 
-asdfini=$BREW_PREFIX/opt/asdf/asdf.sh
-if [ -e "$asdfini" ]; then
-  . "$asdfini"
-fi
+asdf_sources=(libexec/asdf.sh etc/bash_completion.d/asdf.bash)
+for s in "${asdf_sources[@]}"; do
+  [[ -f "$(brew --prefix asdf)/$s" ]] && . "$(brew --prefix asdf)/$s"
+done
 
 if [ "$(command -v gcloud)" ]; then
   gcloudpath="$(dirname "$(dirname "$(readlink "$(command -v gcloud)")")")"
