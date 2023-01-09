@@ -2,6 +2,7 @@
 
 tap "homebrew/cask"
 tap "homebrew/cask-versions"
+tap "homebrew/cask-drivers"
 tap "universal-ctags/universal-ctags"
 tap "ikuwow/ikuwow-sshrc"
 tap "domt4/autoupdate"
@@ -28,6 +29,7 @@ cask "adguard"
 cask "nordvpn"
 brew "bash"
 cask "atok"
+cask "logi-options-plus"
 
 brew "coreutils"
 brew "diffutils"
