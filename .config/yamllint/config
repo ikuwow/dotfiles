@@ -1,7 +1,8 @@
 ---
-
-extends: default
+extends: relaxed
 
 rules:
-  truthy: disable
+  line-length:
+    level: warning
+    max: 120
   # This matches `on:` of GitHub Actions
