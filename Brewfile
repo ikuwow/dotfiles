@@ -23,7 +23,7 @@ cask "authy"
 cask "iterm2"
 cask "pastebot"
 cask "istat-menus"
-# cask "ferdium" # FIXME: On M1 Mac, it downloads intel binary.
+cask "rambox"
 cask "vanilla"
 cask "adguard"
 cask "nordvpn"
