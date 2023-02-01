@@ -1,1 +1,4 @@
 disable=SC2039
+disable=SC3010
+disable=SC3060
+disable=SC3028
