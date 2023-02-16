@@ -113,6 +113,7 @@ brew "k9s"
 cask "lens"
 brew "minikube"
 brew "kind"
+brew "flux"
 # kubectl and kustomize should be managed by asdf
 
 cask "docker" # homebrew/cask/docker
