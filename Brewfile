@@ -113,6 +113,7 @@ brew "k9s"
 cask "lens"
 brew "minikube"
 brew "kind"
+brew "flux"
 # kubectl and kustomize should be managed by asdf
 
 cask "docker" # homebrew/cask/docker
@@ -132,8 +133,6 @@ cask "powershell"
 
 mas "Dark Reader for Safari", id: 1438243180
 mas "The Unarchiver", id: 425424353
-mas "Tweetbot", id: 1384080005
-mas "TweetShot", id: 1227057295
 mas "Numbers", id: 409203825
 mas "Keynote", id: 409183694
 mas "Pages", id: 409201541
@@ -144,7 +143,6 @@ mas "New File Menu", id: 1064959555
 mas "Kindle", id: 405399194
 mas "LINE", id: 539883307
 mas "WaterMinder", id: 1415257369
-mas "Simplified for Twitter", id: 1479307973
 mas "Pomodoro-Tracker", id: 1396146802
 mas "EasyRes", id: 688211836
 mas "Streaks", id: 963034692
