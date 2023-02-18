@@ -144,7 +144,6 @@ mas "New File Menu", id: 1064959555
 mas "Kindle", id: 405399194
 mas "LINE", id: 539883307
 mas "WaterMinder", id: 1415257369
-mas "Pomodoro-Tracker", id: 1396146802
 mas "EasyRes", id: 688211836
 mas "Streaks", id: 963034692
 mas "Speedtest", id: 1153157709
