@@ -21,12 +21,10 @@ build = './install.sh'
 
 [[plugins]]
 repo = 'glidenote/memolist.vim'
-depends = ['nerdtree']
 on_event = ['CmdwinEnter']
 hook_add = '''
     let g:memolist_path = expand("~/Documents/Memos")
     let g:memolist_memo_suffix = "md"
-    let g:memolist_ex_cmd = 'NERDTree'
 '''
 
 [[plugins]]
