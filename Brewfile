@@ -99,6 +99,7 @@ brew "tflint"
 brew "python-yq" # Not "yq"
 brew "gh"
 brew "kafka"
+brew "akamai"
 
 # For PHP
 brew "libsodium"
