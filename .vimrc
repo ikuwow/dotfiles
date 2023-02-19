@@ -90,7 +90,7 @@ if strlen($SSH_CLIENT) == 0
             echo "Cloning dein.vim..."
             execute '!git clone https://github.com/Shougo/dein.vim' s:dein_src
         endif
-        execute 'set runtimepath^=' . substitute(s:dein_src, '[/\\]$', '', '')
+        execute 'set runtimepath+=' . substitute(s:dein_src, '[/\\]$', '', '')
     endif
 
     " Load dein.vim config
