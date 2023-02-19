@@ -3,6 +3,9 @@ repo = 'Shougo/dein.vim'
 
 [[plugins]]
 repo = 'lambdalisue/fern.vim'
+hook_add = '''
+    command! Nt Fern . -drawer
+'''
 
 [[plugins]]
 repo = 'Shougo/vimproc.vim'
