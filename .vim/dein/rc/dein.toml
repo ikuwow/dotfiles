@@ -2,14 +2,6 @@
 repo = 'Shougo/dein.vim'
 
 [[plugins]]
-repo = 'scrooloose/nerdtree'
-hook_add = '''
-    let g:NERDTreeShowHidden = 1
-    command! Nt NERDTree
-'''
-# it should not be loaded lazily or denite.vim does not work!
-
-[[plugins]]
 repo = 'Shougo/vimproc.vim'
 build = 'make'
 
