@@ -8,6 +8,10 @@ hook_add = '''
 '''
 
 [[plugins]]
+repo = 'lambdalisue/fern-git-status.vim'
+depends_on = ['fern.vim']
+
+[[plugins]]
 repo = 'Shougo/vimproc.vim'
 build = 'make'
 
