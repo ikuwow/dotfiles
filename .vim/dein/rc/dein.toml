@@ -4,6 +4,7 @@ repo = 'Shougo/dein.vim'
 [[plugins]]
 repo = 'lambdalisue/fern.vim'
 hook_add = '''
+    let g:fern#default_hidden = 1
     command! Nt Fern . -drawer
 '''
 
