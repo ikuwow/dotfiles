@@ -8,6 +8,16 @@ hook_add = '''
 '''
 
 [[plugins]]
+repo = 'lambdalisue/nerdfont.vim'
+
+[[plugins]]
+repo = 'lambdalisue/fern-renderer-nerdfont.vim'
+depends = ['fern.vim', 'nerdfont.vim']
+hook_add = '''
+    let g:fern#renderer = "nerdfont"
+'''
+
+[[plugins]]
 repo = 'Shougo/vimproc.vim'
 build = 'make'
 
