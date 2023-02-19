@@ -77,25 +77,33 @@ endif
 "=====================================
 "-- dein.vim Configulation Section --
 "=====================================
-let s:dein_dir = expand('~/.vim/dein')
-let s:dein_repo = s:dein_dir . '/repos/github.com/Shougo/dein.vim'
-let s:dein_toml = s:dein_dir . '/rc/dein.toml'
-let s:dein_toml_lazy = s:dein_dir . '/rc/dein_lazy.toml'
 
-if !isdirectory(s:dein_repo) && strlen($SSH_CLIENT) == 0
-    echo "Cloning dein.vim..."
-    call system('git clone https://github.com/Shougo/dein.vim ' . shellescape(s:dein_repo))
-    if v:shell_error != 0
-        echo "Error while cloning dein.vim."
-    end
-endif
+if strlen($SSH_CLIENT) == 0
 
-if isdirectory(s:dein_repo)
-    if has('vim_starting')
-        execute "set runtimepath+=" . s:dein_repo
+    " Install dein.vim to ~/.cache/dein/
+    let $CACHE = expand('~/.cache')
+    if !isdirectory($CACHE)
+        call mkdir($CACHE, 'p')
     endif
-    if dein#load_state(s:dein_dir)
-        call dein#begin(s:dein_dir)
+    if &runtimepath !~# '/dein.vim'
+        let s:dein_dir = fnamemodify('dein.vim', ':p')
+        if !isdirectory(s:dein_dir)
+            let s:dein_dir = $CACHE . '/dein/repos/github.com/Shougo/dein.vim'
+            if !isdirectory(s:dein_dir)
+                echo "Cloning dein.vim..."
+                execute '!git clone https://github.com/Shougo/dein.vim' s:dein_dir
+            endif
+        endif
+        execute 'set runtimepath^=' . substitute(fnamemodify(s:dein_dir, ':p') , '[/\\]$', '', '')
+    endif
+
+    " Load dein.vim config
+    let s:dein_repo_dir = expand('~/.cache/dein/')
+    let s:dein_toml = expand('~/.vim/dein') . '/rc/dein.toml'
+    let s:dein_toml_lazy = expand('~/.vim/dein') . '/rc/dein_lazy.toml'
+
+    if dein#load_state(s:dein_repo_dir)
+        call dein#begin(s:dein_repo_dir)
         if filereadable(s:dein_toml)
             call dein#load_toml(s:dein_toml)
         endif
@@ -105,9 +113,11 @@ if isdirectory(s:dein_repo)
         call dein#end()
         call dein#save_state()
     endif
+
     if has('vim_starting') && dein#check_install()
         call dein#install()
     endif
+
 endif
 
 " https://github.com/Shougo/dein.vim
