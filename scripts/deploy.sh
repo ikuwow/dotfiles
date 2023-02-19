@@ -24,6 +24,11 @@ done
 mkdir -p "$XDG_CONFIG_HOME"
 find "$DOTPATH/.config" -maxdepth 1 -mindepth 1 -exec ln -fvns {} "$XDG_CONFIG_HOME/" \;
 
+# ssh
+mkdir -p "$HOME/.ssh"
+ln -fvns "$DOTPATH/.ssh/config" "$HOME/.ssh/config"
+mkdir -p "$HOME/.ssh/config.d"
+
 # bin
 mkdir -p ~/bin
 find "$DOTPATH/bin/" -type f -perm 0755 -exec ln -fvns {} ~/bin/ \;
