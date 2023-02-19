@@ -2,12 +2,14 @@
 repo = 'Shougo/dein.vim'
 
 [[plugins]]
-repo = 'scrooloose/nerdtree'
+repo = 'lambdalisue/fern.vim'
 hook_add = '''
-    let g:NERDTreeShowHidden = 1
-    command! Nt NERDTree
+    command! Nt Fern . -drawer
 '''
-# it should not be loaded lazily or denite.vim does not work!
+
+[[plugins]]
+repo = 'lambdalisue/fern-git-status.vim'
+depends_on = ['fern.vim']
 
 [[plugins]]
 repo = 'Shougo/vimproc.vim'
@@ -98,7 +100,7 @@ repo = 'tpope/vim-fugitive'
 
 [[plugins]]
 repo = 'itchyny/lightline.vim'
-depends = ['nerdtree', 'vim-fugitive']
+depends = ['vim-fugitive']
 hook_add = '''
     let g:lightline = {
         \ 'colorscheme': 'jellybeans',
@@ -124,7 +126,7 @@ hook_add = '''
     "-- lightline functions --"
     function! CurrentBranch()
         try
-            if &ft !~? 'nerdtree' && exists('*fugitive#head') && strlen(fugitive#head())
+            if exists('*fugitive#head') && strlen(fugitive#head())
                 return "ト " . fugitive#head()
             endif
         catch
@@ -133,15 +135,12 @@ hook_add = '''
     endfunction
 
     function! FileName()
-        if &ft !~? 'nerdtree'
-            return expand('%:t')
-        endif
-        return ''
+        return expand('%:t')
     endfunction
 
     function! MultiMode()
         let fname = expand('%:t')
-        return fname =~ 'NERD_tree' ? 'NERDTree' : lightline#mode()
+        return lightline#mode()
     endfunction
 
     function! FileFormat()
