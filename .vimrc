@@ -110,6 +110,7 @@ if strlen($SSH_CLIENT) == 0
     endif
 
     if has('vim_starting') && dein#check_install()
+        echo "Executing dein#install()..."
         call dein#install()
     endif
 
