@@ -81,7 +81,11 @@ endif
 if strlen($SSH_CLIENT) == 0
 
     " Install dein.vim
-    let s:dein_base = expand('~/.cache/dein')
+    if has("nvim")
+        let s:dein_base = expand('~/.cache/dein_nvim')
+    else
+        let s:dein_base = expand('~/.cache/dein_vim')
+    endif
     call mkdir(s:dein_base, 'p')
 
     if &runtimepath !~# '/dein.vim'
