@@ -93,6 +93,9 @@ if strlen($SSH_CLIENT) == 0
         execute 'set runtimepath+=' . substitute(s:dein_src, '[/\\]$', '', '')
     endif
 
+    " dein.vim options
+    let g:dein#auto_recache = v:true
+
     " Load dein.vim config
     let s:dein_toml = expand('~/.vim/dein/rc/dein.toml')
     let s:dein_toml_lazy = expand('~/.vim/dein/rc/dein_lazy.toml')
