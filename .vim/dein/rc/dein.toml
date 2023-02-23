@@ -2,17 +2,6 @@
 repo = 'Shougo/dein.vim'
 
 [[plugins]]
-repo = 'lambdalisue/fern.vim'
-hook_add = '''
-    let g:fern#default_hidden = 1
-    command! Nt Fern . -drawer
-'''
-
-[[plugins]]
-repo = 'lambdalisue/fern-git-status.vim'
-depends_on = ['fern.vim']
-
-[[plugins]]
 repo = 'Shougo/vimproc.vim'
 build = 'make'
 

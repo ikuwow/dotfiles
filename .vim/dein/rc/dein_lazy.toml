@@ -20,6 +20,19 @@ on_event = ['InsertEnter']
 build = './install.sh'
 
 [[plugins]]
+repo = 'lambdalisue/fern.vim'
+on_event = ['CmdwinEnter']
+hook_add = '''
+    let g:fern#default_hidden = 1
+    command! Nt Fern . -drawer
+'''
+
+[[plugins]]
+repo = 'lambdalisue/fern-git-status.vim'
+on_event = ['CmdwinEnter']
+depends_on = ['fern.vim']
+
+[[plugins]]
 repo = 'glidenote/memolist.vim'
 on_event = ['CmdwinEnter']
 hook_add = '''
