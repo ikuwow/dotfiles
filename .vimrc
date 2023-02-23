@@ -69,9 +69,8 @@ endif
 let g:python3_host_prog = s:bin_prefix . 'python3'
 if has("nvim")
     let s:pip3 = s:bin_prefix . 'pip3'
-    " TODO: It's slow
-    " TODO: Show message when install
-    call system(s:pip3 . ' install neovim pynvim')
+    " NOTE: It's temporarily disabled because it's slow
+    " call system(s:pip3 . ' install neovim pynvim')
 endif
 
 "=====================================
