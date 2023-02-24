@@ -44,6 +44,41 @@ set backupskip=/tmp/*,/private/tmp/*
 set cmdheight=1
 set virtualedit=block
 
+" quickly edit .vimrc
+command! Ev edit $MYVIMRC
+command! Eg edit $MYGVIMRC
+command! Sv source $MYVIMRC
+command! Sg source $MYGVIMRC
+
+" complement { after Enter
+inoremap {<Enter> {}<Left><CR><ESC><S-o>
+
+augroup HighlightTrailingSpaces
+    autocmd!
+    autocmd VimEnter,WinEnter,ColorScheme * highlight TrailingSpaces term=underline guibg=green ctermbg=green
+    autocmd VimEnter,WinEnter * match TrailingSpaces /\s\+$/
+augroup END
+
+" quickly remove trailing whitespaces
+fun! TrimTrailingWhitespaces()
+    let l:save = winsaveview()
+    %s/\s\+$//e
+    call winrestview(l:save)
+endfun
+command! TrimTrailingWhitespaces call TrimTrailingWhitespaces()
+
+" automatically apply .vimrc changes
+augroup AutoReloadVimrc
+    autocmd!
+augroup END
+
+if has('gui_running')
+    autocmd AutoReloadVimrc BufWritePost $MYVIMRC source $MYVIMRC | if has('gui_running') | source $MYGVIMRC
+    autocmd AutoReloadVimrc BufWritePost $MYGVIMRC if has ('gui_running') | source $MYGVIMRC
+else
+    autocmd AutoReloadVimrc BufWritePost $MYVIMRC nested source $MYVIMRC
+endif
+
 " Disable providers except python3
 let g:loaded_python_provider = 0
 let g:loaded_ruby_provider = 0
@@ -210,42 +245,7 @@ if strlen($SSH_CLIENT) == 0
 
     " This automatically executes `filetype plugin indent on` and `syntax enable`.
     call plug#end()
-endif
 
-" statusline config
-set laststatus=2
-
-" quickly edit .vimrc
-command! Ev edit $MYVIMRC
-command! Eg edit $MYGVIMRC
-command! Sv source $MYVIMRC
-command! Sg source $MYGVIMRC
-
-" complement { after Enter
-inoremap {<Enter> {}<Left><CR><ESC><S-o>
-
-augroup HighlightTrailingSpaces
-    autocmd!
-    autocmd VimEnter,WinEnter,ColorScheme * highlight TrailingSpaces term=underline guibg=green ctermbg=green
-    autocmd VimEnter,WinEnter * match TrailingSpaces /\s\+$/
-augroup END
-
-" quickly remove trailing whitespaces
-fun! TrimTrailingWhitespaces()
-    let l:save = winsaveview()
-    %s/\s\+$//e
-    call winrestview(l:save)
-endfun
-command! TrimTrailingWhitespaces call TrimTrailingWhitespaces()
-
-" automatically apply .vimrc changes
-augroup MyAutoCmd
-    autocmd!
-augroup END
-
-if has('gui_running')
-    autocmd MyAutoCmd BufWritePost $MYVIMRC source $MYVIMRC | if has('gui_running') | source $MYGVIMRC
-    autocmd MyAutoCmd BufWritePost $MYGVIMRC if has ('gui_running') | source $MYGVIMRC
-else
-    autocmd MyAutoCmd BufWritePost $MYVIMRC nested source $MYVIMRC
+    " statusline config
+    set laststatus=2
 endif
