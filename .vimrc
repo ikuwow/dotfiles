@@ -2,6 +2,12 @@
 "-- Basic Configurations --"
 "=========================="
 
+" Only Vim >= 8.0 and NeoVim are supported
+if v:version < 800 && !has("nvim")
+    echo "WARNING: This .vimrc/init.vim does not support your vim!"
+    echo "Some function may not be working."
+endif
+
 autocmd!
 set nocompatible " do not use vi compatible mode
 
@@ -28,16 +34,12 @@ set autoindent
 set expandtab " convert tab to spaces
 set tabstop=4 " spaces number of tab
 set tw=0 " text width
-if version >=800 || has("nvim")
-    set breakindent
-endif
+set breakindent
 set formatoptions=q
 autocmd FileType * setlocal formatoptions-=ro
 
 set nobackup " do not create *~ files
-if version >= 703
-    set noundofile " do not create *.un~ files
-endif
+set noundofile " do not create *.un~ files
 set backupskip=/tmp/*,/private/tmp/*
 set cmdheight=1
 set virtualedit=block
