@@ -214,7 +214,6 @@ endif
 
 " statusline config
 set laststatus=2
-set t_Co=256
 
 " quickly edit .vimrc
 command! Ev edit $MYVIMRC
