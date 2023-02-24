@@ -92,60 +92,52 @@ if strlen($SSH_CLIENT) == 0
     call plug#begin()
 
     Plug 'lambdalisue/fern.vim'
-    let g:fern#default_hidden = 1
-    command! Nt Fern . -toggle -drawer
-
-    Plug 'lambdalisue/fern-git-status.vim' " It depends on fern.vim
-
-    if has('nvim')
-        Plug 'kassio/neoterm'
-    endif
+        let g:fern#default_hidden = 1
+        command! Nt Fern . -toggle -drawer
+        Plug 'lambdalisue/fern-git-status.vim' " It depends on fern.vim
 
     Plug 'w0rp/ale'
-    let g:ale_linters = {
-    \    'html': ['htmlhint'],
-    \    'php': ['php', 'phpcs'],
-    \    'javascript': ['eslint'],
-    \    'markdown': ['textlint']
-    \}
-    let g:ale_lint_on_text_changed = 'never'
-
-    Plug 'airblade/vim-gitgutter'
+        let g:ale_linters = {
+        \    'html': ['htmlhint'],
+        \    'php': ['php', 'phpcs'],
+        \    'javascript': ['eslint'],
+        \    'markdown': ['textlint']
+        \}
+        let g:ale_lint_on_text_changed = 'never'
 
     Plug 'thinca/vim-zenspace'
-    let g:zenspace#default_mode = 'on'
-    augroup vimrc-highlight
-        autocmd!
-        autocmd ColorScheme * highlight ZenSpace ctermbg=Red guibg=Red
-    augroup END
-
+        let g:zenspace#default_mode = 'on'
+        augroup vimrc-highlight
+            autocmd!
+            autocmd ColorScheme * highlight ZenSpace ctermbg=Red guibg=Red
+        augroup END
 
     Plug 'tpope/vim-fugitive'
 
     Plug 'itchyny/lightline.vim' " It depends on vim-fugitive
-    let g:lightline = {
-        \ 'colorscheme': 'jellybeans',
-        \ 'active': {
-        \     'left': [
-        \         ['mode', 'current_branch', 'paste'],
-        \         [ 'modified', 'filename', 'readonly']
-        \     ]
-        \ },
-        \ 'component': {
-        \     'readonly': '%{&readonly?"[RO]":""}'
-        \ },
-        \ 'component_function': {
-        \     'current_branch': 'CurrentBranch',
-        \     'filename': 'FileName',
-        \     'mode': 'MultiMode',
-        \     'fileformat': 'FileFormat',
-        \     'filetype': 'FileType',
-        \     'fileencoding': 'FileEncoding'
+        let g:lightline = {
+            \ 'colorscheme': 'jellybeans',
+            \ 'active': {
+            \     'left': [
+            \         ['mode', 'current_branch', 'paste'],
+            \         [ 'modified', 'filename', 'readonly']
+            \     ]
+            \ },
+            \ 'component': {
+            \     'readonly': '%{&readonly?"[RO]":""}'
+            \ },
+            \ 'component_function': {
+            \     'current_branch': 'LLCurrentBranch',
+            \     'filename': 'LLFileName',
+            \     'mode': 'LLMultiMode',
+            \     'fileformat': 'LLFileFormat',
+            \     'filetype': 'LLFileType',
+            \     'fileencoding': 'LLFileEncoding'
+            \ }
         \ }
-    \ }
 
     "-- lightline functions --"
-    function! CurrentBranch()
+    function! LLCurrentBranch()
         try
             if exists('*fugitive#head') && strlen(fugitive#head())
                 return "ト " . fugitive#head()
@@ -155,73 +147,75 @@ if strlen($SSH_CLIENT) == 0
         return ''
     endfunction
 
-    function! FileName()
+    function! LLFileName()
         return expand('%:t')
     endfunction
 
-    function! MultiMode()
+    function! LLMultiMode()
         let fname = expand('%:t')
         return lightline#mode()
     endfunction
 
-    function! FileFormat()
+    function! LLFileFormat()
         return winwidth(0) > 70 ? &fileformat : ''
     endfunction
 
-    function! FileType()
+    function! LLFileType()
         return winwidth(0) > 70 ? (&filetype !=# '' ? &filetype : 'no ft') : ''
     endfunction
 
-    function! FileEncoding()
+    function! LLFileEncoding()
         return winwidth(0) > 70 ? (&fenc !=# '' ? &fenc : &enc) : ''
     endfunction
 
-
-    Plug 'tpope/vim-rhubarb'
-
     Plug 'nathanaelkane/vim-indent-guides'
-    let g:indent_guides_enable_on_vim_startup=1
-    let g:indent_guides_start_level=2
-    let g:indent_guides_color_change_percent = 2
-    let g:indent_guides_guide_size = 1
+        let g:indent_guides_enable_on_vim_startup=1
+        let g:indent_guides_start_level=2
+        let g:indent_guides_color_change_percent = 2
+        let g:indent_guides_guide_size = 1
 
     Plug 'editorconfig/editorconfig-vim'
-    let g:EditorConfig_core_mode = 'python_external'
-    let g:EditorConfig_max_line_indicator = "exceeding"
-
-    Plug 'tomtom/tcomment_vim'
+        let g:EditorConfig_core_mode = 'python_external'
+        let g:EditorConfig_max_line_indicator = "exceeding"
 
     Plug 'vim-scripts/taglist.vim'
-    let g:Tlist_Use_Right_Window = 1
-    let g:Tlist_WinWidth = 40
+        let g:Tlist_Use_Right_Window = 1
+        let g:Tlist_WinWidth = 40
 
+    Plug 'glidenote/memolist.vim'
+        let g:memolist_path = expand("~/Documents/Memos")
+        let g:memolist_memo_suffix = "md"
+
+    Plug 'previm/previm'
+        let g:previm_open_cmd="open -a Safari"
+        augroup PrevimSettings
+            autocmd!
+            autocmd BufNewFile,BufRead *.{md,mdwn,mkd,mkdn,mark*} set filetype=markdown
+        augroup END
+
+    Plug 'tpope/vim-rhubarb'
+    Plug 'tomtom/tcomment_vim'
+    Plug 'airblade/vim-gitgutter'
+    Plug 'mattn/emmet-vim'
+    Plug 'junegunn/vim-easy-align'
+
+    " File specific
+    Plug 'KazuakiM/vim-sqlfix'
+    Plug 'cespare/vim-toml'
+    Plug 'hashivim/vim-terraform'
+    Plug 'othree/yajs.vim'
+    Plug 'mattn/vim-sqlfmt'
+    Plug 'fatih/vim-go'
     Plug 'chr4/nginx.vim'
     Plug 'glench/vim-jinja2-syntax'
     Plug 'pearofducks/ansible-vim'
     Plug 'posva/vim-vue'
     Plug 'bfontaine/Brewfile.vim'
     Plug 'okkiroxx/rtx.vim'
-    Plug 'glidenote/memolist.vim'
-    let g:memolist_path = expand("~/Documents/Memos")
-    let g:memolist_memo_suffix = "md"
 
-    Plug 'mattn/emmet-vim'
-
-    Plug 'previm/previm'
-    let g:previm_open_cmd="open -a Safari"
-    augroup PrevimSettings
-        autocmd!
-        autocmd BufNewFile,BufRead *.{md,mdwn,mkd,mkdn,mark*} set filetype=markdown
-    augroup END
-
-    Plug 'junegunn/vim-easy-align'
-    Plug 'KazuakiM/vim-sqlfix'
-
-    Plug 'cespare/vim-toml'
-    Plug 'hashivim/vim-terraform'
-    Plug 'othree/yajs.vim'
-    Plug 'mattn/vim-sqlfmt'
-    Plug 'fatih/vim-go'
+    if has('nvim')
+        Plug 'kassio/neoterm'
+    endif
 
     " This automatically executes `filetype plugin indent on` and `syntax enable`.
     call plug#end()
