@@ -194,25 +194,17 @@ if strlen($SSH_CLIENT) == 0
     let g:Tlist_WinWidth = 40
 
     Plug 'chr4/nginx.vim'
-
     Plug 'glench/vim-jinja2-syntax'
-
     Plug 'pearofducks/ansible-vim'
-
     Plug 'posva/vim-vue'
-
     Plug 'bfontaine/Brewfile.vim'
-
     Plug 'okkiroxx/rtx.vim'
-
-    Plug 'glidenote/memolist.vim' " TODO: Install on CmdwinEnter
+    Plug 'glidenote/memolist.vim'
     let g:memolist_path = expand("~/Documents/Memos")
     let g:memolist_memo_suffix = "md"
 
-    " TODO: on_event = ['InsertEnter']
     Plug 'mattn/emmet-vim'
 
-    " TODO: on_ft = ['markdown']
     Plug 'previm/previm'
     let g:previm_open_cmd="open -a Safari"
     augroup PrevimSettings
@@ -220,16 +212,14 @@ if strlen($SSH_CLIENT) == 0
         autocmd BufNewFile,BufRead *.{md,mdwn,mkd,mkdn,mark*} set filetype=markdown
     augroup END
 
-    " on_event = ['CmdwinEnter']
     Plug 'junegunn/vim-easy-align'
     Plug 'KazuakiM/vim-sqlfix'
 
-    " TODO: Load on specific filetype
-    Plug 'cespare/vim-toml' " on_ft = ['toml']
-    Plug 'hashivim/vim-terraform' " on_ft = ['terraform']
-    Plug 'othree/yajs.vim' " on_ft = ['javascript', 'html']
-    Plug 'mattn/vim-sqlfmt' " on_ft = ['sql']
-    Plug 'fatih/vim-go' " on_ft = ['go']
+    Plug 'cespare/vim-toml'
+    Plug 'hashivim/vim-terraform'
+    Plug 'othree/yajs.vim'
+    Plug 'mattn/vim-sqlfmt'
+    Plug 'fatih/vim-go'
 
     " This automatically executes `filetype plugin indent on` and `syntax enable`.
     call plug#end()
