@@ -44,15 +44,6 @@ set backupskip=/tmp/*,/private/tmp/*
 set cmdheight=1
 set virtualedit=block
 
-augroup HighlightTrailingSpaces
-    autocmd!
-    autocmd VimEnter,WinEnter,ColorScheme * highlight TrailingSpaces term=underline guibg=green ctermbg=green
-    autocmd VimEnter,WinEnter * match TrailingSpaces /\s\+$/
-augroup END
-
-" complement { after Enter
-inoremap {<Enter> {}<Left><CR><ESC><S-o>
-
 " Disable providers except python3
 let g:loaded_python_provider = 0
 let g:loaded_ruby_provider = 0
@@ -221,6 +212,7 @@ if strlen($SSH_CLIENT) == 0
     call plug#end()
 endif
 
+" statusline config
 set laststatus=2
 set t_Co=256
 
@@ -229,6 +221,15 @@ command! Ev edit $MYVIMRC
 command! Eg edit $MYGVIMRC
 command! Sv source $MYVIMRC
 command! Sg source $MYGVIMRC
+
+" complement { after Enter
+inoremap {<Enter> {}<Left><CR><ESC><S-o>
+
+augroup HighlightTrailingSpaces
+    autocmd!
+    autocmd VimEnter,WinEnter,ColorScheme * highlight TrailingSpaces term=underline guibg=green ctermbg=green
+    autocmd VimEnter,WinEnter * match TrailingSpaces /\s\+$/
+augroup END
 
 " quickly remove trailing whitespaces
 fun! TrimTrailingWhitespaces()
