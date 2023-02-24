@@ -209,37 +209,27 @@ if strlen($SSH_CLIENT) == 0
     let g:memolist_path = expand("~/Documents/Memos")
     let g:memolist_memo_suffix = "md"
 
+    " TODO: on_event = ['InsertEnter']
     Plug 'mattn/emmet-vim'
-    " on_event = ['InsertEnter']
 
+    " TODO: on_ft = ['markdown']
     Plug 'previm/previm'
-    " on_ft = ['markdown']
     let g:previm_open_cmd="open -a Safari"
     augroup PrevimSettings
         autocmd!
         autocmd BufNewFile,BufRead *.{md,mdwn,mkd,mkdn,mark*} set filetype=markdown
     augroup END
 
+    " on_event = ['CmdwinEnter']
     Plug 'junegunn/vim-easy-align'
-    " on_event = ['CmdwinEnter']
-
     Plug 'KazuakiM/vim-sqlfix'
-    " on_event = ['CmdwinEnter']
 
-    Plug 'cespare/vim-toml'
-    " on_ft = ['toml']
-
-    Plug 'hashivim/vim-terraform'
-    " on_ft = ['terraform']
-
-    Plug 'othree/yajs.vim'
-    " on_ft = ['javascript', 'html']
-
-    Plug 'mattn/vim-sqlfmt'
-    " on_ft = ['sql']
-
-    Plug 'fatih/vim-go'
-    " on_ft = ['go']
+    " TODO: Load on specific filetype
+    Plug 'cespare/vim-toml' " on_ft = ['toml']
+    Plug 'hashivim/vim-terraform' " on_ft = ['terraform']
+    Plug 'othree/yajs.vim' " on_ft = ['javascript', 'html']
+    Plug 'mattn/vim-sqlfmt' " on_ft = ['sql']
+    Plug 'fatih/vim-go' " on_ft = ['go']
 
     " This automatically executes `filetype plugin indent on` and `syntax enable`.
     call plug#end()
