@@ -73,6 +73,16 @@ if has("nvim")
     " call system(s:pip3 . ' install neovim pynvim')
 endif
 
+if strlen($SSH_CLIENT) == 0
+    " Install vim-plug
+    let data_dir = has('nvim') ? stdpath('data') . '/site' : '~/.vim'
+    if empty(glob(data_dir . '/autoload/plug.vim'))
+        let s:vim_plug_url = 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+        silent execute '!curl -fLo ' . data_dir . '/autoload/plug.vim --create-dirs ' . s:vim_plug_url
+        autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+    endif
+endif
+
 "=====================================
 "-- dein.vim Configulation Section --
 "=====================================
