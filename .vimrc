@@ -81,60 +81,169 @@ if strlen($SSH_CLIENT) == 0
         silent execute '!curl -fLo ' . data_dir . '/autoload/plug.vim --create-dirs ' . s:vim_plug_url
         autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
     endif
+
+    " Run PlugInstall if there are missing plugins
+    autocmd VimEnter * if len(filter(values(g:plugs), '!isdirectory(v:val.dir)'))
+        \| PlugInstall --sync | source $MYVIMRC
+        \| endif
+
+    call plug#begin()
+
+    Plug 'lambdalisue/fern.vim'
+    let g:fern#default_hidden = 1
+    command! Nt Fern . -toggle -drawer
+
+    Plug 'lambdalisue/fern-git-status.vim' " It depends on fern.vim
+
+    if has('nvim')
+        Plug 'kassio/neoterm'
+    endif
+
+    Plug 'w0rp/ale'
+    let g:ale_linters = {
+    \    'html': ['htmlhint'],
+    \    'php': ['php', 'phpcs'],
+    \    'javascript': ['eslint'],
+    \    'markdown': ['textlint']
+    \}
+    let g:ale_lint_on_text_changed = 'never'
+
+    Plug 'airblade/vim-gitgutter'
+
+    Plug 'thinca/vim-zenspace'
+    let g:zenspace#default_mode = 'on'
+    augroup vimrc-highlight
+        autocmd!
+        autocmd ColorScheme * highlight ZenSpace ctermbg=Red guibg=Red
+    augroup END
+
+
+    Plug 'tpope/vim-fugitive'
+
+    Plug 'itchyny/lightline.vim' " It depends on vim-fugitive
+    let g:lightline = {
+        \ 'colorscheme': 'jellybeans',
+        \ 'active': {
+        \     'left': [
+        \         ['mode', 'current_branch', 'paste'],
+        \         [ 'modified', 'filename', 'readonly']
+        \     ]
+        \ },
+        \ 'component': {
+        \     'readonly': '%{&readonly?"[RO]":""}'
+        \ },
+        \ 'component_function': {
+        \     'current_branch': 'CurrentBranch',
+        \     'filename': 'FileName',
+        \     'mode': 'MultiMode',
+        \     'fileformat': 'FileFormat',
+        \     'filetype': 'FileType',
+        \     'fileencoding': 'FileEncoding'
+        \ }
+    \ }
+
+    "-- lightline functions --"
+    function! CurrentBranch()
+        try
+            if exists('*fugitive#head') && strlen(fugitive#head())
+                return "ト " . fugitive#head()
+            endif
+        catch
+        endtry
+        return ''
+    endfunction
+
+    function! FileName()
+        return expand('%:t')
+    endfunction
+
+    function! MultiMode()
+        let fname = expand('%:t')
+        return lightline#mode()
+    endfunction
+
+    function! FileFormat()
+        return winwidth(0) > 70 ? &fileformat : ''
+    endfunction
+
+    function! FileType()
+        return winwidth(0) > 70 ? (&filetype !=# '' ? &filetype : 'no ft') : ''
+    endfunction
+
+    function! FileEncoding()
+        return winwidth(0) > 70 ? (&fenc !=# '' ? &fenc : &enc) : ''
+    endfunction
+
+
+    Plug 'tpope/vim-rhubarb'
+
+    Plug 'nathanaelkane/vim-indent-guides'
+    let g:indent_guides_enable_on_vim_startup=1
+    let g:indent_guides_start_level=2
+    let g:indent_guides_color_change_percent = 2
+    let g:indent_guides_guide_size = 1
+
+    Plug 'editorconfig/editorconfig-vim'
+    let g:EditorConfig_core_mode = 'python_external'
+    let g:EditorConfig_max_line_indicator = "exceeding"
+
+    Plug 'tomtom/tcomment_vim'
+
+    Plug 'vim-scripts/taglist.vim'
+    let g:Tlist_Use_Right_Window = 1
+    let g:Tlist_WinWidth = 40
+
+    Plug 'chr4/nginx.vim'
+
+    Plug 'glench/vim-jinja2-syntax'
+
+    Plug 'pearofducks/ansible-vim'
+
+    Plug 'posva/vim-vue'
+
+    Plug 'bfontaine/Brewfile.vim'
+
+    Plug 'okkiroxx/rtx.vim'
+
+    Plug 'glidenote/memolist.vim' " TODO: Install on CmdwinEnter
+    let g:memolist_path = expand("~/Documents/Memos")
+    let g:memolist_memo_suffix = "md"
+
+    Plug 'mattn/emmet-vim'
+    " on_event = ['InsertEnter']
+
+    Plug 'previm/previm'
+    " on_ft = ['markdown']
+    let g:previm_open_cmd="open -a Safari"
+    augroup PrevimSettings
+        autocmd!
+        autocmd BufNewFile,BufRead *.{md,mdwn,mkd,mkdn,mark*} set filetype=markdown
+    augroup END
+
+    Plug 'junegunn/vim-easy-align'
+    " on_event = ['CmdwinEnter']
+
+    Plug 'KazuakiM/vim-sqlfix'
+    " on_event = ['CmdwinEnter']
+
+    Plug 'cespare/vim-toml'
+    " on_ft = ['toml']
+
+    Plug 'hashivim/vim-terraform'
+    " on_ft = ['terraform']
+
+    Plug 'othree/yajs.vim'
+    " on_ft = ['javascript', 'html']
+
+    Plug 'mattn/vim-sqlfmt'
+    " on_ft = ['sql']
+
+    Plug 'fatih/vim-go'
+    " on_ft = ['go']
+
+    " This automatically executes `filetype plugin indent on` and `syntax enable`.
+    call plug#end()
 endif
-
-"=====================================
-"-- dein.vim Configulation Section --
-"=====================================
-
-if strlen($SSH_CLIENT) == 0
-
-    " Install dein.vim
-    if has("nvim")
-        let s:dein_base = expand('~/.cache/dein_nvim')
-    else
-        let s:dein_base = expand('~/.cache/dein_vim')
-    endif
-    call mkdir(s:dein_base, 'p')
-
-    if &runtimepath !~# '/dein.vim'
-        let s:dein_src = s:dein_base . '/repos/github.com/Shougo/dein.vim'
-        if !isdirectory(s:dein_src)
-            echo "Cloning dein.vim..."
-            execute '!git clone https://github.com/Shougo/dein.vim' s:dein_src
-        endif
-        execute 'set runtimepath+=' . substitute(s:dein_src, '[/\\]$', '', '')
-    endif
-
-    " dein.vim options
-    let g:dein#auto_recache = v:true
-
-    " Load dein.vim config
-    let s:dein_toml = expand('~/.vim/dein/rc/dein.toml')
-    let s:dein_toml_lazy = expand('~/.vim/dein/rc/dein_lazy.toml')
-
-    if dein#load_state(s:dein_base)
-        call dein#begin(s:dein_base)
-        if filereadable(s:dein_toml)
-            call dein#load_toml(s:dein_toml)
-        endif
-        if filereadable(s:dein_toml_lazy)
-            call dein#load_toml(s:dein_toml_lazy, {'lazy': 1})
-        endif
-        call dein#end()
-        call dein#save_state()
-    endif
-
-    if has('vim_starting') && dein#check_install()
-        echo "Executing dein#install()..."
-        call dein#install()
-    endif
-
-endif
-
-" https://github.com/Shougo/dein.vim
-filetype plugin indent on
-syntax enable
 
 set laststatus=2
 set t_Co=256
