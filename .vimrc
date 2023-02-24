@@ -2,6 +2,12 @@
 "-- Basic Configurations --"
 "=========================="
 
+" Only Vim >= 8.0 and NeoVim are supported
+if v:version < 800 && !has("nvim")
+    echo "WARNING: This .vimrc/init.vim does not support your vim!"
+    echo "Some function may not be working."
+endif
+
 autocmd!
 set nocompatible " do not use vi compatible mode
 
@@ -28,19 +34,24 @@ set autoindent
 set expandtab " convert tab to spaces
 set tabstop=4 " spaces number of tab
 set tw=0 " text width
-if version >=800 || has("nvim")
-    set breakindent
-endif
+set breakindent
 set formatoptions=q
 autocmd FileType * setlocal formatoptions-=ro
 
 set nobackup " do not create *~ files
-if version >= 703
-    set noundofile " do not create *.un~ files
-endif
+set noundofile " do not create *.un~ files
 set backupskip=/tmp/*,/private/tmp/*
 set cmdheight=1
 set virtualedit=block
+
+" quickly edit .vimrc
+command! Ev edit $MYVIMRC
+command! Eg edit $MYGVIMRC
+command! Sv source $MYVIMRC
+command! Sg source $MYGVIMRC
+
+" complement { after Enter
+inoremap {<Enter> {}<Left><CR><ESC><S-o>
 
 augroup HighlightTrailingSpaces
     autocmd!
@@ -48,8 +59,25 @@ augroup HighlightTrailingSpaces
     autocmd VimEnter,WinEnter * match TrailingSpaces /\s\+$/
 augroup END
 
-" complement { after Enter
-inoremap {<Enter> {}<Left><CR><ESC><S-o>
+" quickly remove trailing whitespaces
+fun! TrimTrailingWhitespaces()
+    let l:save = winsaveview()
+    %s/\s\+$//e
+    call winrestview(l:save)
+endfun
+command! TrimTrailingWhitespaces call TrimTrailingWhitespaces()
+
+" automatically apply .vimrc changes
+augroup AutoReloadVimrc
+    autocmd!
+augroup END
+
+if has('gui_running')
+    autocmd AutoReloadVimrc BufWritePost $MYVIMRC source $MYVIMRC | if has('gui_running') | source $MYGVIMRC
+    autocmd AutoReloadVimrc BufWritePost $MYGVIMRC if has ('gui_running') | source $MYGVIMRC
+else
+    autocmd AutoReloadVimrc BufWritePost $MYVIMRC nested source $MYVIMRC
+endif
 
 " Disable providers except python3
 let g:loaded_python_provider = 0
@@ -73,84 +101,154 @@ if has("nvim")
     " call system(s:pip3 . ' install neovim pynvim')
 endif
 
-"=====================================
-"-- dein.vim Configulation Section --
-"=====================================
-
-if strlen($SSH_CLIENT) == 0
-
-    " Install dein.vim
-    if has("nvim")
-        let s:dein_base = expand('~/.cache/dein_nvim')
-    else
-        let s:dein_base = expand('~/.cache/dein_vim')
-    endif
-    call mkdir(s:dein_base, 'p')
-
-    if &runtimepath !~# '/dein.vim'
-        let s:dein_src = s:dein_base . '/repos/github.com/Shougo/dein.vim'
-        if !isdirectory(s:dein_src)
-            echo "Cloning dein.vim..."
-            execute '!git clone https://github.com/Shougo/dein.vim' s:dein_src
-        endif
-        execute 'set runtimepath+=' . substitute(s:dein_src, '[/\\]$', '', '')
-    endif
-
-    " dein.vim options
-    let g:dein#auto_recache = v:true
-
-    " Load dein.vim config
-    let s:dein_toml = expand('~/.vim/dein/rc/dein.toml')
-    let s:dein_toml_lazy = expand('~/.vim/dein/rc/dein_lazy.toml')
-
-    if dein#load_state(s:dein_base)
-        call dein#begin(s:dein_base)
-        if filereadable(s:dein_toml)
-            call dein#load_toml(s:dein_toml)
-        endif
-        if filereadable(s:dein_toml_lazy)
-            call dein#load_toml(s:dein_toml_lazy, {'lazy': 1})
-        endif
-        call dein#end()
-        call dein#save_state()
-    endif
-
-    if has('vim_starting') && dein#check_install()
-        echo "Executing dein#install()..."
-        call dein#install()
-    endif
-
+if strlen($SSH_CLIENT) != 0
+    echo 'Your vim is over ssh, so no plugins are loaded.'
+    finish
 endif
 
-" https://github.com/Shougo/dein.vim
-filetype plugin indent on
-syntax enable
+" Install vim-plug
+let data_dir = has('nvim') ? stdpath('data') . '/site' : '~/.vim'
+if empty(glob(data_dir . '/autoload/plug.vim'))
+    let s:vim_plug_url = 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+    silent execute '!curl -fLo ' . data_dir . '/autoload/plug.vim --create-dirs ' . s:vim_plug_url
+    autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+endif
 
+" Run PlugInstall if there are missing plugins
+autocmd VimEnter * if len(filter(values(g:plugs), '!isdirectory(v:val.dir)'))
+    \| PlugInstall --sync | source $MYVIMRC
+    \| endif
+
+call plug#begin()
+
+Plug 'lambdalisue/fern.vim'
+    let g:fern#default_hidden = 1
+    command! Nt Fern . -toggle -drawer
+    Plug 'lambdalisue/fern-git-status.vim' " It depends on fern.vim
+
+Plug 'w0rp/ale'
+    let g:ale_linters = {
+    \    'html': ['htmlhint'],
+    \    'php': ['php', 'phpcs'],
+    \    'javascript': ['eslint'],
+    \    'markdown': ['textlint']
+    \}
+    let g:ale_lint_on_text_changed = 'never'
+
+Plug 'thinca/vim-zenspace'
+    let g:zenspace#default_mode = 'on'
+    augroup vimrc-highlight
+        autocmd!
+        autocmd ColorScheme * highlight ZenSpace ctermbg=Red guibg=Red
+    augroup END
+
+Plug 'tpope/vim-fugitive'
+
+Plug 'itchyny/lightline.vim' " It depends on vim-fugitive
+    let g:lightline = {
+        \ 'colorscheme': 'jellybeans',
+        \ 'active': {
+        \     'left': [
+        \         ['mode', 'current_branch', 'paste'],
+        \         [ 'modified', 'filename', 'readonly']
+        \     ]
+        \ },
+        \ 'component': {
+        \     'readonly': '%{&readonly?"[RO]":""}'
+        \ },
+        \ 'component_function': {
+        \     'current_branch': 'LLCurrentBranch',
+        \     'filename': 'LLFileName',
+        \     'mode': 'LLMultiMode',
+        \     'fileformat': 'LLFileFormat',
+        \     'filetype': 'LLFileType',
+        \     'fileencoding': 'LLFileEncoding'
+        \ }
+    \ }
+
+"-- lightline functions --"
+function! LLCurrentBranch()
+    try
+        if exists('*fugitive#head') && strlen(fugitive#head())
+            return "ト " . fugitive#head()
+        endif
+    catch
+    endtry
+    return ''
+endfunction
+
+function! LLFileName()
+    return expand('%:t')
+endfunction
+
+function! LLMultiMode()
+    let fname = expand('%:t')
+    return lightline#mode()
+endfunction
+
+function! LLFileFormat()
+    return winwidth(0) > 70 ? &fileformat : ''
+endfunction
+
+function! LLFileType()
+    return winwidth(0) > 70 ? (&filetype !=# '' ? &filetype : 'no ft') : ''
+endfunction
+
+function! LLFileEncoding()
+    return winwidth(0) > 70 ? (&fenc !=# '' ? &fenc : &enc) : ''
+endfunction
+
+Plug 'nathanaelkane/vim-indent-guides'
+    let g:indent_guides_enable_on_vim_startup=1
+    let g:indent_guides_start_level=2
+    let g:indent_guides_color_change_percent = 2
+    let g:indent_guides_guide_size = 1
+
+Plug 'editorconfig/editorconfig-vim'
+    let g:EditorConfig_core_mode = 'python_external'
+    let g:EditorConfig_max_line_indicator = "exceeding"
+
+Plug 'vim-scripts/taglist.vim'
+    let g:Tlist_Use_Right_Window = 1
+    let g:Tlist_WinWidth = 40
+
+Plug 'glidenote/memolist.vim'
+    let g:memolist_path = expand("~/Documents/Memos")
+    let g:memolist_memo_suffix = "md"
+
+Plug 'previm/previm'
+    let g:previm_open_cmd="open -a Safari"
+    augroup PrevimSettings
+        autocmd!
+        autocmd BufNewFile,BufRead *.{md,mdwn,mkd,mkdn,mark*} set filetype=markdown
+    augroup END
+
+Plug 'tpope/vim-rhubarb'
+Plug 'tomtom/tcomment_vim'
+Plug 'airblade/vim-gitgutter'
+Plug 'mattn/emmet-vim'
+Plug 'junegunn/vim-easy-align'
+
+" File specific
+Plug 'KazuakiM/vim-sqlfix'
+Plug 'cespare/vim-toml'
+Plug 'hashivim/vim-terraform'
+Plug 'othree/yajs.vim'
+Plug 'mattn/vim-sqlfmt'
+Plug 'fatih/vim-go'
+Plug 'chr4/nginx.vim'
+Plug 'glench/vim-jinja2-syntax'
+Plug 'pearofducks/ansible-vim'
+Plug 'posva/vim-vue'
+Plug 'bfontaine/Brewfile.vim'
+Plug 'okkiroxx/rtx.vim'
+
+if has('nvim')
+    Plug 'kassio/neoterm'
+endif
+
+" This automatically executes `filetype plugin indent on` and `syntax enable`.
+call plug#end()
+
+" statusline config
 set laststatus=2
-set t_Co=256
-
-" quickly edit .vimrc
-command! Ev edit $MYVIMRC
-command! Eg edit $MYGVIMRC
-command! Sv source $MYVIMRC
-command! Sg source $MYGVIMRC
-
-" quickly remove trailing whitespaces
-fun! TrimTrailingWhitespaces()
-    let l:save = winsaveview()
-    %s/\s\+$//e
-    call winrestview(l:save)
-endfun
-command! TrimTrailingWhitespaces call TrimTrailingWhitespaces()
-
-" automatically apply .vimrc changes
-augroup MyAutoCmd
-    autocmd!
-augroup END
-
-if has('gui_running')
-    autocmd MyAutoCmd BufWritePost $MYVIMRC source $MYVIMRC | if has('gui_running') | source $MYGVIMRC
-    autocmd MyAutoCmd BufWritePost $MYGVIMRC if has ('gui_running') | source $MYGVIMRC
-else
-    autocmd MyAutoCmd BufWritePost $MYVIMRC nested source $MYVIMRC
-endif
