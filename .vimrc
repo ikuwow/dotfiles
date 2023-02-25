@@ -134,6 +134,7 @@ Plug 'w0rp/ale'
     \    'markdown': ['textlint']
     \}
     let g:ale_lint_on_text_changed = 'never'
+    let g:ale_virtualtext_cursor = 0
 
 Plug 'thinca/vim-zenspace'
     let g:zenspace#default_mode = 'on'
