@@ -126,6 +126,7 @@ Plug 'lambdalisue/fern.vim'
     command! Nt Fern . -toggle -drawer
     Plug 'lambdalisue/fern-git-status.vim' " It depends on fern.vim
 
+let g:ale_completion_enabled = 1 " This setting must be set before ALE is loaded.
 Plug 'w0rp/ale'
     let g:ale_linters = {
     \    'html': ['htmlhint'],
