@@ -127,7 +127,7 @@ Plug 'lambdalisue/fern.vim'
     Plug 'lambdalisue/fern-git-status.vim' " It depends on fern.vim
 
 let g:ale_completion_enabled = 1 " This setting must be set before ALE is loaded.
-Plug 'w0rp/ale'
+Plug 'dense-analysis/ale'
     let g:ale_linters = {
     \    'html': ['htmlhint'],
     \    'php': ['php', 'phpcs'],
