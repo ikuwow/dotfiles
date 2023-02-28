@@ -4,9 +4,10 @@
 
 # shellcheck source=/dev/null
 
-if [ "$(arch)" = "arm64" ]; then
+ARCH="$(arch)"
+if [ "$ARCH" = "arm64" ]; then
   BREW_PREFIX="/opt/homebrew"
-elif [ "$(arch)" = "i386" ]; then
+elif [ "$ARCH" = "i386" ]; then
   BREW_PREFIX="/usr/local"
 fi
 export BREW_PREFIX
@@ -62,7 +63,7 @@ fi
 
 asdf_sources=(libexec/asdf.sh etc/bash_completion.d/asdf.bash)
 for s in "${asdf_sources[@]}"; do
-  [[ -f "$(brew --prefix asdf)/$s" ]] && . "$(brew --prefix asdf)/$s"
+  [[ -f "$BREW_PREFIX/asdf/$s" ]] && . "$BREW_PREFIX/asdf/$s"
 done
 
 if [ "$(command -v gcloud)" ]; then
