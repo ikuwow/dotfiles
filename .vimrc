@@ -5,7 +5,7 @@
 " Only Vim >= 8.0 and NeoVim are supported
 if v:version < 800 && !has("nvim")
     echo "WARNING: This .vimrc/init.vim does not support your vim!"
-    echo "Some function may not be working."
+    echo "Some functions may not work."
 endif
 
 autocmd!
