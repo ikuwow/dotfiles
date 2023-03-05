@@ -9,9 +9,6 @@ fi
 # shellcheck disable=SC1091
 [[ -f /etc/bashrc ]] && . /etc/bashrc
 
-## Auto complete
-complete -C aws_completer aws
-
 BASH_COMPLETION="$BREW_PREFIX/etc/profile.d/bash_completion.sh"
 # shellcheck disable=SC1090
 [[ -r "$BASH_COMPLETION" ]] && . "$BASH_COMPLETION"
@@ -23,12 +20,6 @@ export GOPATH=$HOME/.go
 
 # shellcheck disable=SC1090
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
-
-# shellcheck disable=SC1090
-[[ $(command -v kubectl) ]] && source <(kubectl completion bash)
-
-# shellcheck disable=SC1090
-[[ $(command -v gh) ]] && eval "$(gh completion -s bash)"
 
 # shellcheck disable=SC1090
 [[ $(command -v akamai) ]] && eval "$(akamai --bash)"
