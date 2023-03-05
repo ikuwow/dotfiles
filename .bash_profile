@@ -61,10 +61,7 @@ if [ -f ~/.aws/current_profile ]; then
   export AWS_PROFILE
 fi
 
-asdf_sources=(libexec/asdf.sh)
-for s in "${asdf_sources[@]}"; do
-  [[ -f "$BREW_PREFIX/asdf/$s" ]] && . "$BREW_PREFIX/asdf/$s"
-done
+[[ -f "$BREW_PREFIX/opt/asdf/libexec/asdf.sh" ]] && . "$BREW_PREFIX/opt/asdf/libexec/asdf.sh"
 
 if [ "$(command -v gcloud)" ]; then
   gcloudpath="$(dirname "$(dirname "$(readlink "$(command -v gcloud)")")")"
