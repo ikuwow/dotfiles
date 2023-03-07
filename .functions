@@ -116,3 +116,8 @@ fi
 kubecurl() {
   kubectl run -it --rm "ikuwow-curl-$(date "+%s")" --namespace default --image curlimages/curl sh
 }
+
+eksukc() {
+  cluster="$1"
+  aws eks update-kubeconfig --name "$cluster" --alias "$cluster"
+}

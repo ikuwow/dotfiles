@@ -40,9 +40,8 @@ brew "gnu-which"
 brew "gawk"
 brew "grep"
 
-# required by denite.nvim etc.
+# required by vim
 brew "python"
-brew "ruby"
 
 # For AWS
 brew "awscli"
