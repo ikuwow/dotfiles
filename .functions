@@ -110,6 +110,15 @@ if [ ! "$(command -v aps)" ]; then
     echo "$profile" > ~/.aws/current_profile
     export AWS_PROFILE="$profile"
     echo "AWS Profile set: $profile"
+
+    SSO_ACCOUNT_ID="$(aws configure get sso_account_id)"
+    if [ -n "$SSO_ACCOUNT_ID" ]; then
+      echo "SSO detected. Checking SSO session..."
+      SSO_ACCOUNT="$(aws sts get-caller-identity --query "Account")"
+      if [ ${#SSO_ACCOUNT} != 14 ]; then
+        aws sso login
+      fi
+    fi
   }
 fi
 
