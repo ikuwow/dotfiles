@@ -30,6 +30,7 @@ cask "nordvpn"
 brew "bash"
 cask "atok"
 cask "logi-options-plus"
+cask "logitech-g-hub"
 cask "jetbrains-toolbox"
 
 brew "coreutils"
