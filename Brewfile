@@ -30,8 +30,10 @@ cask "nordvpn"
 brew "bash"
 cask "atok"
 cask "logi-options-plus"
-cask "logitech-g-hub"
 cask "jetbrains-toolbox"
+# This installation process hangs up!
+# Install by yourself from: https://www.logitechg.com/en-us/innovation/g-hub.html
+# cask "logitech-g-hub"
 
 brew "coreutils"
 brew "diffutils"
