@@ -45,6 +45,7 @@ brew "grep"
 
 # required by vim
 brew "python"
+brew "node@16"
 
 # For AWS
 brew "awscli"

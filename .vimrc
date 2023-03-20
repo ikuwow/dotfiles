@@ -230,6 +230,8 @@ Plug 'tomtom/tcomment_vim'
 Plug 'airblade/vim-gitgutter'
 Plug 'mattn/emmet-vim'
 Plug 'junegunn/vim-easy-align'
+Plug 'github/copilot.vim'
+    let g:copilot_node_command = '/opt/homebrew/opt/node@16/bin/node'
 
 " File specific
 Plug 'KazuakiM/vim-sqlfix'
