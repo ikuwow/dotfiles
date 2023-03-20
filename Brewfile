@@ -77,7 +77,7 @@ brew "watch"
 brew "fontforge"
 brew "neovim"
 brew "graphviz"
-brew "universal-ctags", args: ["HEAD"]
+brew "universal-ctags"
 brew "shellcheck"
 brew "slackcat"
 brew "circleci"
