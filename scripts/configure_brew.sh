@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 
 echo "Configuring brew autoupdate..."
-if brew autoupdate --status | grep -v 'Autoupdate is installed and running.' > /dev/null; then
-  brew autoupdate --upgrade --cleanup --enable-notification --start
+brew autoupdate --status | grep 'Autoupdate is installed and running.' > /dev/null
+status="$?"
+if [ "$status" != 0 ]; then
+  brew autoupdate --start --upgrade --cleanup
 else
   echo "Autoupdate is enabled. Nothing to do."
 fi

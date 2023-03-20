@@ -3,9 +3,9 @@
 tap "homebrew/cask"
 tap "homebrew/cask-versions"
 tap "homebrew/cask-drivers"
+tap "homebrew/autoupdate"
 tap "universal-ctags/universal-ctags"
 tap "ikuwow/ikuwow-sshrc"
-tap "domt4/autoupdate"
 tap "minamijoyo/tfmigrate"
 
 brew "mas"
