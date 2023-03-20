@@ -86,14 +86,15 @@ let g:loaded_node_provider = 0
 let g:loaded_perl_provider = 0
 
 " Python3 configurations
-let s:ostype = trim(system('uname -m'))
-if s:ostype == 'arm64'
-    let s:bin_prefix = '/opt/homebrew/bin/'
-elseif s:ostype == 'x86_64'
-    let s:bin_prefix = '/usr/local/bin/'
+if executable('brew')
+    let s:brew_prefix = trim(system('brew --prefix'))
+    let s:bin_prefix = s:brew_prefix . '/bin/'
 else
-    echo 'Error: Unsupported ostype'
+    echo 'Warning: `brew` not found. s:brew_prefix/s:bin_prefix is set empty.'
+    let s:brew_prefix = ''
+    let s:bin_prefix = ''
 endif
+
 let g:python3_host_prog = s:bin_prefix . 'python3'
 if has("nvim")
     let s:pip3 = s:bin_prefix . 'pip3'
@@ -231,7 +232,9 @@ Plug 'airblade/vim-gitgutter'
 Plug 'mattn/emmet-vim'
 Plug 'junegunn/vim-easy-align'
 Plug 'github/copilot.vim'
-    let g:copilot_node_command = '/opt/homebrew/opt/node@16/bin/node'
+    if s:brew_prefix != ''
+        let g:copilot_node_command = s:brew_prefix . '/opt/node@16/bin/node'
+    endif
 
 " File specific
 Plug 'KazuakiM/vim-sqlfix'
