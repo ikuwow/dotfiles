@@ -17,7 +17,6 @@ mas "Bear", id: 1091189122
 cask "1password"
 mas "1Password for Safari", id: 1569813296
 mas "WiFi Signal", id: 525912054
-cask "google-chrome"
 cask "karabiner-elements"
 cask "authy"
 cask "iterm2"
@@ -120,11 +119,14 @@ brew "kind"
 brew "fluxcd/tap/flux"
 # kubectl and kustomize should be managed by asdf
 
+# Browsers
+cask "google-chrome"
+cask "microsoft-edge"
+cask "firefox"
+
 cask "docker" # homebrew/cask/docker
 cask "vimr"
 cask "xquartz"
-cask "firefox"
-cask "microsoft-edge"
 cask "google-cloud-sdk"
 cask "vagrant"
 cask "vlc"
