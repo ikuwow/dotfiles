@@ -124,6 +124,7 @@ cask "docker" # homebrew/cask/docker
 cask "vimr"
 cask "xquartz"
 cask "firefox"
+cask "microsoft-edge"
 cask "google-cloud-sdk"
 cask "vagrant"
 cask "vlc"
