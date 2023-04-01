@@ -25,7 +25,7 @@ cask "istat-menus"
 cask "rambox"
 cask "vanilla"
 cask "adguard"
-cask "nordvpn"
+mas "nordvpn", id: 905953485
 brew "bash"
 cask "atok"
 cask "logi-options-plus"
