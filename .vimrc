@@ -208,7 +208,6 @@ Plug 'nathanaelkane/vim-indent-guides'
     let g:indent_guides_guide_size = 1
 
 Plug 'editorconfig/editorconfig-vim'
-    let g:EditorConfig_core_mode = 'python_external'
     let g:EditorConfig_max_line_indicator = "exceeding"
 
 Plug 'vim-scripts/taglist.vim'
