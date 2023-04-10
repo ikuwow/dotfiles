@@ -1,6 +1,6 @@
 [user]
 	name = Ikuo Degawa
-	email = degawa@ikuwow.com
+	email = ikuwow@gmail.com
 [core]
     editor = nvim
     quotepath = false
