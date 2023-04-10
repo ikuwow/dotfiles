@@ -82,7 +82,6 @@ brew "slackcat"
 brew "circleci"
 brew "actionlint"
 brew "yamllint"
-brew "gpg"
 brew "sqlparse"
 brew "imagemagick"
 brew "thefuck"
@@ -102,6 +101,10 @@ brew "python-yq" # Not "yq"
 brew "gh"
 brew "kafka"
 brew "akamai"
+
+# For gpg key
+brew "gpg"
+cask "gpg-suite-no-mail"
 
 # For PHP
 brew "libsodium"
