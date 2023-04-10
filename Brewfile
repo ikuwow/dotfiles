@@ -119,7 +119,7 @@ brew "k9s"
 cask "lens"
 brew "minikube"
 brew "kind"
-brew "fluxcd/tap/flux"
+brew "fluxcd/tap/flux@0.41"
 # kubectl and kustomize should be managed by asdf
 
 # Browsers
