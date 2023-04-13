@@ -128,6 +128,7 @@ cask "microsoft-edge"
 cask "firefox"
 
 cask "docker" # homebrew/cask/docker
+cask "finch"
 cask "vimr"
 cask "xquartz"
 cask "google-cloud-sdk"
