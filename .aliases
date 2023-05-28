@@ -2,7 +2,7 @@
 
 ## Linux aliases
 # shellcheck disable=2012
-if ls --version >/dev/null 2>&1 && ls --version | head -n 1 | grep GNU >/dev/null; then
+if ls --version | head -n 1 | grep GNU >/dev/null; then
   alias ls='ls --color=auto'
 else
   alias ls='ls -G'
