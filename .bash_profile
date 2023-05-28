@@ -62,11 +62,7 @@ if [ -f ~/.aws/current_profile ]; then
 fi
 
 [[ -f "$BREW_PREFIX/opt/asdf/libexec/asdf.sh" ]] && . "$BREW_PREFIX/opt/asdf/libexec/asdf.sh"
-
-if [ "$(command -v gcloud)" ]; then
-  gcloudpath="$(dirname "$(dirname "$(readlink "$(command -v gcloud)")")")"
-  [[ -f "$gcloudpath/path.bash.inc" ]] && . "$gcloudpath/path.bash.inc"
-fi
+[[ -f "$BREW_PREFIX/share/google-cloud-sdk/path.bash.inc" ]] && . "$BREW_PREFIX/share/google-cloud-sdk/path.bash.inc"
 
 for file in ~/.{bashrc,aliases,functions,brew_api_token}; do
   [[ -r "$file" ]] && [[ -f "$file" ]] && . "$file"
