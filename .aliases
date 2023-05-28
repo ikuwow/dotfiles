@@ -22,11 +22,6 @@ alias watch='watch --color'
 [[ "$(command -v nvim)" ]] && alias vim='nvim'
 [[ "$(command -v sshrc)" ]]  && alias ssh=sshrc
 
-## Workaround
-# https://github.com/hashicorp/terraform/issues/27350#issuecomment-751269666
-# Fix after migrated arm terraform
-alias terraform='GODEBUG=asyncpreemptoff=1 terraform'
-
 ## Aliases for convenience
 alias be='bundle exec'
 alias pir='pipenv run'
@@ -37,8 +32,6 @@ alias dcr='docker-compose run'
 alias mysql='mysql --pager="less -S -n -i -F -X"'
 alias remotehost="cat ~/.ssh/config ~/.ssh/config.d/* | grep -e '^Host' | sed -e 's/^Host //g'"
 alias tf='terraform'
-alias updatedots='git -C ~/dotfiles sync'
 alias today='date +%Y%m%d'
 alias now='date +%Y%m%d%H%I%S'
 alias kc='kubectl'
-alias kx='kubectx'
