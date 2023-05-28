@@ -19,7 +19,6 @@ alias watch='watch --color'
 [[ "$(command -v tmux)" ]] && [[ -n "$TMUX_CONF" ]] && alias tmux='tmux -f "$TMUX_CONF"'
 
 ## Overriding aliases
-[[ "$(command -v hub)" ]] && eval "$(hub alias -s)"
 [[ "$(command -v nvim)" ]] && alias vim='nvim'
 [[ "$(command -v sshrc)" ]]  && alias ssh=sshrc
 
