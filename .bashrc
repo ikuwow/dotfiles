@@ -19,7 +19,13 @@ export GOPATH=$HOME/.go
 [[ -f ~/.asdf/plugions/java/set-java-home.bash ]] && . ~/.asdf/plugions/java/set-java-home.bash
 
 # shellcheck disable=SC1090
-[ -f ~/.fzf.bash ] && source ~/.fzf.bash
+fzf_bash="$HOME/.fzf.bash"
+if [ -f "$fzf_bash" ]; then
+  # shellcheck disable=SC1090
+  . "$fzf_bash"
+else
+  echo "WARNING: ${fzf_bash} is not installed. See: 'brew info fzf'"
+fi
 
 # shellcheck disable=SC1090
 [[ $(command -v akamai) ]] && eval "$(akamai --bash)"
