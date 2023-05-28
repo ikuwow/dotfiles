@@ -15,8 +15,10 @@ BASH_COMPLETION="$BREW_PREFIX/etc/profile.d/bash_completion.sh"
 
 ## Language Specific configs
 export GOPATH=$HOME/.go
+
+set_java_home_bash="$HOME/.asdf/plugins/java/set-java-home.bash"
 # shellcheck disable=SC1090
-[[ -f ~/.asdf/plugions/java/set-java-home.bash ]] && . ~/.asdf/plugions/java/set-java-home.bash
+[[ -f "$set_java_home_bash" ]] && . "$set_java_home_bash"
 
 # shellcheck disable=SC1090
 fzf_bash="$HOME/.fzf.bash"
