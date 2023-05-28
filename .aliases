@@ -17,7 +17,6 @@ alias grep='grep --color=auto'
 alias man='LANG=C man'
 alias watch='watch --color'
 [[ "$(command -v tmux)" ]] && [[ -n "$TMUX_CONF" ]] && alias tmux='tmux -f "$TMUX_CONF"'
-[[ "$(command -v thefuck)" ]] && eval "$(thefuck --alias)"
 
 ## Overriding aliases
 [[ "$(command -v hub)" ]] && eval "$(hub alias -s)"
