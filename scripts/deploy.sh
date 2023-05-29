@@ -29,6 +29,10 @@ mkdir -p "$HOME/.ssh"
 ln -fvns "$DOTPATH/.ssh/config" "$HOME/.ssh/config"
 mkdir -p "$HOME/.ssh/config.d"
 
+# ~/.kube
+mkdir -p "$HOME/.kube"
+ln -fvns "$DOTPATH/.kube/kubie.yaml" "$HOME/.kube/kubie.yaml"
+
 # bin
 mkdir -p ~/bin
 find "$DOTPATH/bin/" -type f -perm 0755 -exec ln -fvns {} ~/bin/ \;
