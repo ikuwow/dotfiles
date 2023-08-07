@@ -115,7 +115,6 @@ brew "libzip"
 # k8s
 brew "kubie"
 brew "k9s"
-cask "lens"
 brew "kind"
 tap "fluxcd/tap"
 brew "flux@0.41"
