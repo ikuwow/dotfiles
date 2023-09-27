@@ -154,7 +154,7 @@ mas "Instapaper Save", id: 1481302432
 mas "Day One", id: 1055511498
 mas "Spark", id: 1176895641
 mas "New File Menu", id: 1064959555
-mas "Kindle", id: 405399194
+mas "Kindle", id: 302584613
 mas "LINE", id: 539883307
 mas "WaterMinder", id: 1415257369
 mas "EasyRes", id: 688211836
