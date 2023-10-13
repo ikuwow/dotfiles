@@ -1,0 +1,20 @@
+name: Run scripts
+
+on: push
+
+jobs:
+  run_script:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        script:
+          - configure.sh
+          - configure_brew.sh
+          - deploy.sh
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v2
+      - name: Place dotfiles to home
+        run: ln -s ${GITHUB_WORKSPACE}/dotfiles ~/dotfiles
+      - name: Run script
+        run: scripts/${{ matrix.script }}
