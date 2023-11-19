@@ -23,7 +23,7 @@ cask "iterm2"
 cask "pastebot"
 cask "istat-menus"
 cask "rambox"
-cask "vanilla"
+cask "bartender"
 cask "adguard"
 mas "nordvpn", id: 905953485
 brew "bash"
