@@ -116,8 +116,7 @@ brew "libzip"
 brew "kubie"
 brew "k9s"
 brew "kind"
-tap "fluxcd/tap"
-brew "flux@0.41"
+brew "fluxcd/tap/flux"
 # kubectl and kustomize should be managed by asdf
 
 if RUBY_PLATFORM.include?('x86_64')
