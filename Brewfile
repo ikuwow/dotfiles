@@ -24,7 +24,6 @@ cask "pastebot"
 cask "istat-menus"
 cask "rambox"
 cask "bartender"
-cask "adguard"
 mas "nordvpn", id: 905953485
 brew "bash"
 cask "atok"
@@ -33,6 +32,10 @@ cask "logi-options-plus"
 # Install by yourself from: https://www.logitechg.com/en-us/innovation/g-hub.html
 # cask "logitech-g-hub"
 cask "jetbrains-toolbox"
+
+if `hostname`.strip != "E296465"
+  cask "adguard"
+end
 
 brew "coreutils"
 brew "diffutils"
