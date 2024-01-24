@@ -32,6 +32,7 @@
         fi; \
         git switch \"$branch\" && git pull; \
         }; f"
+    oops = commit --all --amend --no-edit
 [credential]
     helper = cache
 [filter "lfs"]
