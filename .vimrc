@@ -232,7 +232,8 @@ Plug 'mattn/emmet-vim'
 Plug 'junegunn/vim-easy-align'
 Plug 'github/copilot.vim'
     let g:copilot_filetypes = {
-    \ 'gitcommit': v:true
+    \ 'gitcommit': v:true,
+    \ 'yaml': v:true
     \ }
     if s:brew_prefix != ''
         let g:copilot_node_command = s:brew_prefix . '/opt/node@16/bin/node'
