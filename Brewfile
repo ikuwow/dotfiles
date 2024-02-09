@@ -120,6 +120,8 @@ brew "kubie"
 brew "k9s"
 brew "kind"
 brew "fluxcd/tap/flux"
+brew "helm"
+brew "helmfile"
 # kubectl and kustomize should be managed by asdf
 
 if RUBY_PLATFORM.include?('x86_64')
