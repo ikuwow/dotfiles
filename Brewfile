@@ -116,6 +116,8 @@ brew "libiconv"
 brew "libzip"
 
 # k8s
+brew "docker"
+brew "colima"
 brew "kubie"
 brew "k9s"
 brew "kind"
@@ -133,7 +135,6 @@ cask "google-chrome"
 cask "microsoft-edge"
 cask "firefox"
 
-cask "docker" # homebrew/cask/docker
 cask "finch"
 cask "vimr"
 cask "xquartz"
