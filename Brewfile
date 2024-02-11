@@ -126,10 +126,6 @@ brew "helm"
 brew "helmfile"
 # kubectl and kustomize should be managed by asdf
 
-if RUBY_PLATFORM.include?('x86_64')
-  cask "intel-power-gadget"
-end
-
 # Browsers
 cask "google-chrome"
 cask "microsoft-edge"
