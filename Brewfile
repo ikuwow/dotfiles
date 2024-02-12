@@ -2,7 +2,6 @@
 
 tap "homebrew/cask"
 tap "homebrew/cask-versions"
-tap "homebrew/cask-drivers"
 tap "homebrew/autoupdate"
 tap "universal-ctags/universal-ctags"
 tap "ikuwow/ikuwow-sshrc"
@@ -47,7 +46,7 @@ brew "grep"
 
 # required by vim
 brew "python"
-brew "node@16"
+brew "node@20"
 
 # For AWS
 brew "awscli"
