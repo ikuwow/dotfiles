@@ -45,7 +45,7 @@ brew "grep"
 
 # required by vim
 brew "python"
-brew "node@20"
+brew "node@20" # for Copilot
 
 # For AWS
 brew "awscli"

@@ -236,7 +236,7 @@ Plug 'github/copilot.vim'
     \ 'yaml': v:true
     \ }
     if s:brew_prefix != ''
-        let g:copilot_node_command = s:brew_prefix . '/opt/node@16/bin/node'
+        let g:copilot_node_command = s:brew_prefix . '/opt/node@20/bin/node'
     endif
 
 " File specific
