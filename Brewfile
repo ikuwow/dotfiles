@@ -3,7 +3,6 @@
 tap "homebrew/cask"
 tap "homebrew/cask-versions"
 tap "homebrew/autoupdate"
-tap "universal-ctags/universal-ctags"
 tap "ikuwow/ikuwow-sshrc"
 tap "minamijoyo/tfmigrate"
 
