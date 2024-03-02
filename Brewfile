@@ -148,7 +148,7 @@ mas "The Unarchiver", id: 425424353
 mas "Numbers", id: 409203825
 mas "Keynote", id: 409183694
 mas "Pages", id: 409201541
-mas "Instapaper Save", id: 1481302432
+mas "Omnivore", id: 1564031042
 mas "Day One", id: 1055511498
 mas "Spark", id: 1176895641
 mas "New File Menu", id: 1064959555
