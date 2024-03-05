@@ -127,6 +127,7 @@ brew "helmfile"
 cask "google-chrome"
 cask "microsoft-edge"
 cask "firefox"
+cask "deepl"
 
 cask "finch"
 cask "vimr"
