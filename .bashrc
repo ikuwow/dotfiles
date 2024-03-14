@@ -9,8 +9,11 @@ fi
 # shellcheck disable=SC1091
 [[ -f /etc/bashrc ]] && . /etc/bashrc
 
+# Completions
 BASH_COMPLETION="$BREW_PREFIX/etc/profile.d/bash_completion.sh"
 [[ -r "$BASH_COMPLETION" ]] && . "$BASH_COMPLETION"
+[[ $(command -v fzf) ]] && eval "$(fzf --bash)"
+[[ $(command -v akamai) ]] && eval "$(akamai --bash)"
 
 ## Language Specific configs
 export GOPATH=$HOME/.go
@@ -18,11 +21,3 @@ export GOPATH=$HOME/.go
 set_java_home_bash="$HOME/.asdf/plugins/java/set-java-home.bash"
 [[ -f "$set_java_home_bash" ]] && . "$set_java_home_bash"
 
-fzf_bash="$HOME/.fzf.bash"
-if [ -f "$fzf_bash" ]; then
-  . "$fzf_bash"
-else
-  echo "WARNING: ${fzf_bash} is not installed. See: 'brew info fzf'"
-fi
-
-[[ $(command -v akamai) ]] && eval "$(akamai --bash)"
