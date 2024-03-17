@@ -17,6 +17,8 @@ BASH_COMPLETION="$BREW_PREFIX/etc/profile.d/bash_completion.sh"
 
 ## Language Specific configs
 export GOPATH=$HOME/.go
+# https://github.com/asdf-community/asdf-golang?tab=readme-ov-file#version-selection
+export ASDF_GOLANG_MOD_VERSION_ENABLED="true"
 
 set_java_home_bash="$HOME/.asdf/plugins/java/set-java-home.bash"
 [[ -f "$set_java_home_bash" ]] && . "$set_java_home_bash"
