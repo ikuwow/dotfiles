@@ -143,6 +143,8 @@ cask "krisp"
 cask "mysqlworkbench"
 cask "powershell"
 cask "onyx"
+cask "chatgpt"
+cask "microsoft-teams"
 
 mas "Dark Reader for Safari", id: 1438243180
 mas "The Unarchiver", id: 425424353
