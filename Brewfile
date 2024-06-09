@@ -160,5 +160,6 @@ mas "LINE", id: 539883307
 mas "EasyRes", id: 688211836
 mas "Streaks", id: 963034692
 mas "Speedtest", id: 1153157709
-mas "Tweaks for Twitter", id: 1567751529
 mas "そら案内", id: 599799247
+mas "Focus", id: 777233759
+mas "Control Panel for Twitter", id: 1668516167
