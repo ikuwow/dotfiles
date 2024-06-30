@@ -98,6 +98,7 @@ brew "python-yq" # Not "yq"
 brew "gh"
 brew "kafka"
 brew "akamai"
+brew "cloudflare-cli4"
 
 # For gpg key
 brew "gpg"
@@ -144,6 +145,10 @@ cask "mysqlworkbench"
 cask "powershell"
 cask "onyx"
 cask "chatgpt"
+
+# Work related
+cask "miro"
+cask "notion"
 cask "microsoft-teams"
 
 mas "Dark Reader for Safari", id: 1438243180
