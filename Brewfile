@@ -99,6 +99,7 @@ brew "gh"
 brew "kafka"
 brew "akamai"
 brew "cloudflare-cli4"
+brew "copilot" # AWS Copilot
 
 # For gpg key
 brew "gpg"
@@ -169,3 +170,4 @@ mas "そら案内", id: 599799247
 mas "Focus", id: 777233759
 mas "Control Panel for Twitter", id: 1668516167
 mas "one sec", id: 1532875441
+mas "Xcode", id: 497799835
