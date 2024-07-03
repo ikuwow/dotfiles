@@ -99,7 +99,6 @@ brew "gh"
 brew "kafka"
 brew "akamai"
 brew "cloudflare-cli4"
-brew "copilot" # AWS Copilot
 
 # For gpg key
 brew "gpg"
@@ -112,9 +111,10 @@ brew "re2c"
 brew "libiconv"
 brew "libzip"
 
-# k8s
+# docker/k8s etc.
 tap "fluxcd/tap"
 brew "docker"
+brew "docker-compose"
 brew "colima"
 brew "kubie"
 brew "k9s"
@@ -122,6 +122,7 @@ brew "kind"
 brew "fluxcd/tap/flux"
 brew "helm"
 brew "helmfile"
+brew "copilot" # AWS Copilot
 # kubectl and kustomize should be managed by asdf
 
 # Browsers
