@@ -96,6 +96,7 @@ brew "gh"
 brew "kafka"
 brew "akamai"
 brew "cloudflare-cli4"
+brew "direnv"
 
 # Databases
 brew "mysql"
