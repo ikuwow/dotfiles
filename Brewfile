@@ -1,5 +1,9 @@
 # rubocop:disable all
 
+def is_m1?
+  system("uname -m | grep arm64")
+end
+
 tap "homebrew/cask"
 tap "homebrew/cask-versions"
 tap "homebrew/autoupdate"
@@ -27,10 +31,7 @@ cask "logi-options-plus"
 # Install by yourself from: https://www.logitechg.com/en-us/innovation/g-hub.html
 # cask "logitech-g-hub"
 cask "jetbrains-toolbox"
-
-if `hostname`.strip != "E296465"
-  cask "adguard"
-end
+cask "adguard"
 
 brew "coreutils"
 brew "diffutils"
@@ -148,7 +149,7 @@ cask "ears"
 cask "krisp"
 cask "powershell"
 cask "onyx"
-cask "chatgpt"
+cask "chatgpt" if is_m1?
 
 # Work related
 cask "miro"
