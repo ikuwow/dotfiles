@@ -163,11 +163,10 @@ mas "Keynote", id: 409183694
 mas "Pages", id: 409201541
 mas "Omnivore", id: 1564031042
 mas "Day One", id: 1055511498
-mas "Spark", id: 1176895641
 mas "New File Menu", id: 1064959555
 mas "Kindle", id: 302584613
 mas "LINE", id: 539883307
-mas "EasyRes", id: 688211836
+mas" RapidRes", id: 1329898474
 mas "Streaks", id: 963034692
 mas "Speedtest", id: 1153157709
 mas "そら案内", id: 599799247
