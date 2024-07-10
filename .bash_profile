@@ -64,6 +64,28 @@ fi
 [[ -f "$BREW_PREFIX/opt/asdf/libexec/asdf.sh" ]] && . "$BREW_PREFIX/opt/asdf/libexec/asdf.sh"
 [[ -f "$BREW_PREFIX/share/google-cloud-sdk/path.bash.inc" ]] && . "$BREW_PREFIX/share/google-cloud-sdk/path.bash.inc"
 
+# asdf golang: https://github.com/asdf-community/asdf-golang?tab=readme-ov-file
+asdf_update_golang_env() {
+  local go_bin_path
+  go_bin_path="$(asdf which go 2>/dev/null)"
+  if [[ -n "${go_bin_path}" ]]; then
+    abs_go_bin_path="$(readlink -f "${go_bin_path}")"
+
+    export GOROOT
+    GOROOT="$(dirname "$(dirname "${abs_go_bin_path}")")"
+
+    export GOPATH
+    GOPATH="$(dirname "${GOROOT}")/packages"
+
+    export GOBIN
+    GOBIN="$(dirname "${GOROOT}")/bin"
+  fi
+}
+asdf_update_golang_env
+export PATH="${GOBIN}:${PATH}"
+export ASDF_GOLANG_MOD_VERSION_ENABLED="true"
+
+
 for file in ~/.{bashrc,aliases,functions,brew_api_token}; do
   [[ -r "$file" ]] && [[ -f "$file" ]] && . "$file"
 done
