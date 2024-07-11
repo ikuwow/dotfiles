@@ -146,7 +146,6 @@ cask "zoom"
 cask "chromedriver"
 cask "lastfm"
 cask "ears"
-cask "krisp"
 cask "powershell"
 cask "onyx"
 cask "chatgpt" if is_m1?
