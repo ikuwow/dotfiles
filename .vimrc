@@ -276,7 +276,7 @@ Plug 'cespare/vim-toml'
 Plug 'hashivim/vim-terraform'
 Plug 'othree/yajs.vim'
 Plug 'mattn/vim-sqlfmt'
-Plug 'fatih/vim-go'
+Plug 'fatih/vim-go', { 'do': 'GoUpdateBinaries' }
 Plug 'chr4/nginx.vim'
 Plug 'glench/vim-jinja2-syntax'
 Plug 'pearofducks/ansible-vim'
