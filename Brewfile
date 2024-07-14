@@ -32,6 +32,7 @@ cask "logi-options-plus"
 # cask "logitech-g-hub"
 cask "jetbrains-toolbox"
 cask "adguard"
+cask "rescuetime"
 
 brew "coreutils"
 brew "diffutils"
