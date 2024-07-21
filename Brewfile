@@ -97,6 +97,7 @@ brew "kafka"
 brew "akamai"
 brew "cloudflare-cli4"
 brew "direnv"
+brew "packer"
 
 # Databases
 brew "mysql"
@@ -115,6 +116,11 @@ brew "bison"
 brew "re2c"
 brew "libiconv"
 brew "libzip"
+
+# Virtual environment:
+brew "qemu"
+brew "libvirt"
+brew "virt-manager"
 
 # docker/k8s etc.
 tap "fluxcd/tap"
