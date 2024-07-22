@@ -120,6 +120,8 @@ brew "libzip"
 # Virtual environment:
 brew "qemu"
 brew "libvirt"
+# This needs `HOMEBREW_NO_VERIFY_ATTESTATIONS=1`
+# See: https://github.com/Homebrew/homebrew-core/issues/177384
 brew "virt-manager"
 
 # docker/k8s etc.
