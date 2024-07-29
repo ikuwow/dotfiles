@@ -5,7 +5,6 @@ def is_m1?
 end
 
 tap "homebrew/cask"
-tap "homebrew/cask-versions"
 tap "homebrew/autoupdate"
 tap "ikuwow/ikuwow-sshrc"
 
