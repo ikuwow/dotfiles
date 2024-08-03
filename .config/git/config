@@ -33,6 +33,7 @@
         git switch \"$branch\" && git pull; \
         }; f"
     oops = commit --all --amend --no-edit
+    ce = "commit --allow-empty"
 [credential]
     helper = cache
 [filter "lfs"]
