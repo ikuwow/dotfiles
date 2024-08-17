@@ -128,7 +128,7 @@ brew "virt-manager"
 tap "fluxcd/tap"
 brew "docker"
 brew "docker-compose"
-brew "colima"
+brew "colima", restart_service: :changed
 brew "kubie"
 brew "k9s"
 brew "kind"
