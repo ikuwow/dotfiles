@@ -1,0 +1,14 @@
+name: Bootstrap
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  bootstrap:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Bootstrap
+        run: ./bootstrap.sh
