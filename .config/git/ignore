@@ -14,3 +14,6 @@
 # myconf
 .tool-versions
 ikuwowfiles
+
+# Terraform
+*.tfvars
