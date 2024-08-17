@@ -23,4 +23,4 @@ fi
 
 cd "$DOTPATH"
 
-# ./bootstrap/main.sh
+./bootstrap/main.sh
