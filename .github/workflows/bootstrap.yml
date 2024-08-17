@@ -7,8 +7,15 @@ on:
 
 jobs:
   bootstrap:
-    runs-on: macos-latest
+    strategy:
+        matrix:
+          os:
+            - macos-latest
+            - ubuntu-latest
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - name: Bootstrap
-        run: ./bootstrap.sh
+        env:
+          BRANCH: ${{ github.head_ref }}
+        run: ./bootstrap.sh "${BRANCH}"
