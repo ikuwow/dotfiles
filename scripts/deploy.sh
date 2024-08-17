@@ -38,4 +38,5 @@ mkdir -p ~/bin
 find "$DOTPATH/bin/" -type f -perm 0755 -exec ln -fvns {} ~/bin/ \;
 
 # iCloud
-ln -fvns "$HOME/Library/Mobile Documents/com~apple~CloudDocs" "$HOME/iCloudDrive"
+ICLOUD_DIR="$HOME/Library/Mobile Documents/com~apple~CloudDocs"
+[[ -d "$ICLOUD_DIR" ]] && ln -fvns "$ICLOUD_DIR" "$HOME/iCloudDrive"
