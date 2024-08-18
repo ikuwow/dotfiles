@@ -68,7 +68,6 @@ brew install mackup
 mackup restore
 echo
 
-export HOMEBREW_BUNDLE_NO_LOCK=1
 brew bundle
 echo
 
