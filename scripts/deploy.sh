@@ -18,6 +18,7 @@ for file in .??*; do
   [[ "$file" == ".travis.yml" ]] && continue
   [[ "$file" == ".config" ]] && continue
   [[ "$file" == ".github" ]] && continue
+  [[ "$file" == ".kube" ]] && continue
   ln -fvns "$DOTPATH/$file" "$HOME/$file"
 done
 
@@ -40,3 +41,4 @@ find "$DOTPATH/bin/" -type f -perm 0755 -exec ln -fvns {} ~/bin/ \;
 # iCloud
 ICLOUD_DIR="$HOME/Library/Mobile Documents/com~apple~CloudDocs"
 [[ -d "$ICLOUD_DIR" ]] && ln -fvns "$ICLOUD_DIR" "$HOME/iCloudDrive"
+echo

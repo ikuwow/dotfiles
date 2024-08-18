@@ -1,0 +1,19 @@
+name: Bootstrap
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  bootstrap:
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Bootstrap
+        env:
+          BRANCH: ${{ github.head_ref }}
+        run: |
+          curl -L https://raw.githubusercontent.com/ikuwow/dotfiles/master/bootstrap.sh | bash -s -- "${BRANCH}"
