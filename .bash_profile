@@ -52,7 +52,6 @@ export HISTSIZE=5000
 export XDG_CONFIG_HOME=~/.config
 export XDG_DATA_HOME=~/.local/share
 export QUOTING_STYLE=literal # for GNU ls
-export HOMEBREW_BUNDLE_NO_LOCK=true
 export HOMEBREW_NO_ENV_HINTS=true
 
 # AWS Profile Switcher
