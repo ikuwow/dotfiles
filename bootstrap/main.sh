@@ -5,6 +5,24 @@
 
 set -eu
 
+os="$(uname)"
+# If os is neither Linux or Darwin, exit 1
+if [ "$os" != 'Darwin' ] && [ "$os" != 'Linux' ]; then
+  echo "Error: Unsupported OS: $os"
+  exit 1
+fi
+echo "OS detected: $os"
+
+archname="$(arch)"
+echo "Arch detected: ${archname}"
+
+scripts/deploy.sh
+
+if [ "$os" = "Linux" ]; then
+  echo "Warning: Linux is not supported after this point."
+  exit 0
+fi
+
 if [ "$(xcode-select -p 1>/dev/null; echo $?)" != 0 ]; then
   echo 'Command line tool is not installed.'
   echo 'Invoked installation.'
@@ -15,12 +33,6 @@ fi
 
 scripts/configure.sh
 echo
-
-scripts/deploy.sh
-echo
-
-archname="$(arch)"
-echo "Arch: ${archname}"
 
 # Install Rosetta 2 when ARM
 if [ "${archname}" = "arm64" ]; then
