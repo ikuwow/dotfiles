@@ -58,9 +58,15 @@ elif [ "${archname}" = "arm64" ]; then
   export PATH="/opt/homebrew/bin:$PATH"
 fi
 
-brew install mackup
-mackup restore
-echo
+# Mackup setup
+# If $CI is set, mackup will not be installed.
+if [ -z "${CI+x}" ]; then
+  brew install mackup
+  mackup restore
+  echo
+else
+  echo "Warning: You are on CI. Skip mackup setup."
+fi
 
 export HOMEBREW_BUNDLE_NO_LOCK=1
 brew bundle
