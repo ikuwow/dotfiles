@@ -58,6 +58,12 @@ elif [ "${archname}" = "arm64" ]; then
   export PATH="/opt/homebrew/bin:$PATH"
 fi
 
+if [ -n "${CI+x}" ]; then
+  echo "Warning: You are on CI. Skip some setup lke 'brew bundle'."
+  exit 0
+fi
+
+# Mackup setup
 brew install mackup
 mackup restore
 echo
