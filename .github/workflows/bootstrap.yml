@@ -9,7 +9,9 @@ jobs:
   bootstrap:
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os:
+          - macos-latest
+          - ubuntu-latest
     runs-on: ${{ matrix.os }}
     steps:
       - name: Bootstrap
