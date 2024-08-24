@@ -26,7 +26,7 @@ cask "rambox"
 cask "bartender"
 mas "nordvpn", id: 905953485
 brew "bash"
-cask "logi-options-plus"
+cask "logi-options+"
 # This installation process hangs up!
 # Install by yourself from: https://www.logitechg.com/en-us/innovation/g-hub.html
 # cask "logitech-g-hub"
@@ -58,6 +58,7 @@ brew "telnet"
 brew "bash-completion@2"
 brew "cloog"
 brew "gcc"
+brew "cmake"
 brew "ghostscript"
 brew "git"
 brew "git-secrets"
