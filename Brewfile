@@ -130,7 +130,7 @@ tap "fluxcd/tap"
 brew "docker"
 brew "docker-compose"
 brew "docker-buildx"
-brew "colima", restart_service: :changed
+brew "colima"
 brew "kubie"
 brew "k9s"
 brew "kind"
