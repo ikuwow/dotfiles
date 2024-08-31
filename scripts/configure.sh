@@ -34,11 +34,6 @@ defaults -currentHost write com.apple.Spotlight MenuItemHidden -int 1
 echo "Configuring with sudo..."
 sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate on
 
-# Disable shortcut (this conflicts spotlight shortcut)
-defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 60 "<dict><key>enabled</key><false/></dict>"
-defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 61 "<dict><key>enabled</key><false/></dict>"
-# spotlight shortcut command + space
-defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 64 "<dict><key>enabled</key><true/><key>value</key><dict><key>parameters</key><array><integer>65535</integer><integer>49</integer><integer>262144</integer></array><key>type</key><string>standard</string></dict></dict>"
 defaults -currentHost write com.apple.screensaver idleTime -int 0
 
 defaults write com.apple.messageshelper.MessageController SOInputLineSettings -dict-add "automaticEmojiSubstitutionEnablediMessage" -bool false
