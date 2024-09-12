@@ -8,8 +8,8 @@ function start-session() {
 target="$1"
 
 if [ -z "$target" ]; then
-  echo "Usage: ssm <instance-id>"
-  return
+  echo "Usage: ssm <instance-id/Name-tag>"
+  exit 1
 fi
 
 if [[ "$target" =~ ^i\- ]]; then
