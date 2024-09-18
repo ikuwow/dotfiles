@@ -100,6 +100,7 @@ brew "akamai"
 brew "cloudflare-cli4"
 brew "direnv"
 brew "packer"
+brew "ansible"
 
 # Databases
 brew "mysql"
@@ -161,6 +162,7 @@ cask "powershell"
 cask "onyx"
 cask "chatgpt" if is_m1?
 cask "utm"
+cask "wireshark"
 
 # Work related
 cask "miro"
