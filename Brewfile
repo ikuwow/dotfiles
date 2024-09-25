@@ -129,6 +129,7 @@ brew "virt-manager"
 
 # docker/k8s etc.
 tap "fluxcd/tap"
+tap "kayac/tap"
 brew "docker"
 brew "docker-compose"
 brew "docker-buildx"
@@ -140,6 +141,7 @@ brew "fluxcd/tap/flux"
 brew "helm"
 brew "helmfile"
 brew "copilot" # AWS Copilot
+brew "ecspresso"
 # kubectl and kustomize should be managed by asdf
 
 # Browsers
