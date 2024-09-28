@@ -63,11 +63,6 @@ if [ -n "${CI+x}" ]; then
   exit 0
 fi
 
-# Mackup setup
-brew install mackup
-mackup restore
-echo
-
 brew bundle
 echo
 
