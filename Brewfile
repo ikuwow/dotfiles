@@ -9,7 +9,6 @@ tap "homebrew/autoupdate"
 tap "ikuwow/ikuwow-sshrc"
 
 brew "mas"
-brew "mackup"
 
 # First required
 mas "Things3", id: 904280696
