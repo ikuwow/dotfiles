@@ -118,6 +118,7 @@ brew "bison"
 brew "re2c"
 brew "libiconv"
 brew "libzip"
+brew "miller"
 
 # Virtual environment:
 brew "qemu"
