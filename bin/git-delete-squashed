@@ -4,7 +4,10 @@
 
 set -e
 
-default_branch=master
+default_branch=main
+if [ ! "$(git rev-parse --verify "$default_branch" 2>/dev/null)" ];then
+  default_branch=master
+fi
 
 git checkout -q "$default_branch"
 git for-each-ref refs/heads/ "--format=%(refname:short)" | \
