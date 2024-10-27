@@ -102,7 +102,8 @@ brew "packer"
 brew "ansible"
 
 # Databases
-brew "mysql"
+brew "mysql", link: false
+brew "mysql-client@8.4", link: true
 cask "mysqlworkbench"
 brew "postgresql@14"
 brew "tbls"
