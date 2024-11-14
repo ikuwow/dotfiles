@@ -65,7 +65,7 @@ fi
 [[ -f "$HOME/.asdf/plugins/golang/set-env.bash" ]] && . "$HOME/.asdf/plugins/golang/set-env.bash"
 export PATH="${GOBIN}:${PATH}"
 export ASDF_GOLANG_MOD_VERSION_ENABLED="true"
-
+export CLOUDSDK_PYTHON="$BREW_PREFIX/bin/python3" # for gcloud
 
 for file in ~/.{bashrc,aliases,functions,brew_api_token}; do
   [[ -r "$file" ]] && [[ -f "$file" ]] && . "$file"
