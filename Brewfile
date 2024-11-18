@@ -7,12 +7,13 @@ end
 tap "homebrew/cask"
 tap "homebrew/autoupdate"
 tap "ikuwow/ikuwow-sshrc"
+tap "Songmu/tap"
 
 brew "mas"
 
 # First required
 mas "Things3", id: 904280696
-mas "Bear", id: 1091189122
+cask "obsidian"
 cask "1password"
 mas "1Password for Safari", id: 1569813296
 mas "WiFi Signal", id: 525912054
@@ -100,6 +101,7 @@ brew "cloudflare-cli4"
 brew "direnv"
 brew "packer"
 brew "ansible"
+brew "ipv6toolkit"
 
 # Databases
 brew "mysql", link: false
@@ -108,6 +110,7 @@ cask "mysqlworkbench"
 brew "postgresql@14"
 brew "tbls"
 brew "sqlparse"
+brew "mongocli"
 
 # For gpg key
 brew "gpg"
@@ -143,6 +146,7 @@ brew "helm"
 brew "helmfile"
 brew "copilot" # AWS Copilot
 brew "ecspresso"
+brew "Songmu/tap/ecschedule"
 # kubectl and kustomize should be managed by asdf
 
 # Browsers
@@ -177,7 +181,6 @@ mas "The Unarchiver", id: 425424353
 mas "Numbers", id: 409203825
 mas "Keynote", id: 409183694
 mas "Pages", id: 409201541
-mas "Omnivore", id: 1564031042
 mas "Day One", id: 1055511498
 mas "New File Menu", id: 1064959555
 mas "Kindle", id: 302584613
@@ -191,3 +194,4 @@ mas "Control Panel for Twitter", id: 1668516167
 mas "one sec", id: 1532875441
 mas "Xcode", id: 497799835
 mas "WireGuard", id: 1451685025
+# TODO: Add Save to Reader (ReadWise)
