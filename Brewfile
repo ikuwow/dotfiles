@@ -147,6 +147,7 @@ brew "helmfile"
 brew "copilot" # AWS Copilot
 brew "ecspresso"
 brew "Songmu/tap/ecschedule"
+brew "e1s"
 # kubectl and kustomize should be managed by asdf
 
 # Browsers
