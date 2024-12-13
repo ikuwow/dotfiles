@@ -54,6 +54,7 @@ cask "session-manager-plugin"
 
 brew "zlib"
 brew "asdf"
+brew "aquaproj/aqua/aqua"
 brew "openssl"
 brew "telnet"
 brew "bash-completion@2"

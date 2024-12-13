@@ -60,7 +60,10 @@ if [ -f ~/.aws/current_profile ]; then
   export AWS_PROFILE
 fi
 
+# Version managers (asdf, aqua)
 [[ -f "$BREW_PREFIX/opt/asdf/libexec/asdf.sh" ]] && . "$BREW_PREFIX/opt/asdf/libexec/asdf.sh"
+export PATH=${AQUA_ROOT_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/aquaproj-aqua}/bin:$PATH
+
 [[ -f "$BREW_PREFIX/share/google-cloud-sdk/path.bash.inc" ]] && . "$BREW_PREFIX/share/google-cloud-sdk/path.bash.inc"
 [[ -f "$HOME/.asdf/plugins/golang/set-env.bash" ]] && . "$HOME/.asdf/plugins/golang/set-env.bash"
 export PATH="${GOBIN}:${PATH}"
