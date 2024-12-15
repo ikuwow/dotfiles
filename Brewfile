@@ -103,6 +103,7 @@ brew "direnv"
 brew "packer"
 brew "ansible"
 brew "ipv6toolkit"
+brew "yt-dlp"
 
 # Databases
 brew "mysql", link: false
