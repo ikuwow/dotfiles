@@ -119,6 +119,42 @@ if [ ! "$(command -v aps)" ]; then
   }
 fi
 
+if [ ! "$(command -v gps)" ]; then
+  gps() {
+    if [ ! "$(command -v fzf)" ]; then
+      echo "Error: ${FUNCNAME} requires fzf executable."
+      exit 1
+    fi
+    query="$1"
+
+    DUMMY_CONFIG_NAME="none"
+
+    if [ "$query" = "--clear" ]; then
+      export GC_ACTIVE_CONFIG="$DUMMY_CONFIG_NAME"
+      gcloud config configurations activate "$DUMMY_CONFIG_NAME"
+      echo "Google Cloud configuration cleared."
+      return
+    fi
+
+    config=""
+    if [ -n "$query" ]; then
+      config="$(gcloud config configurations list --format='value(name)' | grep -v "^${DUMMY_CONFIG_NAME}$" | fzf --filter "$query" | head -n 1)"
+    else
+      config="$(gcloud config configurations list --format='value(name)' | grep -v "^${DUMMY_CONFIG_NAME}$" | fzf)"
+    fi
+
+    if [ -z "$config" ]; then
+      echo "No profiles are selected."
+      return
+    fi
+
+    gcloud config configurations activate "$config"
+    export GC_ACTIVE_CONFIG="$(cat ~/.config/gcloud/active_config)"
+    echo "Google Cloud config set: $config"
+  }
+fi
+
+
 kubecurl() {
   kubectl run -it --rm "ikuwow-curl-$(date "+%s")" --namespace default --image curlimages/curl sh
 }
