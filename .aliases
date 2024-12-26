@@ -36,3 +36,5 @@ alias today='date +%Y%m%d'
 alias now='date +%Y%m%d%H%I%S'
 alias kc='kubectl'
 alias bs='brew services'
+
+alias gcopen='open "https://console.cloud.google.com/home/dashboard?project=$(gcloud config get-value project)"'
