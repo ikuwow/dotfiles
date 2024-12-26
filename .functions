@@ -21,7 +21,7 @@ prompts() {
     PS1='localhost: \W\$ '
   fi
 
-  export PROMPT_COMMAND="prompt_aws;$PROMPT_COMMAND"
+  export PROMPT_COMMAND="prompt_aws;prompt_gc;$PROMPT_COMMAND"
 
   if [ "$(command -v __git_ps1)" ]; then
     # shellcheck disable=2016
@@ -29,6 +29,7 @@ prompts() {
   fi
 
   PS1="$(echo "${PS1}" | sed 's/\\\$ /$AWS_PROMPT\\\$ /')"
+  PS1="$(echo "${PS1}" | sed 's/\\\$ /$GC_PROMPT\\\$ /')"
 
   # Make dollar yellow
   PS1="$(echo "${PS1}" | sed 's/\\\$ /\\\[\\e\[33m\\\]\\\$\\\[\\e\[0m\\\] /')"
