@@ -8,12 +8,20 @@ prompt_aws() {
   fi
 }
 
+prompt_gc() {
+  if [[ -n "${GC_ACTIVE_CONFIG}" ]]; then
+    GC_PROMPT=" <GC:${GC_ACTIVE_CONFIG}>"
+  else
+    GC_PROMPT=""
+  fi
+}
+
 prompts() {
   if [ -z "$SSH_CLIENT" ]; then
     PS1='localhost: \W\$ '
   fi
 
-  export PROMPT_COMMAND="prompt_aws;$PROMPT_COMMAND"
+  export PROMPT_COMMAND="prompt_aws;prompt_gc;$PROMPT_COMMAND"
 
   if [ "$(command -v __git_ps1)" ]; then
     # shellcheck disable=2016
@@ -21,6 +29,7 @@ prompts() {
   fi
 
   PS1="$(echo "${PS1}" | sed 's/\\\$ /$AWS_PROMPT\\\$ /')"
+  PS1="$(echo "${PS1}" | sed 's/\\\$ /$GC_PROMPT\\\$ /')"
 
   # Make dollar yellow
   PS1="$(echo "${PS1}" | sed 's/\\\$ /\\\[\\e\[33m\\\]\\\$\\\[\\e\[0m\\\] /')"
@@ -110,6 +119,42 @@ if [ ! "$(command -v aps)" ]; then
     fi
   }
 fi
+
+if [ ! "$(command -v gps)" ]; then
+  gps() {
+    if [ ! "$(command -v fzf)" ]; then
+      echo "Error: ${FUNCNAME} requires fzf executable."
+      exit 1
+    fi
+    query="$1"
+
+    DUMMY_CONFIG_NAME="none"
+
+    if [ "$query" = "--clear" ]; then
+      export GC_ACTIVE_CONFIG="$DUMMY_CONFIG_NAME"
+      gcloud config configurations activate "$DUMMY_CONFIG_NAME"
+      echo "Google Cloud configuration cleared."
+      return
+    fi
+
+    config=""
+    if [ -n "$query" ]; then
+      config="$(gcloud config configurations list --format='value(name)' | grep -v "^${DUMMY_CONFIG_NAME}$" | fzf --filter "$query" | head -n 1)"
+    else
+      config="$(gcloud config configurations list --format='value(name)' | grep -v "^${DUMMY_CONFIG_NAME}$" | fzf)"
+    fi
+
+    if [ -z "$config" ]; then
+      echo "No profiles are selected."
+      return
+    fi
+
+    gcloud config configurations activate "$config"
+    export GC_ACTIVE_CONFIG="$(cat ~/.config/gcloud/active_config)"
+    echo "Google Cloud config set: $config"
+  }
+fi
+
 
 kubecurl() {
   kubectl run -it --rm "ikuwow-curl-$(date "+%s")" --namespace default --image curlimages/curl sh
