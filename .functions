@@ -9,7 +9,7 @@ prompt_aws() {
 }
 
 prompt_gc() {
-  if [[ -n "${GC_ACTIVE_CONFIG}" ]]; then
+  if [[ -n "${GC_ACTIVE_CONFIG}" && "${GC_ACTIVE_CONFIG}" != "none" ]]; then
     GC_PROMPT=" <GC:${GC_ACTIVE_CONFIG}>"
   else
     GC_PROMPT=""
