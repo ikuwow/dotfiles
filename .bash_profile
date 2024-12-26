@@ -60,6 +60,11 @@ if [ -f ~/.aws/current_profile ]; then
   export AWS_PROFILE
 fi
 
+if [ -f ~/.config/gcloud/active_config ]; then
+  GC_ACTIVE_CONFIG="$(cat ~/.config/gcloud/active_config)"
+  export GC_ACTIVE_CONFIG
+fi
+
 # Version managers (asdf, aqua)
 [[ -f "$BREW_PREFIX/opt/asdf/libexec/asdf.sh" ]] && . "$BREW_PREFIX/opt/asdf/libexec/asdf.sh"
 export PATH=${AQUA_ROOT_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/aquaproj-aqua}/bin:$PATH

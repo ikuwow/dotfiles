@@ -8,6 +8,14 @@ prompt_aws() {
   fi
 }
 
+prompt_gc() {
+  if [[ -n "${GC_ACTIVE_CONFIG}" ]]; then
+    GC_PROMPT=" <GC:${GC_ACTIVE_CONFIG}>"
+  else
+    GC_PROMPT=""
+  fi
+}
+
 prompts() {
   if [ -z "$SSH_CLIENT" ]; then
     PS1='localhost: \W\$ '
