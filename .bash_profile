@@ -79,14 +79,3 @@ for file in ~/.{bashrc,aliases,functions,brew_api_token}; do
   [[ -r "$file" ]] && [[ -f "$file" ]] && . "$file"
 done
 [[ "$(command -v prompts)" ]] && prompts
-
-# iTerm2 shell integration
-# See: https://iterm2.com/documentation-shell-integration.html
-shell_integration_path=~/.iterm2_shell_integration.bash
-if [[ -e  "$shell_integration_path" ]]; then
-  source "$shell_integration_path"
-else
-  echo "iTerm2 shell integration is not installed!"
-  echo "Please place ${shell_integration_path}."
-  echo "See: https://iterm2.com/documentation-shell-integration.html"
-fi
