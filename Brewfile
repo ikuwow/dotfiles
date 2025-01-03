@@ -20,6 +20,7 @@ mas "WiFi Signal", id: 525912054
 cask "karabiner-elements"
 cask "iterm2"
 cask "itermai"
+cask "ghostty"
 cask "pastebot"
 cask "istat-menus"
 cask "rambox"
