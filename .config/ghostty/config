@@ -1,0 +1,4 @@
+theme = Japanesque
+shell-integration-features = no-cursor
+cursor-style = block
+cursor-style-blink = true
