@@ -1,4 +1,12 @@
 theme = Japanesque
+
+# Specify cursor style
 shell-integration-features = no-cursor
 cursor-style = block
 cursor-style-blink = true
+
+# Default window size
+window-height = 62
+window-width = 100
+
+macos-titlebar-style = tabs
