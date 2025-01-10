@@ -105,8 +105,7 @@ brew "ipv6toolkit"
 brew "yt-dlp"
 
 # Databases
-brew "mysql", link: false
-brew "mysql-client@8.4", link: true
+brew "mysql"
 cask "mysqlworkbench"
 brew "postgresql@14"
 brew "tbls"
