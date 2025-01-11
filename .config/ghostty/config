@@ -1,7 +1,10 @@
 theme = Japanesque
 
+shell-integration-features = no-cursor, sudo
+# no-cursor: Specify cursor style manually
+# sudo: Enable shell integration of sudo command
+
 # Specify cursor style
-shell-integration-features = no-cursor
 cursor-style = block
 cursor-style-blink = true
 
