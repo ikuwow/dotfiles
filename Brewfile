@@ -23,7 +23,6 @@ cask "pastebot"
 cask "istat-menus"
 cask "rambox"
 cask "bartender"
-mas "nordvpn", id: 905953485
 mas "WireGuard", id: 1451685025
 brew "bash"
 cask "logi-options+"
