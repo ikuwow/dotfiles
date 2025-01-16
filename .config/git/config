@@ -25,13 +25,15 @@
     bl = blame
     grepi = grep --ignore-case
     clone = clone --recursive
-    home = "!f() { \
-        if git rev-parse --verify --quiet main > /dev/null; then branch='main'; \
-        elif git rev-parse --verify --quiet master > /dev/null; then branch='master'; \
-        else echo 'Error: main/master branch does not exist.' && exit 1; \
-        fi; \
-        git switch \"$branch\" && git pull; \
-        }; f"
+    home = "!sh -c ' \
+        branch=$( \
+            git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null || \
+            (git remote set-head origin -a && git symbolic-ref refs/remotes/origin/HEAD) \
+        ) && \
+        branch=${branch#refs/remotes/origin/} && \
+        git switch \"$branch\" && \
+        git pull \
+    '"
     oops = commit --all --amend --no-edit
     ce = "commit --allow-empty"
 [credential]
