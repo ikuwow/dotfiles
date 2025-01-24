@@ -38,3 +38,4 @@ alias kc='kubectl'
 alias bs='brew services'
 
 alias gcopen='open "https://console.cloud.google.com/home/dashboard?project=$(gcloud config get-value project)"'
+alias gaal='gcloud auth application-default login'
