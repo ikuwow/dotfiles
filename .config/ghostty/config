@@ -13,3 +13,6 @@ window-height = 62
 window-width = 100
 
 macos-titlebar-style = tabs
+
+keybind = global:cmd+shift+space=toggle_quick_terminal
+quick-terminal-position = center
