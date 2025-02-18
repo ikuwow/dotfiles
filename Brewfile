@@ -105,7 +105,8 @@ brew "ipv6toolkit"
 brew "yt-dlp"
 
 # Databases
-brew "mysql"
+# brew "mysql" # Do not install mysql (server)
+brew "mysql-client"
 cask "mysqlworkbench"
 brew "postgresql@14"
 brew "tbls"
