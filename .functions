@@ -129,6 +129,9 @@ if [ ! "$(command -v gps)" ]; then
     query="$1"
 
     DUMMY_CONFIG_NAME="none"
+    if [ ! "$(gcloud config configurations list --format='value(name)' | grep "^${DUMMY_CONFIG_NAME}$")" ]; then
+      gcloud config configurations create "$DUMMY_CONFIG_NAME"
+    fi
 
     if [ "$query" = "--clear" ]; then
       export GC_ACTIVE_CONFIG="$DUMMY_CONFIG_NAME"
