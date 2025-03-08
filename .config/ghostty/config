@@ -19,5 +19,7 @@ quick-terminal-position = center
 
 # font-family = "Osaka-Mono"
 font-family = "Monaco"
+font-style = Regular
+font-size = 12
 # Disable ligatures
 font-feature = -calt, -liga, -dlig
