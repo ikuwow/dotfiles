@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 function start-session() {
   local target="$1"
   aws ssm start-session --target "$target"
@@ -25,6 +27,11 @@ INSTANCE_IDS=$(aws ec2 describe-instances \
 readarray -t INSTANCE_IDS_ARRAY <<< "$INSTANCE_IDS"
 
 if [ ${#INSTANCE_IDS_ARRAY[@]} -eq 1 ]; then
+  if [ -z "${INSTANCE_IDS_ARRAY[0]}" ]; then
+    echo "No instances found with the given Name tag value."
+    exit 1
+  fi
+
   echo "EC2 instance found: ${INSTANCE_IDS_ARRAY[0]}"
   start-session "${INSTANCE_IDS_ARRAY[0]}"
   exit $!
