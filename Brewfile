@@ -50,6 +50,8 @@ brew "awscli"
 brew "awslogs"
 brew "cfn-lint"
 cask "session-manager-plugin"
+tap "fujiwara/tap"
+brew "lambroll"
 
 brew "zlib"
 brew "asdf"
