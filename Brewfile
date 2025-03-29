@@ -191,7 +191,6 @@ mas "Day One", id: 1055511498
 mas "New File Menu", id: 1064959555
 mas "Kindle", id: 302584613
 mas "LINE", id: 539883307
-mas" RapidRes", id: 1329898474
 mas "Streaks", id: 963034692
 mas "Speedtest", id: 1153157709
 mas "Focus", id: 777233759
