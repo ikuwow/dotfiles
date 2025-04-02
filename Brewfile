@@ -199,4 +199,5 @@ mas "one sec", id: 1532875441
 mas "Xcode", id: 497799835
 mas "WireGuard", id: 1451685025
 mas "Apple Configurator", id: 1037126344
+mas "Wappalyzer", id: 1520333300
 # TODO: Add Save to Reader (ReadWise)
