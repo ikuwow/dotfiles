@@ -175,7 +175,6 @@ cask "onyx"
 cask "chatgpt" if is_m1?
 cask "utm"
 cask "wireshark"
-cask "timemachinestatus"
 
 # Work related
 cask "miro"
