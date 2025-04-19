@@ -173,6 +173,7 @@ cask "ears"
 cask "powershell"
 cask "onyx"
 cask "chatgpt" if is_m1?
+cask "claude"
 cask "utm"
 cask "wireshark"
 
