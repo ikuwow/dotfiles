@@ -32,6 +32,7 @@ cask "logi-options+"
 cask "jetbrains-toolbox"
 cask "adguard"
 cask "applite"
+cask "timemachineeditor"
 
 brew "coreutils"
 brew "diffutils"
