@@ -33,6 +33,7 @@ cask "jetbrains-toolbox"
 cask "adguard"
 cask "applite"
 cask "timemachineeditor"
+brew "mcpm"
 
 brew "coreutils"
 brew "diffutils"
@@ -44,7 +45,10 @@ brew "grep"
 
 # required by vim
 brew "python"
-brew "node@20" # for Copilot
+
+# Required by Claude MCP config
+brew "uv"
+brew "node"
 
 # For AWS
 brew "awscli"
