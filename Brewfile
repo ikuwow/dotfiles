@@ -49,6 +49,8 @@ brew "python"
 # Required by Claude MCP config
 brew "uv"
 brew "node"
+tap "oven-sh/bun"
+brew "bun"
 
 # For AWS
 brew "awscli"
