@@ -32,6 +32,8 @@ cask "logi-options+"
 cask "jetbrains-toolbox"
 cask "adguard"
 cask "applite"
+cask "timemachineeditor"
+brew "mcpm"
 
 brew "coreutils"
 brew "diffutils"
@@ -43,13 +45,20 @@ brew "grep"
 
 # required by vim
 brew "python"
-brew "node@20" # for Copilot
+
+# Required by Claude MCP config
+brew "uv"
+brew "node"
+tap "oven-sh/bun"
+brew "bun"
 
 # For AWS
 brew "awscli"
 brew "awslogs"
 brew "cfn-lint"
 cask "session-manager-plugin"
+tap "fujiwara/tap"
+brew "lambroll"
 
 brew "zlib"
 brew "asdf"
@@ -171,8 +180,10 @@ cask "ears"
 cask "powershell"
 cask "onyx"
 cask "chatgpt" if is_m1?
+cask "claude"
 cask "utm"
 cask "wireshark"
+cask "neat"
 
 # Work related
 cask "miro"
@@ -188,7 +199,6 @@ mas "Day One", id: 1055511498
 mas "New File Menu", id: 1064959555
 mas "Kindle", id: 302584613
 mas "LINE", id: 539883307
-mas" RapidRes", id: 1329898474
 mas "Streaks", id: 963034692
 mas "Speedtest", id: 1153157709
 mas "Focus", id: 777233759
@@ -196,4 +206,6 @@ mas "Control Panel for Twitter", id: 1668516167
 mas "one sec", id: 1532875441
 mas "Xcode", id: 497799835
 mas "WireGuard", id: 1451685025
+mas "Apple Configurator", id: 1037126344
+mas "Wappalyzer", id: 1520333300
 # TODO: Add Save to Reader (ReadWise)
