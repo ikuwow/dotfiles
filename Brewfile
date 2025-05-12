@@ -183,6 +183,7 @@ cask "chatgpt" if is_m1?
 cask "claude"
 cask "utm"
 cask "wireshark"
+cask "neat"
 
 # Work related
 cask "miro"
