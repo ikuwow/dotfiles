@@ -109,6 +109,7 @@ brew "akamai"
 brew "cloudflare-cli4"
 brew "direnv"
 brew "ansible"
+brew "ansible-lint"
 brew "ipv6toolkit"
 brew "yt-dlp"
 
@@ -181,7 +182,7 @@ cask "chatgpt" if is_m1?
 cask "claude"
 cask "utm"
 cask "wireshark"
-cask "neat"
+cask "gitify"
 
 # Work related
 cask "miro"
