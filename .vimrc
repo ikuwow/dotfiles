@@ -262,7 +262,7 @@ Plug 'airblade/vim-gitgutter'
 Plug 'mattn/emmet-vim'
 Plug 'junegunn/vim-easy-align'
 Plug 'tpope/vim-surround'
-Plug 'Exafunction/codeium.vim'
+Plug 'Exafunction/windsurf.vim'
 " Plug 'github/copilot.vim'
 "     let g:copilot_filetypes = {
 "     \ 'gitcommit': v:true,
