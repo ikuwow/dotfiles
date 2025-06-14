@@ -168,7 +168,7 @@ cask "vivaldi"
 
 cask "deepl"
 cask "1password-cli"
-cask "vimr"
+cask "goneovim"
 cask "xquartz"
 cask "google-cloud-sdk"
 cask "vagrant"
