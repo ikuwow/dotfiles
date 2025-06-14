@@ -16,3 +16,5 @@ ikuwowfiles
 
 # Terraform
 *.tfvars
+
+**/.claude/settings.local.json
