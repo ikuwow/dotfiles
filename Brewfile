@@ -113,7 +113,7 @@ brew "actionlint"
 brew "yamllint"
 brew "tflint"
 brew "ansible-lint"
-brew "hidolint"
+brew "hadolint"
 
 # Databases
 # brew "mysql" # Do not install mysql (server)
@@ -213,7 +213,13 @@ mas "Wappalyzer", id: 1520333300
 # TODO: Add Save to Reader (ReadWise)
 
 at_exit do
-  puts 'Running post-install tasks...'
-  system 'xattr -c /Applications/goneovim.app'
-  puts 'Done.'
+  commands = [
+    'xattr -c /Applications/goneovim.app'
+  ]
+  commands.each do |c|
+    puts 'Running post-install tasks...'
+    puts "Command: #{c}"
+    system c
+    puts 'Done.'
+  end
 end
