@@ -46,3 +46,4 @@ echo
 # AIRULES.md
 # https://docs.anthropic.com/en/docs/claude-code/memory#how-claude-looks-up-memories
 [[ -d "$HOME/.claude/" ]] && ln -fvns "$DOTPATH/AIRULES.md" "$HOME/.claude/CLAUDE.md"
+[[ -d "$HOME/.codeium/memories/" ]] && ln -fvns "$DOTPATH/AIRULES.md" "$HOME/.codeium/memories/global_rules.md"
