@@ -211,3 +211,9 @@ mas "WireGuard", id: 1451685025
 mas "Apple Configurator", id: 1037126344
 mas "Wappalyzer", id: 1520333300
 # TODO: Add Save to Reader (ReadWise)
+
+at_exit do
+  puts 'Running post-install tasks...'
+  system 'xattr -c /Applications/goneovim.app'
+  puts 'Done.'
+end
