@@ -161,6 +161,7 @@ brew "Songmu/tap/ecschedule"
 tap "keidarcy/tap"
 brew "e1s"
 # kubectl and kustomize should be managed by asdf
+cask "container"
 
 # Browsers
 cask "google-chrome"
