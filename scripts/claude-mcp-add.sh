@@ -36,8 +36,12 @@ jq -r '.mcpServers | to_entries[] | @json' "$MCP_CONFIG_FILE" | while IFS= read 
     args=$(echo "$args_json" | jq -r '.[] | @sh' | tr '\n' ' ')
   fi
 
-  # Execute claude mcp add command
-  eval "claude mcp add \"$server_name\" \"$server_command\" $args"
+  # Execute claude mcp add command (with user scope)
+  if [[ -n "$args" ]]; then
+    eval "claude mcp add --scope user \"$server_name\" \"$server_command\" -- $args"
+  else
+    claude mcp add --scope user "$server_name" "$server_command"
+  fi
 
   echo "✓ Added $server_name"
 done
