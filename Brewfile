@@ -33,7 +33,6 @@ cask "jetbrains-toolbox"
 cask "adguard"
 cask "applite"
 cask "timemachineeditor"
-brew "mcpm"
 
 brew "coreutils"
 brew "diffutils"
