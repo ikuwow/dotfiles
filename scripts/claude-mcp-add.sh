@@ -22,28 +22,18 @@ fi
 echo "Adding MCP servers from $MCP_CONFIG_FILE..."
 
 jq -r '.mcpServers | to_entries[] | @json' "$MCP_CONFIG_FILE" | while IFS= read -r server_json; do
-  server_name=$(echo "$server_json" | jq -r '.key')
-  server_command=$(echo "$server_json" | jq -r '.value.command')
+  original_name=$(echo "$server_json" | jq -r '.key')
+  server_config=$(echo "$server_json" | jq -c '.value')
 
-  echo "Adding MCP server: $server_name"
+  # Sanitize server name: replace dots and other invalid characters with underscores
+  server_name="${original_name//[^a-zA-Z0-9_-]/_}"
 
-  # Build args array
-  args_json=$(echo "$server_json" | jq -c '.value.args // []')
+  echo "Adding MCP server: $original_name (as $server_name)"
 
-  # Convert args array to command line arguments
-  args=""
-  if [[ "$args_json" != "[]" ]]; then
-    args=$(echo "$args_json" | jq -r '.[] | @sh' | tr '\n' ' ')
-  fi
+  # Execute claude mcp add-json command (with user scope)
+  claude mcp add-json --scope user "$server_name" "$server_config"
 
-  # Execute claude mcp add command (with user scope)
-  if [[ -n "$args" ]]; then
-    eval "claude mcp add --scope user \"$server_name\" \"$server_command\" -- $args"
-  else
-    claude mcp add --scope user "$server_name" "$server_command"
-  fi
-
-  echo "✓ Added $server_name"
+  echo "✓ Added $original_name as $server_name"
 done
 
 echo "All MCP servers have been added successfully!"
