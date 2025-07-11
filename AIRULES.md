@@ -39,6 +39,7 @@
    - `git grep`
 6. shellscriptは必ずshellcheckが通る状態にすること
 7. 行末の空白を残さないこと。ただしMarkdown等の、行末の空白が意味を持つものは例外とする。
+8. Pull Requestを作る場合、Pull request templateがあれば必ずそのフォーマットに従うこと。
 
 ## 文脈の扱い方
 
