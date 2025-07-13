@@ -294,3 +294,38 @@ call plug#end()
 
 " statusline config
 set laststatus=2
+
+" Terminal configuration (only for NeoVim)
+if has('nvim')
+    " Terminal mode settings
+    augroup TerminalStuff
+        autocmd!
+        " When entering terminal, go to insert mode
+        autocmd TermOpen * startinsert
+        " Disable line numbers in terminal
+        autocmd TermOpen * setlocal nonumber norelativenumber
+        " Fix terminal redraw issues
+        autocmd TermOpen * setlocal scrollback=10000
+        " Set terminal type
+        autocmd TermOpen * let $TERM = 'xterm-256color'
+        " Disable some visual features that might cause issues
+        autocmd TermOpen * setlocal nocursorline nocursorcolumn
+        autocmd TermOpen * setlocal signcolumn=no
+        " Disable text wrapping in terminal
+        autocmd TermOpen * setlocal nowrap
+        " Set textwidth to 0 to prevent auto-wrapping
+        autocmd TermOpen * setlocal textwidth=0
+        " Disable linebreak
+        autocmd TermOpen * setlocal nolinebreak
+    augroup END
+
+    " Press Esc to exit terminal mode
+    tnoremap <Esc> <C-\><C-n>
+
+    " Quick command to open Claude in split
+    command! Claude split | terminal claude
+
+    " Override default :terminal to use split
+    command! -nargs=* Terminal split | terminal <args>
+    cabbrev terminal Terminal
+endif
