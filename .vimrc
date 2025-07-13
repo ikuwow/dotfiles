@@ -98,8 +98,7 @@ endif
 let g:python3_host_prog = s:bin_prefix . 'python3'
 if has("nvim")
     let s:pip3 = s:bin_prefix . 'pip3'
-    " NOTE: It's temporarily disabled because it's slow
-    " call system(s:pip3 . ' install neovim pynvim')
+    call system(s:pip3 . ' install neovim pynvim')
 endif
 
 if strlen($SSH_CLIENT) != 0
