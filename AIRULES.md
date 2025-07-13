@@ -32,14 +32,18 @@
 3. 必要に応じて設定しているMCPサーバーを随時利用すること。
 4. ファイルの末尾には必ず改行を入れること
 5. 書き込み処理を伴わないgit操作は許可を得ずに自由に実行すること。
-   - `git status`
-   - `git diff`
-   - `git log`
-   - `git branch`
-   - `git grep`
+    - `git status`
+    - `git diff`
+    - `git log`
+    - `git branch`
+    - `git grep`
 6. shellscriptは必ずshellcheckが通る状態にすること
 7. 行末の空白を残さないこと。ただしMarkdown等の、行末の空白が意味を持つものは例外とする。
-8. Pull Requestを作る場合、Pull request templateがあれば必ずそのフォーマットに従うこと。
+8. Pull Request (以下PR) を作る場合は以下のルールに従うこと
+    - Pull request templateがあれば必ずそのフォーマットに従うこと
+    - PRは必ずdraftで作成し、Review Readyにはしないこと
+    - 日本語を使う場合はですますを使うこと。ただし箇条書きで客観的に事実を羅列する場合などは例外とする。
+    - 実際にテストや確認をしたことだけを「テストした」「確認した」と言うこと
 
 ## 文脈の扱い方
 
