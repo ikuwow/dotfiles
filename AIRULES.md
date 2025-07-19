@@ -44,6 +44,19 @@
     - PRは必ずdraftで作成し、Review Readyにはしないこと
     - 日本語を使う場合はですますを使うこと。ただし箇条書きで客観的に事実を羅列する場合などは例外とする。
     - 実際にテストや確認をしたことだけを「テストした」「確認した」と言うこと
+9. コミットを作成する場合は、GitHubの仕様に従い、コミットメッセージの最後に空行を入れてから、Co-authored-by: に続けてGitHubユーザーの情報を記すこと
+    - AIとの協働作業であることを明示するため
+    - 複数のAIや人間と協働した場合は、それぞれの共著者情報を別行で記載すること
+    - 記載例:
+      ```
+      fix: バリデーション処理のバグを修正
+
+      入力値チェックの不具合を解決
+
+      Co-authored-by: Cascade <cascade@windsurf.ai>
+      Co-authored-by: John Doe <john@example.com>
+      ```
+    - 仕様の詳細: https://docs.github.com/en/pull-requests/committing-changes-to-your-project/creating-and-editing-commits/creating-a-commit-with-multiple-authors
 
 ## 文脈の扱い方
 
