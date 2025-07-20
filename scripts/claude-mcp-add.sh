@@ -28,12 +28,20 @@ jq -r '.mcpServers | to_entries[] | @json' "$MCP_CONFIG_FILE" | while IFS= read 
   # Sanitize server name: replace dots and other invalid characters with underscores
   server_name="${original_name//[^a-zA-Z0-9_-]/_}"
 
+  # Check if server already exists
+  if claude mcp list 2>/dev/null | grep -q "^$server_name:"; then
+    echo "⚠️  MCP server $original_name (as $server_name) already exists, skipping..."
+    continue
+  fi
+
   echo "Adding MCP server: $original_name (as $server_name)"
 
-  # Execute claude mcp add-json command (with user scope)
-  claude mcp add-json --scope user "$server_name" "$server_config"
-
-  echo "✓ Added $original_name as $server_name"
+  # Execute claude mcp add-json command
+  if claude mcp add-json "$server_name" "$server_config"; then
+    echo "✓ Added $original_name as $server_name"
+  else
+    echo "❌ Failed to add $original_name as $server_name" >&2
+  fi
 done
 
-echo "All MCP servers have been added successfully!"
+echo "MCP server configuration completed."
