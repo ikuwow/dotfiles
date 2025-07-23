@@ -167,3 +167,36 @@ eksukc() {
   cluster="$1"
   aws eks update-kubeconfig --name "$cluster" --alias "$cluster"
 }
+
+flushdns() {
+  # Check if dscacheutil exists (macOS only)
+  if ! command -v dscacheutil &>/dev/null; then
+    echo "Error: This command is for macOS only. dscacheutil not found."
+    return 1
+  fi
+
+  if ! pgrep mDNSResponder &>/dev/null; then
+    echo "Error: mDNSResponder is not running. This command requires macOS."
+    return 1
+  fi
+
+  echo "Flushing DNS cache..."
+
+  # Flush DNS cache
+  if sudo dscacheutil -flushcache; then
+    echo "dscacheutil: Cache cleared successfully"
+  else
+    echo "Error: Failed to clear cache with dscacheutil"
+    return 1
+  fi
+
+  # Restart mDNSResponder
+  if sudo killall -HUP mDNSResponder; then
+    echo "mDNSResponder: Restarted successfully"
+  else
+    echo "Error: Failed to restart mDNSResponder"
+    return 1
+  fi
+
+  echo "DNS cache flush completed."
+}
