@@ -31,7 +31,6 @@ cask "logi-options+"
 # cask "logitech-g-hub"
 cask "jetbrains-toolbox"
 cask "adguard"
-cask "applite"
 cask "timemachineeditor"
 
 brew "coreutils"
@@ -163,7 +162,6 @@ cask "container"
 
 # Browsers
 cask "google-chrome"
-cask "microsoft-edge"
 cask "firefox"
 cask "vivaldi"
 
@@ -189,7 +187,6 @@ cask "gitify"
 # Work related
 cask "miro"
 cask "notion"
-cask "microsoft-teams"
 
 mas "Dark Reader for Safari", id: 1438243180
 mas "The Unarchiver", id: 425424353
