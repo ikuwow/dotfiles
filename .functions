@@ -94,6 +94,19 @@ if [ ! "$(command -v aps)" ]; then
       return
     fi
 
+    if [ "$query" = "--list" ]; then
+      # List all profiles with current one marked with *
+      current_profile="${AWS_PROFILE:-$(cat ~/.aws/current_profile 2>/dev/null || echo "")}"
+      sed -n "s/^\[profile \(.*\)\]$/\1/p" < ~/.aws/config | while read -r profile; do
+        if [ "$profile" = "$current_profile" ]; then
+          echo "* $profile"
+        else
+          echo "  $profile"
+        fi
+      done
+      return
+    fi
+
     if [ -n "$query" ]; then
       profile="$(sed -n "s/^\[profile \(.*\)\]$/\1/p" < ~/.aws/config | fzf --filter "$query" | head -n 1)"
     else
@@ -137,6 +150,19 @@ if [ ! "$(command -v gps)" ]; then
       export GC_ACTIVE_CONFIG="$DUMMY_CONFIG_NAME"
       gcloud config configurations activate "$DUMMY_CONFIG_NAME"
       echo "Google Cloud configuration cleared."
+      return
+    fi
+
+    if [ "$query" = "--list" ]; then
+      # List all configurations with current one marked with *
+      current_config="${GC_ACTIVE_CONFIG:-$(cat ~/.config/gcloud/active_config 2>/dev/null || echo "")}"
+      gcloud config configurations list --format='value(name)' | while read -r config; do
+        if [ "$config" = "$current_config" ]; then
+          echo "* $config"
+        else
+          echo "  $config"
+        fi
+      done
       return
     fi
 

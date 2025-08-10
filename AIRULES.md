@@ -75,6 +75,10 @@
       Co-authored-by: John Doe <john@example.com>
       ```
     - 仕様の詳細: https://docs.github.com/en/pull-requests/committing-changes-to-your-project/creating-and-editing-commits/creating-a-commit-with-multiple-authors
+9. AWSやGoogle Cloudの権限を扱う際は以下のルールに従うこと：
+    - AWS: 権限が必要な時は`aps`コマンドで適切なprofileに切り替え、`aps --list`で現在のprofileを確認すること
+    - Google Cloud: 権限が必要な時は`gps`コマンドで適切な設定に切り替え、`gps --list`で現在の設定を確認すること
+    - いずれも`--list`オプションでgit branchのように現在選択中のものに`*`が表示される
 
 ## 文脈の扱い方
 
