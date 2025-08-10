@@ -7,5 +7,6 @@ set langmenu=none
 source $VIMRUNTIME/menu.vim
 
 " color schemes
-set guifont=Osaka-Mono:h14
+" set guifont=Osaka-Mono:h14
+set guifont=Monaco:h12
 set background=dark
