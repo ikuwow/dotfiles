@@ -75,6 +75,9 @@
       Co-authored-by: John Doe <john@example.com>
       ```
     - 仕様の詳細: https://docs.github.com/en/pull-requests/committing-changes-to-your-project/creating-and-editing-commits/creating-a-commit-with-multiple-authors
+9. AWSの権限を扱う際は以下のルールに従うこと：
+    - AWS権限が必要な時は`aps`コマンドを使って適切なprofileに切り替えること
+    - AWSの権限を利用する時は必ず`aps --list`で現在のprofileを確認し表示すること（git branchのように現在のprofileには`*`が表示される）
 
 ## 文脈の扱い方
 
