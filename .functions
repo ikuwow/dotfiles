@@ -153,6 +153,19 @@ if [ ! "$(command -v gps)" ]; then
       return
     fi
 
+    if [ "$query" = "--list" ]; then
+      # List all configurations with current one marked with *
+      current_config="${GC_ACTIVE_CONFIG:-$(cat ~/.config/gcloud/active_config 2>/dev/null || echo "")}"
+      gcloud config configurations list --format='value(name)' | while read -r config; do
+        if [ "$config" = "$current_config" ]; then
+          echo "* $config"
+        else
+          echo "  $config"
+        fi
+      done
+      return
+    fi
+
     config=""
     if [ -n "$query" ]; then
       config="$(gcloud config configurations list --format='value(name)' | grep -v "^${DUMMY_CONFIG_NAME}$" | fzf --filter "$query" | head -n 1)"
