@@ -41,6 +41,11 @@ brew "gnu-which"
 brew "gawk"
 brew "grep"
 
+# AI tools
+brew "codex"
+brew "claude-code"
+brew "gemini-cli"
+
 # required by vim
 brew "python"
 
