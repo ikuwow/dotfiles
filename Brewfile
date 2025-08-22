@@ -48,6 +48,7 @@ brew "gemini-cli"
 
 # required by vim
 brew "python"
+brew "pipx"
 
 # Required by Claude MCP config
 brew "uv"
