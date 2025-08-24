@@ -9,7 +9,9 @@ fi
 
 cd "$DOTPATH" || exit 1
 
-[[ -z $XDG_CONFIG_HOME ]] && XDG_CONFIG_HOME=$HOME/.config
+if [[ -z $XDG_CONFIG_HOME ]]; then
+  XDG_CONFIG_HOME=$HOME/.config
+fi
 
 for file in .??*; do
   [[ "$file" == ".git" ]] && continue
@@ -40,10 +42,16 @@ find "$DOTPATH/bin/" -type f -perm 0755 -exec ln -fvns {} ~/bin/ \;
 
 # iCloud
 ICLOUD_DIR="$HOME/Library/Mobile Documents/com~apple~CloudDocs"
-[[ -d "$ICLOUD_DIR" ]] && ln -fvns "$ICLOUD_DIR" "$HOME/iCloudDrive"
+if [[ -d "$ICLOUD_DIR" ]]; then
+  ln -fvns "$ICLOUD_DIR" "$HOME/iCloudDrive"
+fi
 echo
 
 # AIRULES.md
 # https://docs.anthropic.com/en/docs/claude-code/memory#how-claude-looks-up-memories
-[[ -d "$HOME/.claude/" ]] && ln -fvns "$DOTPATH/AIRULES.md" "$HOME/.claude/CLAUDE.md"
-[[ -d "$HOME/.codeium/memories/" ]] && ln -fvns "$DOTPATH/AIRULES.md" "$HOME/.codeium/memories/global_rules.md"
+if [[ -d "$HOME/.claude/" ]]; then
+  ln -fvns "$DOTPATH/AIRULES.md" "$HOME/.claude/CLAUDE.md"
+fi
+if [[ -d "$HOME/.codeium/memories/" ]]; then
+  ln -fvns "$DOTPATH/AIRULES.md" "$HOME/.codeium/memories/global_rules.md"
+fi
