@@ -103,11 +103,14 @@ defaults write com.apple.finder FXRemoveOldTrashItems -bool true
 condkillall Finder
 
 echo "Configuring Safari..."
-defaults write com.apple.Safari ShowFullURLInSmartSearchField -bool true
-defaults write com.apple.Safari IncludeInternalDebugMenu -bool true
-defaults write com.apple.Safari ShowStatusBar -bool true
-defaults write com.apple.Safari AutoFillPasswords -bool true
-condkillall Safari
+# Note: Safari is sandboxed and these settings may not work due to container restrictions
+# You may need to configure these manually in Safari preferences
+# defaults write com.apple.Safari ShowFullURLInSmartSearchField -bool true
+# defaults write com.apple.Safari IncludeInternalDebugMenu -bool true
+# defaults write com.apple.Safari ShowStatusBar -bool true
+# defaults write com.apple.Safari AutoFillPasswords -bool true
+# condkillall Safari
+echo "  Note: Safari settings require manual configuration due to sandboxing"
 
 echo "Configuring Notes..."
 defaults write com.apple.Notes ShouldContinuouslyCheckSpelling -bool false
