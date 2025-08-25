@@ -168,7 +168,6 @@ cask "container"
 # Browsers
 cask "google-chrome"
 cask "firefox"
-cask "vivaldi"
 
 cask "deepl"
 cask "1password-cli"
