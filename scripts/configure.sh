@@ -17,6 +17,7 @@ fi
 echo "Configuring..."
 defaults write -g AppleLanguages '( "en-JP", "ja-JP")'
 defaults write -g AppleShowScrollBars -string "WhenScrolling"
+defaults write -g AppleInterfaceStyleSwitchesAutomatically -bool true  # Auto appearance (Light/Dark)
 defaults write -g NSAutomaticQuoteSubstitutionEnabled -bool false
 defaults write -g NSAutomaticDashSubstitutionEnabled -bool false
 defaults write -g NSAutomaticCapitalizationEnabled -bool false
@@ -87,6 +88,7 @@ defaults write com.apple.dock wvous-tr-corner -int 12 # Notification Center
 defaults write com.apple.dock wvous-tr-modifier -int 0
 defaults write com.apple.dock mru-spaces -bool false # Disable automatically rearrange spacet
 defaults write com.apple.dock expose-group-apps -int 0 # Disable Mission Control's "Group windows by application"
+defaults write com.apple.dock autohide -bool true  # Auto-hide the Dock
 condkillall Dock
 
 echo "Configuring Finder..."
@@ -119,6 +121,3 @@ condkillall Pastebot
 echo ""
 echo "Configuration Complete!"
 echo "Please restart Mac to make sure settings are reflected."
-
-## Deprecated
-# defaults write com.apple.dock autohide -bool true
