@@ -7,6 +7,10 @@ end
 tap "homebrew/autoupdate"
 tap "ikuwow/ikuwow-sshrc"
 tap "Songmu/tap"
+tap "fujiwara/tap"
+tap "kayac/tap"
+tap "keidarcy/tap"
+tap "oven-sh/bun"
 
 brew "mas"
 
@@ -52,7 +56,6 @@ brew "pipx"
 # Required by Claude MCP config
 brew "uv"
 brew "node"
-tap "oven-sh/bun"
 brew "bun"
 
 # For AWS
@@ -60,7 +63,6 @@ brew "awscli"
 brew "awslogs"
 brew "cfn-lint"
 cask "session-manager-plugin"
-tap "fujiwara/tap"
 brew "lambroll"
 
 brew "zlib"
@@ -146,7 +148,6 @@ brew "libvirt"
 brew "virt-manager"
 
 # docker/k8s etc.
-tap "kayac/tap"
 brew "docker"
 brew "docker-compose"
 brew "docker-buildx"
@@ -159,8 +160,7 @@ brew "helm"
 brew "helmfile"
 brew "copilot" # AWS Copilot
 brew "ecspresso"
-brew "Songmu/tap/ecschedule"
-tap "keidarcy/tap"
+brew "ecschedule"
 brew "e1s"
 # kubectl and kustomize should be managed by asdf
 cask "container"
