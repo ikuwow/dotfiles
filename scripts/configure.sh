@@ -58,6 +58,7 @@ echo "Configuring Trackpad..."
 defaults write com.apple.AppleMultitouchTrackpad TrackpadRightClick -bool true
 defaults write com.apple.AppleMultitouchTrackpad Clicking -bool true
 defaults write com.apple.AppleMultitouchTrackpad TrackpadThreeFingerDrag -bool true
+defaults write -g com.apple.trackpad.scaling -int 2  # Tracking speed (0=slowest, 3=fastest)
 
 echo "Configuring Keyboard..."
 defaults write -g InitialKeyRepeat -int 35

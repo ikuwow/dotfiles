@@ -42,7 +42,7 @@ brew "grep"
 
 # AI tools
 brew "codex"
-brew "claude-code"
+cask "claude-code"
 brew "gemini-cli"
 
 # required by vim
@@ -189,8 +189,6 @@ cask "wireshark"
 cask "gitify"
 
 # Work related
-cask "miro"
-cask "notion"
 
 mas "Dark Reader for Safari", id: 1438243180
 mas "The Unarchiver", id: 425424353
@@ -201,7 +199,6 @@ mas "Day One", id: 1055511498
 mas "New File Menu", id: 1064959555
 mas "Kindle", id: 302584613
 mas "LINE", id: 539883307
-mas "Habitify", id: 1111447047
 mas "Speedtest", id: 1153157709
 mas "Focus", id: 777233759
 mas "Control Panel for Twitter", id: 1668516167
