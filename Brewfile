@@ -4,7 +4,6 @@ def is_m1?
   system("uname -m | grep arm64")
 end
 
-tap "homebrew/cask"
 tap "homebrew/autoupdate"
 tap "ikuwow/ikuwow-sshrc"
 tap "Songmu/tap"
