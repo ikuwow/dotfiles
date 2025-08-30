@@ -13,15 +13,35 @@ if [[ -z $XDG_CONFIG_HOME ]]; then
   XDG_CONFIG_HOME=$HOME/.config
 fi
 
-for file in .??*; do
-  [[ "$file" == ".git" ]] && continue
-  [[ "$file" == ".gitignore" ]] && continue
-  [[ "$file" == ".DS_Store" ]] && continue
-  [[ "$file" == ".travis.yml" ]] && continue
-  [[ "$file" == ".config" ]] && continue
-  [[ "$file" == ".github" ]] && continue
-  [[ "$file" == ".kube" ]] && continue
-  ln -fvns "$DOTPATH/$file" "$HOME/$file"
+# Whitelist of dotfiles to symlink
+DOTFILES=(
+  ".aliases"
+  ".asdfrc"
+  ".bash_profile"
+  ".bashrc"
+  ".default-gems"
+  ".default-npm-packages"
+  ".default-python-packages"
+  ".functions"
+  ".gemrc"
+  ".gvimrc"
+  ".ideavimrc"
+  ".inputrc"
+  ".npmrc"
+  ".shellcheckrc"
+  ".sshrc"
+  ".terraformrc"
+  ".tmux.conf"
+  ".tool-versions"
+  ".vimrc"
+)
+
+for file in "${DOTFILES[@]}"; do
+  if [[ -e "$DOTPATH/$file" ]]; then
+    ln -fvns "$DOTPATH/$file" "$HOME/$file"
+  else
+    echo "Warning: $file not found in $DOTPATH"
+  fi
 done
 
 mkdir -p "$XDG_CONFIG_HOME"
@@ -47,11 +67,14 @@ if [[ -d "$ICLOUD_DIR" ]]; then
 fi
 echo
 
-# AIRULES.md
-# https://docs.anthropic.com/en/docs/claude-code/memory#how-claude-looks-up-memories
-if [[ -d "$HOME/.claude/" ]]; then
-  ln -fvns "$DOTPATH/AIRULES.md" "$HOME/.claude/CLAUDE.md"
+# Claude Code user settings
+if [[ -d "$DOTPATH/claude-user-config" && ! -e "$HOME/.claude" ]]; then
+  ln -fvns "$DOTPATH/claude-user-config" "$HOME/.claude"
+elif [[ -d "$DOTPATH/claude-user-config" && -e "$HOME/.claude" ]]; then
+  echo "Note: ~/.claude already exists, skipping claude-user-config symlink"
 fi
+
+# Codeium memory
 if [[ -d "$HOME/.codeium/memories/" ]]; then
   ln -fvns "$DOTPATH/AIRULES.md" "$HOME/.codeium/memories/global_rules.md"
 fi

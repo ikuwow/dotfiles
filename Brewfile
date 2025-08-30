@@ -4,10 +4,13 @@ def is_m1?
   system("uname -m | grep arm64")
 end
 
-tap "homebrew/cask"
 tap "homebrew/autoupdate"
 tap "ikuwow/ikuwow-sshrc"
 tap "Songmu/tap"
+tap "fujiwara/tap"
+tap "kayac/tap"
+tap "keidarcy/tap"
+tap "oven-sh/bun"
 
 brew "mas"
 
@@ -32,6 +35,7 @@ cask "logi-options+"
 cask "jetbrains-toolbox"
 cask "adguard"
 cask "timemachineeditor"
+cask "windsurf"
 
 brew "coreutils"
 brew "diffutils"
@@ -43,7 +47,7 @@ brew "grep"
 
 # AI tools
 brew "codex"
-brew "claude-code"
+cask "claude-code"
 brew "gemini-cli"
 
 # required by vim
@@ -53,7 +57,6 @@ brew "pipx"
 # Required by Claude MCP config
 brew "uv"
 brew "node"
-tap "oven-sh/bun"
 brew "bun"
 
 # For AWS
@@ -61,7 +64,6 @@ brew "awscli"
 brew "awslogs"
 brew "cfn-lint"
 cask "session-manager-plugin"
-tap "fujiwara/tap"
 brew "lambroll"
 
 brew "zlib"
@@ -147,7 +149,6 @@ brew "libvirt"
 brew "virt-manager"
 
 # docker/k8s etc.
-tap "kayac/tap"
 brew "docker"
 brew "docker-compose"
 brew "docker-buildx"
@@ -160,8 +161,7 @@ brew "helm"
 brew "helmfile"
 brew "copilot" # AWS Copilot
 brew "ecspresso"
-brew "Songmu/tap/ecschedule"
-tap "keidarcy/tap"
+brew "ecschedule"
 brew "e1s"
 # kubectl and kustomize should be managed by asdf
 cask "container"
@@ -169,7 +169,6 @@ cask "container"
 # Browsers
 cask "google-chrome"
 cask "firefox"
-cask "vivaldi"
 
 cask "deepl"
 cask "1password-cli"
@@ -191,8 +190,6 @@ cask "wireshark"
 cask "gitify"
 
 # Work related
-cask "miro"
-cask "notion"
 
 mas "Dark Reader for Safari", id: 1438243180
 mas "The Unarchiver", id: 425424353
@@ -203,8 +200,8 @@ mas "Day One", id: 1055511498
 mas "New File Menu", id: 1064959555
 mas "Kindle", id: 302584613
 mas "LINE", id: 539883307
-mas "Habitify", id: 1111447047
 mas "Speedtest", id: 1153157709
+mas "Online Check", id: 6504709660
 mas "Focus", id: 777233759
 mas "Control Panel for Twitter", id: 1668516167
 mas "one sec", id: 1532875441

@@ -17,6 +17,7 @@ fi
 echo "Configuring..."
 defaults write -g AppleLanguages '( "en-JP", "ja-JP")'
 defaults write -g AppleShowScrollBars -string "WhenScrolling"
+defaults write -g AppleInterfaceStyleSwitchesAutomatically -bool true  # Auto appearance (Light/Dark)
 defaults write -g NSAutomaticQuoteSubstitutionEnabled -bool false
 defaults write -g NSAutomaticDashSubstitutionEnabled -bool false
 defaults write -g NSAutomaticCapitalizationEnabled -bool false
@@ -58,10 +59,15 @@ echo "Configuring Trackpad..."
 defaults write com.apple.AppleMultitouchTrackpad TrackpadRightClick -bool true
 defaults write com.apple.AppleMultitouchTrackpad Clicking -bool true
 defaults write com.apple.AppleMultitouchTrackpad TrackpadThreeFingerDrag -bool true
+defaults write -g com.apple.trackpad.scaling -int 2  # Tracking speed (0=slowest, 3=fastest)
 
 echo "Configuring Keyboard..."
 defaults write -g InitialKeyRepeat -int 35
 defaults write -g KeyRepeat -int 2
+defaults write -g ApplePressAndHoldEnabled -bool false  # Disable press-and-hold for accented characters
+
+echo "Configuring Japanese IME..."
+defaults write com.apple.inputmethod.Kotoeri JIMPrefLiveConversionKey -bool false  # Disable live conversion
 
 echo "Configuring SystemUIServer..."
 defaults write com.apple.systemuiserver menuExtras -array \
@@ -86,7 +92,15 @@ defaults write com.apple.dock wvous-tr-corner -int 12 # Notification Center
 defaults write com.apple.dock wvous-tr-modifier -int 0
 defaults write com.apple.dock mru-spaces -bool false # Disable automatically rearrange spacet
 defaults write com.apple.dock expose-group-apps -int 0 # Disable Mission Control's "Group windows by application"
+defaults write com.apple.dock autohide -bool true  # Auto-hide the Dock
 condkillall Dock
+
+echo "Configuring Window Manager..."
+defaults write com.apple.WindowManager GloballyEnabled -bool false  # Disable window tiling/Stage Manager
+defaults write com.apple.WindowManager EnableTiledWindowMargins -bool false  # Disable tiled window margins
+defaults write com.apple.WindowManager EnableStandardClickToShowDesktop -bool false  # Disable click to show desktop
+defaults write com.apple.WindowManager EnableTilingByEdgeDrag -bool false  # Disable "Drag windows to screen edges to tile"
+defaults write com.apple.WindowManager EnableTopTilingByEdgeDrag -bool false  # Disable "Drag windows to menu bar to fill screen"
 
 echo "Configuring Finder..."
 defaults write com.apple.finder ShowHardDrivesOnDesktop -bool true
@@ -100,11 +114,14 @@ defaults write com.apple.finder FXRemoveOldTrashItems -bool true
 condkillall Finder
 
 echo "Configuring Safari..."
-defaults write com.apple.Safari ShowFullURLInSmartSearchField -bool true
-defaults write com.apple.Safari IncludeInternalDebugMenu -bool true
-defaults write com.apple.Safari ShowStatusBar -bool true
-defaults write com.apple.Safari AutoFillPasswords -bool true
-condkillall Safari
+# Note: Safari is sandboxed and these settings may not work due to container restrictions
+# You may need to configure these manually in Safari preferences
+# defaults write com.apple.Safari ShowFullURLInSmartSearchField -bool true
+# defaults write com.apple.Safari IncludeInternalDebugMenu -bool true
+# defaults write com.apple.Safari ShowStatusBar -bool true
+# defaults write com.apple.Safari AutoFillPasswords -bool true
+# condkillall Safari
+echo "  Note: Safari settings require manual configuration due to sandboxing"
 
 echo "Configuring Notes..."
 defaults write com.apple.Notes ShouldContinuouslyCheckSpelling -bool false
@@ -118,6 +135,3 @@ condkillall Pastebot
 echo ""
 echo "Configuration Complete!"
 echo "Please restart Mac to make sure settings are reflected."
-
-## Deprecated
-# defaults write com.apple.dock autohide -bool true

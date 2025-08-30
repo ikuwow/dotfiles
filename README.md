@@ -6,11 +6,17 @@ My dear dotfiles.
 
 ## Set up your new Mac
 
-* ☑️ Set language and reboot (System Preferences => Language and Region => Click plus button => ...)
+### Initial Setup (usually done in setup wizard)
+Complete these during initial Mac setup or from System Preferences (reboot required if changed later):
+* ☑️ Update macOS to the latest version
+* ☑️ Set language
 * ☑️ Connect to internet
-* ☑️ Sign in Apple ID (System Preferences => Click "Sign in" => ...)
-* ☑️ Set password of login user (System Preferences => Users and Groups => ...)
+* ☑️ Sign in with Apple ID
+* ☑️ Set password for login user
+
+### Required Manual Steps
 * ☑️ Install Developer Tools: `xcode-select --install`
+* ☑️ Grant Full Disk Access to Terminal (System Preferences => Privacy & Security => Privacy => Full Disk Access => Add Terminal.app)
 
 ## Boostrapping
 
@@ -45,7 +51,7 @@ chsh -s "$LOGIN_SHELL"
 ### Create key pair
 
 ```
-ssh-keygen -t rsa -b 4096 -C "ikuwow@gmail.com"
+ssh-keygen -t ed25519 -C "ikuwow@gmail.com"
 ```
 
 Be sure to set passphrase.
