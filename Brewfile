@@ -200,6 +200,7 @@ mas "New File Menu", id: 1064959555
 mas "Kindle", id: 302584613
 mas "LINE", id: 539883307
 mas "Speedtest", id: 1153157709
+mas "Online Check", id: 6504709660
 mas "Focus", id: 777233759
 mas "Control Panel for Twitter", id: 1668516167
 mas "one sec", id: 1532875441
