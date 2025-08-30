@@ -91,6 +91,11 @@ defaults write com.apple.dock expose-group-apps -int 0 # Disable Mission Control
 defaults write com.apple.dock autohide -bool true  # Auto-hide the Dock
 condkillall Dock
 
+echo "Configuring Window Manager..."
+defaults write com.apple.WindowManager GloballyEnabled -bool false  # Disable window tiling/Stage Manager
+defaults write com.apple.WindowManager EnableTiledWindowMargins -bool false  # Disable tiled window margins
+defaults write com.apple.WindowManager EnableStandardClickToShowDesktop -bool false  # Disable click to show desktop
+
 echo "Configuring Finder..."
 defaults write com.apple.finder ShowHardDrivesOnDesktop -bool true
 defaults write com.apple.finder ShowExternalHardDrivesOnDesktop -bool true
