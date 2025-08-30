@@ -65,6 +65,9 @@ echo "Configuring Keyboard..."
 defaults write -g InitialKeyRepeat -int 35
 defaults write -g KeyRepeat -int 2
 
+echo "Configuring Japanese IME..."
+defaults write com.apple.inputmethod.Kotoeri JIMPrefLiveConversionKey -bool false  # Disable live conversion
+
 echo "Configuring SystemUIServer..."
 defaults write com.apple.systemuiserver menuExtras -array \
   "/System/Library/CoreServices/Menu Extras/TimeMachine.menu" \
