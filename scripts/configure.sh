@@ -64,6 +64,7 @@ defaults write -g com.apple.trackpad.scaling -int 2  # Tracking speed (0=slowest
 echo "Configuring Keyboard..."
 defaults write -g InitialKeyRepeat -int 35
 defaults write -g KeyRepeat -int 2
+defaults write -g ApplePressAndHoldEnabled -bool false  # Disable press-and-hold for accented characters
 
 echo "Configuring Japanese IME..."
 defaults write com.apple.inputmethod.Kotoeri JIMPrefLiveConversionKey -bool false  # Disable live conversion
