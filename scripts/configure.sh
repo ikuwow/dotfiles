@@ -95,6 +95,8 @@ echo "Configuring Window Manager..."
 defaults write com.apple.WindowManager GloballyEnabled -bool false  # Disable window tiling/Stage Manager
 defaults write com.apple.WindowManager EnableTiledWindowMargins -bool false  # Disable tiled window margins
 defaults write com.apple.WindowManager EnableStandardClickToShowDesktop -bool false  # Disable click to show desktop
+defaults write com.apple.WindowManager EnableTilingByEdgeDrag -bool false  # Disable "Drag windows to screen edges to tile"
+defaults write com.apple.WindowManager EnableTopTilingByEdgeDrag -bool false  # Disable "Drag windows to menu bar to fill screen"
 
 echo "Configuring Finder..."
 defaults write com.apple.finder ShowHardDrivesOnDesktop -bool true
