@@ -13,15 +13,35 @@ if [[ -z $XDG_CONFIG_HOME ]]; then
   XDG_CONFIG_HOME=$HOME/.config
 fi
 
-for file in .??*; do
-  [[ "$file" == ".git" ]] && continue
-  [[ "$file" == ".gitignore" ]] && continue
-  [[ "$file" == ".DS_Store" ]] && continue
-  [[ "$file" == ".travis.yml" ]] && continue
-  [[ "$file" == ".config" ]] && continue
-  [[ "$file" == ".github" ]] && continue
-  [[ "$file" == ".kube" ]] && continue
-  ln -fvns "$DOTPATH/$file" "$HOME/$file"
+# Whitelist of dotfiles to symlink
+DOTFILES=(
+  ".aliases"
+  ".asdfrc"
+  ".bash_profile"
+  ".bashrc"
+  ".default-gems"
+  ".default-npm-packages"
+  ".default-python-packages"
+  ".functions"
+  ".gemrc"
+  ".gvimrc"
+  ".ideavimrc"
+  ".inputrc"
+  ".npmrc"
+  ".shellcheckrc"
+  ".sshrc"
+  ".terraformrc"
+  ".tmux.conf"
+  ".tool-versions"
+  ".vimrc"
+)
+
+for file in "${DOTFILES[@]}"; do
+  if [[ -e "$DOTPATH/$file" ]]; then
+    ln -fvns "$DOTPATH/$file" "$HOME/$file"
+  else
+    echo "Warning: $file not found in $DOTPATH"
+  fi
 done
 
 mkdir -p "$XDG_CONFIG_HOME"
