@@ -67,11 +67,14 @@ if [[ -d "$ICLOUD_DIR" ]]; then
 fi
 echo
 
-# AIRULES.md
-# https://docs.anthropic.com/en/docs/claude-code/memory#how-claude-looks-up-memories
-if [[ -d "$HOME/.claude/" ]]; then
-  ln -fvns "$DOTPATH/AIRULES.md" "$HOME/.claude/CLAUDE.md"
+# Claude Code user settings
+if [[ -d "$DOTPATH/claude-user-config" && ! -e "$HOME/.claude" ]]; then
+  ln -fvns "$DOTPATH/claude-user-config" "$HOME/.claude"
+elif [[ -d "$DOTPATH/claude-user-config" && -e "$HOME/.claude" ]]; then
+  echo "Note: ~/.claude already exists, skipping claude-user-config symlink"
 fi
+
+# Codeium memory
 if [[ -d "$HOME/.codeium/memories/" ]]; then
   ln -fvns "$DOTPATH/AIRULES.md" "$HOME/.codeium/memories/global_rules.md"
 fi

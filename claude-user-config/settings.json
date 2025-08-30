@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(echo:*)",
+      "Bash(pwd:*)",
+      "Bash(grep:*)",
+      "Bash(mkdir:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git show:*)",
+      "Bash(git blame:*)",
+      "Bash(git add:*)",
+      "Bash(git checkout:*)",
+      "Bash(git pull:*)",
+      "Bash(git grep:*)",
+      "Bash(git add:*)",
+      "Bash(shellcheck:*)",
+      "Bash(actionlint:*)",
+      "Bash(yamllint:*)",
+      "Bash(jq:*)",
+      "Bash(yq:*)",
+      "Bash(dig:*)",
+      "Bash(gh run list:*)",
+      "Bash(gh run view:*)",
+      "Bash(gh issue list:*)",
+      "Bash(gh issue view:*)",
+      "Bash(gh pr list:*)",
+      "Bash(gh pr view:*)",
+      "Bash(gh pr checks:*)",
+      "Bash(gh pr diff:*)",
+      "Bash(gh release view:*)",
+      "Bash(gh label list:*)",
+      "Bash(docker compose ps:*)",
+      "Bash(docker-compose ps:*)",
+      "Bash(terraform validate:*)",
+      "Bash(terraform fmt:*)",
+      "Bash(terraform plan:*)",
+      "Bash(aps-–list:*)",
+      "Bash(gps --list:*)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:docs.github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:docs.anthropic.com)",
+      "WebFetch(domain:pkg.go.dev)",
+      "mcp__deepwiki__*",
+      "mcp__awslabs_aws-documentation-mcp-server__*"
+    ]
+  },
+  "hooks": {
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "noti --title 'Claude Code' --message 'Requires response.'"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "noti --title 'Claude Code' --message 'Done! Yay!'"
+          }
+        ]
+      }
+    ]
+  },
+  "feedbackSurveyState": {
+    "lastShownTime": 1754272823676
+  }
+}

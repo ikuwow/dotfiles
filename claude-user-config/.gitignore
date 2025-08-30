@@ -1,0 +1,17 @@
+# Claude Code dynamic/cache files
+projects/
+todos/
+shell-snapshots/
+statsig/
+
+# Temporary files
+test-which-dir.json
+*.tmp
+*.cache
+
+# Personal settings (not shared)
+settings.local.json
+.mcp.json
+
+# System files
+.DS_Store
