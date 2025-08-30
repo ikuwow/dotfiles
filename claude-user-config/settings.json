@@ -37,7 +37,7 @@
       "Bash(terraform validate:*)",
       "Bash(terraform fmt:*)",
       "Bash(terraform plan:*)",
-      "Bash(aps-–list:*)",
+      "Bash(aps --list:*)",
       "Bash(gps --list:*)",
       "WebFetch(domain:github.com)",
       "WebFetch(domain:docs.github.com)",
