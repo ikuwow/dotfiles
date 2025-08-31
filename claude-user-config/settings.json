@@ -45,7 +45,11 @@
       "WebFetch(domain:docs.anthropic.com)",
       "WebFetch(domain:pkg.go.dev)",
       "mcp__deepwiki__*",
-      "mcp__awslabs_aws-documentation-mcp-server__*"
+      "mcp__awslabs_aws-documentation-mcp-server__*",
+      "mcp__jetbrains__get_*",
+      "mcp__jetbrains__find_*",
+      "mcp__jetbrains__list_*",
+      "mcp__jetbrains__search_*"
     ]
   },
   "hooks": {
