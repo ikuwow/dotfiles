@@ -49,7 +49,14 @@
       "mcp__jetbrains__get_*",
       "mcp__jetbrains__find_*",
       "mcp__jetbrains__list_*",
-      "mcp__jetbrains__search_*"
+      "mcp__jetbrains__search_*",
+      "mcp__serena__find_*",
+      "mcp__serena__list_*",
+      "mcp__serena__get_*",
+      "mcp__serena__search_*",
+      "mcp__serena__read_*",
+      "mcp__serena__check_*",
+      "mcp__serena__think_*"
     ]
   },
   "hooks": {
