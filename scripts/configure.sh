@@ -34,6 +34,7 @@ defaults -currentHost write com.apple.Spotlight MenuItemHidden -int 1
 
 echo "Configuring with sudo..."
 sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate on
+sudo pmset -b lessbright 0  # Disable "Slightly dim the display on battery"
 
 defaults -currentHost write com.apple.screensaver idleTime -int 0
 
