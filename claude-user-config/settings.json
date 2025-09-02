@@ -1,6 +1,12 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
   "permissions": {
+    "ask": [
+      "mcp__jetbrains__run_configuration",
+      "mcp__jetbrains__execute_terminal_command", 
+      "mcp__jetbrains__replace_file_text_by_path",
+      "mcp__jetbrains__execute_action_by_id"
+    ],
     "allow": [
       "Bash(echo:*)",
       "Bash(pwd:*)",
@@ -44,19 +50,21 @@
       "WebFetch(domain:raw.githubusercontent.com)",
       "WebFetch(domain:docs.anthropic.com)",
       "WebFetch(domain:pkg.go.dev)",
-      "mcp__deepwiki__*",
-      "mcp__awslabs_aws-documentation-mcp-server__*",
-      "mcp__jetbrains__get_*",
-      "mcp__jetbrains__find_*",
-      "mcp__jetbrains__list_*",
-      "mcp__jetbrains__search_*",
-      "mcp__serena__find_*",
-      "mcp__serena__list_*",
-      "mcp__serena__get_*",
-      "mcp__serena__search_*",
-      "mcp__serena__read_*",
-      "mcp__serena__check_*",
-      "mcp__serena__think_*"
+      "mcp__deepwiki",
+      "mcp__awslabs_aws-documentation-mcp-server",
+      "mcp__jetbrains",
+      "mcp__serena__find_file",
+      "mcp__serena__find_symbol",
+      "mcp__serena__find_referencing_symbols",
+      "mcp__serena__list_dir",
+      "mcp__serena__list_memories",
+      "mcp__serena__get_symbols_overview",
+      "mcp__serena__search_for_pattern",
+      "mcp__serena__read_memory",
+      "mcp__serena__check_onboarding_performed",
+      "mcp__serena__think_about_collected_information",
+      "mcp__serena__think_about_task_adherence",
+      "mcp__serena__think_about_whether_you_are_done"
     ]
   },
   "hooks": {
