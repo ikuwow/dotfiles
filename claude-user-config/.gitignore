@@ -12,5 +12,8 @@ test-which-dir.json
 # Personal settings (not shared)
 settings.local.json
 
+# IDE config files
+ide/
+
 # System files
 .DS_Store
