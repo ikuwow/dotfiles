@@ -15,5 +15,8 @@ settings.local.json
 # IDE config files
 ide/
 
+# Beta features (not ready for use)
+plugins/
+
 # System files
 .DS_Store
