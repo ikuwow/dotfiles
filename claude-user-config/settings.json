@@ -53,6 +53,7 @@
       "mcp__deepwiki",
       "mcp__awslabs_aws-documentation-mcp-server",
       "mcp__jetbrains",
+      "mcp__pipe-cd_docs-mcp-server",
       "mcp__serena__find_file",
       "mcp__serena__find_symbol",
       "mcp__serena__find_referencing_symbols",
