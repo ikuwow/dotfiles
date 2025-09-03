@@ -1,12 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
   "permissions": {
-    "ask": [
-      "mcp__jetbrains__run_configuration",
-      "mcp__jetbrains__execute_terminal_command", 
-      "mcp__jetbrains__replace_file_text_by_path",
-      "mcp__jetbrains__execute_action_by_id"
-    ],
     "allow": [
       "Bash(echo:*)",
       "Bash(pwd:*)",
@@ -66,6 +60,12 @@
       "mcp__serena__think_about_collected_information",
       "mcp__serena__think_about_task_adherence",
       "mcp__serena__think_about_whether_you_are_done"
+    ],
+    "ask": [
+      "mcp__jetbrains__run_configuration",
+      "mcp__jetbrains__execute_terminal_command",
+      "mcp__jetbrains__replace_file_text_by_path",
+      "mcp__jetbrains__execute_action_by_id"
     ]
   },
   "hooks": {
@@ -94,5 +94,6 @@
   },
   "feedbackSurveyState": {
     "lastShownTime": 1754272823676
-  }
+  },
+  "model": "opus"
 }
