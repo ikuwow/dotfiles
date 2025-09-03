@@ -12,3 +12,6 @@
 .config/oni/config.js
 
 Brewfile.lock.json
+
+# Backup files
+*.bak
