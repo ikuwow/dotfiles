@@ -17,10 +17,10 @@ macos-titlebar-style = tabs
 keybind = global:cmd+shift+space=toggle_quick_terminal
 quick-terminal-position = center
 
-# font-family = "Osaka-Mono"
-font-family = "Monaco"
+font-family = "Osaka-Mono"
+# font-family = "Monaco"
 font-style = Regular
-font-size = 12
+font-size = 13
 # Disable ligatures
 font-feature = -calt, -liga, -dlig
 
