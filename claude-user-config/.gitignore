@@ -20,3 +20,6 @@ plugins/
 
 # System files
 .DS_Store
+
+# Update lock files
+.update.lock
