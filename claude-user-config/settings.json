@@ -68,6 +68,7 @@
       "mcp__jetbrains__execute_action_by_id"
     ]
   },
+  "model": "opusplan",
   "hooks": {
     "Notification": [
       {
@@ -94,6 +95,5 @@
   },
   "feedbackSurveyState": {
     "lastShownTime": 1754272823676
-  },
-  "model": "opus"
+  }
 }
