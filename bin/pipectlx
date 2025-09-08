@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+
+#
+# pipectl wrapper script
+#
+# This script automatically adds API key and server address to pipectl commands
+# by reading configuration from ~/.pipectl/config.json
+#
+# SETUP:
+#   1. Create configuration directory: mkdir -p ~/.pipectl
+#   2. Create config file with the following format:
+#      {
+#        "address": "your-pipecd-server:443",
+#        "api_key": "your-api-key-here"
+#      }
+#
+# USAGE:
+#   ./pipectlx application list         # Automatically adds --api-key and --address
+#   ./pipectlx deployment list --limit 5
+#   ./pipectlx version                  # API connection not needed, runs as-is
+#   ./pipectlx --help                   # Shows original pipectl help
+#
+# FEATURES:
+#   - Automatically detects which commands need API connection
+#   - Transparent pass-through for all arguments and options
+#   - Robust JSON parsing with jq (fallback if jq not available)
+#   - Clear error messages for missing or invalid configuration
+#
+
+# Configuration file path
+CONFIG_FILE="$HOME/.pipectl/config.json"
+
+# Function to read config value using jq
+read_config() {
+  local key="$1"
+  if [[ -f "$CONFIG_FILE" ]]; then
+    if command -v jq >/dev/null 2>&1; then
+      jq -r ".$key // empty" "$CONFIG_FILE" 2>/dev/null
+    else
+      # Fallback: simple grep+sed for basic JSON parsing (not robust but works for simple cases)
+      grep "\"$key\":" "$CONFIG_FILE" | sed 's/.*"'"$key"'":[[:space:]]*"\([^"]*\)".*/\1/'
+    fi
+  fi
+}
+
+# Read configuration
+API_KEY=$(read_config "api_key")
+ADDRESS=$(read_config "address")
+
+# Validate configuration
+if [[ -z "$API_KEY" || -z "$ADDRESS" ]]; then
+  echo "Error: Configuration not found or incomplete in $CONFIG_FILE" >&2
+  echo "Expected format:" >&2
+  echo '{' >&2
+  echo '  "address": "your-pipecd-server:443",' >&2
+  echo '  "api_key": "your-api-key"' >&2
+  echo '}' >&2
+  exit 1
+fi
+
+# Commands that require API connection
+API_COMMANDS=("application" "deployment" "piped" "plan-preview" "event")
+
+# Check if the first argument is an API command
+NEEDS_API=false
+if [[ $# -gt 0 ]]; then
+  for cmd in "${API_COMMANDS[@]}"; do
+    if [[ "$1" == "$cmd" ]]; then
+      NEEDS_API=true
+      break
+    fi
+  done
+fi
+
+# Execute pipectl with or without API configuration
+if [[ "$NEEDS_API" == "true" ]]; then
+  exec pipectl \
+    --api-key "$API_KEY" \
+    --address "$ADDRESS" \
+    "$@"
+else
+  exec pipectl "$@"
+fi
