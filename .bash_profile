@@ -74,7 +74,7 @@ export PATH=${AQUA_ROOT_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/aquaproj-aqua}
 
 [[ -f "$BREW_PREFIX/share/google-cloud-sdk/path.bash.inc" ]] && . "$BREW_PREFIX/share/google-cloud-sdk/path.bash.inc"
 [[ -f "$HOME/.asdf/plugins/golang/set-env.bash" ]] && . "$HOME/.asdf/plugins/golang/set-env.bash"
-export PATH="${GOBIN}:${PATH}"
+[[ -n "$GOBIN" ]] && export PATH="${GOBIN}:${PATH}"
 export ASDF_GOLANG_MOD_VERSION_ENABLED="true"
 export CLOUDSDK_PYTHON="$BREW_PREFIX/bin/python3" # for gcloud
 
