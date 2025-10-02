@@ -9,7 +9,3 @@ repos:
       - id: check-json
       - id: check-yaml
       - id: check-added-large-files
-  - repo: git://github.com/detailyang/pre-commit-shell
-    rev: v1.0.6
-    hooks:
-      - id: shell-lint # shellcheck
