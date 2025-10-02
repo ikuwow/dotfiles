@@ -11,6 +11,7 @@ test-which-dir.json
 
 # Personal settings (not shared)
 settings.local.json
+history.jsonl
 
 # IDE config files
 ide/

@@ -27,17 +27,6 @@
     "Context7": {
       "command": "npx",
       "args": ["-y", "@upstash/context7-mcp"]
-    },
-    "serena": {
-      "command": "uvx",
-      "args": ["--from", "git+https://github.com/oraios/serena", "serena", "start-mcp-server", "--context", "ide-assistant", "--project", "$(pwd)"]
-    },
-     "pipe-cd.docs-mcp-server": {
-      "type": "stdio",
-      "command": "npx",
-      "args": [
-        "@pipe-cd/docs-mcp-server@latest"
-      ]
     }
   }
 }

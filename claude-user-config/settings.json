@@ -23,6 +23,7 @@
       "Bash(jq:*)",
       "Bash(yq:*)",
       "Bash(dig:*)",
+      "Bash(gh repo view:*)",
       "Bash(gh run list:*)",
       "Bash(gh run view:*)",
       "Bash(gh issue list:*)",
@@ -72,7 +73,6 @@
       "mcp__jetbrains__execute_action_by_id"
     ]
   },
-  "model": "opusplan",
   "hooks": {
     "Notification": [
       {
@@ -97,6 +97,7 @@
       }
     ]
   },
+  "alwaysThinkingEnabled": false,
   "feedbackSurveyState": {
     "lastShownTime": 1754272823676
   }
