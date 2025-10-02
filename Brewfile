@@ -27,6 +27,7 @@ cask "istat-menus"
 cask "rambox"
 cask "bartender"
 mas "WireGuard", id: 1451685025
+brew "udp2raw-multiplatform"
 brew "bash"
 cask "logi-options+"
 # This installation process hangs up!
@@ -181,7 +182,6 @@ cask "zoom"
 cask "chromedriver"
 cask "lastfm"
 cask "ears"
-cask "powershell"
 cask "onyx"
 cask "chatgpt" if is_m1?
 cask "claude"
