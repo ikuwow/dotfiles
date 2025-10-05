@@ -23,10 +23,8 @@
       Co-authored-by: John Doe <john@example.com>
       ```
     - 仕様の詳細: https://docs.github.com/en/pull-requests/committing-changes-to-your-project/creating-and-editing-commits/creating-a-commit-with-multiple-authors
-10. AWSやGoogle Cloudの権限を扱う際は以下のルールに従うこと：
-    - AWS: 権限が必要な時は`aps`コマンドで適切なprofileに切り替え、`aps --list`で現在のprofileを確認すること
-    - Google Cloud: 権限が必要な時は`gps`コマンドで適切な設定に切り替え、`gps --list`で現在の設定を確認すること
-    - いずれも`--list`オプションでgit branchのように現在選択中のものに`*`が表示される
+10. AWSやGoogle Cloudの権限が必要な場合はそれぞれ `aps` `gps` コマンドを使い選択すること
+    - 詳細は `aps --help` `gps --help` を参照
 11. プロジェクトに直接関係ないファイルを作成する時は、特に指示がない限り`ikuwowfiles/`以下に置くこと
     - このディレクトリはグローバルにgitignoreされているため、バージョン管理から除外される
 12. コードやファイル内の検索には積極的に`git grep`を使用すること

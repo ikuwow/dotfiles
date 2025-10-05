@@ -87,6 +87,29 @@ if [ ! "$(command -v aps)" ]; then
     fi
     query="$1"
 
+    if [ "$query" = "--help" ] || [ "$query" = "-h" ]; then
+      cat << 'EOF'
+Usage: aps [OPTIONS] [QUERY]
+
+AWS Profile Switcher - Switch between AWS profiles interactively
+
+OPTIONS:
+  --help, -h     Show this help message
+  --clear        Clear the current AWS profile
+  --list         List all profiles (current one marked with *)
+
+ARGUMENTS:
+  QUERY          Filter profiles by query string (optional)
+
+EXAMPLES:
+  aps                  # Interactive profile selection with fzf
+  aps prod             # Filter profiles containing "prod"
+  aps --list           # List all available profiles
+  aps --clear          # Clear current profile
+EOF
+      return
+    fi
+
     if [ "$query" = "--clear" ]; then
       export AWS_PROFILE=""
       rm -f ~/.aws/current_profile
@@ -140,6 +163,29 @@ if [ ! "$(command -v gps)" ]; then
       exit 1
     fi
     query="$1"
+
+    if [ "$query" = "--help" ] || [ "$query" = "-h" ]; then
+      cat << 'EOF'
+Usage: gps [OPTIONS] [QUERY]
+
+Google Cloud Profile Switcher - Switch between gcloud configurations interactively
+
+OPTIONS:
+  --help, -h     Show this help message
+  --clear        Clear the current gcloud configuration (set to "none")
+  --list         List all configurations (current one marked with *)
+
+ARGUMENTS:
+  QUERY          Filter configurations by query string (optional)
+
+EXAMPLES:
+  gps                  # Interactive configuration selection with fzf
+  gps prod             # Filter configurations containing "prod"
+  gps --list           # List all available configurations
+  gps --clear          # Clear current configuration
+EOF
+      return
+    fi
 
     DUMMY_CONFIG_NAME="none"
     if [ ! "$(gcloud config configurations list --format='value(name)' | grep "^${DUMMY_CONFIG_NAME}$")" ]; then
