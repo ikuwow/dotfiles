@@ -2,6 +2,7 @@
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
   "permissions": {
     "allow": [
+      "Read(~/.claude/rules/*)",
       "Bash(ping:*)",
       "Bash(echo:*)",
       "Bash(pwd:*)",
@@ -12,7 +13,6 @@
       "Bash(git log:*)",
       "Bash(git show:*)",
       "Bash(git blame:*)",
-      "Bash(git add:*)",
       "Bash(git checkout:*)",
       "Bash(git pull:*)",
       "Bash(git grep:*)",
@@ -72,7 +72,6 @@
       "mcp__jetbrains__execute_action_by_id"
     ]
   },
-  "model": "opusplan",
   "hooks": {
     "Notification": [
       {
