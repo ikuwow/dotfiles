@@ -68,9 +68,9 @@ fi
 echo
 
 # Claude Code user settings
-if [[ -d "$DOTPATH/claude-user-config" && ! -e "$HOME/.claude" ]]; then
+if [[ ! -d "$HOME/.claude" ]]; then
   ln -fvns "$DOTPATH/claude-user-config" "$HOME/.claude"
-elif [[ -d "$DOTPATH/claude-user-config" && -e "$HOME/.claude" ]]; then
+else
   echo "Note: ~/.claude already exists, skipping claude-user-config symlink"
 fi
 

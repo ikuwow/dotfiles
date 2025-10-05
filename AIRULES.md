@@ -38,13 +38,13 @@
 以下のタスクを行う場合は、該当するルールファイルを必ず読み込むこと：
 
 - **ソフトウェア開発タスク**（コード実装、デバッグ、リファクタリング、Git操作、PR作成等）
-  → `~/dotfiles/rules/development.md`
+  → `rules/development.md`
 
 - **シェルスクリプト作成・修正タスク**（シェルスクリプトの作成、修正、レビュー等）
-  → `~/dotfiles/rules/shell.md`
+  → `rules/shell.md`
 
 - **データ分析・メトリクス調査タスク**（性能指標の分析、CloudWatchメトリクス調査、データ分析等）
-  → `~/dotfiles/rules/data-analysis.md`
+  → `rules/data-analysis.md`
 
 - **セキュリティに関わる作業**（コード作成、レビュー、機密情報の取り扱い等）
-  → `~/dotfiles/rules/security.md`
+  → `rules/security.md`
