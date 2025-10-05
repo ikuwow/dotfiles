@@ -24,3 +24,5 @@ plugins/
 
 # Update lock files
 .update.lock
+
+history.jsonl
