@@ -26,6 +26,7 @@
       "Bash(gh repo view:*)",
       "Bash(gh run list:*)",
       "Bash(gh run view:*)",
+      "Bash(gh run watch:*)",
       "Bash(gh issue list:*)",
       "Bash(gh issue view:*)",
       "Bash(gh pr list:*)",

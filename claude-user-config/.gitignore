@@ -3,6 +3,8 @@ projects/
 todos/
 shell-snapshots/
 statsig/
+debug/
+file-history/
 
 # Temporary files
 test-which-dir.json
