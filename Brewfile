@@ -176,7 +176,7 @@ cask "deepl"
 cask "1password-cli"
 cask "goneovim"
 cask "xquartz"
-cask "google-cloud-sdk"
+cask "gcloud-cli"
 cask "vagrant"
 cask "vlc"
 cask "zoom"
@@ -187,7 +187,7 @@ cask "onyx"
 cask "chatgpt" if is_m1?
 cask "claude"
 cask "utm"
-cask "wireshark"
+cask "wireshark-app"
 cask "gitify"
 
 # Work related
