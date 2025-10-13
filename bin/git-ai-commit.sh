@@ -30,19 +30,20 @@ else
     COMMIT_MSG=$(echo "$PROMPT" | codex exec - 2>/dev/null)
 fi
 
-echo "Generated commit message:" >&2
-echo "$COMMIT_MSG" >&2
-echo "" >&2
-
 if [ -z "$COMMIT_MSG" ]; then
-    echo "Error: Failed to generate commit message." >&2
+    echo "Failed to generate commit message." >&2
     exit 1
 fi
 
-read -p "Commit with this message? (y/N): " -n 1 -r
-echo
+echo "" >&2
+echo "Commit message:" >&2
+echo "  $COMMIT_MSG" >&2
+echo "" >&2
+
+read -p "Commit? (y/N): " -n 1 -r >&2
+echo >&2
 if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-    echo "Commit cancelled." >&2
+    echo "Cancelled." >&2
     exit 1
 fi
 
