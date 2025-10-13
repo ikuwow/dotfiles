@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+DEBUG=false
+if [[ "${1:-}" == "--debug" ]]; then
+    DEBUG=true
+    shift
+fi
+
 DIFF=$(git diff --staged)
 
 if [ -z "$DIFF" ]; then
@@ -18,7 +24,11 @@ Output ONLY the commit message in English, without any additional explanation or
 $DIFF
 --- end of diff ---"
 
-COMMIT_MSG=$(echo "$PROMPT" | codex exec -)
+if [ "$DEBUG" = true ]; then
+    COMMIT_MSG=$(echo "$PROMPT" | codex exec -)
+else
+    COMMIT_MSG=$(echo "$PROMPT" | codex exec - 2>/dev/null)
+fi
 
 echo "Generated commit message:" >&2
 echo "$COMMIT_MSG" >&2
