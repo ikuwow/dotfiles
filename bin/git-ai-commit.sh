@@ -24,9 +24,16 @@ echo "Generated commit message:" >&2
 echo "$COMMIT_MSG" >&2
 echo "" >&2
 
-TEMP_MSG=$(mktemp)
-echo "$COMMIT_MSG" > "$TEMP_MSG"
+if [ -z "$COMMIT_MSG" ]; then
+    echo "Error: Failed to generate commit message." >&2
+    exit 1
+fi
 
-git commit -t "$TEMP_MSG"
+read -p "Commit with this message? (y/N): " -n 1 -r
+echo
+if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+    echo "Commit cancelled." >&2
+    exit 1
+fi
 
-rm -f "$TEMP_MSG"
+git commit -m "$COMMIT_MSG"
