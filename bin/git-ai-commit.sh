@@ -15,14 +15,14 @@ fi
 
 # codex execでコミットメッセージを生成
 echo "コミットメッセージ生成中..." >&2
-PROMPT="Generate an appropriate commit message based on the git diff output below.
-Do NOT execute the git diff command.
-Format: \"verb: description\" in a single concise line.
-Output ONLY the commit message in English, without any additional explanation or text.
+PROMPT="以下のgit diffの出力を元に、適切なコミットメッセージを生成してください。
+git diffコマンドを実行しないでください。
+形式は「動詞: 変更内容」の形式で、簡潔に1行で記述してください。
+メッセージのみを出力し、説明や追加のテキストは不要です。
 
---- git diff output ---
+--- git diff の出力 ---
 $DIFF
---- end of diff ---"
+--- ここまで ---"
 
 COMMIT_MSG=$(echo "$PROMPT" | codex exec -)
 
