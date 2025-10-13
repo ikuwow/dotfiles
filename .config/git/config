@@ -37,6 +37,7 @@
     oops = commit --all --amend --no-edit
     ce = "commit --allow-empty"
 	aicommit = !$HOME/bin/git-ai-commit.sh
+	aic = !git aicommit
 [credential]
     helper = cache
 [filter "lfs"]
