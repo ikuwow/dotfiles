@@ -25,7 +25,7 @@ cask "ghostty"
 cask "pastebot"
 cask "istat-menus"
 cask "rambox"
-cask "bartender"
+mas "Barbee", id: 1548711022
 mas "WireGuard", id: 1451685025
 brew "udp2raw-multiplatform"
 brew "bash"
