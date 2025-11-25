@@ -206,7 +206,7 @@ mas "Online Check", id: 6504709660
 mas "Focus", id: 777233759
 mas "Control Panel for Twitter", id: 1668516167
 mas "one sec", id: 1532875441
-mas "Xcode", id: 497799835
+# mas "Xcode", id: 497799835 # Commented out for heavy disk usage
 mas "WireGuard", id: 1451685025
 mas "Apple Configurator", id: 1037126344
 mas "Wappalyzer", id: 1520333300
