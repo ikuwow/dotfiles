@@ -4,6 +4,7 @@
     "allow": [
       "Read(~/.claude/rules/*)",
       "Bash(ping:*)",
+      "Bash(ls:*)",
       "Bash(echo:*)",
       "Bash(pwd:*)",
       "Bash(grep:*)",
@@ -69,7 +70,6 @@
       "mcp__serena__think_about_whether_you_are_done"
     ],
     "ask": [
-      "Bash(find:*)",
       "mcp__jetbrains__run_configuration",
       "mcp__jetbrains__execute_terminal_command",
       "mcp__jetbrains__replace_file_text_by_path",
