@@ -25,11 +25,14 @@
       "Bash(yq:*)",
       "Bash(dig:*)",
       "Bash(gh repo view:*)",
+      "Bash(gh repo list:*)",
       "Bash(gh run list:*)",
       "Bash(gh run view:*)",
       "Bash(gh run watch:*)",
+      "Bash(gh cache list:*)",
       "Bash(gh issue list:*)",
       "Bash(gh issue view:*)",
+      "Bash(gh search:*)",
       "Bash(gh pr list:*)",
       "Bash(gh pr view:*)",
       "Bash(gh pr checks:*)",
@@ -37,6 +40,8 @@
       "Bash(gh pr ready:*)",
       "Bash(gh release list:*)",
       "Bash(gh release view:*)",
+      "Bash(gh project list:*)",
+      "Bash(gh project view:*)",
       "Bash(gh label list:*)",
       "Bash(gh search repos:*)",
       "Bash(docker compose ps:*)",
@@ -100,7 +105,6 @@
       }
     ]
   },
-  "alwaysThinkingEnabled": false,
   "feedbackSurveyState": {
     "lastShownTime": 1754272823676
   }
