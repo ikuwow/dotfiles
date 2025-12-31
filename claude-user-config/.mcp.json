@@ -27,17 +27,6 @@
     "Context7": {
       "command": "npx",
       "args": ["-y", "@upstash/context7-mcp"]
-    },
-    "jetbrains": {
-      "command": "${HOME}/Applications/IntelliJ IDEA Ultimate.app/Contents/jbr/Contents/Home/bin/java",
-      "args": [
-        "-classpath",
-        "${HOME}/Applications/IntelliJ IDEA Ultimate.app/Contents/plugins/mcpserver/lib/mcpserver-frontend.jar:${HOME}/Applications/IntelliJ IDEA Ultimate.app/Contents/lib/util-8.jar:${HOME}/Applications/IntelliJ IDEA Ultimate.app/Contents/lib/modules/intellij.libraries.ktor.client.cio.jar:${HOME}/Applications/IntelliJ IDEA Ultimate.app/Contents/lib/lib-client.jar:${HOME}/Applications/IntelliJ IDEA Ultimate.app/Contents/lib/modules/intellij.libraries.ktor.client.jar",
-        "com.intellij.mcpserver.stdio.McpStdioRunnerKt"
-      ],
-      "env": {
-        "IJ_MCP_SERVER_PORT": "64342"
-      }
     }
   }
 }
