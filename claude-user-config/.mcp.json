@@ -1,12 +1,12 @@
 {
   "mcpServers": {
-    "awslabs.aws-documentation-mcp-server": {
+    "aws-mcp": {
       "command": "uvx",
-      "args": ["awslabs.aws-documentation-mcp-server@latest"],
-      "env": {
-        "FASTMCP_LOG_LEVEL": "ERROR",
-        "AWS_DOCUMENTATION_PARTITION": "aws"
-      }
+      "args": [
+        "mcp-proxy-for-aws@latest",
+        "https://aws-mcp.us-east-1.api.aws/mcp",
+        "--metadata", "AWS_REGION=ap-northeast-1"
+      ]
     },
     "terraform": {
       "command": "docker",
