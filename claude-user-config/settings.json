@@ -9,6 +9,7 @@
       "Bash(pwd:*)",
       "Bash(grep:*)",
       "Bash(mkdir:*)",
+      "Bash(tree:*)",
       "Bash(git status:*)",
       "Bash(git diff:*)",
       "Bash(git log:*)",
