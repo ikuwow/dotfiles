@@ -32,7 +32,6 @@ PATH="$BREW_PREFIX/opt/grep/libexec/gnubin:$PATH"
 PATH="$BREW_PREFIX/opt/openssl/bin:$PATH"
 PATH="$HOME/bin:$PATH"
 PATH="$HOME/.local/bin:$PATH"
-PATH="$HOME/.codeium/windsurf/bin:$PATH" # Added by Windsurf
 PATH="$BREW_PREFIX/opt/mysql-client/bin:$PATH"
 PATH="$HOME/.ticloud/bin:$PATH"
 export PATH

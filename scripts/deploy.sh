@@ -73,8 +73,3 @@ if [[ ! -d "$HOME/.claude" ]]; then
 else
   echo "Note: ~/.claude already exists, skipping claude-user-config symlink"
 fi
-
-# Codeium memory
-if [[ -d "$HOME/.codeium/memories/" ]]; then
-  ln -fvns "$DOTPATH/AIRULES.md" "$HOME/.codeium/memories/global_rules.md"
-fi

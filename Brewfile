@@ -35,7 +35,6 @@ cask "logi-options+"
 # cask "logitech-g-hub"
 cask "jetbrains-toolbox"
 cask "adguard"
-cask "windsurf"
 
 brew "coreutils"
 brew "diffutils"
