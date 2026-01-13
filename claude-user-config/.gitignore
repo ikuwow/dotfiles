@@ -11,6 +11,7 @@ file-history/
 test-which-dir.json
 *.tmp
 *.cache
+cache/
 
 # Personal settings (not shared)
 settings.local.json
