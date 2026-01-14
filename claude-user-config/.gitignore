@@ -6,6 +6,7 @@ shell-snapshots/
 statsig/
 debug/
 file-history/
+telemetry/
 
 # Temporary files
 test-which-dir.json
