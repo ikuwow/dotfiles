@@ -1,22 +1,5 @@
 {
   "mcpServers": {
-    "aws-mcp": {
-      "command": "uvx",
-      "args": [
-        "mcp-proxy-for-aws@latest",
-        "https://aws-mcp.us-east-1.api.aws/mcp",
-        "--metadata", "AWS_REGION=ap-northeast-1"
-      ]
-    },
-    "terraform": {
-      "command": "docker",
-      "args": [
-        "run",
-        "-i",
-        "--rm",
-        "hashicorp/terraform-mcp-server"
-      ]
-    },
     "deepwiki": {
       "command": "npx",
       "args": [
@@ -27,6 +10,14 @@
     "Context7": {
       "command": "npx",
       "args": ["-y", "@upstash/context7-mcp"]
+    },
+    "intellij-index": {
+      "type": "sse",
+      "url": "http://127.0.0.1:29170/index-mcp/sse"
+    },
+    "goland-index": {
+      "type": "sse",
+      "url": "http://127.0.0.1:29174/index-mcp/sse"
     }
   }
 }
