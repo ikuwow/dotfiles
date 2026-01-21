@@ -16,6 +16,7 @@ macos-titlebar-style = tabs
 
 keybind = global:cmd+shift+space=toggle_quick_terminal
 quick-terminal-position = center
+quick-terminal-size = 1080px, 50%
 
 font-family = "Monaco"
 font-style = Regular
