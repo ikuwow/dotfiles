@@ -8,11 +8,13 @@ debug/
 file-history/
 telemetry/
 
+
 # Temporary files
 test-which-dir.json
 *.tmp
 *.cache
 cache/
+paste-cache/
 
 # Personal settings (not shared)
 settings.local.json
@@ -32,3 +34,5 @@ plugins/
 
 history.jsonl
 stats-cache.json
+
+.credentials.json
