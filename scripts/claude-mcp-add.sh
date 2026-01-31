@@ -28,9 +28,9 @@ jq -r '.mcpServers | to_entries[] | @json' "$MCP_CONFIG_FILE" | while IFS= read 
   # Sanitize server name: replace dots and other invalid characters with underscores
   server_name="${original_name//[^a-zA-Z0-9_-]/_}"
 
-  # Check if server already exists in user scope
-  if claude mcp list --scope user 2>/dev/null | grep -q "^$server_name:"; then
-    echo "⚠️  MCP server $original_name (as $server_name) already exists in user scope, skipping..."
+  # Check if server already exists
+  if claude mcp list 2>/dev/null | grep -q "^${server_name}:"; then
+    echo "MCP server $original_name (as $server_name) already exists, skipping..."
     continue
   fi
 
