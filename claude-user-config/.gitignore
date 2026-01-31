@@ -7,7 +7,7 @@ statsig/
 debug/
 file-history/
 telemetry/
-
+downloads/
 
 # Temporary files
 test-which-dir.json
