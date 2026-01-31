@@ -26,6 +26,7 @@
       "Bash(jq:*)",
       "Bash(yq:*)",
       "Bash(dig:*)",
+      "Bash(brew info:*)",
       "Bash(gh repo view:*)",
       "Bash(gh repo list:*)",
       "Bash(gh run list:*)",
