@@ -31,6 +31,9 @@ prompts() {
   PS1="$(echo "${PS1}" | sed 's/\\\$ /$AWS_PROMPT\\\$ /')"
   PS1="$(echo "${PS1}" | sed 's/\\\$ /$GC_PROMPT\\\$ /')"
 
+  # Add newline before dollar sign (multiline prompt)
+  PS1="$(echo "${PS1}" | sed 's/\\\$ /\\n\\\$ /')"
+
   # Make dollar yellow
   PS1="$(echo "${PS1}" | sed 's/\\\$ /\\\[\\e\[33m\\\]\\\$\\\[\\e\[0m\\\] /')"
 
