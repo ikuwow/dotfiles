@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+prompt_line() {
+  # Generate horizontal line matching terminal width (gray)
+  PROMPT_LINE=$(printf '─%.0s' $(seq 1 "${COLUMNS:-80}"))
+}
+
 prompt_aws() {
   if [[ -n "${AWS_PROFILE}" ]]; then
     AWS_PROMPT=" <AWS:${AWS_PROFILE}>"
@@ -18,10 +23,11 @@ prompt_gc() {
 
 prompts() {
   if [ -z "$SSH_CLIENT" ]; then
-    PS1='localhost: \W\$ '
+    # Line: gray, Info line: cyan with box symbol
+    PS1='\[\e[90m\]$PROMPT_LINE\[\e[0m\]\n\[\e[36m\]┌─ localhost: \W\$ '
   fi
 
-  export PROMPT_COMMAND="prompt_aws;prompt_gc;$PROMPT_COMMAND"
+  export PROMPT_COMMAND="prompt_line;prompt_aws;prompt_gc;$PROMPT_COMMAND"
 
   if [ "$(command -v __git_ps1)" ]; then
     # shellcheck disable=2016
@@ -31,15 +37,16 @@ prompts() {
   PS1="$(echo "${PS1}" | sed 's/\\\$ /$AWS_PROMPT\\\$ /')"
   PS1="$(echo "${PS1}" | sed 's/\\\$ /$GC_PROMPT\\\$ /')"
 
-  # Add newline before dollar sign (multiline prompt)
-  PS1="$(echo "${PS1}" | sed 's/\\\$ /\\n\\\$ /')"
+  # Add newline before dollar sign (multiline prompt) and reset cyan color
+  PS1="$(echo "${PS1}" | sed 's/\\\$ /\\\[\\e\[0m\\\]\\n\\\$ /')"
 
   # Make dollar yellow
   PS1="$(echo "${PS1}" | sed 's/\\\$ /\\\[\\e\[33m\\\]\\\$\\\[\\e\[0m\\\] /')"
 
   if [ -n "$SSH_CLIENT" ]; then
     if [ "$PS1" = "${PS1/ssh/}" ]; then
-      PS1='\[\e[33m\][ssh]\[\e[0m\]'"${PS1}"
+      # Insert [ssh] after the box symbol (within cyan info line)
+      PS1="$(echo "${PS1}" | sed 's/┌─ /┌─ [ssh] /')"
     fi
   fi
 }
