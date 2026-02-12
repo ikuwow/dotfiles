@@ -20,6 +20,7 @@
       "Bash(git pull:*)",
       "Bash(git grep:*)",
       "Bash(git add:*)",
+      "Bash(git switch:*)",
       "Bash(shellcheck:*)",
       "Bash(actionlint:*)",
       "Bash(yamllint:*)",
@@ -57,6 +58,7 @@
       "Bash(gps --list:*)",
       "Bash(gps --help:*)",
       "Bash(dog --help:*)",
+      "Bash(aws sts get-caller-identity:*)",
       "Bash(dog dashboard --help:*)",
       "Bash(dog dashboard show:*)",
       "Bash(dog search query:*)",
@@ -70,6 +72,7 @@
       "WebFetch(domain:docs.github.com)",
       "WebFetch(domain:raw.githubusercontent.com)",
       "WebFetch(domain:docs.anthropic.com)",
+      "WebFetch(domain:repost.aws)",
       "WebFetch(domain:pkg.go.dev)",
       "mcp__goland-index",
       "mcp__intellij-index",
@@ -94,6 +97,7 @@
       "mcp__notion__notion-search"
     ],
     "ask": [
+      "Bash(gh issue edit:*)",
       "mcp__jetbrains__run_configuration",
       "mcp__jetbrains__execute_terminal_command",
       "mcp__jetbrains__replace_file_text_by_path",
@@ -124,10 +128,10 @@
       }
     ]
   },
-  "feedbackSurveyState": {
-    "lastShownTime": 1754272823676
-  },
   "enabledPlugins": {
     "gopls-lsp@claude-plugins-official": true
+  },
+  "feedbackSurveyState": {
+    "lastShownTime": 1754272823676
   }
 }

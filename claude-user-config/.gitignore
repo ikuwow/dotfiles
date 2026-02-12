@@ -26,6 +26,8 @@ ide/
 # Beta features (not ready for use)
 plugins/
 
+tasks/
+
 # System files
 .DS_Store
 
