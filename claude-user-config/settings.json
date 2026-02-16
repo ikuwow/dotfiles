@@ -58,7 +58,6 @@
       "Bash(gh pr diff *)",
       "Bash(gh pr ready *)",
       "Bash(docker compose ps *)",
-      "Bash(docker-compose ps *)",
       "Bash(terraform validate *)",
       "Bash(terraform fmt *)",
       "Bash(terraform plan *)",
