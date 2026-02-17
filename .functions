@@ -68,7 +68,7 @@ prompts() {
 
   if [ -n "$SSH_CLIENT" ]; then
     if [ "$PS1" = "${PS1/ssh/}" ]; then
-      # Insert [ssh] after the box symbol (within cyan info line)
+      # Insert [ssh] after the box symbol
       PS1="$(echo "${PS1}" | sed 's/┌─ /┌─ [ssh] /')"
     fi
   fi
