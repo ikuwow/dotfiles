@@ -7,7 +7,7 @@ set -eu
 
 DOTPATH=$HOME/dotfiles
 
-BRANCH="${1:-master}"
+BRANCH="${1:-main}"
 echo "Bootstrap with branch '${BRANCH}'"
 
 if [ ! -d "$DOTPATH" ]; then

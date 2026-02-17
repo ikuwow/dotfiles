@@ -3,7 +3,7 @@ name: Bootstrap
 on:
   pull_request:
     branches:
-      - master
+      - main
 
 jobs:
   bootstrap:
@@ -18,4 +18,4 @@ jobs:
         env:
           BRANCH: ${{ github.head_ref }}
         run: |
-          curl -L https://raw.githubusercontent.com/ikuwow/dotfiles/master/bootstrap.sh | bash -s -- "${BRANCH}"
+          curl -L https://raw.githubusercontent.com/ikuwow/dotfiles/main/bootstrap.sh | bash -s -- "${BRANCH}"

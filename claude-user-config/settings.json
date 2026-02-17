@@ -17,7 +17,6 @@
       "Bash(git restore .)"
     ],
     "ask": [
-      "Bash(git push *)",
       "Bash(git merge *)",
       "Bash(git rebase *)",
       "Bash(git reset *)",
@@ -64,8 +63,9 @@
       "Bash(gh run watch *)",
       "Bash(gh pr checks *)",
       "Bash(gh pr diff *)",
-      "Bash(gh api *)",
       "Bash(gh pr ready *)",
+      "Bash(gh pr create *)",
+      "Bash(gh api *)",
       "Bash(docker compose ps *)",
       "Bash(terraform validate *)",
       "Bash(terraform fmt *)",

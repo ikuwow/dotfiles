@@ -21,13 +21,13 @@ Complete these during initial Mac setup or from System Preferences (reboot requi
 ## Boostrapping
 
 ```
-curl -L https://raw.githubusercontent.com/ikuwow/dotfiles/master/bootstrap.sh | bash -s
+curl -L https://raw.githubusercontent.com/ikuwow/dotfiles/main/bootstrap.sh | bash -s
 ```
 
 When you want to bootstrap specific branch:
 
 ```
-curl -L https://raw.githubusercontent.com/ikuwow/dotfiles/master/bootstrap.sh | bash -s -- branchname
+curl -L https://raw.githubusercontent.com/ikuwow/dotfiles/main/bootstrap.sh | bash -s -- branchname
 ```
 
 ## Set login shell after bootstrapping
