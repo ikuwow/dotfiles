@@ -16,27 +16,60 @@ prompt_gc() {
   fi
 }
 
+short_git_ps1() {
+  local branch max_len prefix name available half short_name
+  branch=$(__git_ps1 "%s")
+  [ -z "$branch" ] && return
+
+  max_len=20
+  if [ ${#branch} -le $max_len ]; then
+    echo " ($branch)"
+    return
+  fi
+
+  # Separate prefix (feature/, fix/, etc.) from name
+  if [[ "$branch" == */* ]]; then
+    prefix="${branch%%/*}/"
+    name="${branch#*/}"
+  else
+    prefix=""
+    name="$branch"
+  fi
+
+  # Shorten name part (keep beginning and end, replace middle with ..)
+  available=$((max_len - ${#prefix} - 2))  # 2 is for ".."
+  half=$((available / 2))
+  short_name="${name:0:$half}..${name: -$half}"
+
+  echo " ($prefix$short_name)"
+}
+
 prompts() {
   if [ -z "$SSH_CLIENT" ]; then
-    PS1='localhost: \W\$ '
+    # Multiline prompt with box symbol
+    PS1='\n┌─ localhost: \W\$ '
   fi
 
   export PROMPT_COMMAND="prompt_aws;prompt_gc;$PROMPT_COMMAND"
 
   if [ "$(command -v __git_ps1)" ]; then
     # shellcheck disable=2016
-    PS1="$(echo "${PS1}" | sed 's/\\\$ /$(__git_ps1)\\\$ /')"
+    PS1="$(echo "${PS1}" | sed 's/\\\$ /$(short_git_ps1)\\\$ /')"
   fi
 
   PS1="$(echo "${PS1}" | sed 's/\\\$ /$AWS_PROMPT\\\$ /')"
   PS1="$(echo "${PS1}" | sed 's/\\\$ /$GC_PROMPT\\\$ /')"
+
+  # Add newline before dollar sign (multiline prompt)
+  PS1="$(echo "${PS1}" | sed 's/\\\$ /\\n\\\$ /')"
 
   # Make dollar yellow
   PS1="$(echo "${PS1}" | sed 's/\\\$ /\\\[\\e\[33m\\\]\\\$\\\[\\e\[0m\\\] /')"
 
   if [ -n "$SSH_CLIENT" ]; then
     if [ "$PS1" = "${PS1/ssh/}" ]; then
-      PS1='\[\e[33m\][ssh]\[\e[0m\]'"${PS1}"
+      # Insert [ssh] after the box symbol
+      PS1="$(echo "${PS1}" | sed 's/┌─ /┌─ [ssh] /')"
     fi
   fi
 }
