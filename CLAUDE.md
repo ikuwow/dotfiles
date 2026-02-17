@@ -15,10 +15,10 @@ This is a personal dotfiles repository for macOS setup and configuration. It con
 ### Initial Setup
 ```bash
 # Bootstrap a new Mac (from remote)
-curl -L https://raw.githubusercontent.com/ikuwow/dotfiles/master/bootstrap.sh | bash -s
+curl -L https://raw.githubusercontent.com/ikuwow/dotfiles/main/bootstrap.sh | bash -s
 
 # Bootstrap specific branch
-curl -L https://raw.githubusercontent.com/ikuwow/dotfiles/master/bootstrap.sh | bash -s -- branchname
+curl -L https://raw.githubusercontent.com/ikuwow/dotfiles/main/bootstrap.sh | bash -s -- branchname
 ```
 
 ### Deployment
