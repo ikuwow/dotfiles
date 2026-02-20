@@ -294,9 +294,10 @@ call plug#end()
 
 " Terminal buffer settings for Neovim
 if has('nvim')
+    highlight TermNormal guibg=NONE ctermbg=NONE
     augroup NeovimTerminal
         autocmd!
-        autocmd TermOpen * setlocal nonumber
+        autocmd TermOpen * setlocal nonumber winhighlight=Normal:TermNormal
         autocmd TermOpen,BufEnter term://* call clearmatches()
         autocmd TermOpen * if exists(':IndentGuidesDisable') == 2 | execute 'IndentGuidesDisable' | endif
         autocmd TermOpen * startinsert
