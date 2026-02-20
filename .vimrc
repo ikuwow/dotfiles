@@ -286,10 +286,21 @@ Plug 'okkiroxx/rtx.vim'
 
 if has('nvim')
     Plug 'kassio/neoterm'
+    Plug 'folke/snacks.nvim'
+    Plug 'coder/claudecode.nvim'
 endif
 
 " This automatically executes `filetype plugin indent on` and `syntax enable`.
 call plug#end()
+
+" claudecode.nvim setup
+if has('nvim')
+lua << EOF
+    if pcall(require, "claudecode") then
+        require("claudecode").setup()
+    end
+EOF
+endif
 
 " statusline config
 set laststatus=2
