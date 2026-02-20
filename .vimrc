@@ -305,7 +305,6 @@ if has('nvim')
         autocmd VimResized * if &buftype ==# 'terminal' | call clearmatches() | endif
         autocmd TermOpen * startinsert
         autocmd BufEnter term://* startinsert
-        autocmd ModeChanged t:nt if &buftype ==# 'terminal' | startinsert | endif
     augroup END
     tnoremap <C-w>h <Cmd>wincmd h<CR>
     tnoremap <C-w>j <Cmd>wincmd j<CR>
