@@ -297,9 +297,12 @@ if has('nvim')
     highlight TermNormal guibg=NONE ctermbg=NONE
     augroup NeovimTerminal
         autocmd!
-        autocmd TermOpen * setlocal nonumber winhighlight=Normal:TermNormal
+        autocmd ColorScheme * highlight TermNormal guibg=NONE ctermbg=NONE
+        autocmd TermOpen * setlocal nonumber
+        autocmd TermOpen,BufEnter,WinEnter term://* setlocal winhighlight=Normal:TermNormal
         autocmd TermOpen,BufEnter,WinEnter term://* call clearmatches()
         autocmd TermOpen,BufEnter,WinEnter term://* if exists(':IndentGuidesDisable') == 2 | execute 'IndentGuidesDisable' | endif
+        autocmd VimResized * if &buftype ==# 'terminal' | call clearmatches() | endif
         autocmd TermOpen * startinsert
         autocmd BufEnter term://* startinsert
         autocmd ModeChanged t:nt if &buftype ==# 'terminal' | startinsert | endif
