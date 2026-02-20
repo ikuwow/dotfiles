@@ -298,8 +298,8 @@ if has('nvim')
     augroup NeovimTerminal
         autocmd!
         autocmd TermOpen * setlocal nonumber winhighlight=Normal:TermNormal
-        autocmd TermOpen,BufEnter term://* call clearmatches()
-        autocmd TermOpen * if exists(':IndentGuidesDisable') == 2 | execute 'IndentGuidesDisable' | endif
+        autocmd TermOpen,BufEnter,WinEnter term://* call clearmatches()
+        autocmd TermOpen,BufEnter,WinEnter term://* if exists(':IndentGuidesDisable') == 2 | execute 'IndentGuidesDisable' | endif
         autocmd TermOpen * startinsert
         autocmd BufEnter term://* startinsert
         autocmd ModeChanged t:nt if &buftype ==# 'terminal' | startinsert | endif
