@@ -316,6 +316,11 @@ lua << EOF
         require("claudecode").setup({
             terminal = {
                 split_width_percentage = 0.40,
+                snacks_win_opts = {
+                    wo = {
+                        winhighlight = "Normal:TermNormal",
+                    },
+                },
             },
         })
     end
