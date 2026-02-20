@@ -302,6 +302,7 @@ if has('nvim')
         autocmd TermOpen * if exists(':IndentGuidesDisable') == 2 | execute 'IndentGuidesDisable' | endif
         autocmd TermOpen * startinsert
         autocmd BufEnter term://* startinsert
+        autocmd ModeChanged t:nt if &buftype ==# 'terminal' | startinsert | endif
     augroup END
 endif
 
