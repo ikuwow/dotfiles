@@ -292,6 +292,18 @@ endif
 " This automatically executes `filetype plugin indent on` and `syntax enable`.
 call plug#end()
 
+" Terminal buffer settings for Neovim
+if has('nvim')
+    augroup NeovimTerminal
+        autocmd!
+        autocmd TermOpen * setlocal nonumber
+        autocmd TermOpen,BufEnter term://* call clearmatches()
+        autocmd TermOpen * if exists(':IndentGuidesDisable') == 2 | execute 'IndentGuidesDisable' | endif
+        autocmd TermOpen * startinsert
+        autocmd BufEnter term://* startinsert
+    augroup END
+endif
+
 " claudecode.nvim setup
 if has('nvim')
 lua << EOF
