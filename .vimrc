@@ -307,6 +307,10 @@ if has('nvim')
         autocmd BufEnter term://* startinsert
         autocmd ModeChanged t:nt if &buftype ==# 'terminal' | startinsert | endif
     augroup END
+    tnoremap <C-w>h <Cmd>wincmd h<CR>
+    tnoremap <C-w>j <Cmd>wincmd j<CR>
+    tnoremap <C-w>k <Cmd>wincmd k<CR>
+    tnoremap <C-w>l <Cmd>wincmd l<CR>
 endif
 
 " claudecode.nvim setup
