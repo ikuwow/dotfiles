@@ -310,7 +310,11 @@ endif
 if has('nvim')
 lua << EOF
     if pcall(require, "claudecode") then
-        require("claudecode").setup()
+        require("claudecode").setup({
+            terminal = {
+                split_width_percentage = 0.40,
+            },
+        })
     end
 EOF
 endif
