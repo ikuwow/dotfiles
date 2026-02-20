@@ -24,6 +24,9 @@ font-size = 12
 # Disable ligatures
 font-feature = -calt, -liga, -dlig
 
+# Do not dim unfocused splits
+unfocused-split-opacity = 1
+
 # Shift+Enter keybind for Claude Code
 # Ref: https://github.com/ghostty-org/ghostty/discussions/7419
 keybind = shift+enter=text:\x1b\r
