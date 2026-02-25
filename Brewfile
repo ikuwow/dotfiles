@@ -172,7 +172,7 @@ cask "firefox"
 
 cask "deepl"
 cask "1password-cli"
-cask "goneovim"
+cask "neovide"
 cask "xquartz"
 cask "gcloud-cli"
 cask "vagrant"
@@ -210,15 +210,3 @@ mas "Apple Configurator", id: 1037126344
 mas "Wappalyzer", id: 1520333300
 mas "Center", id: 1332483673
 # TODO: Add Save to Reader (ReadWise)
-
-at_exit do
-  commands = [
-    'xattr -c /Applications/goneovim.app'
-  ]
-  commands.each do |c|
-    puts 'Running post-install tasks...'
-    puts "Command: #{c}"
-    system c
-    puts 'Done.'
-  end
-end
