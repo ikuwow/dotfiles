@@ -172,7 +172,7 @@ cask "firefox"
 
 cask "deepl"
 cask "1password-cli"
-cask "neovide"
+brew "neovide", args: ["HEAD"]
 cask "xquartz"
 cask "gcloud-cli"
 cask "vagrant"
