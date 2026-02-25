@@ -286,6 +286,7 @@ Plug 'okkiroxx/rtx.vim'
 
 if has('nvim')
     Plug 'kassio/neoterm'
+    Plug 'sevenc-nanashi/neov-ime.nvim'
 endif
 
 " This automatically executes `filetype plugin indent on` and `syntax enable`.
@@ -293,3 +294,7 @@ call plug#end()
 
 " statusline config
 set laststatus=2
+
+if exists("g:neovide")
+    " Put anything you want to happen only in Neovide here
+endif
