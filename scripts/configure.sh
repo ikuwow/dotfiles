@@ -134,6 +134,9 @@ defaults write com.tapbots.Pastebot2Mac UIVisibilityState 10
 condkillall Pastebot
 
 echo "Configuring Neovide..."
+# neovide を cask ではなく formula (--HEAD) でインストールしている場合、
+# .app が /Applications/ に配置されないためシンボリックリンクを作成する。
+# stable cask に戻した場合はこの処理は不要。
 NEOVIDE_APP="/opt/homebrew/opt/neovide/Neovide.app"
 if [[ -d "$NEOVIDE_APP" ]]; then
   ln -fvns "$NEOVIDE_APP" "/Applications/Neovide.app"
