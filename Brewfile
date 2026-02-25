@@ -174,6 +174,11 @@ cask "deepl"
 cask "1password-cli"
 # neovide --HEAD のビルド依存。brew bundle では依存の自動ダウンロードが失敗することがあるため先に明示インストールする
 brew "ninja"
+brew "libgit2"
+brew "z3"
+brew "llvm"
+brew "rust"
+brew "cargo-bundle"
 brew "neovide", args: ["HEAD"]
 cask "xquartz"
 cask "gcloud-cli"
