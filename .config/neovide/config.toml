@@ -1,1 +1,6 @@
+# Absolute path to nvim binary.
+# Neovide falls back to PATH lookup when unset, but on macOS GUI launch
+# (Finder/Dock) the login-shell PATH resolution can be unreliable (see
+# neovide/neovide#3243). Hardcoding the path works around this.
+# Adjust for Intel Mac (/usr/local/bin/nvim) or Linux if needed.
 neovim-bin = "/opt/homebrew/bin/nvim"
