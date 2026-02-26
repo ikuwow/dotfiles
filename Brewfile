@@ -90,7 +90,7 @@ brew "tree"
 brew "wget"
 brew "watch"
 brew "fontforge"
-brew "neovim", args: ["HEAD"] # neov-ime.nvim が要求する 0.12+ は stable 未リリースのため
+brew "neovim"
 brew "graphviz"
 brew "shellcheck"
 brew "slackcat"

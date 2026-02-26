@@ -286,7 +286,6 @@ Plug 'okkiroxx/rtx.vim'
 
 if has('nvim')
     Plug 'kassio/neoterm'
-    Plug 'sevenc-nanashi/neov-ime.nvim'
 endif
 
 " This automatically executes `filetype plugin indent on` and `syntax enable`.
