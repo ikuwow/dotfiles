@@ -1,9 +1,5 @@
 # rubocop:disable all
 
-def is_m1?
-  system("uname -m | grep arm64")
-end
-
 tap "homebrew/autoupdate"
 tap "ikuwow/ikuwow-sshrc"
 tap "Songmu/tap"
@@ -182,7 +178,7 @@ cask "chromedriver"
 cask "lastfm"
 cask "ears"
 cask "onyx"
-cask "chatgpt" if is_m1?
+cask "chatgpt"
 cask "claude"
 cask "utm"
 cask "wireshark-app"
