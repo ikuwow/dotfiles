@@ -2,8 +2,17 @@
 
 2. 作業を開始する前に必ず以下の手順を踏むこと：
     - default branch (main/master) を最新の状態に更新する (`git pull`)
-    - 作業用のブランチを切り出す (`git checkout -b feature/xxx` や `git checkout -b fix/xxx` など)
-    - ブランチ上で作業を行う
+    - git worktree とブランチを同時に作成し、隔離された作業スペースで作業すること
+      - パス規約: `../repo__branch` の形式で命名すること（例: リポジトリ `myapp`、ブランチ `feature/xxx` なら `../myapp__feature-xxx`）
+      - ブランチ名のスラッシュはハイフンに置き換えること（`feature/xxx` → `feature-xxx`）
+      ```bash
+      git worktree add -b feature/xxx ../myapp__feature-xxx main
+      cd ../myapp__feature-xxx
+      ```
+    - 作業が完了したら worktree を削除すること
+      ```bash
+      git worktree remove ../myapp__feature-xxx
+      ```
     - default branchへの直接コミットは禁止（全ての組織・リポジトリが対象）
     - `git push --force` や `git push -f` は絶対に実行禁止。必要な場合はユーザーに実行を依頼すること。
     - push済みのコミットをamendで編集するなど、force pushが必要になる操作をしない
