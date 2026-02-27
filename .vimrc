@@ -249,7 +249,7 @@ Plug 'glidenote/memolist.vim'
     let g:memolist_memo_suffix = "md"
 
 Plug 'previm/previm'
-    let g:previm_open_cmd="open -a Safari"
+    let g:previm_open_cmd="open"
     augroup PrevimSettings
         autocmd!
         autocmd BufNewFile,BufRead *.{md,mdwn,mkd,mkdn,mark*} set filetype=markdown
