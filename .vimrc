@@ -292,38 +292,13 @@ endif
 " This automatically executes `filetype plugin indent on` and `syntax enable`.
 call plug#end()
 
-" Terminal buffer settings for Neovim
-if has('nvim')
-    highlight TermNormal guibg=NONE ctermbg=NONE
-    augroup NeovimTerminal
-        autocmd!
-        autocmd ColorScheme * highlight TermNormal guibg=NONE ctermbg=NONE
-        autocmd TermOpen * setlocal nonumber
-        autocmd TermOpen,BufEnter,WinEnter term://* setlocal winhighlight=Normal:TermNormal
-        autocmd TermOpen,BufEnter,WinEnter term://* call clearmatches()
-        autocmd TermOpen,BufEnter,WinEnter term://* if exists(':IndentGuidesDisable') == 2 | execute 'IndentGuidesDisable' | endif
-        autocmd VimResized * if &buftype ==# 'terminal' | call clearmatches() | endif
-        autocmd TermOpen * startinsert
-        autocmd BufEnter term://* startinsert
-    augroup END
-    tnoremap <C-w>h <Cmd>wincmd h<CR>
-    tnoremap <C-w>j <Cmd>wincmd j<CR>
-    tnoremap <C-w>k <Cmd>wincmd k<CR>
-    tnoremap <C-w>l <Cmd>wincmd l<CR>
-endif
-
 " claudecode.nvim setup
 if has('nvim')
 lua << EOF
     if pcall(require, "claudecode") then
         require("claudecode").setup({
             terminal = {
-                split_width_percentage = 0.40,
-                snacks_win_opts = {
-                    wo = {
-                        winhighlight = "Normal:TermNormal",
-                    },
-                },
+                provider = "none",
             },
         })
     end
