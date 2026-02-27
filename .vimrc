@@ -26,6 +26,7 @@ if has('termguicolors')
     set termguicolors
 endif
 colorscheme desert
+set ambiwidth=double
 
 " indents and tabs
 set shiftwidth=4
