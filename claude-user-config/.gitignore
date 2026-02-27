@@ -8,6 +8,7 @@ debug/
 file-history/
 telemetry/
 downloads/
+backups/
 
 # Temporary files
 test-which-dir.json
@@ -15,6 +16,7 @@ test-which-dir.json
 *.cache
 cache/
 paste-cache/
+mcp-needs-auth-cache.json
 
 # Personal settings (not shared)
 settings.local.json

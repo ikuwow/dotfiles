@@ -20,7 +20,7 @@ alias watch='watch --color'
 
 ## Overriding aliases
 [[ "$(command -v nvim)" ]] && alias vim='nvim'
-[[ "$(command -v goneovim)" ]] && alias gvim='goneovim'
+[[ "$(command -v goneovim)" ]] && alias gvim='neovide'
 
 ## Aliases for convenience
 alias be='bundle exec'
@@ -40,3 +40,5 @@ alias bs='brew services'
 
 alias gcopen='open "https://console.cloud.google.com/home/dashboard?project=$(gcloud config get-value project)"'
 alias gaal='gcloud auth application-default login'
+
+[[ "$(command -v claude)" ]] && alias claude='claude --worktree'
