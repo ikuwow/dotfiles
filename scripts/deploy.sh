@@ -1,76 +1,81 @@
 #!/usr/bin/env bash
 
+set -eu
+
 DOTPATH="$HOME/dotfiles"
+XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 
 if [ ! -e "$DOTPATH" ]; then
   echo "Error: Directory $DOTPATH does not exist."
   exit 1
 fi
 
-cd "$DOTPATH" || exit 1
-
-if [[ -z $XDG_CONFIG_HOME ]]; then
-  XDG_CONFIG_HOME=$HOME/.config
-fi
-
-# Whitelist of dotfiles to symlink
-DOTFILES=(
-  ".aliases"
-  ".asdfrc"
-  ".bash_profile"
-  ".bashrc"
-  ".default-gems"
-  ".default-npm-packages"
-  ".default-python-packages"
-  ".functions"
-  ".gemrc"
-  ".gvimrc"
-  ".ideavimrc"
-  ".inputrc"
-  ".npmrc"
-  ".shellcheckrc"
-  ".sshrc"
-  ".terraformrc"
-  ".tmux.conf"
-  ".tool-versions"
-  ".vimrc"
-)
-
-for file in "${DOTFILES[@]}"; do
-  if [[ -e "$DOTPATH/$file" ]]; then
-    ln -fvns "$DOTPATH/$file" "$HOME/$file"
-  else
-    echo "Warning: $file not found in $DOTPATH"
+link() {
+  local src="$DOTPATH/$1"
+  local dst="$2"
+  if [ ! -e "$src" ]; then
+    echo "Warning: $src not found, skipping"
+    return
   fi
-done
+  mkdir -p "$(dirname "$dst")"
+  ln -fvns "$src" "$dst"
+}
 
+# Shell
+link .bash_profile  "$HOME/.bash_profile"
+link .bashrc        "$HOME/.bashrc"
+link .aliases       "$HOME/.aliases"
+link .functions     "$HOME/.functions"
+link .inputrc       "$HOME/.inputrc"
+link .sshrc         "$HOME/.sshrc"
+
+# Editor
+link .vimrc         "$HOME/.vimrc"
+link .gvimrc        "$HOME/.gvimrc"
+link .ideavimrc     "$HOME/.ideavimrc"
+
+# Terminal
+link .tmux.conf     "$HOME/.tmux.conf"
+
+# Version / package managers
+link .asdfrc                  "$HOME/.asdfrc"
+link .tool-versions           "$HOME/.tool-versions"
+link .gemrc                   "$HOME/.gemrc"
+link .npmrc                   "$HOME/.npmrc"
+link .default-gems            "$HOME/.default-gems"
+link .default-npm-packages    "$HOME/.default-npm-packages"
+link .default-python-packages "$HOME/.default-python-packages"
+
+# Infrastructure
+link .terraformrc   "$HOME/.terraformrc"
+
+# Linting
+link .shellcheckrc  "$HOME/.shellcheckrc"
+
+# XDG config: all subdirs in .config/ auto-discovered
 mkdir -p "$XDG_CONFIG_HOME"
 find "$DOTPATH/.config" -maxdepth 1 -mindepth 1 -exec ln -fvns {} "$XDG_CONFIG_HOME/" \;
 
-# ssh
-mkdir -p "$HOME/.ssh"
-ln -fvns "$DOTPATH/.ssh/config" "$HOME/.ssh/config"
+# SSH
+link .ssh/config    "$HOME/.ssh/config"
 mkdir -p "$HOME/.ssh/config.d"
 
-# ~/.kube
-mkdir -p "$HOME/.kube"
-ln -fvns "$DOTPATH/.kube/kubie.yaml" "$HOME/.kube/kubie.yaml"
+# Kubernetes
+link .kube/kubie.yaml "$HOME/.kube/kubie.yaml"
 
-# bin
-mkdir -p ~/bin
-find "$DOTPATH/bin/" -type f -perm 0755 -exec ln -fvns {} ~/bin/ \;
+# bin: all executable files auto-discovered
+mkdir -p "$HOME/bin"
+find "$DOTPATH/bin/" -type f -perm 0755 -exec ln -fvns {} "$HOME/bin/" \;
 
-# iCloud
+# iCloud (macOS only, conditional)
 ICLOUD_DIR="$HOME/Library/Mobile Documents/com~apple~CloudDocs"
 if [[ -d "$ICLOUD_DIR" ]]; then
   ln -fvns "$ICLOUD_DIR" "$HOME/iCloudDrive"
 fi
-echo
 
-# Claude Code user settings
-mkdir -p "$HOME/.claude"
-ln -fvns "$DOTPATH/claude/.mcp.json" "$HOME/.claude/.mcp.json"
-ln -fvns "$DOTPATH/claude/settings.json" "$HOME/.claude/settings.json"
-ln -fvns "$DOTPATH/AIRULES.md" "$HOME/.claude/CLAUDE.md"
+# Claude Code: explicit files + commands auto-discovered
+link claude/.mcp.json     "$HOME/.claude/.mcp.json"
+link claude/settings.json "$HOME/.claude/settings.json"
+link AIRULES.md           "$HOME/.claude/CLAUDE.md"
 mkdir -p "$HOME/.claude/commands"
 find "$DOTPATH/claude/commands" -maxdepth 1 -mindepth 1 -exec ln -fvns {} "$HOME/.claude/commands/" \;

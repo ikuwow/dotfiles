@@ -21,37 +21,9 @@ are symlinks pointing to files in this repository.**
 
 ## Symlink Map
 
-The following shows what gets symlinked where by `scripts/deploy.sh`:
-
-| Repository source | Deployed to |
-| --- | --- |
-| `.aliases` | `~/.aliases` |
-| `.asdfrc` | `~/.asdfrc` |
-| `.bash_profile` | `~/.bash_profile` |
-| `.bashrc` | `~/.bashrc` |
-| `.default-gems` | `~/.default-gems` |
-| `.default-npm-packages` | `~/.default-npm-packages` |
-| `.default-python-packages` | `~/.default-python-packages` |
-| `.functions` | `~/.functions` |
-| `.gemrc` | `~/.gemrc` |
-| `.gvimrc` | `~/.gvimrc` |
-| `.ideavimrc` | `~/.ideavimrc` |
-| `.inputrc` | `~/.inputrc` |
-| `.npmrc` | `~/.npmrc` |
-| `.shellcheckrc` | `~/.shellcheckrc` |
-| `.sshrc` | `~/.sshrc` |
-| `.terraformrc` | `~/.terraformrc` |
-| `.tmux.conf` | `~/.tmux.conf` |
-| `.tool-versions` | `~/.tool-versions` |
-| `.vimrc` | `~/.vimrc` |
-| `.config/*` (all subdirs) | `~/.config/` |
-| `.ssh/config` | `~/.ssh/config` |
-| `.kube/kubie.yaml` | `~/.kube/kubie.yaml` |
-| `bin/*` (executable files) | `~/bin/` |
-| `claude/.mcp.json` | `~/.claude/.mcp.json` |
-| `claude/settings.json` | `~/.claude/settings.json` |
-| `AIRULES.md` | `~/.claude/CLAUDE.md` |
-| `claude/commands/*` | `~/.claude/commands/` |
+The canonical symlink mapping is defined in `scripts/deploy.sh`.
+Root-level dotfiles are listed explicitly with `link()` calls grouped by category.
+`bin/`, `.config/`, and `claude/commands/` are auto-discovered from their directories.
 
 ## Repository Structure
 
@@ -106,7 +78,8 @@ pre-commit run --all-files
 ## How to Add a New Dotfile
 
 1. Place the file in the repository root (e.g., `.newconfig`)
-2. Add the filename to the `DOTFILES` array in `scripts/deploy.sh`
+2. Add a `link` call in `scripts/deploy.sh` under the appropriate category:
+   `link .newconfig "$HOME/.newconfig"`
 3. Run `./scripts/deploy.sh` to create the symlink
 
 ## Script Requirements
