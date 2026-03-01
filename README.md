@@ -46,6 +46,43 @@ sudo sh -c "echo $LOGIN_SHELL >> /etc/shells"
 chsh -s "$LOGIN_SHELL"
 ```
 
+## How It Works
+
+All dotfiles in this repository are deployed as symlinks to your home directory by `scripts/deploy.sh`.
+For example, `~/.bashrc` is a symlink pointing to `~/dotfiles/.bashrc`.
+Editing any dotfile means editing the source file in this repository.
+
+### Symlink Map
+
+| Repository source | Deployed to |
+| --- | --- |
+| `.aliases`, `.bash_profile`, `.bashrc`, `.vimrc`, etc. (19 dotfiles) | `~/` |
+| `.config/*` (all subdirectories) | `~/.config/` |
+| `.ssh/config` | `~/.ssh/config` |
+| `.kube/kubie.yaml` | `~/.kube/kubie.yaml` |
+| `bin/*` (executable files) | `~/bin/` |
+| `claude/.mcp.json`, `claude/settings.json`, etc. | `~/.claude/` |
+
+### Repository Structure
+
+```
+dotfiles/
+├── bootstrap.sh          # Entry point (run via curl on a new Mac)
+├── bootstrap/
+│   └── main.sh           # OS detection, prerequisites, orchestrates full setup
+├── scripts/
+│   ├── deploy.sh         # Creates all symlinks (runs on Linux too)
+│   ├── configure.sh      # macOS system preferences via defaults command
+│   └── configure_brew.sh # Homebrew post-install configuration
+├── Brewfile              # Homebrew package definitions
+├── bin/                  # Custom executable scripts → ~/bin/
+├── .config/              # XDG config files → ~/.config/
+├── claude/               # Claude Code settings → ~/.claude/
+├── .bash_profile         # Login shell config → ~/
+├── .bashrc               # Interactive shell config → ~/
+└── ... (other dotfiles)
+```
+
 ## Notes
 
 ### Create key pair

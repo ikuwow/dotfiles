@@ -2,6 +2,29 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## CRITICAL: Symlink Architecture
+
+All dotfiles in `$HOME` are symlinks pointing to files in this repository.
+
+- Always edit source files in THIS repository (e.g., `.bashrc`, `.gitconfig`, `.vimrc`)
+- Never directly edit files under `$HOME` (e.g., `~/.bashrc`, `~/.gitconfig`)
+- Never access `~/.bashrc` or similar — read from this repo instead
+- When asked to modify any shell, vim, git, or other config, the file to edit is here, not in `$HOME`
+
+### Symlink Map
+
+| Repository source | Deployed to |
+| --- | --- |
+| `.aliases`, `.bash_profile`, `.bashrc`, `.vimrc`, etc. (19 dotfiles) | `~/` (see `scripts/deploy.sh` DOTFILES array) |
+| `.config/*` (all subdirs) | `~/.config/` |
+| `.ssh/config` | `~/.ssh/config` |
+| `.kube/kubie.yaml` | `~/.kube/kubie.yaml` |
+| `bin/*` (executable files) | `~/bin/` |
+| `claude/.mcp.json` | `~/.claude/.mcp.json` |
+| `claude/settings.json` | `~/.claude/settings.json` |
+| `AIRULES.md` | `~/.claude/CLAUDE.md` |
+| `claude/commands/*` | `~/.claude/commands/` |
+
 ## Repository Overview
 
 This is a personal dotfiles repository for macOS setup and configuration. It contains:
