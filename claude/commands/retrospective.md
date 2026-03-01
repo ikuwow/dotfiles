@@ -1,5 +1,5 @@
 ---
-description: Use when the user wants to reflect on AI communication quality and get improvement suggestions for rule files. TRIGGER when user invokes /retrospective or asks to review the session.
+description: Use when the user wants to reflect on AI communication quality and get improvement suggestions for rule files or the project itself. TRIGGER when user invokes /retrospective or asks to review the session.
 ---
 
 # AIとのコミュニケーション振り返り
@@ -28,8 +28,23 @@ description: Use when the user wants to reflect on AI communication quality and 
    - 提案は具体的なルール文として記載
    - なぜそのルールが必要かの理由も説明
 
+4. プロジェクト改善の提案
+   - 今回の作業を通じて気づいた、プロジェクト自体の改善点を提案する
+   - ドキュメント：以下のようなドキュメントが不足・不明確だった場合に提案する
+     - README への追記（セットアップ手順、動作確認方法、アーキテクチャ概要）
+     - 開発者向けドキュメント（デバッグ手順、ローカル環境構築、よくあるエラーと対処法）
+     - 設計ドキュメント（モジュール構成、データフロー、主要コンポーネントの役割）
+   - コードの可読性：コードを読んだ際に意図が不明確だった箇所
+     - コメントの追加（特に「なぜそうなっているか」の背景）
+     - 関連 PR・issue・ADR へのリンクコメント
+     - 型定義・インターフェース仕様の補完
+   - 構造・設計：今回の作業で感じた構造上の改善余地
+     - ディレクトリ構成・ファイル配置の見直し
+     - 命名規則の統一や分割・統合の提案
+   - 提案には「どのファイル・ディレクトリに何を追加・変更するか」を具体的に示す
+
 ## 重要な注意点
 
-- タスクの内容そのものではなく、AIとのやり取りのプロセスに注目すること
+- タスクの内容そのものではなく、AIとのやり取りのプロセスと、そこから見えたプロジェクトの改善点に注目すること
 - 具体的で実行可能な改善提案を心がけること
-- ルール変更の提案のみを行い、実際の変更はユーザーの確認を得てから行うこと
+- すべての提案はあくまで提案であり、実際の変更はユーザーの確認を得てから行うこと
