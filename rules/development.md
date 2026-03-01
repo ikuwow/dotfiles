@@ -13,6 +13,7 @@
       ```bash
       git worktree remove ../myapp__feature-xxx
       ```
+    - worktree を作らない場合でも、必ずブランチを作成してから作業すること（default branch への直接コミット禁止と同義）
     - default branchへの直接コミットは禁止（全ての組織・リポジトリが対象）
     - `git push --force` や `git push -f` は絶対に実行禁止。必要な場合はユーザーに実行を依頼すること。
     - push済みのコミットをamendで編集するなど、force pushが必要になる操作をしない
