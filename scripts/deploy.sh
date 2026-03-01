@@ -73,9 +73,9 @@ if [[ -d "$ICLOUD_DIR" ]]; then
   ln -fvns "$ICLOUD_DIR" "$HOME/iCloudDrive"
 fi
 
-# Claude Code: explicit files + commands auto-discovered
+# Claude Code: explicit files + skills auto-discovered
 link claude/.mcp.json     "$HOME/.claude/.mcp.json"
 link claude/settings.json "$HOME/.claude/settings.json"
 link AIRULES.md           "$HOME/.claude/CLAUDE.md"
-mkdir -p "$HOME/.claude/commands"
-find "$DOTPATH/claude/commands" -maxdepth 1 -mindepth 1 -exec ln -fvns {} "$HOME/.claude/commands/" \;
+mkdir -p "$HOME/.claude/skills"
+find "$DOTPATH/claude/skills" -maxdepth 1 -mindepth 1 -type d -exec ln -fvns {} "$HOME/.claude/skills/" \;
