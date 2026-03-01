@@ -83,6 +83,21 @@ dotfiles/
 └── ... (other dotfiles)
 ```
 
+### Bootstrap Flow
+
+1. `bootstrap.sh` — Clones the repo (or updates it), then calls `bootstrap/main.sh`
+2. `bootstrap/main.sh` — Detects OS/architecture, checks prerequisites, orchestrates:
+   - `scripts/deploy.sh` — Creates symlinks (runs on Linux and macOS)
+   - `scripts/configure.sh` — macOS system defaults (macOS only)
+   - Installs Homebrew (macOS only, architecture-aware)
+   - `brew bundle` — Installs packages from Brewfile
+   - `scripts/configure_brew.sh` — Enables Homebrew autoupdate
+
+### Platform Support
+
+- macOS (Intel and Apple Silicon): Full support
+- Linux: Symlink deployment only (no Homebrew, no macOS defaults)
+
 ## Notes
 
 ### Create key pair
