@@ -7,7 +7,9 @@ My dear dotfiles.
 ## Set up your new Mac
 
 ### Initial Setup (usually done in setup wizard)
+
 Complete these during initial Mac setup or from System Preferences (reboot required if changed later):
+
 * ☑️ Update macOS to the latest version
 * ☑️ Set language
 * ☑️ Connect to internet
@@ -15,31 +17,39 @@ Complete these during initial Mac setup or from System Preferences (reboot requi
 * ☑️ Set password for login user
 
 ### Required Manual Steps
+
 * ☑️ Install Developer Tools: `xcode-select --install`
 * ☑️ Grant Full Disk Access to Terminal (System Preferences => Privacy & Security => Privacy => Full Disk Access => Add Terminal.app)
+* ☑️ Generate SSH key pair and register it to GitHub:
 
-## Boostrapping
+```bash
+ssh-keygen -t ed25519 -C "your-email@example.com"
+```
+
+Be sure to set a passphrase.
+
+## Bootstrapping
 
 ```
 curl -L https://raw.githubusercontent.com/ikuwow/dotfiles/main/bootstrap.sh | bash -s
 ```
 
-When you want to bootstrap specific branch:
+When you want to bootstrap a specific branch:
 
 ```
 curl -L https://raw.githubusercontent.com/ikuwow/dotfiles/main/bootstrap.sh | bash -s -- branchname
 ```
 
-## Set login shell after bootstrapping
+### Set login shell after bootstrapping
 
-```
+```bash
 # Intel
 LOGIN_SHELL="/usr/local/bin/bash"
 sudo sh -c "echo $LOGIN_SHELL >> /etc/shells"
 chsh -s "$LOGIN_SHELL"
 ```
 
-```
+```bash
 # Apple Silicon
 LOGIN_SHELL="/opt/homebrew/bin/bash"
 sudo sh -c "echo $LOGIN_SHELL >> /etc/shells"
@@ -97,13 +107,3 @@ dotfiles/
 
 - macOS (Intel and Apple Silicon): Full support
 - Linux: Symlink deployment only (no Homebrew, no macOS defaults)
-
-## Notes
-
-### Create key pair
-
-```
-ssh-keygen -t ed25519 -C "ikuwow@gmail.com"
-```
-
-Be sure to set passphrase.
