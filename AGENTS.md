@@ -84,11 +84,36 @@ dotfiles/
    - `brew bundle` — Installs packages from Brewfile
    - `scripts/configure_brew.sh` — Enables Homebrew autoupdate
 
+## Key Commands
+
+```bash
+# Deploy/update dotfiles (creates symlinks)
+./scripts/deploy.sh
+
+# Configure macOS system preferences
+./scripts/configure.sh
+
+# Install all packages from Brewfile
+brew bundle
+
+# Validate shell scripts
+shellcheck scripts/*.sh bootstrap/*.sh
+
+# Run pre-commit hooks
+pre-commit run --all-files
+```
+
 ## How to Add a New Dotfile
 
 1. Place the file in the repository root (e.g., `.newconfig`)
 2. Add the filename to the `DOTFILES` array in `scripts/deploy.sh`
 3. Run `./scripts/deploy.sh` to create the symlink
+
+## Script Requirements
+
+- Bootstrap scripts use `/bin/bash` (not `/usr/bin/env bash`) for compatibility
+- All scripts must pass shellcheck validation (see `.shellcheckrc` for disabled rules)
+- Use `set -eu` for error handling in critical scripts
 
 ## Platform Support
 
