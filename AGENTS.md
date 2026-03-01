@@ -34,6 +34,11 @@ pre-commit run --all-files
    `link .newconfig "$HOME/.newconfig"`
 3. Run `./scripts/deploy.sh` to create the symlink
 
+## Git Workflow
+
+- Always create a branch before making changes (direct commits to main are prohibited)
+- Do NOT create git worktrees — branch only, no worktree
+
 ## Script Requirements
 
 - Bootstrap scripts use `/bin/bash` (not `/usr/bin/env bash`) for compatibility
