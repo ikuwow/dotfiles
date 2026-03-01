@@ -54,7 +54,7 @@ link .shellcheckrc  "$HOME/.shellcheckrc"
 
 # XDG config: all subdirs in .config/ auto-discovered
 mkdir -p "$XDG_CONFIG_HOME"
-find "$DOTPATH/.config" -maxdepth 1 -mindepth 1 -exec ln -fvns {} "$XDG_CONFIG_HOME/" \;
+find "$DOTPATH/.config" -maxdepth 1 -mindepth 1 ! -name '.*' -exec ln -fvns {} "$XDG_CONFIG_HOME/" \;
 
 # SSH
 link .ssh/config    "$HOME/.ssh/config"
