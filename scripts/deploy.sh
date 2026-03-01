@@ -68,8 +68,9 @@ fi
 echo
 
 # Claude Code user settings
-if [[ ! -d "$HOME/.claude" ]]; then
-  ln -fvns "$DOTPATH/claude-user-config" "$HOME/.claude"
-else
-  echo "Note: ~/.claude already exists, skipping claude-user-config symlink"
-fi
+mkdir -p "$HOME/.claude"
+ln -fvns "$DOTPATH/claude/.mcp.json" "$HOME/.claude/.mcp.json"
+ln -fvns "$DOTPATH/claude/settings.json" "$HOME/.claude/settings.json"
+ln -fvns "$DOTPATH/AIRULES.md" "$HOME/.claude/CLAUDE.md"
+ln -fvns "$DOTPATH/rules" "$HOME/.claude/rules"
+ln -fvns "$DOTPATH/claude/commands" "$HOME/.claude/commands"
