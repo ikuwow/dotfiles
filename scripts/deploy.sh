@@ -72,6 +72,5 @@ mkdir -p "$HOME/.claude"
 ln -fvns "$DOTPATH/claude/.mcp.json" "$HOME/.claude/.mcp.json"
 ln -fvns "$DOTPATH/claude/settings.json" "$HOME/.claude/settings.json"
 ln -fvns "$DOTPATH/AIRULES.md" "$HOME/.claude/CLAUDE.md"
-ln -fvns "$DOTPATH/rules" "$HOME/.claude/rules"
 mkdir -p "$HOME/.claude/commands"
 find "$DOTPATH/claude/commands" -maxdepth 1 -mindepth 1 -exec ln -fvns {} "$HOME/.claude/commands/" \;
