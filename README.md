@@ -2,7 +2,7 @@
 
 ![CI](https://github.com/ikuwow/dotfiles/actions/workflows/ci.yml/badge.svg)
 
-My dear dotfiles.
+Personal macOS configuration files, managed as symlinks for portability across machines.
 
 ## Set up your new Mac
 
