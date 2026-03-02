@@ -13,6 +13,7 @@
 
 # myconf
 ikuwowfiles
+.worktrees/
 
 # Terraform
 *.tfvars
