@@ -102,6 +102,17 @@
     ]
   },
   "hooks": {
+    "PermissionRequest": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ~/.claude/hooks/auto-approve-git-commit.py"
+          }
+        ]
+      }
+    ],
     "Notification": [
       {
         "matcher": "",
