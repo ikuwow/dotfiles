@@ -63,7 +63,10 @@
     - 必ず draft で作成する
     - 実際に確認したことだけを「確認した」と記載する
     - 既存 PR にコミット追加後はタイトル・本文を最新状態に合わせて更新する
-7. コミット作成時: メッセージ末尾に空行を入れて `Co-authored-by: Name <email>` を記載する
+7. コミット作成時:
+    - メッセージ末尾に空行を入れて `Co-authored-by: Name <email>` を記載する
+    - heredoc や `$()` は `Bash(git *)` のパーミッションパターンにマッチしないため、`-m` を複数回使う:
+      `git commit -m "Subject" -m "" -m "Co-authored-by: Name <email>"`
 8. AWS/GCP の権限切り替えは `aps` / `gps` コマンドを使用する
 9. プロジェクトと無関係のファイルは `ikuwowfiles/` 以下に置く（グローバル gitignore 対象）
 10. コード・ファイル内の検索は `git grep` を第一選択とする
