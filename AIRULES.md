@@ -40,11 +40,11 @@
     - Claude Code の `--worktree` オプション・EnterWorktree ツールは使用しない（既知の不具合あり）
     - git worktree とブランチを git コマンドで作成し、worktree に移動してから作業する:
       ```
-      git worktree add -b <branch> .worktrees/<branch>
-      cd .worktrees/<branch>
+      branch="<branch-name>"
+      dir=".worktrees/$(echo "$branch" | tr '/' '-')-$(date +%Y%m%d)"
+      git worktree add -b "$branch" "$dir"
+      cd "$dir"
       ```
-      - ブランチ名中のスラッシュはハイフンに置換してディレクトリ名にする
-      - 例: ブランチ `feature/login` → `.worktrees/feature-login`
       - `.worktrees/` はグローバル gitignore 対象
     - ルールやプロンプトで明示的に worktree 禁止と指定されているプロジェクトではブランチのみ作成する
     - default branch への直接コミットは禁止
