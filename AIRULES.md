@@ -48,7 +48,7 @@
       - `.worktrees/` はグローバル gitignore 対象
     - ルールやプロンプトで明示的に worktree 禁止と指定されているプロジェクトではブランチのみ作成する
     - default branch への直接コミットは禁止
-    - 作業完了後（push / PR 作成後）のクリーンアップ:
+    - タスク完全完了後（PR マージ後等）のクリーンアップ:
       ```
       cd <リポジトリルート>
       git worktree remove .worktrees/<branch>
