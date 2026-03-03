@@ -105,7 +105,10 @@
       "mcp__jetbrains",
       "mcp__Context7",
       "mcp__notion__notion-search",
-      "WebSearch"
+      "WebSearch",
+      "Write(//tmp/**)",
+      "Edit(//tmp/**)",
+      "Read(//tmp/**)"
     ]
   },
   "hooks": {
