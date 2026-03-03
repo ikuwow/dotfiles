@@ -12,3 +12,9 @@ jobs:
           shellcheck -- **/*.sh
           shellcheck -- bin/*
           shellcheck --exclude SC2148 .bash_profile .bashrc
+  python-doctest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: doctest
+        run: python3 -m doctest claude/hooks/auto_approve_write_commands.py
