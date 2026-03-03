@@ -26,6 +26,11 @@
       "Bash(git branch -D *)",
       "Bash(git branch * -D *)",
       "Bash(git config *)",
+      "Bash(git worktree remove *)",
+      "Bash(git worktree prune *)",
+      "Bash(git worktree move *)",
+      "Bash(git worktree lock *)",
+      "Bash(git worktree unlock *)",
       "Bash(gh issue edit *)",
       "Bash(gh api * --method *)",
       "Bash(gh api * -X *)",
@@ -42,6 +47,7 @@
     "allow": [
       "Read(~/.claude/rules/*)",
       "Bash(ls *)",
+      "Bash(cd .worktrees/*)",
       "Bash(echo *)",
       "Bash(pwd *)",
       "Bash(grep *)",
@@ -98,7 +104,8 @@
       "mcp__awslabs_aws-documentation-mcp-server",
       "mcp__jetbrains",
       "mcp__Context7",
-      "mcp__notion__notion-search"
+      "mcp__notion__notion-search",
+      "WebSearch"
     ]
   },
   "hooks": {

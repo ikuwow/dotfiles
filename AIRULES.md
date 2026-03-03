@@ -37,9 +37,22 @@
 
 1. 作業開始前:
     - default branch を `git pull` で最新化する
-    - git worktree とブランチを同時に作成する（命名: `../repo__feature-xxx`、スラッシュはハイフンに置換）
-    - 作業完了後は worktree を削除する
-    - worktree を使わない場合でも必ずブランチを作成する（default branch への直接コミット禁止）
+    - Claude Code の `--worktree` オプション・EnterWorktree ツールは使用しない（既知の不具合あり）
+    - git worktree とブランチを git コマンドで作成し、worktree に移動してから作業する:
+      ```
+      branch="<branch-name>"
+      dir=".worktrees/$(echo "$branch" | tr '/' '-')-$(date +%Y%m%d)"
+      git worktree add -b "$branch" "$dir"
+      cd "$dir"
+      ```
+      - `.worktrees/` はグローバル gitignore 対象
+    - ルールやプロンプトで明示的に worktree 禁止と指定されているプロジェクトではブランチのみ作成する
+    - default branch への直接コミットは禁止
+    - タスク完全完了後（PR マージ後等）のクリーンアップ:
+      ```
+      cd <リポジトリルート>
+      git worktree remove .worktrees/<branch>
+      ```
     - `git push --force` / `git push -f` は絶対に実行しない。必要な場合はユーザーに依頼する
 2. README.md があれば必ず読む
 3. 既存ファイルの更新時は必ず最初にファイルを読んで現状を把握してから作業する
