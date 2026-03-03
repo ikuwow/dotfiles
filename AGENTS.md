@@ -39,6 +39,11 @@ pre-commit run --all-files
 - Always create a branch before making changes (direct commits to main are prohibited)
 - Do NOT create git worktrees — branch only, no worktree
 
+## Language
+
+- Write all text in English: commit messages, PR descriptions, issue comments, code comments, etc.
+- Exception: `AIRULES.md` is written in Japanese; references to its content may also be in Japanese
+
 ## Script Requirements
 
 - Bootstrap scripts use `/bin/bash` (not `/usr/bin/env bash`) for compatibility
