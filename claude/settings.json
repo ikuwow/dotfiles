@@ -51,6 +51,7 @@
       "Bash(echo *)",
       "Bash(pwd *)",
       "Bash(grep *)",
+      "Bash(tr *)",
       "Bash(mkdir *)",
       "Bash(tree *)",
       "Bash(git *)",
