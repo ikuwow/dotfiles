@@ -14,6 +14,8 @@ Background:
 
   This hook fires via the PermissionRequest event and auto-approves these commands,
   bypassing the pre-checks while keeping other commands subject to normal rules.
+
+Spec: https://docs.anthropic.com/en/docs/claude-code/hooks (PermissionRequest section)
 """
 import json
 import sys
