@@ -42,6 +42,7 @@
     "allow": [
       "Read(~/.claude/rules/*)",
       "Bash(ls *)",
+      "Bash(cd .worktrees/*)",
       "Bash(echo *)",
       "Bash(pwd *)",
       "Bash(grep *)",
