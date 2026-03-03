@@ -108,7 +108,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ~/.claude/hooks/auto-approve-write-commands.py"
+            "command": "python3 ~/.claude/hooks/auto_approve_write_commands.py"
           }
         ]
       }

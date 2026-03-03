@@ -12,3 +12,7 @@ Brewfile.lock.json
 
 # Backup files
 *.bak
+
+# Python
+__pycache__/
+*.pyc
