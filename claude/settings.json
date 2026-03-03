@@ -108,7 +108,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ~/.claude/hooks/auto-approve-git-commit.py"
+            "command": "python3 ~/.claude/hooks/auto-approve-write-commands.py"
           }
         ]
       }
