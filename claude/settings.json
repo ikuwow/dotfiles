@@ -105,7 +105,9 @@
       "mcp__jetbrains",
       "mcp__Context7",
       "mcp__notion__notion-search",
-      "WebSearch"
+      "WebSearch",
+      "Bash(* > //tmp/*)",
+      "Bash(* >> //tmp/*)"
     ]
   },
   "hooks": {
