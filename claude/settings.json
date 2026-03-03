@@ -102,6 +102,17 @@
     ]
   },
   "hooks": {
+    "PermissionRequest": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ~/.claude/hooks/auto_approve_write_commands.py"
+          }
+        ]
+      }
+    ],
     "Notification": [
       {
         "matcher": "",
