@@ -55,6 +55,7 @@
       "Bash(mkdir *)",
       "Bash(tree *)",
       "Bash(git *)",
+      "Bash(git-worktree-create *)",
       "Bash(jq *)",
       "Bash(yq *)",
       "Bash(ping *)",
