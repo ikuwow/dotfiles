@@ -4,7 +4,7 @@ jobs:
   shellcheck:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Display shellcheck version
         run: shellcheck --version
       - name: shellcheck
@@ -12,3 +12,9 @@ jobs:
           shellcheck -- **/*.sh
           shellcheck -- bin/*
           shellcheck --exclude SC2148 .bash_profile .bashrc
+  python-doctest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: doctest
+        run: python3 -m doctest claude/hooks/approve_safe_heredoc.py
