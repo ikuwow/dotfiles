@@ -72,6 +72,7 @@
       "Bash(gh pr diff *)",
       "Bash(gh pr ready *)",
       "Bash(gh pr create *)",
+      "Bash(gh issue create *)",
       "Bash(gh api *)",
       "Bash(docker compose ps *)",
       "Bash(terraform validate *)",
@@ -113,17 +114,6 @@
     ]
   },
   "hooks": {
-    "PermissionRequest": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 ~/.claude/hooks/auto_approve_write_commands.py"
-          }
-        ]
-      }
-    ],
     "Notification": [
       {
         "matcher": "",
