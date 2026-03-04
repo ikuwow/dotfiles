@@ -9,10 +9,10 @@ Read README.md for the project overview, repository structure, and how it works.
 **Files like `~/.bashrc`, `~/.bash_profile`, `~/.vimrc`, etc. in `$HOME`
 are symlinks pointing to files in this repository.**
 
+- Before searching for a file's location, check `scripts/deploy.sh` for symlink mappings first
 - Always edit the source files in THIS repository
 - Never directly edit files under `$HOME` (e.g., `~/.bashrc`, `~/.gitconfig`)
 - Never access `~/.bashrc` or similar — read from this repo instead
-- The canonical symlink mapping is defined in `scripts/deploy.sh`
 
 ## Key Commands
 
