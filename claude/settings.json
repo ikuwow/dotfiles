@@ -55,6 +55,7 @@
       "Bash(mkdir *)",
       "Bash(tree *)",
       "Bash(git *)",
+      "Bash(git-worktree-create *)",
       "Bash(jq *)",
       "Bash(yq *)",
       "Bash(ping *)",
@@ -72,6 +73,7 @@
       "Bash(gh pr diff *)",
       "Bash(gh pr ready *)",
       "Bash(gh pr create *)",
+      "Bash(gh issue create *)",
       "Bash(gh api *)",
       "Bash(docker compose ps *)",
       "Bash(terraform validate *)",
@@ -119,7 +121,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ~/.claude/hooks/auto_approve_write_commands.py"
+            "command": "python3 ~/.claude/hooks/approve_safe_commands.py"
           }
         ]
       }

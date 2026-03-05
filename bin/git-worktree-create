@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# Create a git worktree with a sanitized directory name under .worktrees/
+# Usage: git-worktree-create <branch-name>
+
+set -eu
+
+if [ $# -ne 1 ]; then
+  echo "Usage: git-worktree-create <branch-name>" >&2
+  exit 1
+fi
+
+branch="$1"
+sanitized="$(echo "$branch" | tr '/' '-')"
+date_str="$(date +%Y%m%d)"
+dir=".worktrees/${sanitized}-${date_str}"
+
+git worktree add -b "$branch" "$dir"
+echo "$dir"
