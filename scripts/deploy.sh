@@ -74,8 +74,9 @@ if [[ -d "$ICLOUD_DIR" ]]; then
 fi
 
 # Claude Code: explicit files + skills auto-discovered
-link claude/.mcp.json     "$HOME/.claude/.mcp.json"
-link claude/settings.json "$HOME/.claude/settings.json"
+link claude/.mcp.json              "$HOME/.claude/.mcp.json"
+link claude/settings.json          "$HOME/.claude/settings.json"
+link claude/statusline-command.sh  "$HOME/.claude/statusline-command.sh"
 link AIRULES.md           "$HOME/.claude/CLAUDE.md"
 mkdir -p "$HOME/.claude/skills"
 find "$DOTPATH/claude/skills" -maxdepth 1 -mindepth 1 -type d -exec ln -fvns {} "$HOME/.claude/skills/" \;
