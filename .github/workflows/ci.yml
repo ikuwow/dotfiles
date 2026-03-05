@@ -10,7 +10,7 @@ jobs:
       - name: shellcheck
         run: |
           shellcheck -- **/*.sh
-          shellcheck -- bin/!(*.md)
+          find bin/ -type f ! -name '*.md' -exec shellcheck {} +
           shellcheck --exclude SC2148 .bash_profile .bashrc
   python-doctest:
     runs-on: ubuntu-latest
