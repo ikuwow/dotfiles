@@ -19,8 +19,6 @@ CONTEXT_PCT=$(echo "$INPUT" | jq -r '.context_window.used_percentage // 0')
 LINES_ADDED=$(echo "$INPUT" | jq -r '.cost.total_lines_added // 0')
 LINES_REMOVED=$(echo "$INPUT" | jq -r '.cost.total_lines_removed // 0')
 
-BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "N/A")
-
 color_for_pct() {
   local pct=$1
   if [ "$pct" -ge 80 ]; then
@@ -32,6 +30,6 @@ color_for_pct() {
   fi
 }
 
-# Line 1: model, context, lines changed, branch
+# Line 1: model, context, lines changed
 CTX_COLOR=$(color_for_pct "$CONTEXT_PCT")
-printf '%b' "🤖 ${MODEL}${SEP}📊 ${CTX_COLOR}${CONTEXT_PCT}%${RESET}${SEP}✏️ +${LINES_ADDED}/-${LINES_REMOVED}${SEP}🔀 ${BRANCH}\n"
+printf '%b' "🤖 ${MODEL}${SEP}📊 ${CTX_COLOR}${CONTEXT_PCT}%${RESET}${SEP}✏️ +${LINES_ADDED}/-${LINES_REMOVED}${SEP}\n"
