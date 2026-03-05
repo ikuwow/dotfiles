@@ -1,49 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
   "permissions": {
-    "deny": [
-      "Bash(git push --force *)",
-      "Bash(git push -f *)",
-      "Bash(git push * --force *)",
-      "Bash(git push * -f *)",
-      "Bash(git push *--force*)",
-      "Bash(git reset --hard *)",
-      "Bash(git reset * --hard *)",
-      "Bash(git clean -f *)",
-      "Bash(git clean -fd *)",
-      "Bash(git clean * -f *)",
-      "Bash(git clean * -fd *)",
-      "Bash(git checkout .)",
-      "Bash(git restore .)"
-    ],
-    "ask": [
-      "Bash(git merge *)",
-      "Bash(git rebase *)",
-      "Bash(git reset *)",
-      "Bash(git clean *)",
-      "Bash(git stash drop *)",
-      "Bash(git stash clear *)",
-      "Bash(git branch -D *)",
-      "Bash(git branch * -D *)",
-      "Bash(git config *)",
-      "Bash(git worktree remove *)",
-      "Bash(git worktree prune *)",
-      "Bash(git worktree move *)",
-      "Bash(git worktree lock *)",
-      "Bash(git worktree unlock *)",
-      "Bash(gh issue edit *)",
-      "Bash(gh api * --method *)",
-      "Bash(gh api * -X *)",
-      "Bash(gh api * --input *)",
-      "Bash(gh api * -f *)",
-      "Bash(gh api * --field *)",
-      "Bash(gh api * -F *)",
-      "Bash(gh api * --raw-field *)",
-      "mcp__jetbrains__run_configuration",
-      "mcp__jetbrains__execute_terminal_command",
-      "mcp__jetbrains__replace_file_text_by_path",
-      "mcp__jetbrains__execute_action_by_id"
-    ],
     "allow": [
       "Read(~/.claude/rules/*)",
       "Bash(ls *)",
@@ -112,9 +69,63 @@
       "Write(//tmp/**)",
       "Edit(//tmp/**)",
       "Read(//tmp/**)"
+    ],
+    "deny": [
+      "Bash(git push --force *)",
+      "Bash(git push -f *)",
+      "Bash(git push * --force *)",
+      "Bash(git push * -f *)",
+      "Bash(git push *--force*)",
+      "Bash(git reset --hard *)",
+      "Bash(git reset * --hard *)",
+      "Bash(git clean -f *)",
+      "Bash(git clean -fd *)",
+      "Bash(git clean * -f *)",
+      "Bash(git clean * -fd *)",
+      "Bash(git checkout .)",
+      "Bash(git restore .)"
+    ],
+    "ask": [
+      "Bash(git merge *)",
+      "Bash(git rebase *)",
+      "Bash(git reset *)",
+      "Bash(git clean *)",
+      "Bash(git stash drop *)",
+      "Bash(git stash clear *)",
+      "Bash(git branch -D *)",
+      "Bash(git branch * -D *)",
+      "Bash(git config *)",
+      "Bash(git worktree remove *)",
+      "Bash(git worktree prune *)",
+      "Bash(git worktree move *)",
+      "Bash(git worktree lock *)",
+      "Bash(git worktree unlock *)",
+      "Bash(gh issue edit *)",
+      "Bash(gh api * --method *)",
+      "Bash(gh api * -X *)",
+      "Bash(gh api * --input *)",
+      "Bash(gh api * -f *)",
+      "Bash(gh api * --field *)",
+      "Bash(gh api * -F *)",
+      "Bash(gh api * --raw-field *)",
+      "mcp__jetbrains__run_configuration",
+      "mcp__jetbrains__execute_terminal_command",
+      "mcp__jetbrains__replace_file_text_by_path",
+      "mcp__jetbrains__execute_action_by_id"
     ]
   },
   "hooks": {
+    "PermissionRequest": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ~/.claude/hooks/approve_safe_commands.py"
+          }
+        ]
+      }
+    ],
     "Notification": [
       {
         "matcher": "",
