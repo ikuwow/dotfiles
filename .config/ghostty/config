@@ -19,8 +19,6 @@ quick-terminal-position = center
 quick-terminal-size = 1080px, 50%
 
 font-family = "Monaco"
-# Japanese fallback font
-font-family = "Osaka-Mono"
 font-style = Regular
 font-size = 12
 # Disable ligatures
