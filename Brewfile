@@ -18,6 +18,7 @@ mas "1Password for Safari", id: 1569813296
 mas "WiFi Signal", id: 525912054
 cask "karabiner-elements"
 cask "ghostty"
+cask "font-noto-sans-mono-cjk-jp"
 cask "pastebot"
 cask "istat-menus"
 cask "rambox"
