@@ -121,7 +121,7 @@ brew "hadolint"
 # brew "mysql" # Do not install mysql (server)
 brew "mysql-client"
 cask "mysqlworkbench"
-brew "postgresql@14"
+brew "postgresql"
 brew "tbls"
 brew "sqlparse"
 brew "mongocli"
