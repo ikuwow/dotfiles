@@ -40,11 +40,13 @@ Note: `.worktrees/` is covered by the global gitignore.
 ## 4. Create a PR
 
 1. Write the PR body to a temp file using the Write tool:
-   `Write(/tmp/pr-body.md)`
+   `Write(/tmp/pr-body-<unique-id>.md)`
+   Use a unique ID (e.g., branch name or timestamp) to avoid collisions
+   with other parallel sessions.
    - Follow the repository's PR template if one exists.
    - Describe only what was actually verified under "confirmed" items.
 2. Create the PR as a draft:
-   `gh pr create --draft --body-file /tmp/pr-body.md`
+   `gh pr create --draft --body-file /tmp/pr-body-<unique-id>.md`
    - Never use `--body` for PR creation. The `#`-prefixed lines in the body
      trigger Claude Code's security pre-check, which cannot be bypassed by
      hooks. Always go through `--body-file`.
