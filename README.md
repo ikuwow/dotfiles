@@ -71,7 +71,8 @@ Editing any dotfile means editing the source file in this repository.
 | `.ssh/config` | `~/.ssh/config` |
 | `.kube/kubie.yaml` | `~/.kube/kubie.yaml` |
 | `bin/*` (executable files) | `~/bin/` |
-| `claude/.mcp.json`, `claude/settings.json`, etc. | `~/.claude/` |
+| `claude/` (settings, hooks, skills, MCP config) | `~/.claude/` |
+| `AIRULES.md` | `~/.claude/CLAUDE.md` |
 
 ### Repository Structure
 
