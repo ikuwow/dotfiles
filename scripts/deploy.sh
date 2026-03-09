@@ -82,3 +82,5 @@ mkdir -p "$HOME/.claude/skills"
 find "$DOTPATH/claude/skills" -maxdepth 1 -mindepth 1 -type d -exec ln -fvns {} "$HOME/.claude/skills/" \;
 mkdir -p "$HOME/.claude/hooks"
 find "$DOTPATH/claude/hooks" -maxdepth 1 -mindepth 1 -type f ! -name 'test_*' -exec ln -fvns {} "$HOME/.claude/hooks/" \;
+mkdir -p "$HOME/.claude/rules"
+find "$DOTPATH/claude/rules" -maxdepth 1 -mindepth 1 -type f -name '*.md' -exec ln -fvns {} "$HOME/.claude/rules/" \;
