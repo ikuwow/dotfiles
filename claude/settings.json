@@ -113,7 +113,8 @@
       "WebSearch",
       "Write(//tmp/**)",
       "Edit(//tmp/**)",
-      "Read(//tmp/**)"
+      "Read(//tmp/**)",
+      "Bash(mdfind:*)"
     ]
   },
   "hooks": {
