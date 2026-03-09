@@ -35,32 +35,14 @@
 
 ## ソフトウェア開発における考慮
 
-1. 作業開始前:
-    - default branch を `git pull` で最新化する
+1. 作業開始・ブランチ・push・PR のフローは `~/.claude/rules/git-workflow.md` に従う
     - Claude Code の `--worktree` オプション・EnterWorktree ツールは使用しない（既知の不具合あり）
-    - `git-worktree-create` コマンドで worktree とブランチを作成し、出力されたディレクトリに移動する:
-      ```
-      git-worktree-create <branch-name>
-      cd <出力されたディレクトリ>
-      ```
-      - `.worktrees/` はグローバル gitignore 対象
-    - ルールやプロンプトで明示的に worktree 禁止と指定されているプロジェクトではブランチのみ作成する
     - default branch への直接コミットは禁止
-    - タスク完全完了後（PR マージ後等）のクリーンアップ:
-      ```
-      cd <リポジトリルート>
-      git worktree remove .worktrees/<branch>
-      ```
-    - `git push --force` / `git push -f` は絶対に実行しない。必要な場合はユーザーに依頼する
 2. README.md があれば必ず読む
 3. 既存ファイルの更新時は必ず最初にファイルを読んで現状を把握してから作業する
 4. 全体を少しずつ作り、1コミットごとにレスポンスを返す形で進める
 5. コメントはコードから読み取れない意図の説明のみに限定する
-6. PR を作る場合:
-    - テンプレートがあれば必ず従う
-    - 必ず draft で作成する
-    - 実際に確認したことだけを「確認した」と記載する
-    - 既存 PR にコミット追加後はタイトル・本文を最新状態に合わせて更新する
+6. PR の作成・更新は `~/.claude/rules/git-workflow.md` に従う
 7. シェルコマンドは `&&` や `;` で連結せず、1コマンドずつ個別に実行する（パーミッション制御を正しく機能させるため）。特に `cd` は他のコマンドと絶対に連結しない（bare repository attack 防止チェックに該当するため）
 8. シェルコマンド内でコマンド置換（`$()`、バッククォート）を使わない。複数行テキストを渡す場合はシングルクォートの複数行文字列をそのまま使う（例: `git commit -m '...'`）。本文にシングルクォートが含まれる場合のみヒアドキュメントにフォールバックする
     - ただし `gh pr create --body` / `gh issue create --body` で `#` を含む複数行テキストを渡す場合は `--body-file` を使う（"quoted newline + #" security pre-check が hooks で回避不可能なため）。テンポラリファイルは Write ツールで作成し（`Write(//tmp/**)` は許可済み）、`--body-file /tmp/body.md` で渡す
