@@ -63,7 +63,7 @@
     - 既存 PR にコミット追加後はタイトル・本文を最新状態に合わせて更新する
 7. シェルコマンドは `&&` や `;` で連結せず、1コマンドずつ個別に実行する（パーミッション制御を正しく機能させるため）。特に `cd` は他のコマンドと絶対に連結しない（bare repository attack 防止チェックに該当するため）
 8. シェルコマンド内でコマンド置換（`$()`、バッククォート）を使わない。複数行テキストを渡す場合はシングルクォートの複数行文字列をそのまま使う（例: `git commit -m '...'`）。本文にシングルクォートが含まれる場合のみヒアドキュメントにフォールバックする
-    - ただし `gh pr create --body` / `gh issue create --body` で `#` を含む複数行テキストを渡す場合は `--body-file` を使う（"quoted newline + #" security pre-check が hooks で回避不可能なため）。テンポラリファイルに書き出してから `--body-file /tmp/body.md` で渡し、実行後にファイルを削除する
+    - ただし `gh pr create --body` / `gh issue create --body` で `#` を含む複数行テキストを渡す場合は `--body-file` を使う（"quoted newline + #" security pre-check が hooks で回避不可能なため）。テンポラリファイルは Write ツールで作成し（`Write(//tmp/**)` は許可済み）、`--body-file /tmp/body.md` で渡す
 9. コミット作成時: メッセージ末尾に空行を入れて `Co-authored-by: Name <email>` を記載する
 10. AWS/GCP の権限切り替えは `aps` / `gps` コマンドを使用する
 11. プロジェクトと無関係のファイルは `ikuwowfiles/` 以下に置く（グローバル gitignore 対象）
