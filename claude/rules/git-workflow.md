@@ -70,8 +70,7 @@ After pushing and creating/updating a PR, wait for CI:
 - Update body:
   `gh pr edit <number> --body '...'`
   Use `--body` (not `--body-file`) so the content is visible in the
-  permission dialog. Fall back to `--body-file` only when the body contains
-  `#`-prefixed lines after a newline.
+  permission dialog.
 - Always fetch the latest PR content before editing remote content.
 
 ## 7. Cleanup After Task Completion
