@@ -116,6 +116,7 @@ brew "yamllint"
 brew "tflint"
 brew "ansible-lint"
 brew "hadolint"
+brew "datadog-labs/pack/pup"
 
 # Databases
 # brew "mysql" # Do not install mysql (server)
