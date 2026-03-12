@@ -63,7 +63,7 @@ self-review in parallel:
      self-review the PR.
 2. Once both finish, read the self-review output.
 3. If the verdict is NEEDS_IMPROVEMENT:
-   - Address all "Must Fix" items.
+   - Immediately fix all "Must Fix" items without waiting for user input.
    - Address "Should Fix" items where reasonable.
    - Update the PR (title, body, or code) as needed.
    - Push changes if code was modified, then re-run `gh pr checks --watch`.
