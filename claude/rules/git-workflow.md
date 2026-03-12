@@ -52,16 +52,26 @@ Note: `.worktrees/` is covered by the global gitignore.
      hooks. Always go through `--body-file`.
 3. After creating the PR, proceed to CI wait (step 5).
 
-## 5. CI Wait
+## 5. CI Wait & Self-Review
 
-After pushing and creating/updating a PR, wait for CI:
+After pushing and creating/updating a PR, run CI monitoring and
+self-review in parallel:
 
-1. Watch all checks:
-   `gh pr checks --watch`
-2. If any check fails:
+1. Start both at the same time:
+   - Run `gh pr checks --watch` to monitor CI.
+   - Launch a background subagent with `/pr-selfcheck <PR number>` to
+     self-review the PR.
+2. Once both finish, read the self-review output.
+3. If the verdict is NEEDS_IMPROVEMENT:
+   - Address all "Must Fix" items.
+   - Address "Should Fix" items where reasonable.
+   - Update the PR (title, body, or code) as needed.
+   - Push changes if code was modified, then re-run `gh pr checks --watch`.
+4. If any CI check fails:
    - Review details: `gh pr checks`
    - View failure logs: `gh run view --log-failed`
    - Fix the issue, commit, push, then watch again.
+5. Do not re-run the self-review after fixes (single pass only).
 
 ## 6. Update a PR (title / body)
 
