@@ -31,10 +31,13 @@ recurrence through external mechanisms:
 - Permission setting
 - Project structure change
 
-Format as a compact list of pairs:
+Format as a numbered list of pairs. Include a severity rating for each:
 
 ```
+## 1. <short title>
+
 Problem: <what happened>
+Severity: high / medium / low (with brief justification: time wasted, user intervention needed, etc.)
 Countermeasure: <structural fix> (scope: global / project-specific)
 ```
 
