@@ -44,7 +44,7 @@ Note: `.worktrees/` is covered by the global gitignore.
    Use a unique ID (e.g., branch name or timestamp) to avoid collisions
    with other parallel sessions.
    - Follow the repository's PR template if one exists.
-   - Describe only what was actually verified under "confirmed" items.
+   - Follow the PR Body Checklist in `pr-guidelines.md`.
 2. Create the PR as a draft:
    `gh pr create --draft --body-file /tmp/pr-body-<unique-id>.md`
    - Never use `--body` for PR creation. The `#`-prefixed lines in the body
