@@ -19,29 +19,8 @@ Perform a self-review of the specified PR to catch issues before a human reviewe
 
 ## Review Criteria
 
-1. Reviewer-facing information
-   - Can a reviewer understand the purpose, what changed, and the impact from the PR body alone?
-   - Is the scope of the change clear?
-
-2. Sources and references
-   - Are official documentation URLs or other authoritative sources provided to justify configuration values, tool choices, or version selections?
-   - This is especially important for dotfiles / infrastructure changes where "why this value" matters.
-
-3. Intent and rationale
-   - Does the PR explain not just what changed but why?
-   - Is the motivation (bug, feature request, tech debt, compliance, etc.) stated?
-
-4. Link validity
-   - Do all URLs in the PR body resolve to the expected content?
-   - Do anchor links point to the correct section?
-
-5. Title / body / diff consistency
-   - Does the PR title accurately reflect the change?
-   - Is there any contradiction between the body description and the actual diff?
-
-6. Diff coverage
-   - Does the PR body account for all files and changes in the diff?
-   - Are there unexplained changes?
+Evaluate the PR against the Review Criteria defined in `pr-guidelines.md`.
+Read that file before starting the review.
 
 ## Output Format
 
