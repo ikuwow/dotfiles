@@ -2,49 +2,73 @@
 description: Use when the user wants to reflect on AI communication quality and get improvement suggestions for rule files or the project itself. TRIGGER when user invokes /retrospective or asks to review the session.
 ---
 
-# AIとのコミュニケーション振り返り
+# Session Retrospective
 
-今回のセッションを振り返り、AIとのコミュニケーション改善のための提案を行ってください。
+Review the current session and identify problematic AI behaviors with
+structural countermeasures.
 
-タスクの内容や進捗ではなく、AIとユーザーの「やり取りの質」に焦点を当てて分析してください。
+Focus on the interaction process, not on the task content itself.
 
-## 分析してほしい観点
+## Step 1: List Problem Behaviors
 
-1. コミュニケーションの課題
-   - AIが誤解した指示や、再度説明が必要だった部分はあったか
-   - 期待と異なる動作をした箇所はあったか
-   - 無駄な作業や非効率だったやり取りはあったか
+Scan the session for AI behaviors that caused issues. For each one, write:
 
-2. 改善できる点
-   - より効率的に進められた可能性がある部分
-   - 指示の出し方で改善できる点
-   - AIの応答で改善すべき点
+- What the AI did (concrete action, not vague description)
+- Why it was a problem (wasted time, wrong output, user had to correct, etc.)
 
-3. ルールファイルへの追記提案
-   - 今回の課題を踏まえて、追加すべきルールがあれば具体的に提案
-   - グローバルルール（AIRULES.md）とプロジェクトルール（プロジェクトの CLAUDE.md 等）のどちらに追加すべきかを明示する
-     - グローバルルール：すべてのプロジェクトに適用する汎用的な AI 指示
-     - プロジェクトルール：このプロジェクト固有の制約・慣習
-   - 提案は具体的なルール文として記載
-   - なぜそのルールが必要かの理由も説明
+Keep each entry to 1-2 lines. Skip behaviors that had no real impact.
 
-4. プロジェクト改善の提案
-   - 今回の作業を通じて気づいた、プロジェクト自体の改善点を提案する
-   - ドキュメント：以下のようなドキュメントが不足・不明確だった場合に提案する
-     - README への追記（セットアップ手順、動作確認方法、アーキテクチャ概要）
-     - 開発者向けドキュメント（デバッグ手順、ローカル環境構築、よくあるエラーと対処法）
-     - 設計ドキュメント（モジュール構成、データフロー、主要コンポーネントの役割）
-   - コードの可読性：コードを読んだ際に意図が不明確だった箇所
-     - コメントの追加（特に「なぜそうなっているか」の背景）
-     - 関連 PR・issue・ADR へのリンクコメント
-     - 型定義・インターフェース仕様の補完
-   - 構造・設計：今回の作業で感じた構造上の改善余地
-     - ディレクトリ構成・ファイル配置の見直し
-     - 命名規則の統一や分割・統合の提案
-   - 提案には「どのファイル・ディレクトリに何を追加・変更するか」を具体的に示す
+## Step 2: Propose Structural Countermeasures
 
-## 重要な注意点
+For each problem behavior, propose a countermeasure that prevents
+recurrence through external mechanisms:
 
-- タスクの内容そのものではなく、AIとのやり取りのプロセスと、そこから見えたプロジェクトの改善点に注目すること
-- 具体的で実行可能な改善提案を心がけること
-- すべての提案はあくまで提案であり、実際の変更はユーザーの確認を得てから行うこと
+- Rule addition (to AIRULES.md for global, or project CLAUDE.md for project-specific)
+- Hook (pre-commit, Claude Code PreToolUse/PostToolUse/PermissionRequest hook)
+- Linter or static analysis rule
+- Script or automation
+- Template or checklist
+- Permission setting
+- Project structure change
+
+Format as a compact list of pairs:
+
+```
+Problem: <what happened>
+Countermeasure: <structural fix> (scope: global / project-specific)
+```
+
+## Prohibited Countermeasures
+
+The following are NOT valid countermeasures. Never propose them:
+
+- "Follow existing rules more carefully" or any variation of rule compliance
+- "Pay more attention to X"
+- "Be more careful about Y"
+- "Remember to Z"
+- Any countermeasure that relies on the model's judgment, attention, or
+  memory improving in the future
+- Restating an existing rule as if adding it would help
+
+The premise: the model's behavior cannot be trusted to improve through
+willpower. Only external enforcement mechanisms count.
+
+## Prohibited Root Causes
+
+Do not attribute problems to:
+
+- "Existing rule was not followed" — the rule exists but failed to prevent
+  the behavior, so the rule or enforcement is insufficient
+- "AI didn't understand the instruction" — if the instruction was clear,
+  the question is why the structure allowed misinterpretation
+
+Instead, ask: what structural change would have made the wrong behavior
+impossible or caught it before it caused damage?
+
+## Output Format
+
+Keep the output compact. No preamble, no summary section, no closing
+remarks. Just the list of problem-countermeasure pairs.
+
+If there are no significant problem behaviors in the session, say so in
+one line and stop.
