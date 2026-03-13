@@ -95,10 +95,15 @@ else
     let s:bin_prefix = ''
 endif
 
-let g:python3_host_prog = s:bin_prefix . 'python3'
 if has("nvim")
-    let s:pip3 = s:bin_prefix . 'pip3'
-    call system(s:pip3 . ' install neovim pynvim')
+    let s:nvim_venv = stdpath('data') . '/python3-venv'
+    if !filereadable(s:nvim_venv . '/bin/python3')
+        call system(s:bin_prefix . 'python3 -m venv ' . s:nvim_venv)
+        call system(s:nvim_venv . '/bin/pip install pynvim')
+    endif
+    let g:python3_host_prog = s:nvim_venv . '/bin/python3'
+else
+    let g:python3_host_prog = s:bin_prefix . 'python3'
 endif
 
 if strlen($SSH_CLIENT) != 0
@@ -300,6 +305,10 @@ lua << EOF
         require("claudecode").setup({
             terminal = {
                 provider = "none",
+            },
+            diff_opts = {
+                layout = "horizontal",
+                open_in_new_tab = true,
             },
         })
     end
