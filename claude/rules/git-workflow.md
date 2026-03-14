@@ -50,7 +50,9 @@ Note: `.worktrees/` is covered by the global gitignore.
    - Never use `--body` for PR creation. The `#`-prefixed lines in the body
      trigger Claude Code's security pre-check, which cannot be bypassed by
      hooks. Always go through `--body-file`.
-3. After creating the PR, proceed to CI wait (step 5).
+3. After creating the PR, display the PR URL to the user:
+   `gh pr view --json url --jq '.url'`
+4. Proceed to CI wait (step 5).
 
 ## 5. CI Wait & Self-Review
 
