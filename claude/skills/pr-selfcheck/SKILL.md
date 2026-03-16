@@ -20,7 +20,6 @@ Perform a self-review of the specified PR to catch issues before a human reviewe
 ## Review Criteria
 
 Evaluate the PR against the Review Criteria defined in `pr-guidelines.md`.
-Read that file before starting the review.
 
 ## Output Format
 
