@@ -29,6 +29,7 @@ recurrence through external mechanisms:
 - Script or automation
 - Template or checklist
 - Permission setting
+- CI check (GitHub Actions workflow, test assertion, etc.)
 - Project structure change
 
 Format as a numbered list of pairs. Include a severity rating for each:
@@ -41,6 +42,24 @@ Severity: high / medium / low (with brief justification: time wasted, user inter
 Countermeasure: <structural fix> (scope: global / project-specific)
 ```
 
+### Countermeasure Specificity
+
+Each countermeasure must specify:
+
+- The exact target file path (e.g., `AIRULES.md`, `CLAUDE.md`,
+  `.claude/rules/foo.md`, `.pre-commit-config.yaml`)
+- The concrete content to add or modify — draft the actual wording, not
+  just "add a rule about X"
+
+### Placement Scope
+
+Choose the placement based on who benefits:
+
+- Team-shared enforcement → project's `CLAUDE.md` or its `rules/` directory
+- Personal habits or preferences → global `AIRULES.md` or `~/.claude/rules/`
+- Memory is for recording facts only. It must not be used as a mechanism
+  for behavior change (see Prohibited Countermeasures below).
+
 ## Prohibited Countermeasures
 
 The following are NOT valid countermeasures. Never propose them:
@@ -51,6 +70,9 @@ The following are NOT valid countermeasures. Never propose them:
 - "Remember to Z"
 - Any countermeasure that relies on the model's judgment, attention, or
   memory improving in the future
+- "Save to memory" / "Record in memory" — memory depends on model
+  judgment for recall and is not a structural enforcement mechanism.
+  Memory is valid for recording facts, but not for driving behavior change.
 - Restating an existing rule as if adding it would help
 
 The premise: the model's behavior cannot be trusted to improve through
