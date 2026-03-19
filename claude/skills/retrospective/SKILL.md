@@ -29,6 +29,7 @@ recurrence through external mechanisms:
 - Script or automation
 - Template or checklist
 - Permission setting
+- CI check (GitHub Actions workflow, test assertion, etc.)
 - Project structure change
 
 Format as a numbered list of pairs. Include a severity rating for each:
