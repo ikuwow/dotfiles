@@ -22,6 +22,8 @@ jobs:
       - name: Verify login shell
         if: runner.os == 'Linux'
         run: bash --login -c 'echo "Login shell OK"'
+      - name: Verify deploy
+        run: ~/dotfiles/scripts/verify_deploy.sh
 
   bootstrap-minimal:
     runs-on: ubuntu-latest
@@ -34,3 +36,5 @@ jobs:
           curl -L "https://raw.githubusercontent.com/ikuwow/dotfiles/${BRANCH}/bootstrap.sh" | bash -s -- "${BRANCH}"
       - name: Verify login shell
         run: bash --login -c 'echo "Login shell OK"'
+      - name: Verify deploy
+        run: ~/dotfiles/scripts/verify_deploy.sh
