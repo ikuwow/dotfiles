@@ -97,7 +97,7 @@ dotfiles/
 
 ### Bootstrap Flow
 
-1. `bootstrap.sh` — Clones the repo (or updates it). If `DOTFILES_MINIMAL=1`, runs `bootstrap/remote.sh` (symlinks only) and exits. Otherwise calls `bootstrap/main.sh`.
+1. `bootstrap.sh` — Clones the repo (or updates it). If `DOTFILES_MINIMAL=1`, runs `bootstrap/claude-code-web.sh` (symlinks only) and exits. Otherwise calls `bootstrap/main.sh`.
 2. `bootstrap/main.sh` — Detects OS/architecture, checks prerequisites, orchestrates:
    - `scripts/deploy.sh` — Creates symlinks (runs on Linux and macOS)
    - `scripts/configure.sh` — macOS system defaults (macOS only)
@@ -112,12 +112,18 @@ dotfiles/
 
 On Linux, the bootstrap process deploys symlinks and exits. Homebrew is not used on Linux in this project; shell configuration (`.bash_profile`, `.bashrc`) detects whether Homebrew is installed and skips all Homebrew-dependent setup when it is absent.
 
-### Minimal Bootstrap for Remote Environments
+### Claude Code Web
 
-For remote or ephemeral environments (e.g., Claude Code web, CI containers) where most tools are already pre-installed, set `DOTFILES_MINIMAL=1` to run a fast symlink-only bootstrap that skips OS detection and macOS-specific steps:
+When `CLAUDE_CODE_REMOTE=true` is detected (set automatically by Claude Code web), `bootstrap.sh` runs `bootstrap/claude-code-web.sh` instead of the full macOS setup. This script:
+
+1. Installs packages not in the default image (`gh`, `jq`, `fzf`)
+2. Deploys all dotfile symlinks via `deploy.sh`
+3. Registers MCP servers (`deepwiki`, `Context7`) via `claude mcp add`
+
+Use this as the Claude Code web setup script:
 
 ```
-DOTFILES_MINIMAL=1 curl -L https://raw.githubusercontent.com/ikuwow/dotfiles/main/bootstrap.sh | bash -s
+curl -L https://raw.githubusercontent.com/ikuwow/dotfiles/main/bootstrap.sh | bash -s
 ```
 
-This deploys all symlinks (shell config, aliases, editor settings, Claude Code config, custom scripts in `bin/`, etc.) without installing any packages.
+No environment variables need to be configured; `CLAUDE_CODE_REMOTE` is set automatically by the platform.
