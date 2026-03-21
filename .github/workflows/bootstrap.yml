@@ -23,13 +23,13 @@ jobs:
         if: runner.os == 'Linux'
         run: bash --login -c 'echo "Login shell OK"'
 
-  bootstrap-remote:
+  bootstrap-minimal:
     runs-on: ubuntu-latest
     steps:
-      - name: Bootstrap (remote mode)
+      - name: Bootstrap (minimal mode)
         env:
           BRANCH: ${{ github.head_ref }}
-          CLAUDE_CODE_REMOTE: "1"
+          DOTFILES_MINIMAL: "1"
         run: |
           curl -L "https://raw.githubusercontent.com/ikuwow/dotfiles/${BRANCH}/bootstrap.sh" | bash -s -- "${BRANCH}"
       - name: Verify login shell

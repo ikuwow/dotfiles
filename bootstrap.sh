@@ -23,8 +23,8 @@ fi
 
 cd "$DOTPATH"
 
-# Fast path for remote/ephemeral environments (e.g., Claude Code web)
-if [ -n "${CLAUDE_CODE_REMOTE:-}" ]; then
+# Fast path for remote/ephemeral environments
+if [ -n "${DOTFILES_MINIMAL:-}" ]; then
   ./bootstrap/remote.sh
   exit 0
 fi
