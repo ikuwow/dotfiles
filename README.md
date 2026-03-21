@@ -126,6 +126,7 @@ Use this as the Claude Code web setup script:
 curl -L https://raw.githubusercontent.com/ikuwow/dotfiles/main/bootstrap.sh | bash -s
 ```
 
-`CLAUDE_CODE_REMOTE` is set automatically by the platform; no environment variables need to be configured.
+Environment variables:
 
-Limitations: `gh` CLI cannot authenticate in the remote environment. Git operations (clone, push) work through the platform's proxy, but `gh` requires a separate GitHub token which cannot be securely provided. Use the Claude Code web UI (diff view) for PR creation instead.
+- `CLAUDE_CODE_REMOTE`: Set automatically by the platform (no configuration needed)
+- `GH_TOKEN`: Set a [GitHub Personal Access Token](https://github.com/settings/tokens) with `repo` scope to enable `gh` CLI operations (PR creation, etc.)
