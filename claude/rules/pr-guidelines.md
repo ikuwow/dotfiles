@@ -33,6 +33,10 @@ When writing a PR body, cover every applicable item:
 4. Verification
    - Describe only what was actually verified under "confirmed" items.
    - Do not claim verification that was not performed.
+   - When the change affects environments that CI cannot replicate
+     (e.g., Claude Code web, external services), include manual test
+     steps the reviewer can follow to verify in the real environment
+     before merging.
 
 ## Review Criteria
 
@@ -68,3 +72,10 @@ Used by `/pr-selfcheck` to evaluate a PR after creation.
    - Is the body a high-level summary rather than a line-by-line restatement
      of the diff?
    - Are bullet points few and meaningful, each conveying a distinct point?
+
+8. Verification completeness
+   - Is every changed code path covered by CI, manual test steps in the
+     PR body, or another verification mechanism?
+   - Are there paths that only run in a specific target environment
+     (e.g., Claude Code web, external services) without a stated plan
+     to verify them?
