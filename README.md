@@ -80,7 +80,8 @@ Editing any dotfile means editing the source file in this repository.
 dotfiles/
 ├── bootstrap.sh          # Entry point (run via curl on a new Mac)
 ├── bootstrap/
-│   └── main.sh           # OS detection, prerequisites, orchestrates full setup
+│   ├── main.sh           # OS detection, prerequisites, orchestrates full setup
+│   └── remote.sh         # Minimal bootstrap for remote environments
 ├── scripts/
 │   ├── deploy.sh         # Creates all symlinks (runs on Linux too)
 │   ├── configure.sh      # macOS system preferences via defaults command
@@ -96,7 +97,7 @@ dotfiles/
 
 ### Bootstrap Flow
 
-1. `bootstrap.sh` — Clones the repo (or updates it), then calls `bootstrap/main.sh`
+1. `bootstrap.sh` — Clones the repo (or updates it). If `DOTFILES_MINIMAL=1`, runs `bootstrap/remote.sh` (symlinks only) and exits. Otherwise calls `bootstrap/main.sh`.
 2. `bootstrap/main.sh` — Detects OS/architecture, checks prerequisites, orchestrates:
    - `scripts/deploy.sh` — Creates symlinks (runs on Linux and macOS)
    - `scripts/configure.sh` — macOS system defaults (macOS only)
@@ -106,5 +107,17 @@ dotfiles/
 
 ### Platform Support
 
-- macOS (Intel and Apple Silicon): Full support
-- Linux: Symlink deployment only (no Homebrew, no macOS defaults)
+- macOS (Intel and Apple Silicon): Full support (Homebrew, system defaults, GUI apps)
+- Linux: Symlink deployment only
+
+On Linux, the bootstrap process deploys symlinks and exits. Homebrew is not used on Linux in this project; shell configuration (`.bash_profile`, `.bashrc`) detects whether Homebrew is installed and skips all Homebrew-dependent setup when it is absent.
+
+### Minimal Bootstrap for Remote Environments
+
+For remote or ephemeral environments (e.g., Claude Code web, CI containers) where most tools are already pre-installed, set `DOTFILES_MINIMAL=1` to run a fast symlink-only bootstrap that skips OS detection and macOS-specific steps:
+
+```
+DOTFILES_MINIMAL=1 curl -L https://raw.githubusercontent.com/ikuwow/dotfiles/main/bootstrap.sh | bash -s
+```
+
+This deploys all symlinks (shell config, aliases, editor settings, Claude Code config, custom scripts in `bin/`, etc.) without installing any packages.
