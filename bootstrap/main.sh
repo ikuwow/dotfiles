@@ -19,7 +19,7 @@ echo "Arch detected: ${archname}"
 scripts/deploy.sh
 
 if [ "$os" = "Linux" ]; then
-  echo "Warning: Linux is not supported after this point."
+  echo "Linux: symlink deployment complete. Skipping macOS-specific setup."
   exit 0
 fi
 
