@@ -162,8 +162,9 @@
   "enabledPlugins": {
     "gopls-lsp@claude-plugins-official": true
   },
+  "voiceEnabled": true,
   "feedbackSurveyState": {
     "lastShownTime": 1754272823676
   },
-  "voiceEnabled": true
+  "model": "opus"
 }

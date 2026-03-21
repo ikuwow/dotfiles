@@ -80,7 +80,8 @@ Editing any dotfile means editing the source file in this repository.
 dotfiles/
 ├── bootstrap.sh          # Entry point (run via curl on a new Mac)
 ├── bootstrap/
-│   └── main.sh           # OS detection, prerequisites, orchestrates full setup
+│   ├── main.sh           # OS detection, prerequisites, orchestrates full setup
+│   └── remote.sh         # Minimal bootstrap for remote environments
 ├── scripts/
 │   ├── deploy.sh         # Creates all symlinks (runs on Linux too)
 │   ├── configure.sh      # macOS system preferences via defaults command
@@ -96,7 +97,7 @@ dotfiles/
 
 ### Bootstrap Flow
 
-1. `bootstrap.sh` — Clones the repo (or updates it), then calls `bootstrap/main.sh`
+1. `bootstrap.sh` — Clones the repo (or updates it). If `DOTFILES_MINIMAL=1`, runs `bootstrap/claude-code-web.sh` (symlinks only) and exits. Otherwise calls `bootstrap/main.sh`.
 2. `bootstrap/main.sh` — Detects OS/architecture, checks prerequisites, orchestrates:
    - `scripts/deploy.sh` — Creates symlinks (runs on Linux and macOS)
    - `scripts/configure.sh` — macOS system defaults (macOS only)
@@ -106,5 +107,26 @@ dotfiles/
 
 ### Platform Support
 
-- macOS (Intel and Apple Silicon): Full support
-- Linux: Symlink deployment only (no Homebrew, no macOS defaults)
+- macOS (Intel and Apple Silicon): Full support (Homebrew, system defaults, GUI apps)
+- Linux: Symlink deployment only
+
+On Linux, the bootstrap process deploys symlinks and exits. Homebrew is not used on Linux in this project; shell configuration (`.bash_profile`, `.bashrc`) detects whether Homebrew is installed and skips all Homebrew-dependent setup when it is absent.
+
+### Claude Code Web
+
+When `CLAUDE_CODE_REMOTE=true` is detected (set automatically by Claude Code web), `bootstrap.sh` runs `bootstrap/claude-code-web.sh` instead of the full macOS setup. This script:
+
+1. Installs packages not in the default image (`gh`, `jq`, `fzf`)
+2. Deploys all dotfile symlinks via `deploy.sh`
+3. Registers MCP servers (`deepwiki`, `Context7`) via `claude mcp add`
+
+Use this as the Claude Code web setup script:
+
+```
+curl -L https://raw.githubusercontent.com/ikuwow/dotfiles/main/bootstrap.sh | bash -s
+```
+
+Environment variables:
+
+- `CLAUDE_CODE_REMOTE` is set automatically by the platform (no configuration needed)
+- `GH_TOKEN`: Set a GitHub Personal Access Token to enable `gh` CLI operations (PR creation, etc.)
