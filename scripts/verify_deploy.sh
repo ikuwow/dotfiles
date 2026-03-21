@@ -5,7 +5,6 @@
 
 set -eu
 
-DOTPATH="$HOME/dotfiles"
 errors=0
 
 check_symlink() {
