@@ -74,6 +74,8 @@ Used by `/pr-selfcheck` to evaluate a PR after creation.
    - Are bullet points few and meaningful, each conveying a distinct point?
 
 8. Verification completeness
-   - Has every changed code path been tested in an environment where it
-     actually runs, not just passed through CI?
-   - Are there untested paths that only fail in the real target environment?
+   - Is every changed code path covered by CI, manual test steps in the
+     PR body, or another verification mechanism?
+   - Are there paths that only run in a specific target environment
+     (e.g., Claude Code web, external services) without a stated plan
+     to verify them?
