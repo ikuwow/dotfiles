@@ -129,4 +129,9 @@ curl -L https://raw.githubusercontent.com/ikuwow/dotfiles/main/bootstrap.sh | ba
 Environment variables:
 
 - `CLAUDE_CODE_REMOTE`: Set automatically by the platform (no configuration needed)
-- `GH_TOKEN`: Set a [GitHub Personal Access Token](https://github.com/settings/tokens) with `repo` scope to enable `gh` CLI operations (PR creation, etc.)
+- `GH_TOKEN`: Set a [GitHub fine-grained Personal Access Token](https://github.com/settings/personal-access-tokens/new) to enable `gh` CLI operations. Required repository permissions:
+  - Contents: Read and write
+  - Pull requests: Read and write
+  - Issues: Read and write
+  - Actions: Read-only (for `gh pr checks`, `gh run view`)
+  - Metadata: Read-only (granted automatically)
