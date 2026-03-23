@@ -81,6 +81,8 @@
       "Bash(git clean -fd *)",
       "Bash(git clean * -f *)",
       "Bash(git clean * -fd *)",
+      "Bash(git add .)",
+      "Bash(git add -A *)",
       "Bash(git checkout .)",
       "Bash(git restore .)",
       "WebFetch(domain:localhost)",
@@ -165,6 +167,5 @@
   "voiceEnabled": true,
   "feedbackSurveyState": {
     "lastShownTime": 1754272823676
-  },
-  "model": "opus"
+  }
 }
