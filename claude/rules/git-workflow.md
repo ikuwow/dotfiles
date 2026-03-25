@@ -3,6 +3,12 @@
 Standard git/GitHub workflow for all projects.
 Follow each step in order. Skip steps that don't apply.
 
+## Principles
+
+- Never create or edit files on the default branch. Always move into the
+  worktree (or feature branch) first. Creating files before branching
+  leads to redundant copy-and-delete work.
+
 ## 1. Start Work
 
 1. Pull the latest default branch:
@@ -75,7 +81,7 @@ self-review in parallel:
    - Fix the issue, commit, push, then watch again.
 5. Do not re-run the self-review after fixes (single pass only).
 
-## 6. Update a PR (title / body)
+## 6. Update a PR / issue (title / body)
 
 - Update title:
   `gh pr edit <number> --title '...'`
@@ -83,7 +89,12 @@ self-review in parallel:
   `gh pr edit <number> --body '...'`
   Use `--body` (not `--body-file`) so the content is visible in the
   permission dialog.
-- Always fetch the latest PR content before editing remote content.
+- The same applies to `gh issue edit` — always use `--body`, not
+  `--body-file`.
+- Always fetch the latest content before editing remote content.
+
+Note: `--body-file` is only for `gh pr create` / `gh issue create`
+(to bypass the `#`-prefixed line security pre-check).
 
 ## 7. Cleanup After Task Completion
 
