@@ -8,6 +8,9 @@ step in `git-workflow.md` and the `/pr-selfcheck` skill.
 - Summarize the change at a high level. Do not mirror the diff line-by-line.
 - Keep bullet points few and meaningful. Each bullet should convey a
   distinct decision or outcome, not an individual code change.
+- Focus on what changes from the user's or system's perspective — behavior
+  changes, new capabilities, removed limitations, etc. — rather than
+  listing implementation details (resources added, files touched).
 - Anything a reviewer can see by reading the diff does not need to be
   restated in the body. Focus on context the diff cannot convey: why the
   change was made, trade-offs considered, and things to watch out for.
