@@ -8,6 +8,7 @@ on:
 jobs:
   bootstrap:
     strategy:
+      fail-fast: false
       matrix:
         os:
           - macos-latest
