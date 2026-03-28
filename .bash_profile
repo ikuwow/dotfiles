@@ -67,7 +67,7 @@ else
 fi
 export HISTTIMEFORMAT='%y-%m-%d %H:%M:%S '
 export HISTSIZE=5000
-export XDG_CONFIG_HOME=~/.config
+export XDG_CONFIG_HOME=~/.config # Some tools hardcode this path; do not change without auditing
 export XDG_DATA_HOME=~/.local/share
 export QUOTING_STYLE=literal # for GNU ls
 

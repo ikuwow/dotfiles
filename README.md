@@ -74,6 +74,8 @@ Editing any dotfile means editing the source file in this repository.
 | `claude/` (settings, hooks, skills, MCP config) | `~/.claude/` |
 | `AIRULES.md` | `~/.claude/CLAUDE.md` |
 
+Note: Some config files (e.g. git `templateDir`) hardcode `~/.config/` because they don't support variable expansion. This assumes `XDG_CONFIG_HOME` is set to the default `~/.config`.
+
 ### Repository Structure
 
 ```
