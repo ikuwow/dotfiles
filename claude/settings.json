@@ -167,5 +167,6 @@
   "voiceEnabled": true,
   "feedbackSurveyState": {
     "lastShownTime": 1754272823676
-  }
+  },
+  "model": "opus"
 }
