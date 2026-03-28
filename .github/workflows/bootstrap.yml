@@ -8,6 +8,7 @@ on:
 jobs:
   bootstrap:
     strategy:
+      fail-fast: false
       matrix:
         os:
           - macos-latest
@@ -19,8 +20,13 @@ jobs:
           BRANCH: ${{ github.head_ref }}
         run: |
           curl -L "https://raw.githubusercontent.com/ikuwow/dotfiles/${BRANCH}/bootstrap.sh" | bash -s -- "${BRANCH}"
-      - name: Verify login shell
-        if: runner.os == 'Linux'
-        run: bash --login -c 'echo "Login shell OK"'
+      - name: Verify login shell produces no errors
+        run: |
+          errors=$(bash --login -c '' 2>&1 1>/dev/null) || true
+          if [ -n "$errors" ]; then
+            echo "Login shell produced errors on stderr:"
+            echo "$errors"
+            exit 1
+          fi
       - name: Verify deploy
         run: ~/dotfiles/scripts/verify_deploy.sh
