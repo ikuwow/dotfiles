@@ -38,7 +38,6 @@ link .ideavimrc     "$HOME/.ideavimrc"
 link .tmux.conf     "$HOME/.tmux.conf"
 
 # Version / package managers
-link .asdfrc                  "$HOME/.asdfrc"
 link .tool-versions           "$HOME/.tool-versions"
 link .gemrc                   "$HOME/.gemrc"
 link .npmrc                   "$HOME/.npmrc"

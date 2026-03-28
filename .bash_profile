@@ -83,13 +83,11 @@ if [ -f "$CLOUDSDK_CONFIG/active_config" ]; then
   export GC_ACTIVE_CONFIG
 fi
 
-# Version managers (asdf, aqua)
-export PATH="${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
+# Version managers (mise, aqua)
+eval "$(mise activate bash)"
 export PATH=${AQUA_ROOT_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/aquaproj-aqua}/bin:$PATH
 
-[[ -f "$HOME/.asdf/plugins/golang/set-env.bash" ]] && . "$HOME/.asdf/plugins/golang/set-env.bash"
 [[ -n "$GOBIN" ]] && export PATH="${GOBIN}:${PATH}"
-export ASDF_GOLANG_MOD_VERSION_ENABLED="true"
 
 for file in ~/.{bashrc,aliases,functions,brew_api_token}; do
   [[ -r "$file" ]] && [[ -f "$file" ]] && . "$file"
