@@ -49,8 +49,8 @@ check_dir "$HOME/.ssh/config.d"
 
 echo ""
 echo "=== XDG config (auto-discovered) ==="
-check_symlink "$HOME/.config/git"
-check_symlink "$HOME/.config/nvim"
+check_symlink "${XDG_CONFIG_HOME:-$HOME/.config}/git"
+check_symlink "${XDG_CONFIG_HOME:-$HOME/.config}/nvim"
 
 echo ""
 echo "=== bin (auto-discovered) ==="

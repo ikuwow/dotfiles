@@ -77,8 +77,9 @@ if [ -f ~/.aws/current_profile ]; then
   export AWS_PROFILE
 fi
 
-if [ -f ~/.config/gcloud/active_config ]; then
-  GC_ACTIVE_CONFIG="$(cat ~/.config/gcloud/active_config)"
+export CLOUDSDK_CONFIG="$XDG_CONFIG_HOME/gcloud"
+if [ -f "$CLOUDSDK_CONFIG/active_config" ]; then
+  GC_ACTIVE_CONFIG="$(cat "$CLOUDSDK_CONFIG/active_config")"
   export GC_ACTIVE_CONFIG
 fi
 
