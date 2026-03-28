@@ -52,9 +52,9 @@ link .terraformrc   "$HOME/.terraformrc"
 # Linting
 link .shellcheckrc  "$HOME/.shellcheckrc"
 
-# XDG config: all subdirs in .config/ auto-discovered
+# XDG config: all subdirs in xdg-config/ auto-discovered
 mkdir -p "$XDG_CONFIG_HOME"
-find "$DOTPATH/.config" -maxdepth 1 -mindepth 1 ! -name '.*' -exec ln -fvns {} "$XDG_CONFIG_HOME/" \;
+find "$DOTPATH/xdg-config" -maxdepth 1 -mindepth 1 ! -type f ! -name '.*' -exec ln -fvns {} "$XDG_CONFIG_HOME/" \;
 
 # SSH
 link .ssh/config    "$HOME/.ssh/config"

@@ -67,12 +67,14 @@ Editing any dotfile means editing the source file in this repository.
 | Repository source | Deployed to |
 | --- | --- |
 | `.aliases`, `.bash_profile`, `.bashrc`, `.vimrc`, etc. (19 dotfiles) | `~/` |
-| `.config/*` (all subdirectories) | `~/.config/` |
+| `xdg-config/*` (all subdirectories) | `~/.config/` |
 | `.ssh/config` | `~/.ssh/config` |
 | `.kube/kubie.yaml` | `~/.kube/kubie.yaml` |
 | `bin/*` (executable files) | `~/bin/` |
 | `claude/` (settings, hooks, skills, MCP config) | `~/.claude/` |
 | `AIRULES.md` | `~/.claude/CLAUDE.md` |
+
+Note: Some config files (e.g. git `templateDir`) hardcode `~/.config/` because they don't support variable expansion. This assumes `XDG_CONFIG_HOME` is set to the default `~/.config`.
 
 ### Repository Structure
 
@@ -88,7 +90,7 @@ dotfiles/
 │   └── configure_brew.sh # Homebrew post-install configuration
 ├── Brewfile              # Homebrew package definitions
 ├── bin/                  # Custom executable scripts → ~/bin/
-├── .config/              # XDG config files → ~/.config/
+├── xdg-config/           # XDG config files → ~/.config/
 ├── claude/               # Claude Code settings → ~/.claude/
 ├── .bash_profile         # Login shell config → ~/
 ├── .bashrc               # Interactive shell config → ~/

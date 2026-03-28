@@ -234,7 +234,7 @@ EOF
 
     if [ "$query" = "--list" ]; then
       # List all configurations with current one marked with *
-      current_config="${GC_ACTIVE_CONFIG:-$(cat ~/.config/gcloud/active_config 2>/dev/null || echo "")}"
+      current_config="${GC_ACTIVE_CONFIG:-$(cat "${CLOUDSDK_CONFIG:-${XDG_CONFIG_HOME:-$HOME/.config}/gcloud}/active_config" 2>/dev/null || echo "")}"
       gcloud config configurations list --format='value(name)' | while read -r config; do
         if [ "$config" = "$current_config" ]; then
           echo "* $config"
@@ -258,7 +258,7 @@ EOF
     fi
 
     gcloud config configurations activate "$config"
-    export GC_ACTIVE_CONFIG="$(cat ~/.config/gcloud/active_config)"
+    export GC_ACTIVE_CONFIG="$(cat "${CLOUDSDK_CONFIG:-${XDG_CONFIG_HOME:-$HOME/.config}/gcloud}/active_config")"
     echo "Google Cloud config set: $config"
   }
 fi
