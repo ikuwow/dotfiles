@@ -21,7 +21,4 @@ fi
 
 ## Language Specific configs
 
-set_java_home_bash="$HOME/.asdf/plugins/java/set-java-home.bash"
-[[ -f "$set_java_home_bash" ]] && . "$set_java_home_bash"
-
 [[ $(command -v direnv) ]] && eval "$(direnv hook bash)"

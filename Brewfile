@@ -7,6 +7,7 @@ tap "fujiwara/tap"
 tap "kayac/tap"
 tap "keidarcy/tap"
 tap "oven-sh/bun"
+tap "pipe-cd/homebrew-tap"
 
 brew "mas"
 
@@ -63,7 +64,7 @@ cask "session-manager-plugin"
 brew "lambroll"
 
 brew "zlib"
-brew "asdf"
+brew "mise"
 brew "aqua"
 brew "openssl"
 brew "telnet"
@@ -161,7 +162,8 @@ brew "copilot" # AWS Copilot
 brew "ecspresso"
 brew "ecschedule"
 brew "e1s"
-# kubectl and kustomize should be managed by asdf
+# kubectl and kustomize should be managed by mise
+brew "pipe-cd/homebrew-tap/pipectl"
 cask "container"
 
 # Browsers
