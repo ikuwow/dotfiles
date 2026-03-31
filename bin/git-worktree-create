@@ -11,9 +11,10 @@ if [ $# -ne 1 ]; then
 fi
 
 branch="$1"
+repo_root="$(git rev-parse --show-toplevel)"
 sanitized="$(echo "$branch" | tr '/' '-')"
 date_str="$(date +%Y%m%d)"
-dir=".worktrees/${sanitized}-${date_str}"
+dir="${repo_root}/.worktrees/${sanitized}-${date_str}"
 
 git worktree add -b "$branch" "$dir"
 echo "$dir"
