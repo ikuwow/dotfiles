@@ -97,6 +97,19 @@ dotfiles/
 └── ... (other dotfiles)
 ```
 
+### Machine-Local Overrides
+
+To define aliases or settings that apply only to a specific machine (not tracked by this repository),
+create `~/.aliases.local`. This file is sourced by `.bash_profile` after `.aliases`, so it can
+override any repo-managed alias.
+
+Example:
+
+```bash
+# ~/.aliases.local
+alias claude='claude --model opusplan'
+```
+
 ### Bootstrap Flow
 
 1. `bootstrap.sh` — Clones the repo (or updates it). If `DOTFILES_MINIMAL=1`, runs `bootstrap/claude-code-web.sh` (symlinks only) and exits. Otherwise calls `bootstrap/main.sh`.

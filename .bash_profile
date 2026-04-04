@@ -92,4 +92,9 @@ export PATH=${AQUA_ROOT_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/aquaproj-aqua}
 for file in ~/.{bashrc,aliases,functions,brew_api_token}; do
   [[ -r "$file" ]] && [[ -f "$file" ]] && . "$file"
 done
+
+# Machine-local overrides (not managed by dotfiles repo)
+if [[ -r ~/.aliases.local ]]; then
+  . ~/.aliases.local
+fi
 [[ "$(command -v prompts)" ]] && prompts
