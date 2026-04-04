@@ -164,6 +164,9 @@
   "enabledPlugins": {
     "gopls-lsp@claude-plugins-official": true
   },
+  "env": {
+    "DISABLE_AUTOUPDATER": "1"
+  },
   "voiceEnabled": true,
   "feedbackSurveyState": {
     "lastShownTime": 1754272823676
