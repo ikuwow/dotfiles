@@ -93,8 +93,9 @@ for file in ~/.{bashrc,aliases,functions,brew_api_token}; do
   [[ -r "$file" ]] && [[ -f "$file" ]] && . "$file"
 done
 
-# Machine-local overrides (not managed by dotfiles repo)
-if [[ -r ~/.aliases.local ]]; then
-  . ~/.aliases.local
-fi
 [[ "$(command -v prompts)" ]] && prompts
+
+# Machine-local overrides (not managed by dotfiles repo)
+if [[ -r ~/.bash_profile.local ]]; then
+  . ~/.bash_profile.local
+fi
