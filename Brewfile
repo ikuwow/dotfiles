@@ -186,6 +186,7 @@ cask "claude"
 cask "utm"
 cask "wireshark-app"
 cask "gitify"
+cask "zotero"
 
 # Work related
 
