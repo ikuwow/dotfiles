@@ -97,6 +97,19 @@ dotfiles/
 └── ... (other dotfiles)
 ```
 
+### Machine-Local Overrides
+
+To define settings that apply only to a specific machine (not tracked by this repository),
+create `~/.bash_profile.local`. This file is sourced by `.bash_profile` at the end of startup,
+so it can set environment variables, aliases, or anything else that should not be committed.
+
+Example:
+
+```bash
+# ~/.bash_profile.local
+export ANTHROPIC_MODEL=opusplan
+```
+
 ### Bootstrap Flow
 
 1. `bootstrap.sh` — Clones the repo (or updates it). If `DOTFILES_MINIMAL=1`, runs `bootstrap/claude-code-web.sh` (symlinks only) and exits. Otherwise calls `bootstrap/main.sh`.
