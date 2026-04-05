@@ -83,9 +83,8 @@ if [ -f "$CLOUDSDK_CONFIG/active_config" ]; then
   export GC_ACTIVE_CONFIG
 fi
 
-# Version managers (mise, aqua)
+# Version managers (mise)
 [[ $(command -v mise) ]] && eval "$(mise activate bash)"
-export PATH=${AQUA_ROOT_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/aquaproj-aqua}/bin:$PATH
 
 [[ -n "$GOBIN" ]] && export PATH="${GOBIN}:${PATH}"
 
