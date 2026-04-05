@@ -106,9 +106,11 @@ Before marking the PR ready, run a self-review gate:
   1. Fetch the current body:
      `gh pr view <number> --json body --jq .body`
      (or `gh issue view <number> --json body --jq .body` for issues)
-  2. Show the user a diff between the current body and the proposed new body.
-  3. Only then execute the edit command.
-  This ensures manually-written content is never silently overwritten.
+  2. Output a diff between the current body and the new body in the
+     conversation (so what changed is visible and recoverable).
+  3. Execute the edit command.
+  The goal is observability — the user can see what changed and recover
+  manually-written content if it was accidentally overwritten.
 
 Note: `--body-file` is only for `gh pr create` / `gh issue create`
 (to bypass the `#`-prefixed line security pre-check).
