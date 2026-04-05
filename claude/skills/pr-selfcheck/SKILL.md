@@ -1,5 +1,5 @@
 ---
-description: Perform a self-review of a PR before requesting human review. TRIGGER when user invokes /pr-selfcheck, or when the git workflow reaches the self-review step after PR creation. Accepts a PR number as an argument.
+description: Perform a self-review of a PR before requesting human review. TRIGGER when user invokes /pr-selfcheck, when the git workflow reaches the self-review step after PR creation, or immediately after marking a PR as ready for review with `gh pr ready`. Accepts a PR number as an argument.
 model: sonnet
 ---
 
