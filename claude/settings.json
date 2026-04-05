@@ -97,7 +97,9 @@
     "ask": [
       "Bash(git merge *)",
       "Bash(git rebase *)",
+      "Bash(git commit --amend)",
       "Bash(git commit --amend *)",
+      "Bash(git commit * --amend)",
       "Bash(git commit * --amend *)",
       "Bash(git reset *)",
       "Bash(git clean *)",
