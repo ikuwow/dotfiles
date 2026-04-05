@@ -81,7 +81,19 @@ self-review in parallel:
    - Fix the issue, commit, push, then watch again.
 5. Do not re-run the self-review after fixes (single pass only).
 
-## 6. Update a PR / issue (title / body)
+## 6. Mark PR as Ready for Review
+
+Before marking the PR ready, run a self-review gate:
+
+1. Run `/pr-selfcheck <PR number>`.
+2. If the verdict is NEEDS_IMPROVEMENT:
+   - Fix all "Must Fix" items. Address "Should Fix" items where reasonable.
+   - Push changes, then re-run `gh pr checks --watch`.
+   - Re-run `/pr-selfcheck` after fixes.
+3. Once the verdict is PASS, mark the PR as ready:
+   `gh pr ready`
+
+## 7. Update a PR / issue (title / body)
 
 - Update title:
   `gh pr edit <number> --title '...'`
@@ -96,7 +108,7 @@ self-review in parallel:
 Note: `--body-file` is only for `gh pr create` / `gh issue create`
 (to bypass the `#`-prefixed line security pre-check).
 
-## 7. Cleanup After Task Completion
+## 8. Cleanup After Task Completion
 
 After the PR is merged (or the task is fully done):
 
