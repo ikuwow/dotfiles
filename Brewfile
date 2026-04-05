@@ -43,7 +43,7 @@ brew "gawk"
 brew "grep"
 
 # AI tools
-brew "codex"
+cask "codex"
 cask "claude-code"
 brew "gemini-cli"
 
