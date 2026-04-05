@@ -99,11 +99,18 @@ Before marking the PR ready, run a self-review gate:
   `gh pr edit <number> --title '...'`
 - Update body:
   `gh pr edit <number> --body '...'`
-  Use `--body` (not `--body-file`) so the content is visible in the
-  permission dialog.
-- The same applies to `gh issue edit` — always use `--body`, not
-  `--body-file`.
-- Always fetch the latest content before editing remote content.
+- The same applies to `gh issue edit`.
+- Use `--body` (not `--body-file`) so the full content remains visible in
+  the command invocation/arguments and conversation history.
+- Before executing any body edit (`--body`), always:
+  1. Fetch the current body:
+     `gh pr view <number> --json body --jq .body`
+     (or `gh issue view <number> --json body --jq .body` for issues)
+  2. Output a diff between the current body and the new body in the
+     conversation (so what changed is visible and recoverable).
+  3. Execute the edit command.
+  The goal is observability — the user can see what changed and recover
+  manually-written content if it was accidentally overwritten.
 
 Note: `--body-file` is only for `gh pr create` / `gh issue create`
 (to bypass the `#`-prefixed line security pre-check).

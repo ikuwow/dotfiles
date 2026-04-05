@@ -30,6 +30,7 @@
       "Bash(gh pr diff *)",
       "Bash(gh pr ready *)",
       "Bash(gh pr create *)",
+      "Bash(gh pr edit *)",
       "Bash(gh issue create *)",
       "Bash(gh api *)",
       "Bash(docker compose ps *)",
