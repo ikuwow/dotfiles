@@ -100,8 +100,8 @@ Before marking the PR ready, run a self-review gate:
 - Update body:
   `gh pr edit <number> --body '...'`
 - The same applies to `gh issue edit`.
-- Use `--body` (not `--body-file`) so the full content appears in the
-  command output and conversation history.
+- Use `--body` (not `--body-file`) so the full content remains visible in
+  the command invocation/arguments and conversation history.
 - Before executing any body edit (`--body`), always:
   1. Fetch the current body:
      `gh pr view <number> --json body --jq .body`
