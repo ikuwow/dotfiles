@@ -83,13 +83,15 @@ self-review in parallel:
 
 ## 6. Mark PR as Ready for Review
 
-When the PR is ready for human review:
+Before marking the PR ready, run a self-review gate:
 
-1. Mark the PR as ready:
+1. Run `/pr-selfcheck <PR number>`.
+2. If the verdict is NEEDS_IMPROVEMENT:
+   - Fix all "Must Fix" items. Address "Should Fix" items where reasonable.
+   - Push changes, then re-run `gh pr checks --watch`.
+   - Re-run `/pr-selfcheck` after fixes.
+3. Once the verdict is PASS, mark the PR as ready:
    `gh pr ready`
-2. Run self-review immediately after:
-   `gh pr checks --watch` and `/pr-selfcheck <PR number>` in parallel
-3. Apply the same fix/push cycle as in step 5 if verdict is NEEDS_IMPROVEMENT.
 
 ## 7. Update a PR / issue (title / body)
 
