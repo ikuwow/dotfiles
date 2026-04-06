@@ -107,7 +107,11 @@
       "Bash(mise plugins ls)",
       "Bash(mise env *)",
       "Bash(mise --version)",
-      "Bash(mise version)"
+      "Bash(mise version)",
+      "Bash(AWS_PROFILE=stg-ro aws *)",
+      "Bash(AWS_PROFILE=prd-ro aws *)",
+      "Bash(AWS_PROFILE=payer-ro aws *)",
+      "Bash(pup --read-only *)"
     ],
     "deny": [
       "Bash(git push --force *)",
