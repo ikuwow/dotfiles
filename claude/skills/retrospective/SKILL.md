@@ -43,6 +43,25 @@ Severity: high / medium / low (with brief justification: time wasted, user inter
 Countermeasure: <structural fix> (scope: global / project-specific)
 ```
 
+### Severity Criteria
+
+Judge severity by how disproportionate the burden on the user was
+relative to the task's inherent complexity. Evaluate the final outcome,
+not intermediate trial-and-error — failed attempts that the AI
+self-corrects are not penalized.
+
+| Level | Conditions (any one is sufficient) |
+|---|---|
+| high | Misjudgment that caused a direction change / User had to redo work manually / Errors introduced into deliverables / Confidently wrong assertion that misled the user |
+| medium | User correction or course adjustment needed / Disproportionately many confirmations relative to task complexity / Communication or judgment mistakes that could affect deliverable quality / Silent failure: appeared to succeed but the result was subtly wrong |
+| low | AI resolved the issue autonomously (including trial-and-error) / Proceeded without user intervention / Minor inefficiency only |
+
+Adjustment rules:
+
+- If the pattern is likely to recur across sessions, raise one level
+- If the volume of interaction is justified by inherent task complexity,
+  do not raise
+
 ### Countermeasure Specificity
 
 Each countermeasure must specify:
