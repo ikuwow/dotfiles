@@ -65,6 +65,7 @@ brew "lambroll"
 
 brew "zlib"
 brew "mise"
+brew "aqua"
 brew "openssl"
 brew "telnet"
 brew "bash-completion@2"
