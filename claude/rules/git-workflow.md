@@ -15,8 +15,7 @@ Follow each step in order. Skip steps that don't apply.
    `git pull`
 2. Create a worktree and branch:
    `git-worktree-create <branch-name>`
-3. Move into the worktree directory:
-   `cd <output directory>`
+3. Follow the command shown in the script output to move into the worktree.
 4. If the project rules explicitly prohibit worktrees, create a branch only:
    `git checkout -b <branch-name>`
 
