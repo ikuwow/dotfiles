@@ -10,11 +10,17 @@ if [ $# -ne 1 ]; then
   exit 1
 fi
 
+if [ "$(pwd)" != "$(git rev-parse --show-toplevel)" ]; then
+  echo "Error: must be run from the repository root" >&2
+  exit 1
+fi
+
 branch="$1"
-repo_root="$(git rev-parse --show-toplevel)"
 sanitized="$(echo "$branch" | tr '/' '-')"
 date_str="$(date +%Y%m%d)"
-dir="${repo_root}/.worktrees/${sanitized}-${date_str}"
+dir=".worktrees/${sanitized}-${date_str}"
 
 git worktree add -b "$branch" "$dir"
-echo "$dir"
+echo ""
+echo "Run this to start working in the worktree:"
+echo "  cd $dir"
