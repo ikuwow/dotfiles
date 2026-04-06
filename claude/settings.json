@@ -30,6 +30,7 @@
       "Bash(gh pr diff *)",
       "Bash(gh pr ready *)",
       "Bash(gh pr create *)",
+      "Bash(gh pr edit *)",
       "Bash(gh issue create *)",
       "Bash(gh api *)",
       "Bash(docker compose ps *)",
@@ -96,6 +97,10 @@
     "ask": [
       "Bash(git merge *)",
       "Bash(git rebase *)",
+      "Bash(git commit --amend)",
+      "Bash(git commit --amend *)",
+      "Bash(git commit * --amend)",
+      "Bash(git commit * --amend *)",
       "Bash(git reset *)",
       "Bash(git clean *)",
       "Bash(git stash drop *)",
@@ -163,6 +168,9 @@
   },
   "enabledPlugins": {
     "gopls-lsp@claude-plugins-official": true
+  },
+  "env": {
+    "DISABLE_AUTOUPDATER": "1"
   },
   "voiceEnabled": true,
   "feedbackSurveyState": {

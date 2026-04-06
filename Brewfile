@@ -43,7 +43,7 @@ brew "gawk"
 brew "grep"
 
 # AI tools
-brew "codex"
+cask "codex"
 cask "claude-code"
 brew "gemini-cli"
 
@@ -65,7 +65,6 @@ brew "lambroll"
 
 brew "zlib"
 brew "mise"
-brew "aqua"
 brew "openssl"
 brew "telnet"
 brew "bash-completion@2"
@@ -186,6 +185,7 @@ cask "claude"
 cask "utm"
 cask "wireshark-app"
 cask "gitify"
+cask "zotero"
 
 # Work related
 

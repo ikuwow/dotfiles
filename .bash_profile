@@ -83,13 +83,18 @@ if [ -f "$CLOUDSDK_CONFIG/active_config" ]; then
   export GC_ACTIVE_CONFIG
 fi
 
-# Version managers (mise, aqua)
+# Version managers (mise)
 [[ $(command -v mise) ]] && eval "$(mise activate bash)"
-export PATH=${AQUA_ROOT_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/aquaproj-aqua}/bin:$PATH
 
 [[ -n "$GOBIN" ]] && export PATH="${GOBIN}:${PATH}"
 
 for file in ~/.{bashrc,aliases,functions,brew_api_token}; do
   [[ -r "$file" ]] && [[ -f "$file" ]] && . "$file"
 done
+
 [[ "$(command -v prompts)" ]] && prompts
+
+# Machine-local overrides (not managed by dotfiles repo)
+if [[ -r ~/.bash_profile.local ]] && [[ -f ~/.bash_profile.local ]]; then
+  . ~/.bash_profile.local
+fi

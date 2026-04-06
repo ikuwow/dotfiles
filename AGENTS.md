@@ -10,6 +10,7 @@ Read README.md for the project overview, repository structure, and how it works.
 are symlinks pointing to files in this repository.**
 
 - `claude/` directory is symlinked to `~/.claude/` — always look at `claude/` in this repo first for Claude Code configuration (settings, hooks, MCP, skills, etc.)
+- `AIRULES.md` is also symlinked to `~/.codex/AGENTS.md` for Codex CLI global instructions
 - Before searching for a file's location, check `scripts/deploy.sh` for symlink mappings first
 - Always edit the source files in THIS repository
 - Never directly edit files under `$HOME` (e.g., `~/.bashrc`, `~/.gitconfig`)

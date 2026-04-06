@@ -81,22 +81,42 @@ self-review in parallel:
    - Fix the issue, commit, push, then watch again.
 5. Do not re-run the self-review after fixes (single pass only).
 
-## 6. Update a PR / issue (title / body)
+## 6. Mark PR as Ready for Review
+
+Before marking the PR ready, run a self-review gate:
+
+1. Run `/pr-selfcheck <PR number>`.
+2. If the verdict is NEEDS_IMPROVEMENT:
+   - Fix all "Must Fix" items. Address "Should Fix" items where reasonable.
+   - Push changes, then re-run `gh pr checks --watch`.
+   - Re-run `/pr-selfcheck` after fixes.
+3. Once the verdict is PASS, mark the PR as ready:
+   `gh pr ready`
+
+## 7. Update a PR / issue (title / body)
 
 - Update title:
   `gh pr edit <number> --title '...'`
-- Update body:
-  `gh pr edit <number> --body '...'`
-  Use `--body` (not `--body-file`) so the content is visible in the
-  permission dialog.
-- The same applies to `gh issue edit` — always use `--body`, not
-  `--body-file`.
-- Always fetch the latest content before editing remote content.
+- Update body (always use `--body-file`, never `--body`):
+  1. Fetch the current body:
+     `gh pr view <number> --json body --jq .body`
+     (or `gh issue view <number> --json body --jq .body` for issues)
+  2. Output a diff between the current body and the new body in the
+     conversation (so what changed is visible and recoverable).
+  3. Write the new body to a temp file:
+     `Write(/tmp/pr-body-<unique-id>.md)`
+  4. Execute the edit:
+     `gh pr edit <number> --body-file /tmp/pr-body-<unique-id>.md`
+     (or `gh issue edit <number> --body-file /tmp/pr-body-<unique-id>.md`)
+  The goal is observability — always show the diff so the user can see
+  what changed and recover manually-written content if accidentally
+  overwritten.
 
-Note: `--body-file` is only for `gh pr create` / `gh issue create`
-(to bypass the `#`-prefixed line security pre-check).
+Note: Always use `--body-file` for any body update. The `#`-prefixed lines
+in PR/issue bodies trigger Claude Code's security pre-check when passed
+via `--body`, which cannot be bypassed by hooks.
 
-## 7. Cleanup After Task Completion
+## 8. Cleanup After Task Completion
 
 After the PR is merged (or the task is fully done):
 
