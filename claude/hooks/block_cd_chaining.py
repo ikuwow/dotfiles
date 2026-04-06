@@ -19,6 +19,9 @@ import sys
 # Matches shell separators: &&, ||, ;
 _SEPARATOR_RE = re.compile(r"&&|\|\||;")
 
+# Matches "cd" followed by whitespace or end of string
+_CD_RE = re.compile(r"^cd(\s|$)")
+
 
 def _split_outside_quotes(command: str) -> list[str]:
     """Split command by shell separators, ignoring separators inside quotes.
@@ -31,6 +34,8 @@ def _split_outside_quotes(command: str) -> list[str]:
     ['echo "cd /path && ls"']
     >>> _split_outside_quotes("cd /path ; echo 'hello ; world' && pwd")
     ['cd /path ', " echo 'hello ; world' ", ' pwd']
+    >>> _split_outside_quotes('echo "a\\\\" && cd /x"')
+    ['echo "a\\\\" && cd /x"']
     """
     segments = []
     current = []
@@ -39,6 +44,13 @@ def _split_outside_quotes(command: str) -> list[str]:
     i = 0
     while i < len(command):
         ch = command[i]
+
+        # Handle backslash escapes inside double quotes
+        if ch == "\\" and in_double and i + 1 < len(command):
+            current.append(ch)
+            current.append(command[i + 1])
+            i += 2
+            continue
 
         # Toggle quote state
         if ch == "'" and not in_double:
@@ -100,11 +112,15 @@ def has_chained_cd(command: str) -> bool:
     False
     >>> has_chained_cd("terraform plan")
     False
+
+    Blocked (cd with tab separator):
+    >>> has_chained_cd("cd\\t/path && ls")
+    True
     """
     segments = _split_outside_quotes(command)
     if len(segments) < 2:
         return False
-    return any(seg.strip().startswith("cd ") or seg.strip() == "cd" for seg in segments)
+    return any(_CD_RE.match(seg.strip()) for seg in segments)
 
 
 if __name__ == "__main__":
@@ -118,12 +134,15 @@ if __name__ == "__main__":
 
     if tool_name == "Bash" and has_chained_cd(command):
         print(json.dumps({
-            "decision": "block",
-            "reason": (
-                "Do not chain `cd` with other commands using &&, ;, or ||. "
-                "Run `cd` as a separate Bash call first, then run the other "
-                "command in the next call."
-            ),
+            "hookSpecificOutput": {
+                "hookEventName": "PreToolUse",
+                "permissionDecision": "deny",
+                "permissionDecisionReason": (
+                    "Do not chain `cd` with other commands using &&, ;, or ||. "
+                    "Run `cd` as a separate Bash call first, then run the other "
+                    "command in the next call."
+                ),
+            },
         }))
 
     sys.exit(0)
