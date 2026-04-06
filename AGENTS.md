@@ -11,10 +11,10 @@ are symlinks pointing to files in this repository.**
 
 - `claude/` directory is symlinked to `~/.claude/` — always look at `claude/` in this repo first for Claude Code configuration (settings, hooks, MCP, skills, etc.)
 - `AIRULES.md` is also symlinked to `~/.codex/AGENTS.md` for Codex CLI global instructions
-- Before searching for a file's location, check `scripts/deploy.sh` for symlink mappings first
-- Always edit the source files in THIS repository
-- Never directly edit files under `$HOME` (e.g., `~/.bashrc`, `~/.gitconfig`)
-- Never access `~/.bashrc` or similar — read from this repo instead
+- When reading or editing files managed by this repository, always use the
+  path within this repo (e.g., `bin/foo` not `~/bin/foo`,
+  `claude/settings.json` not `~/.claude/settings.json`)
+- Check `scripts/deploy.sh` for the full list of symlink mappings
 
 ## Key Commands
 
