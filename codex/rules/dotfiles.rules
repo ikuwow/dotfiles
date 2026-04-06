@@ -1,4 +1,4 @@
-# Safe read-only and utility commands
+# Safe utility commands
 prefix_rule(pattern=["ls"], decision="allow")
 prefix_rule(pattern=["pwd"], decision="allow")
 prefix_rule(pattern=["echo"], decision="allow")
@@ -36,6 +36,8 @@ prefix_rule(pattern=["git", "checkout", "."], decision="forbidden", justificatio
 prefix_rule(pattern=["git", "restore", "."], decision="forbidden", justification="Discards all changes")
 prefix_rule(pattern=["git", "add", "."], decision="forbidden", justification="Use specific file paths")
 prefix_rule(pattern=["git", "add", "-A"], decision="forbidden", justification="Use specific file paths")
+prefix_rule(pattern=["git", "add", "--all"], decision="forbidden", justification="Use specific file paths")
+prefix_rule(pattern=["git", "push", "--force-with-lease"], decision="forbidden", justification="Use normal push")
 
 # Git - allow (read-only and safe)
 prefix_rule(pattern=["git", "status"], decision="allow")
@@ -57,9 +59,9 @@ prefix_rule(pattern=["git", "shortlog"], decision="allow")
 prefix_rule(pattern=["git", "describe"], decision="allow")
 prefix_rule(pattern=["git", "grep"], decision="allow")
 prefix_rule(pattern=["git", "worktree", "list"], decision="allow")
-prefix_rule(pattern=["git", "add"], decision="allow")
+prefix_rule(pattern=["git", "add"], decision="prompt", justification="Review staging targets before adding files")
 prefix_rule(pattern=["git", "commit"], decision="allow")
-prefix_rule(pattern=["git", "push"], decision="allow")
+prefix_rule(pattern=["git", "push"], decision="prompt", justification="Review push destination and flags before pushing")
 prefix_rule(pattern=["git", "checkout"], decision="allow")
 prefix_rule(pattern=["git", "switch"], decision="allow")
 prefix_rule(pattern=["git", "restore"], decision="allow")
