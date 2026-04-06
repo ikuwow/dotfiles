@@ -17,4 +17,8 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: doctest
-        run: python3 -m doctest claude/hooks/approve_safe_commands.py
+        run: |
+          for f in claude/hooks/*.py; do
+            echo "Testing $f"
+            python3 -m doctest "$f"
+          done
