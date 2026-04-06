@@ -87,7 +87,27 @@
       "Edit(//tmp/**)",
       "Read(//tmp/**)",
       "Read(//private/tmp/**)",
-      "Bash(mdfind:*)"
+      "Bash(mdfind:*)",
+      "Bash(mise list *)",
+      "Bash(mise list)",
+      "Bash(mise ls *)",
+      "Bash(mise ls)",
+      "Bash(mise current *)",
+      "Bash(mise current)",
+      "Bash(mise where *)",
+      "Bash(mise which *)",
+      "Bash(mise doctor)",
+      "Bash(mise doctor *)",
+      "Bash(mise settings list *)",
+      "Bash(mise settings list)",
+      "Bash(mise settings get *)",
+      "Bash(mise plugins list *)",
+      "Bash(mise plugins list)",
+      "Bash(mise plugins ls *)",
+      "Bash(mise plugins ls)",
+      "Bash(mise env *)",
+      "Bash(mise --version)",
+      "Bash(mise version)"
     ],
     "deny": [
       "Bash(git push --force *)",
@@ -143,7 +163,14 @@
       "mcp__jetbrains__run_configuration",
       "mcp__jetbrains__execute_terminal_command",
       "mcp__jetbrains__replace_file_text_by_path",
-      "mcp__jetbrains__execute_action_by_id"
+      "mcp__jetbrains__execute_action_by_id",
+      "Bash(mise install *)",
+      "Bash(mise use *)",
+      "Bash(mise uninstall *)",
+      "Bash(mise remove *)",
+      "Bash(mise run *)",
+      "Bash(mise exec *)",
+      "Bash(mise settings set *)"
     ]
   },
   "hooks": {
