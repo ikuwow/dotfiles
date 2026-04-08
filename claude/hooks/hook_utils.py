@@ -9,9 +9,11 @@ import sys
 def has_unsafe_substitution(command: str) -> bool:
     """Check if command has $() or backticks outside single-quoted strings.
 
-    Shell single-quoting rules: everything between '...' is literal.
-    Split by ' to determine inside vs outside. Even-indexed segments
-    are outside single quotes, odd-indexed are inside.
+    Uses a state machine to track single/double quote context. Only
+    single quotes suppress command substitution in shell; double quotes
+    do NOT prevent $() or backtick expansion. Handles backslash escapes
+    inside double quotes and the shell idiom '\\'' (end single-quote,
+    literal escaped quote, start single-quote).
 
     Safe (substitution inside single quotes):
     >>> has_unsafe_substitution("git commit -m 'msg with `code`'")
@@ -21,12 +23,22 @@ def has_unsafe_substitution(command: str) -> bool:
     >>> has_unsafe_substitution("gh pr create --body '## `Title`\\n$(not expanded)'")
     False
 
-    Unsafe (substitution outside single quotes):
+    Safe (shell-escaped single quote — '\\'' idiom):
+    >>> has_unsafe_substitution("git commit -m 'don'\\\\''t do $(this)'")
+    False
+
+    Unsafe (substitution inside double quotes — shell expands these):
     >>> has_unsafe_substitution("git commit -m \\"$(cat file)\\"")
     True
     >>> has_unsafe_substitution("git commit -m \\"`date`\\"")
     True
+
+    Unsafe (substitution outside all quotes):
     >>> has_unsafe_substitution("git commit -m $(cat file)")
+    True
+
+    Unsafe (breaking out of single quotes):
+    >>> has_unsafe_substitution("git commit -m 'safe'$(evil)'rest'")
     True
 
     No substitution at all:
@@ -35,11 +47,36 @@ def has_unsafe_substitution(command: str) -> bool:
     >>> has_unsafe_substitution("git commit --amend")
     False
     """
-    parts = command.split("'")
-    for i, part in enumerate(parts):
-        if i % 2 == 0:  # outside single quotes
-            if "$(" in part or "`" in part:
+    in_single = False
+    in_double = False
+    i = 0
+    while i < len(command):
+        ch = command[i]
+
+        # Backslash escapes: skip next char when outside single quotes
+        # (inside single quotes, backslash is literal in shell)
+        if ch == "\\" and not in_single and i + 1 < len(command):
+            i += 2
+            continue
+
+        # Toggle quote state
+        if ch == "'" and not in_double:
+            in_single = not in_single
+            i += 1
+            continue
+        if ch == '"' and not in_single:
+            in_double = not in_double
+            i += 1
+            continue
+
+        # Only single quotes suppress substitution; double quotes do NOT
+        if not in_single:
+            if ch == "$" and i + 1 < len(command) and command[i + 1] == "(":
                 return True
+            if ch == "`":
+                return True
+
+        i += 1
     return False
 
 

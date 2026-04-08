@@ -6,7 +6,7 @@ gh api graphql requires -f query='...' which triggers the ask rule
 read-only queries (query/shorthand), while mutations stay gated.
 
 Convention (see claude/rules/gh-graphql.md): read-only GraphQL must
-use single-quoted -f query='query ...' or -f query='{ ...'.
+use single-quoted -f query='query ...' or -f query='{ ... }'.
 
 Spec: https://code.claude.com/docs/en/hooks
 """
@@ -35,6 +35,12 @@ def should_approve(tool_name: str, command: str) -> bool:
     >>> should_approve("Bash", "gh api graphql -f query='mutation { addStar(input: {starrableId: 123}) { clientMutationId } }'")
     False
 
+    Multiple query= flags (last one wins, must also be read-only):
+    >>> should_approve("Bash", "gh api graphql -f query='query { safe }' -f query='mutation { evil }'")
+    False
+    >>> should_approve("Bash", "gh api graphql -f query='mutation { evil }' -f query='query { safe }'")
+    True
+
     Non-matching formats (fall through to ask):
     >>> should_approve("Bash", "gh api graphql --field query='query { viewer { login } }'")
     False
@@ -58,10 +64,11 @@ def should_approve(tool_name: str, command: str) -> bool:
         return False
     if has_unsafe_substitution(stripped):
         return False
-    match = GRAPHQL_QUERY_RE.search(stripped)
-    if not match:
+    matches = GRAPHQL_QUERY_RE.findall(stripped)
+    if not matches:
         return False
-    query_body = match.group(1).lstrip()
+    # Use the last match — gh uses the last -f value when duplicated
+    query_body = matches[-1].lstrip()
     return query_body.startswith("query") or query_body.startswith("{")
 
 
