@@ -221,7 +221,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ~/.claude/hooks/approve_safe_commands.py"
+            "command": "python3 ~/.claude/hooks/approve_git_gh_commands.py"
+          },
+          {
+            "type": "command",
+            "command": "python3 ~/.claude/hooks/approve_gh_graphql_readonly.py"
           }
         ]
       }
