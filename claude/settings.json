@@ -251,6 +251,17 @@
           }
         ]
       }
+    ],
+    "PreCompact": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ~/.claude/hooks/pre_compact_backup.py"
+          }
+        ]
+      }
     ]
   },
   "statusLine": {
