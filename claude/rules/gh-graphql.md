@@ -22,5 +22,6 @@ Rules:
 - Mutations use the normal format and will require manual approval (this
   is intentional)
 
-This convention enables the `approve_safe_commands.py` hook to auto-approve
-read-only GraphQL queries while keeping mutations gated behind confirmation.
+This convention enables the `approve_gh_graphql_readonly.py` hook to
+auto-approve read-only GraphQL queries while keeping mutations gated
+behind confirmation.
