@@ -18,7 +18,7 @@ Background:
   where the -f query= value starts with 'query' or '{' (not 'mutation').
   See claude/rules/gh-graphql.md for the convention.
 
-Spec: https://docs.anthropic.com/en/docs/claude-code/hooks
+Spec: https://code.claude.com/docs/en/hooks
 """
 import json
 import re
