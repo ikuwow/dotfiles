@@ -14,9 +14,14 @@ Background:
   command substitution ($() or backticks) is only dangerous when it
   appears OUTSIDE single-quoted strings.
 
+  It also auto-approves read-only GraphQL queries via gh api graphql,
+  where the -f query= value starts with 'query' or '{' (not 'mutation').
+  See claude/rules/gh-graphql.md for the convention.
+
 Spec: https://docs.anthropic.com/en/docs/claude-code/hooks
 """
 import json
+import re
 import sys
 
 APPROVED_PREFIXES = (
@@ -63,6 +68,46 @@ def has_unsafe_substitution(command: str) -> bool:
     return False
 
 
+GRAPHQL_QUERY_RE = re.compile(r"-f\s+query='([^']*)'")
+
+
+def is_readonly_graphql(command: str) -> bool:
+    """Return True if command is a read-only gh api graphql call.
+
+    Convention (see claude/rules/gh-graphql.md): read-only GraphQL must use
+    single-quoted -f query='query ...' or -f query='{ ...'.
+
+    Read-only queries:
+    >>> is_readonly_graphql("gh api graphql -f query='query { viewer { login } }'")
+    True
+    >>> is_readonly_graphql("gh api graphql -f query='{ viewer { login } }'")
+    True
+    >>> is_readonly_graphql("gh api graphql -f query='  query { viewer { login } }'")
+    True
+    >>> is_readonly_graphql("gh api graphql -f query='query($owner: String!) { repository(owner: $owner) { name } }' -f owner='octocat'")
+    True
+
+    Mutations (must remain in ask):
+    >>> is_readonly_graphql("gh api graphql -f query='mutation { addStar(input: {starrableId: 123}) { clientMutationId } }'")
+    False
+
+    Non-matching formats (fall through to ask):
+    >>> is_readonly_graphql("gh api graphql --field query='query { viewer { login } }'")
+    False
+    >>> is_readonly_graphql("gh api graphql -f query=\\"query { viewer { login } }\\"")
+    False
+    >>> is_readonly_graphql("gh api /repos/owner/repo -f title='hello'")
+    False
+    """
+    if not command.startswith("gh api graphql"):
+        return False
+    match = GRAPHQL_QUERY_RE.search(command)
+    if not match:
+        return False
+    query_body = match.group(1).lstrip()
+    return query_body.startswith("query") or query_body.startswith("{")
+
+
 def should_approve(tool_name: str, command: str) -> bool:
     """Return True if the permission request should be auto-approved.
 
@@ -82,11 +127,13 @@ def should_approve(tool_name: str, command: str) -> bool:
     if tool_name != "Bash":
         return False
     stripped = command.lstrip()
-    if not stripped.startswith(APPROVED_PREFIXES):
-        return False
     if has_unsafe_substitution(stripped):
         return False
-    return True
+    if stripped.startswith(APPROVED_PREFIXES):
+        return True
+    if is_readonly_graphql(stripped):
+        return True
+    return False
 
 
 if __name__ == "__main__":
