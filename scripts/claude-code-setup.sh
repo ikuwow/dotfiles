@@ -6,6 +6,11 @@
 
 set -eu
 
+if ! command -v claude >/dev/null 2>&1; then
+  echo "Error: claude CLI is not installed" >&2
+  exit 1
+fi
+
 # Wrapper: ignore "already exists" from claude mcp add-json, fail on real errors
 mcp_add() {
   local output

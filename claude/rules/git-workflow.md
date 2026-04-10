@@ -77,6 +77,10 @@ Wait for both to finish. If either fails:
 - Fix CI failures (`gh run view --log-failed`).
 - Push fixes, then re-run both until both pass.
 
+Note: `/pr-selfcheck` is a mechanical check, not a code review.
+Re-running it after fixes is expected. The "single-pass" policy
+applies only to code reviews in Phase 2.
+
 ### Phase 2: Code reviews (parallel)
 
 Once Phase 1 passes, launch both:
