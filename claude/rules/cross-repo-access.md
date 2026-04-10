@@ -7,7 +7,7 @@ working directory, prefer local clones over GitHub API access.
 
 1. Check if the repo is already cloned locally:
    `ghq list | grep <owner>/<repo>`
-2. If found, the path is: `/Users/ikuwow/ghq/github.com/<owner>/<repo>`
+2. If found, derive the path from ghq root: `$(ghq root)/github.com/<owner>/<repo>`
 3. If not found, clone it via SSH: `ghq get -p <owner>/<repo>`
    - Do not clone known-huge repositories (linux, chromium, webkit, etc.)
      without user confirmation
