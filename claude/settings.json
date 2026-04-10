@@ -147,6 +147,7 @@
       "Bash(configcat permission-group show *)",
       "Bash(configcat workspace show *)",
       "Bash(configcat workspace show)",
+      "Bash(mktemp /tmp/*)",
       "Bash(xxd *)",
       "Bash(xxd)",
       "Bash(claude --help)",
