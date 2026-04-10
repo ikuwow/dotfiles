@@ -59,26 +59,47 @@ Note: `.worktrees/` is covered by the global gitignore.
    `gh pr view --json url --jq '.url'`
 4. Proceed to CI wait (step 5).
 
-## 5. CI Wait & Self-Review
+## 5. CI Wait & Review
 
-After pushing and creating/updating a PR, run CI monitoring and
-self-review in parallel:
+After pushing and creating/updating a PR, run CI, self-review, and
+code review. Self-review runs first (fast, fixes PR presentation),
+then code reviews run in parallel.
+
+### Phase 1: CI + PR self-review (parallel)
 
 1. Start both at the same time:
    - Run `gh pr checks --watch` to monitor CI.
    - Launch a background subagent with `/pr-selfcheck <PR number>` to
      self-review the PR.
-2. Once both finish, read the self-review output.
+2. Once the self-review finishes, read the output.
 3. If the verdict is NEEDS_IMPROVEMENT:
    - Immediately fix all "Must Fix" items without waiting for user input.
    - Address "Should Fix" items where reasonable.
    - Update the PR (title, body, or code) as needed.
-   - Push changes if code was modified, then re-run `gh pr checks --watch`.
-4. If any CI check fails:
-   - Review details: `gh pr checks`
-   - View failure logs: `gh run view --log-failed`
-   - Fix the issue, commit, push, then watch again.
-5. Do not re-run the self-review after fixes (single pass only).
+   - Push changes if code was modified.
+
+### Phase 2: Code reviews (parallel)
+
+Once Phase 1 fixes are done (or if none were needed), launch both:
+
+- `/codex:adversarial-review` — challenges design decisions via Codex.
+- `/code-review` — multi-agent code review (CLAUDE.md compliance,
+  bug detection, git-blame context analysis).
+
+Read both outputs and fix issues as needed. Push if code changed,
+then re-run `gh pr checks --watch`.
+
+### CI failures
+
+If any CI check fails at any point:
+- Review details: `gh pr checks`
+- View failure logs: `gh run view --log-failed`
+- Fix the issue, commit, push, then watch again.
+
+### Single-pass rule
+
+Do not re-run self-review or code reviews after fixes (single pass
+only per review type).
 
 ## 6. Mark PR as Ready for Review
 

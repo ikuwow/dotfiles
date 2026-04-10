@@ -230,7 +230,8 @@
   },
   "enabledPlugins": {
     "gopls-lsp@claude-plugins-official": true,
-    "codex@openai-codex": true
+    "codex@openai-codex": true,
+    "code-review@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
     "openai-codex": {
