@@ -33,7 +33,10 @@ When writing a PR body, cover every applicable item:
    - Especially important for dotfiles / infrastructure changes where
      "why this value" matters.
 
-4. Verification
+4. Issue linking
+   - Do NOT use auto-close keywords (`Closes`, `Fixes`, `Resolves`).
+
+5. Verification
    - Describe only what was actually verified under "confirmed" items.
    - Do not claim verification that was not performed.
    - When the change affects environments that CI cannot replicate
