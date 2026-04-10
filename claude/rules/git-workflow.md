@@ -61,52 +61,36 @@ Note: `.worktrees/` is covered by the global gitignore.
 
 ## 5. CI Wait & Review
 
-After pushing and creating/updating a PR, run CI, self-review, and
-code review. Self-review runs first (fast, fixes PR presentation),
-then code reviews run in parallel.
+Three-phase review: fix PR presentation first, then run CI and
+code reviews in parallel, then consolidate.
 
-### Phase 1: CI + PR self-review (parallel)
+### Phase 1: PR self-review
 
-1. Start all at the same time:
-   - Run `gh pr checks --watch` in the background to monitor CI.
-   - Launch `/pr-selfcheck <PR number>` to self-review the PR.
-2. Once the self-review finishes, read the output.
-3. If the verdict is NEEDS_IMPROVEMENT:
-   - Immediately fix all "Must Fix" items without waiting for user input.
-   - Address "Should Fix" items where reasonable.
-   - Update the PR (title, body, or code) as needed.
+1. Run `/pr-selfcheck <PR number>`.
+2. If the verdict is NEEDS_IMPROVEMENT:
+   - Fix "Must Fix" items immediately. Address "Should Fix" where
+     reasonable.
    - Push changes if code was modified.
-4. Do not wait for CI to finish before proceeding to Phase 2.
 
-### Phase 2: Code reviews (parallel)
+### Phase 2: CI + code reviews (all parallel)
 
-Once Phase 1 fixes are done (or if none were needed), launch both:
+Launch all three at the same time:
 
+- `gh pr checks --watch` — CI monitoring.
 - `/codex:adversarial-review` — challenges design decisions via Codex.
 - `/code-review` — multi-agent code review (CLAUDE.md compliance,
   bug detection, git-blame context analysis).
 
-CI continues running in the background throughout this phase.
-Read both review outputs and fix issues as needed. Push if code
-changed.
+### Phase 3: Consolidate and fix
 
-### Final: Confirm CI
+Once all three have finished, review the combined results:
 
-After all reviews and fixes are complete, confirm CI has passed:
-- If `gh pr checks --watch` is still running, wait for it to finish.
-- If it already finished with failures, investigate and fix.
+1. Fix issues found by code reviews.
+2. If CI failed, investigate with `gh run view --log-failed` and fix.
+3. Push fixes if any code was changed, then re-run
+   `gh pr checks --watch` to confirm CI passes.
 
-### CI failures
-
-If any CI check fails at any point:
-- Review details: `gh pr checks`
-- View failure logs: `gh run view --log-failed`
-- Fix the issue, commit, push, then watch again.
-
-### Single-pass rule
-
-Do not re-run self-review or code reviews after fixes (single pass
-only per review type).
+Each review type is single-pass — do not re-run after fixes.
 
 ## 6. Mark PR as Ready for Review
 
