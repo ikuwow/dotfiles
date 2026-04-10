@@ -67,16 +67,16 @@ then code reviews run in parallel.
 
 ### Phase 1: CI + PR self-review (parallel)
 
-1. Start both at the same time:
-   - Run `gh pr checks --watch` to monitor CI.
-   - Launch a background subagent with `/pr-selfcheck <PR number>` to
-     self-review the PR.
+1. Start all at the same time:
+   - Run `gh pr checks --watch` in the background to monitor CI.
+   - Launch `/pr-selfcheck <PR number>` to self-review the PR.
 2. Once the self-review finishes, read the output.
 3. If the verdict is NEEDS_IMPROVEMENT:
    - Immediately fix all "Must Fix" items without waiting for user input.
    - Address "Should Fix" items where reasonable.
    - Update the PR (title, body, or code) as needed.
    - Push changes if code was modified.
+4. Do not wait for CI to finish before proceeding to Phase 2.
 
 ### Phase 2: Code reviews (parallel)
 
@@ -86,8 +86,15 @@ Once Phase 1 fixes are done (or if none were needed), launch both:
 - `/code-review` — multi-agent code review (CLAUDE.md compliance,
   bug detection, git-blame context analysis).
 
-Read both outputs and fix issues as needed. Push if code changed,
-then re-run `gh pr checks --watch`.
+CI continues running in the background throughout this phase.
+Read both review outputs and fix issues as needed. Push if code
+changed.
+
+### Final: Confirm CI
+
+After all reviews and fixes are complete, confirm CI has passed:
+- If `gh pr checks --watch` is still running, wait for it to finish.
+- If it already finished with failures, investigate and fix.
 
 ### CI failures
 
