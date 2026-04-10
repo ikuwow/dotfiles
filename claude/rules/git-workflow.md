@@ -8,6 +8,7 @@ Follow each step in order. Skip steps that don't apply.
 - Never create or edit files on the default branch. Always move into the
   worktree (or feature branch) first. Creating files before branching
   leads to redundant copy-and-delete work.
+- Never modify commits that have already been pushed.
 
 ## 1. Start Work
 

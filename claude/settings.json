@@ -63,6 +63,7 @@
       "Bash(ghq get -p *)",
       "Bash(which *)",
       "Bash(wc *)",
+      "Bash(nl *)",
       "Bash(uname)",
       "Bash(uname *)",
       "Bash(file *)",
