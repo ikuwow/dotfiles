@@ -143,7 +143,9 @@
       "Bash(configcat permission-group ls)",
       "Bash(configcat permission-group show *)",
       "Bash(configcat workspace show *)",
-      "Bash(configcat workspace show)"
+      "Bash(configcat workspace show)",
+      "Bash(xxd *)",
+      "Bash(xxd)"
     ],
     "deny": [
       "Bash(git push --force *)",
