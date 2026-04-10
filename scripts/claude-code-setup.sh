@@ -6,11 +6,23 @@
 
 set -eu
 
+# Wrapper: ignore "already exists" from claude mcp add-json, fail on real errors
+mcp_add() {
+  local output
+  if output=$(claude mcp add-json --scope user "$@" 2>&1); then
+    return 0
+  fi
+  if [[ "$output" == *"already exists"* ]]; then
+    return 0
+  fi
+  echo "$output" >&2
+  return 1
+}
+
 # --- MCP servers ---
-# add-json exits 1 if already registered, so suppress with || true
 # IDE-local servers (intellij-index, goland-index) are intentionally omitted
-claude mcp add-json --scope user deepwiki '{"type":"http","url":"https://mcp.deepwiki.com/mcp"}' || true
-claude mcp add-json --scope user Context7 '{"command":"npx","args":["-y","@upstash/context7-mcp"]}' || true
+mcp_add deepwiki '{"type":"http","url":"https://mcp.deepwiki.com/mcp"}'
+mcp_add Context7 '{"command":"npx","args":["-y","@upstash/context7-mcp"]}'
 
 # --- Plugins ---
 # marketplace add and plugin install are both idempotent
