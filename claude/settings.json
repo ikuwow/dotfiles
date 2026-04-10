@@ -220,6 +220,7 @@
       "Bash(mise exec *)",
       "Bash(mise settings set *)",
       "Skill(code-review *)",
+      "Skill(codex:adversarial-review *)",
       "Skill(codex:rescue *)"
     ]
   },
