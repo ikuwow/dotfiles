@@ -154,7 +154,8 @@
       "Bash(claude mcp * --help)",
       "Bash(claude plugin --help)",
       "Bash(claude plugin * --help)",
-      "Skill(pr-selfcheck *)"
+      "Skill(pr-selfcheck *)",
+      "Skill(codex:setup *)"
     ],
     "deny": [
       "Bash(git push --force *)",
@@ -218,7 +219,8 @@
       "Bash(mise run *)",
       "Bash(mise exec *)",
       "Bash(mise settings set *)",
-      "Skill(code-review *)"
+      "Skill(code-review *)",
+      "Skill(codex:rescue *)"
     ]
   },
   "model": "opus",
