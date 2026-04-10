@@ -59,8 +59,14 @@
       "Bash(dog monitor query *)",
       "Bash(dog monitor show *)",
       "Bash(dog monitor show_all *)",
+      "Bash(ghq list)",
+      "Bash(ghq list *)",
+      "Bash(ghq root)",
+      "Bash(ghq root *)",
+      "Bash(ghq get -p *)",
       "Bash(which *)",
       "Bash(wc *)",
+      "Bash(nl *)",
       "Bash(uname)",
       "Bash(uname *)",
       "Bash(file *)",
@@ -115,6 +121,34 @@
       "Bash(AWS_PROFILE=prd-ro aws *)",
       "Bash(AWS_PROFILE=payer-ro aws *)",
       "Bash(pup --read-only *)",
+      "Bash(configcat ls *)",
+      "Bash(configcat ls)",
+      "Bash(configcat product ls *)",
+      "Bash(configcat product ls)",
+      "Bash(configcat config ls *)",
+      "Bash(configcat config ls)",
+      "Bash(configcat environment ls *)",
+      "Bash(configcat environment ls)",
+      "Bash(configcat flag ls *)",
+      "Bash(configcat flag ls)",
+      "Bash(configcat flag value show *)",
+      "Bash(configcat flag-v2 ls *)",
+      "Bash(configcat flag-v2 ls)",
+      "Bash(configcat flag-v2 value show *)",
+      "Bash(configcat segment ls *)",
+      "Bash(configcat segment ls)",
+      "Bash(configcat segment show *)",
+      "Bash(configcat tag ls *)",
+      "Bash(configcat tag ls)",
+      "Bash(configcat eval *)",
+      "Bash(configcat config-json get *)",
+      "Bash(configcat permission-group ls *)",
+      "Bash(configcat permission-group ls)",
+      "Bash(configcat permission-group show *)",
+      "Bash(configcat workspace show *)",
+      "Bash(configcat workspace show)",
+      "Bash(xxd *)",
+      "Bash(xxd)",
       "Bash(claude --help)",
       "Bash(claude mcp --help)",
       "Bash(claude mcp * --help)",
@@ -206,7 +240,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ~/.claude/hooks/approve_safe_commands.py"
+            "command": "python3 ~/.claude/hooks/approve_git_gh_commands.py"
+          },
+          {
+            "type": "command",
+            "command": "python3 ~/.claude/hooks/approve_gh_graphql_readonly.py"
           }
         ]
       }

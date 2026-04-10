@@ -16,8 +16,8 @@ import json
 import re
 import sys
 
-# Matches shell separators: &&, ||, ;
-_SEPARATOR_RE = re.compile(r"&&|\|\||;")
+# Matches shell separators: &&, ||, ;, newline
+_SEPARATOR_RE = re.compile(r"&&|\|\||;|\n")
 
 # Matches "cd" followed by whitespace or end of string
 _CD_RE = re.compile(r"^cd(\s|$)")
@@ -36,6 +36,8 @@ def _split_outside_quotes(command: str) -> list[str]:
     ['cd /path ', " echo 'hello ; world' ", ' pwd']
     >>> _split_outside_quotes('echo "a\\\\" && cd /x"')
     ['echo "a\\\\" && cd /x"']
+    >>> _split_outside_quotes("cd /path\\ngit status")
+    ['cd /path', 'git status']
     """
     segments = []
     current = []
@@ -116,6 +118,18 @@ def has_chained_cd(command: str) -> bool:
     Blocked (cd with tab separator):
     >>> has_chained_cd("cd\\t/path && ls")
     True
+
+    Blocked (cd with newline separator):
+    >>> has_chained_cd("cd /path\\ngit status")
+    True
+    >>> has_chained_cd("cd /path\\ncd /other")
+    True
+    >>> has_chained_cd("ls -la\\ncd /path")
+    True
+
+    Allowed (newline inside quotes):
+    >>> has_chained_cd("echo 'cd /path\\ngit status'")
+    False
     """
     segments = _split_outside_quotes(command)
     if len(segments) < 2:
@@ -138,9 +152,9 @@ if __name__ == "__main__":
                 "hookEventName": "PreToolUse",
                 "permissionDecision": "deny",
                 "permissionDecisionReason": (
-                    "Do not chain `cd` with other commands using &&, ;, or ||. "
-                    "Run `cd` as a separate Bash call first, then run the other "
-                    "command in the next call."
+                    "Do not chain `cd` with other commands using &&, ;, ||, "
+                    "or newlines. Run `cd` as a separate Bash call first, "
+                    "then run the other command in the next call."
                 ),
             },
         }))

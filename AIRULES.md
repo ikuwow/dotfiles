@@ -37,6 +37,7 @@
 
 ## ソフトウェア開発における考慮
 
+0. Unix 哲学に従い、スクリプトやモジュールは小さく保ち、一つのことだけをうまくやらせる
 1. 作業開始・ブランチ・push・PR のフローは `~/.claude/rules/git-workflow.md` に従う
     - Claude Code の `--worktree` オプション・EnterWorktree ツールは使用しない（既知の不具合あり）
     - default branch への直接コミットは禁止
