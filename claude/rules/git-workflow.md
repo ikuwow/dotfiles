@@ -88,9 +88,12 @@ Once all three have finished, review the combined results:
 1. Fix issues found by code reviews.
 2. If CI failed, investigate with `gh run view --log-failed` and fix.
 3. Push fixes if any code was changed, then re-run
-   `gh pr checks --watch` to confirm CI passes.
+   `/pr-selfcheck` and `gh pr checks --watch` to confirm the PR
+   is still consistent and CI passes.
 
-Each review type is single-pass — do not re-run after fixes.
+Code reviews are single-pass — do not re-run after fixes.
+`/pr-selfcheck` runs again here to catch inconsistencies
+introduced by Phase 3 changes.
 
 ## 6. Mark PR as Ready for Review
 
