@@ -111,7 +111,8 @@
       "Bash(AWS_PROFILE=stg-ro aws *)",
       "Bash(AWS_PROFILE=prd-ro aws *)",
       "Bash(AWS_PROFILE=payer-ro aws *)",
-      "Bash(pup --read-only *)"
+      "Bash(pup --read-only *)",
+      "Bash(claude * --help)"
     ],
     "deny": [
       "Bash(git push --force *)",
