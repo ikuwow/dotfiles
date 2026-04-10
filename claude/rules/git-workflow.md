@@ -61,39 +61,41 @@ Note: `.worktrees/` is covered by the global gitignore.
 
 ## 5. CI Wait & Review
 
-Three-phase review: fix PR presentation first, then run CI and
-code reviews in parallel, then consolidate.
+Three-phase review: pass all mechanical checks first, then run
+code reviews, then consolidate.
 
-### Phase 1: PR self-review
+### Phase 1: PR self-review + CI (parallel)
 
-1. Run `/pr-selfcheck <PR number>`.
-2. If the verdict is NEEDS_IMPROVEMENT:
-   - Fix "Must Fix" items immediately. Address "Should Fix" where
-     reasonable.
-   - Push changes if code was modified.
+Launch both at the same time:
 
-### Phase 2: CI + code reviews (all parallel)
-
-Launch all three at the same time:
-
+- `/pr-selfcheck <PR number>` — PR presentation review.
 - `gh pr checks --watch` — CI monitoring.
+
+Wait for both to finish. If either fails:
+- Fix self-review "Must Fix" / "Should Fix" items.
+- Fix CI failures (`gh run view --log-failed`).
+- Push fixes, then re-run both until both pass.
+
+### Phase 2: Code reviews (parallel)
+
+Once Phase 1 passes, launch both:
+
 - `/codex:adversarial-review` — challenges design decisions via Codex.
 - `/code-review` — multi-agent code review (CLAUDE.md compliance,
   bug detection, git-blame context analysis).
 
 ### Phase 3: Consolidate and fix
 
-Once all three have finished, review the combined results:
+Once both reviews finish, review the combined results:
 
 1. Fix issues found by code reviews.
-2. If CI failed, investigate with `gh run view --log-failed` and fix.
-3. Push fixes if any code was changed, then re-run
+2. Push fixes if any code was changed, then re-run
    `/pr-selfcheck` and `gh pr checks --watch` to confirm the PR
    is still consistent and CI passes.
 
 Code reviews are single-pass — do not re-run after fixes.
-`/pr-selfcheck` runs again here to catch inconsistencies
-introduced by Phase 3 changes.
+`/pr-selfcheck` runs again in Phase 3 to catch inconsistencies
+introduced by review fix changes.
 
 ## 6. Mark PR as Ready for Review
 
