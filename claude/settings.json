@@ -115,7 +115,8 @@
       "Bash(AWS_PROFILE=prd-ro aws *)",
       "Bash(AWS_PROFILE=payer-ro aws *)",
       "Bash(pup --read-only *)",
-      "Bash(claude * --help)"
+      "Bash(claude * --help)",
+      "Skill(pr-selfcheck *)"
     ],
     "deny": [
       "Bash(git push --force *)",
@@ -178,7 +179,8 @@
       "Bash(mise remove *)",
       "Bash(mise run *)",
       "Bash(mise exec *)",
-      "Bash(mise settings set *)"
+      "Bash(mise settings set *)",
+      "Skill(code-review *)"
     ]
   },
   "model": "opus",
