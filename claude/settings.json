@@ -1,5 +1,8 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "env": {
+    "DISABLE_AUTOUPDATER": "1"
+  },
   "permissions": {
     "allow": [
       "Read(~/.claude/rules/*)",
@@ -145,7 +148,15 @@
       "Bash(configcat workspace show *)",
       "Bash(configcat workspace show)",
       "Bash(xxd *)",
-      "Bash(xxd)"
+      "Bash(xxd)",
+      "Bash(claude --help)",
+      "Bash(claude mcp --help)",
+      "Bash(claude mcp * --help)",
+      "Bash(claude plugin --help)",
+      "Bash(claude plugin * --help)",
+      "Skill(pr-selfcheck *)",
+      "Skill(codex:setup *)",
+      "Skill(pr-review-toolkit:review-pr *)"
     ],
     "deny": [
       "Bash(git push --force *)",
@@ -208,9 +219,12 @@
       "Bash(mise remove *)",
       "Bash(mise run *)",
       "Bash(mise exec *)",
-      "Bash(mise settings set *)"
+      "Bash(mise settings set *)",
+      "Skill(codex:adversarial-review *)",
+      "Skill(codex:rescue *)"
     ]
   },
+  "model": "opus",
   "hooks": {
     "PreToolUse": [
       {
@@ -266,14 +280,20 @@
     "command": "bash ~/.claude/statusline-command.sh"
   },
   "enabledPlugins": {
-    "gopls-lsp@claude-plugins-official": true
+    "gopls-lsp@claude-plugins-official": true,
+    "codex@openai-codex": true,
+    "pr-review-toolkit@claude-plugins-official": true
   },
-  "env": {
-    "DISABLE_AUTOUPDATER": "1"
+  "extraKnownMarketplaces": {
+    "openai-codex": {
+      "source": {
+        "source": "github",
+        "repo": "openai/codex-plugin-cc"
+      }
+    }
   },
   "voiceEnabled": true,
   "feedbackSurveyState": {
     "lastShownTime": 1754272823676
-  },
-  "model": "opus"
+  }
 }
