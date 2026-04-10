@@ -60,26 +60,52 @@ Note: `.worktrees/` is covered by the global gitignore.
    `gh pr view --json url --jq '.url'`
 4. Proceed to CI wait (step 5).
 
-## 5. CI Wait & Self-Review
+## 5. CI Wait & Review
 
-After pushing and creating/updating a PR, run CI monitoring and
-self-review in parallel:
+Three-phase review: pass all mechanical checks first, then run
+code reviews, then consolidate.
 
-1. Start both at the same time:
-   - Run `gh pr checks --watch` to monitor CI.
-   - Launch a background subagent with `/pr-selfcheck <PR number>` to
-     self-review the PR.
-2. Once both finish, read the self-review output.
-3. If the verdict is NEEDS_IMPROVEMENT:
-   - Immediately fix all "Must Fix" items without waiting for user input.
-   - Address "Should Fix" items where reasonable.
-   - Update the PR (title, body, or code) as needed.
-   - Push changes if code was modified, then re-run `gh pr checks --watch`.
-4. If any CI check fails:
-   - Review details: `gh pr checks`
-   - View failure logs: `gh run view --log-failed`
-   - Fix the issue, commit, push, then watch again.
-5. Do not re-run the self-review after fixes (single pass only).
+### Phase 1: PR self-review + CI (parallel)
+
+Launch both at the same time:
+
+- `/pr-selfcheck <PR number>` — PR presentation review.
+- `gh pr checks --watch` — CI monitoring.
+
+Wait for both to finish. If either fails:
+- Fix self-review "Must Fix" / "Should Fix" items.
+- Fix CI failures (`gh run view --log-failed`).
+- Push fixes, then re-run both until both pass.
+
+Note: `/pr-selfcheck` is a mechanical check, not a code review.
+Re-running it after fixes is expected. The "single-pass" policy
+applies only to code reviews in Phase 2.
+
+### Phase 2: Code reviews (parallel)
+
+Once Phase 1 passes, launch both:
+
+- `/codex:adversarial-review` — challenges design decisions via Codex.
+- `/pr-review-toolkit:review-pr` — multi-agent code review (CLAUDE.md
+  compliance, bug detection, error handling, test coverage).
+  Reports findings in the conversation, does not post PR comments.
+
+Note: `/codex:adversarial-review` cannot be invoked via the Skill tool
+(blocked by `disable-model-invocation`). Use the `codex:codex-rescue`
+subagent to delegate the review instead.
+
+### Phase 3: Consolidate and fix
+
+Once both reviews finish, review the combined results:
+
+1. Fix issues found by code reviews.
+2. Push fixes if any code was changed, then re-run
+   `/pr-selfcheck` and `gh pr checks --watch` to confirm the PR
+   is still consistent and CI passes.
+
+Code reviews are single-pass — do not re-run after fixes.
+`/pr-selfcheck` runs again in Phase 3 to catch inconsistencies
+introduced by review fix changes.
 
 ## 6. Mark PR as Ready for Review
 
