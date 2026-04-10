@@ -115,7 +115,11 @@
       "Bash(AWS_PROFILE=prd-ro aws *)",
       "Bash(AWS_PROFILE=payer-ro aws *)",
       "Bash(pup --read-only *)",
-      "Bash(claude * --help)",
+      "Bash(claude --help)",
+      "Bash(claude mcp --help)",
+      "Bash(claude mcp * --help)",
+      "Bash(claude plugin --help)",
+      "Bash(claude plugin * --help)",
       "Skill(pr-selfcheck *)"
     ],
     "deny": [

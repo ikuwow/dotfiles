@@ -2,7 +2,7 @@
 
 # Bootstrap for Claude Code web remote environments (Ubuntu 24.04).
 # Installs useful packages, deploys dotfile symlinks, and configures
-# Claude Code MCP servers.
+# Claude Code MCP servers and plugins.
 
 set -eu
 
