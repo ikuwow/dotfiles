@@ -33,4 +33,4 @@ mcp_add Context7 '{"command":"npx","args":["-y","@upstash/context7-mcp"]}'
 # marketplace add and plugin install are both idempotent
 claude plugin marketplace add openai/codex-plugin-cc
 claude plugin install codex@openai-codex
-claude plugin install code-review@claude-plugins-official
+claude plugin install pr-review-toolkit@claude-plugins-official

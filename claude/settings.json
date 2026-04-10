@@ -155,7 +155,8 @@
       "Bash(claude plugin --help)",
       "Bash(claude plugin * --help)",
       "Skill(pr-selfcheck *)",
-      "Skill(codex:setup *)"
+      "Skill(codex:setup *)",
+      "Skill(pr-review-toolkit:review-pr *)"
     ],
     "deny": [
       "Bash(git push --force *)",
@@ -219,7 +220,6 @@
       "Bash(mise run *)",
       "Bash(mise exec *)",
       "Bash(mise settings set *)",
-      "Skill(code-review *)",
       "Skill(codex:adversarial-review *)",
       "Skill(codex:rescue *)"
     ]
@@ -282,7 +282,7 @@
   "enabledPlugins": {
     "gopls-lsp@claude-plugins-official": true,
     "codex@openai-codex": true,
-    "code-review@claude-plugins-official": true
+    "pr-review-toolkit@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
     "openai-codex": {

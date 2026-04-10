@@ -86,16 +86,13 @@ applies only to code reviews in Phase 2.
 Once Phase 1 passes, launch both:
 
 - `/codex:adversarial-review` — challenges design decisions via Codex.
-- `/code-review` — multi-agent code review (CLAUDE.md compliance,
-  bug detection, git-blame context analysis).
+- `/pr-review-toolkit:review-pr` — multi-agent code review (CLAUDE.md
+  compliance, bug detection, error handling, test coverage).
+  Reports findings in the conversation, does not post PR comments.
 
 Note: `/codex:adversarial-review` cannot be invoked via the Skill tool
 (blocked by `disable-model-invocation`). Use the `codex:codex-rescue`
 subagent to delegate the review instead.
-
-Note: `/code-review` posts comments on the PR via `gh pr comment`.
-This is intended for reviews by others, not self-review. Skip it
-when reviewing your own PR.
 
 ### Phase 3: Consolidate and fix
 
