@@ -45,20 +45,22 @@ Note: `.worktrees/` is covered by the global gitignore.
 
 ## 4. Create a PR
 
-1. Write the PR body to a temp file using the Write tool:
-   `Write(/tmp/pr-body-<unique-id>.md)`
-   Use a unique ID (e.g., branch name or timestamp) to avoid collisions
-   with other parallel sessions.
+1. Generate a unique temp file path:
+   `mktemp --suffix=.md`
+   Run this as a standalone Bash command (no command substitution).
+   Read the output to obtain the generated path.
+2. Write the PR body to the generated path using the Write tool:
+   `Write(<path from mktemp>)`
    - Follow the repository's PR template if one exists.
    - Follow the PR Body Checklist in `pr-guidelines.md`.
-2. Create the PR as a draft:
-   `gh pr create --draft --body-file /tmp/pr-body-<unique-id>.md`
+3. Create the PR as a draft:
+   `gh pr create --draft --body-file <path from mktemp>`
    - Never use `--body` for PR creation. The `#`-prefixed lines in the body
      trigger Claude Code's security pre-check, which cannot be bypassed by
      hooks. Always go through `--body-file`.
-3. After creating the PR, display the PR URL to the user:
+4. After creating the PR, display the PR URL to the user:
    `gh pr view --json url --jq '.url'`
-4. Proceed to CI wait (step 5).
+5. Proceed to CI wait (step 5).
 
 ## 5. CI Wait & Review
 
@@ -129,11 +131,14 @@ Before marking the PR ready, run a self-review gate:
      (or `gh issue view <number> --json body --jq .body` for issues)
   2. Output a diff between the current body and the new body in the
      conversation (so what changed is visible and recoverable).
-  3. Write the new body to a temp file:
-     `Write(/tmp/pr-body-<unique-id>.md)`
-  4. Execute the edit:
-     `gh pr edit <number> --body-file /tmp/pr-body-<unique-id>.md`
-     (or `gh issue edit <number> --body-file /tmp/pr-body-<unique-id>.md`)
+  3. Generate a unique temp file path:
+     `mktemp --suffix=.md`
+     Run this as a standalone Bash command and read the output.
+  4. Write the new body to the generated path:
+     `Write(<path from mktemp>)`
+  5. Execute the edit:
+     `gh pr edit <number> --body-file <path from mktemp>`
+     (or `gh issue edit <number> --body-file <path from mktemp>`)
   The goal is observability — always show the diff so the user can see
   what changed and recover manually-written content if accidentally
   overwritten.
