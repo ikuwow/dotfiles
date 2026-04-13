@@ -46,7 +46,7 @@ Note: `.worktrees/` is covered by the global gitignore.
 ## 4. Create a PR
 
 1. Generate a unique temp file path:
-   `mktemp /tmp/pr-body-XXXXXXXX.md`
+   `mktemp --suffix=.md`
    Run this as a standalone Bash command (no command substitution).
    Read the output to obtain the generated path.
 2. Write the PR body to the generated path using the Write tool:
@@ -132,7 +132,7 @@ Before marking the PR ready, run a self-review gate:
   2. Output a diff between the current body and the new body in the
      conversation (so what changed is visible and recoverable).
   3. Generate a unique temp file path:
-     `mktemp /tmp/pr-body-XXXXXXXX.md`
+     `mktemp --suffix=.md`
      Run this as a standalone Bash command and read the output.
   4. Write the new body to the generated path:
      `Write(<path from mktemp>)`
