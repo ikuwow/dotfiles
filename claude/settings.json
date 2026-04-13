@@ -191,7 +191,8 @@
       "WebFetch(domain:[::1])",
       "WebFetch(domain:*.local)",
       "WebFetch(domain:*.internal)",
-      "WebFetch(domain:169.254.169.254)"
+      "WebFetch(domain:169.254.169.254)",
+      "mcp__claude_ai_GitHub_MCP"
     ],
     "ask": [
       "Bash(git merge *)",
