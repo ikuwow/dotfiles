@@ -83,6 +83,9 @@ Note: `/pr-selfcheck` is a mechanical check, not a code review.
 Re-running it after fixes is expected. The "single-pass" policy
 applies only to code reviews in Phase 2.
 
+Do not ask if the PR is ready after Phase 1 passes.
+Phase 2 is mandatory — proceed directly.
+
 ### Phase 2: Code reviews (parallel)
 
 Once Phase 1 passes, launch both:
