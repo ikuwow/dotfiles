@@ -159,8 +159,11 @@
       "Bash(claude mcp * --help)",
       "Bash(claude plugin --help)",
       "Bash(claude plugin * --help)",
+      "Skill(pr-selfcheck)",
       "Skill(pr-selfcheck *)",
+      "Skill(codex:setup)",
       "Skill(codex:setup *)",
+      "Skill(pr-review-toolkit:review-pr)",
       "Skill(pr-review-toolkit:review-pr *)"
     ],
     "deny": [
