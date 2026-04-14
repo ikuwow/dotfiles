@@ -1,5 +1,5 @@
 ---
-description: Perform a self-review of a PR before requesting human review. TRIGGER when user invokes /pr-selfcheck, when the git workflow reaches the self-review step after PR creation, or as a required gate before running `gh pr ready`. Accepts a PR number as an argument.
+description: Perform a self-review of a PR before requesting human review. TRIGGER when user invokes /pr-selfcheck or when the git workflow reaches the self-review step after PR creation. Accepts a PR number as an argument.
 model: sonnet
 ---
 
@@ -44,6 +44,6 @@ If there are no items for a severity level, write "None."
 
 ## Important Notes
 
-- This is a single-pass check. Do not re-run the check after fixes.
+- This check may be re-run after fixes (e.g., Phase 1 retry, Phase 3 consistency check in the git workflow).
 - Focus on the PR as a communication artifact for human reviewers, not on code correctness (CI covers that).
 - When in doubt, prefer "Should Fix" over "Must Fix" to avoid blocking on subjective issues.

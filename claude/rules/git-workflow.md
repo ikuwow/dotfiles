@@ -9,6 +9,9 @@ Follow each step in order. Skip steps that don't apply.
   worktree (or feature branch) first. Creating files before branching
   leads to redundant copy-and-delete work.
 - Never modify commits that have already been pushed.
+- Steps 4 and 5 are a single continuous flow. After creating a
+  draft PR, proceed through all three review phases without pausing
+  to report. Report results only after Phase 3 is complete.
 
 ## 1. Start Work
 
@@ -112,19 +115,7 @@ Code reviews are single-pass — do not re-run after fixes.
 `/pr-selfcheck` runs again in Phase 3 to catch inconsistencies
 introduced by review fix changes.
 
-## 6. Mark PR as Ready for Review
-
-Before marking the PR ready, run a self-review gate:
-
-1. Run `/pr-selfcheck <PR number>`.
-2. If the verdict is NEEDS_IMPROVEMENT:
-   - Fix all "Must Fix" items. Address "Should Fix" items where reasonable.
-   - Push changes, then re-run `gh pr checks --watch`.
-   - Re-run `/pr-selfcheck` after fixes.
-3. Once the verdict is PASS, mark the PR as ready:
-   `gh pr ready`
-
-## 7. Update a PR / issue (title / body)
+## 6. Update a PR / issue (title / body)
 
 - Update title:
   `gh pr edit <number> --title '...'`
@@ -150,7 +141,7 @@ Note: Always use `--body-file` for any body update. The `#`-prefixed lines
 in PR/issue bodies trigger Claude Code's security pre-check when passed
 via `--body`, which cannot be bypassed by hooks.
 
-## 8. Cleanup After Task Completion
+## 7. Cleanup After Task Completion
 
 After the PR is merged (or the task is fully done):
 
