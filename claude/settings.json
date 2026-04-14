@@ -236,7 +236,6 @@
       "Skill(codex:rescue *)"
     ]
   },
-  "model": "opus",
   "hooks": {
     "PreToolUse": [
       {
