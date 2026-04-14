@@ -94,13 +94,13 @@ Phase 2 is mandatory — proceed directly.
 Once Phase 1 passes, launch both:
 
 - `/codex:adversarial-review` — challenges design decisions via Codex.
+  If it fails with `disable-model-invocation` error, skip and continue
+  with Phase 3. This is a known upstream issue
+  (openai/codex-plugin-cc#211, anthropics/claude-code#43809) — once
+  fixed, this command should work directly via the Skill tool.
 - `/pr-review-toolkit:review-pr` — multi-agent code review (CLAUDE.md
   compliance, bug detection, error handling, test coverage).
   Reports findings in the conversation, does not post PR comments.
-
-Note: `/codex:adversarial-review` cannot be invoked via the Skill tool
-(blocked by `disable-model-invocation`). Use the `codex:codex-rescue`
-subagent to delegate the review instead.
 
 ### Phase 3: Consolidate and fix
 
