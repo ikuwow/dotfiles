@@ -18,7 +18,7 @@ fi
 branch="$1"
 sanitized="$(echo "$branch" | tr '/' '-')"
 date_str="$(date +%Y%m%d)"
-dir=".worktrees/${sanitized}-${date_str}"
+dir=".worktrees/${date_str}-${sanitized}"
 
 git worktree add -b "$branch" "$dir"
 echo ""
