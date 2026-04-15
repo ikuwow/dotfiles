@@ -1,7 +1,7 @@
 # PR Guidelines
 
-Quality criteria for pull requests. Referenced by both the PR creation
-step in `git-workflow.md` and the `/pr-selfcheck` skill.
+Quality criteria for pull requests. Follow these when writing a PR body
+and when reviewing your own PR.
 
 ## Writing Style
 

@@ -55,7 +55,7 @@ Note: `.worktrees/` is covered by the global gitignore.
 2. Write the PR body to the generated path using the Write tool:
    `Write(<path from mktemp>)`
    - Follow the repository's PR template if one exists.
-   - Follow the PR Body Checklist in `pr-guidelines.md`.
+   - Follow the PR Body Checklist and Review Criteria.
 3. Create the PR as a draft:
    `gh pr create --draft --body-file <path from mktemp>`
    - Never use `--body` for PR creation. The `#`-prefixed lines in the body
