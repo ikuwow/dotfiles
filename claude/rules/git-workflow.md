@@ -9,6 +9,9 @@ Follow each step in order. Skip steps that don't apply.
   worktree (or feature branch) first. Creating files before branching
   leads to redundant copy-and-delete work.
 - Never modify commits that have already been pushed.
+- Implementation plans MUST include the full workflow from Step 1
+  through Step 5. Never produce a plan that ends at "edit the file"
+  without covering commit, push, PR creation, and CI review.
 - Steps 4 and 5 are a single continuous flow. After creating a
   draft PR, proceed through all three review phases without pausing
   to report. Report results only after Phase 3 is complete.
@@ -94,6 +97,13 @@ Phase 2 is mandatory — proceed directly.
 Once Phase 1 passes, launch both:
 
 - `/codex:adversarial-review` — challenges design decisions via Codex.
+  Always run in the background (`run_in_background: true`) without
+  asking the user for the execution mode. Do not use `AskUserQuestion`
+  for foreground/background selection.
+  After receiving the review output, immediately provide your own
+  assessment of each finding (agree/disagree with reasoning) and
+  propose concrete next actions. Never output the review verbatim
+  and stop.
   If it fails with `disable-model-invocation` error, skip and continue
   with Phase 3. This is a known upstream issue
   (openai/codex-plugin-cc#211, anthropics/claude-code#43809) — once
