@@ -164,6 +164,7 @@
       "Bash(claude plugin * --help)",
       "Bash(copilot --version)",
       "Bash(copilot --help)",
+      "Bash(copilot * --help)",
       "Skill(pr-selfcheck)",
       "Skill(pr-selfcheck *)",
       "Skill(codex:setup)",
