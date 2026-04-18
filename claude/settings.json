@@ -162,6 +162,9 @@
       "Bash(claude mcp * --help)",
       "Bash(claude plugin --help)",
       "Bash(claude plugin * --help)",
+      "Bash(copilot --version)",
+      "Bash(copilot --help)",
+      "Bash(copilot * --help)",
       "Skill(pr-selfcheck)",
       "Skill(pr-selfcheck *)",
       "Skill(codex:setup)",
@@ -233,7 +236,11 @@
       "Bash(mise exec *)",
       "Bash(mise settings set *)",
       "Skill(codex:adversarial-review *)",
-      "Skill(codex:rescue *)"
+      "Skill(codex:rescue *)",
+      "Bash(copilot -p)",
+      "Bash(copilot -p *)",
+      "Bash(copilot update)",
+      "Bash(copilot update *)"
     ]
   },
   "hooks": {
