@@ -160,7 +160,7 @@ brew "k9s"
 brew "kind"
 brew "helm"
 brew "helmfile"
-brew "copilot" # AWS Copilot
+cask "copilot-cli" # GitHub Copilot CLI
 brew "ecspresso"
 brew "ecschedule"
 brew "e1s"
