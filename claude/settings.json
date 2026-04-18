@@ -237,8 +237,10 @@
       "Bash(mise settings set *)",
       "Skill(codex:adversarial-review *)",
       "Skill(codex:rescue *)",
+      "Bash(copilot -p)",
       "Bash(copilot -p *)",
-      "Bash(copilot update)"
+      "Bash(copilot update)",
+      "Bash(copilot update *)"
     ]
   },
   "hooks": {
