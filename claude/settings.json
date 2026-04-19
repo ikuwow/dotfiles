@@ -309,6 +309,7 @@
     }
   },
   "voiceEnabled": true,
+  "remoteControlAtStartup": true,
   "feedbackSurveyState": {
     "lastShownTime": 1754272823676
   }
