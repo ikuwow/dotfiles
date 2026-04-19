@@ -15,6 +15,8 @@ Follow each step in order. Skip steps that don't apply.
 - Steps 4 and 5 are a single continuous flow. After creating a
   draft PR, proceed through all three review phases without pausing
   to report. Report results only after Phase 3 is complete.
+  Stopping after PR creation without completing Step 5 is a workflow
+  violation — there are no exceptions.
 
 ## 1. Start Work
 
