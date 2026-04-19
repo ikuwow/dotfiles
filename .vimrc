@@ -303,12 +303,9 @@ if has('nvim')
 lua << EOF
     if pcall(require, "claudecode") then
         require("claudecode").setup({
-            terminal = {
-                provider = "none",
-            },
             diff_opts = {
-                layout = "horizontal",
-                open_in_new_tab = true,
+                vertical_split = false,
+                open_in_current_tab = false,
             },
         })
     end
