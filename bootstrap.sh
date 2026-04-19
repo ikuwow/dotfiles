@@ -5,7 +5,7 @@
 
 set -eu
 
-DOTPATH=$HOME/dotfiles
+DOTPATH="$HOME/dotfiles"
 
 BRANCH="${1:-main}"
 echo "Bootstrap with branch '${BRANCH}'"

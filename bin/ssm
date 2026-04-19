@@ -16,7 +16,7 @@ fi
 
 if [[ "$target" =~ ^i\- ]]; then
   start-session "$target"
-  exit $!
+  exit 0
 fi
 
 INSTANCE_IDS=$(aws ec2 describe-instances \
@@ -34,7 +34,7 @@ if [ ${#INSTANCE_IDS_ARRAY[@]} -eq 1 ]; then
 
   echo "EC2 instance found: ${INSTANCE_IDS_ARRAY[0]}"
   start-session "${INSTANCE_IDS_ARRAY[0]}"
-  exit $!
+  exit 0
 elif [ ${#INSTANCE_IDS_ARRAY[@]} -gt 1 ]; then
   echo "Error: Target ${target} exists in multiple instances!"
   exit 1
