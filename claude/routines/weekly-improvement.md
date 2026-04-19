@@ -7,18 +7,16 @@ This file contains all instructions for the routine.
 
 Before making any changes, check past routine PRs for feedback:
 
-1. List past routine PRs (branch prefix `improve/dotfiles-` matches the naming in Step 4):
-   `gh pr list --repo ikuwow/dotfiles --search 'head:improve/dotfiles' --state all --limit 20 --json number,title,state,mergedAt`
+1. List past routine PRs:
+   `gh pr list --repo ikuwow/dotfiles --label 'claude-routine' --state all --limit 20 --json number,title,state,mergedAt`
 2. For any closed (not merged) PRs, read the comments to understand why they were rejected:
    `gh pr view <number> --repo ikuwow/dotfiles --comments`
 3. Learn from this feedback. Avoid making similar changes that were previously rejected.
 
 ## Step 2: Understand the Repository
 
-1. Read `AGENTS.md` (or `CLAUDE.md`) to understand repository rules and conventions.
-2. Read `README.md` for the overall structure.
-3. Read `scripts/deploy.sh` to understand symlink mappings.
-4. Explore the codebase to find improvement opportunities.
+Read `AGENTS.md` to understand repository rules, conventions, and structure.
+Then explore the codebase to find improvement opportunities.
 
 ## Step 3: Find Improvements
 
@@ -39,11 +37,13 @@ Do NOT modify:
 
 If worthwhile improvements are found:
 
-1. Create a branch: `improve/dotfiles-YYYY-MM-DD` (use today's date)
-2. Make changes and commit with clear messages
-3. Follow `claude/rules/git-workflow.md` Steps 1-4 only (push + create draft PR).
+1. Ensure the `claude-routine` label exists:
+   `gh label create 'claude-routine' --repo ikuwow/dotfiles --description 'Created by Claude Code weekly routine' --color '6e40c9' --force`
+2. Create a branch: `improve/dotfiles-YYYY-MM-DD` (use today's date)
+3. Make changes and commit with clear messages
+4. Follow `claude/rules/git-workflow.md` Steps 1-4 only (push + create draft PR with `--label 'claude-routine'`).
    Skip Step 5 entirely (CI wait, self-review, and code reviews) — this is a draft for human review.
-4. Follow `claude/rules/pr-guidelines.md` for the PR body. It must include:
+5. Follow `claude/rules/pr-guidelines.md` for the PR body. It must include:
    - What was improved and why
    - How to verify each change
    - Reference to any past feedback that influenced decisions
