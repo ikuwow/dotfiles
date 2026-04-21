@@ -5,6 +5,10 @@ Follow each step in order. Skip steps that don't apply.
 
 ## Principles
 
+- All steps within a single workflow run are pre-authorized by the user
+  who initiated the task. Do not pause between steps to ask for
+  confirmation unless blocked by an error or ambiguity. Execute the
+  full flow continuously and report results at the end.
 - Never create or edit files on the default branch. Always move into the
   worktree (or feature branch) first. Creating files before branching
   leads to redundant copy-and-delete work.
@@ -12,11 +16,6 @@ Follow each step in order. Skip steps that don't apply.
 - Implementation plans MUST include the full workflow from Step 1
   through Step 5. Never produce a plan that ends at "edit the file"
   without covering commit, push, PR creation, and CI review.
-- Steps 4 and 5 are a single continuous flow. After creating a
-  draft PR, proceed through all three review phases without pausing
-  to report. Report results only after Phase 3 is complete.
-  Stopping after PR creation without completing Step 5 is a workflow
-  violation — there are no exceptions.
 
 ## 1. Start Work
 
@@ -90,9 +89,6 @@ Wait for both to finish. If either fails:
 Note: `/pr-selfcheck` is a mechanical check, not a code review.
 Re-running it after fixes is expected. The "single-pass" policy
 applies only to code reviews in Phase 2.
-
-Do not ask if the PR is ready after Phase 1 passes.
-Phase 2 is mandatory — proceed directly.
 
 ### Phase 2: Code reviews (parallel)
 
