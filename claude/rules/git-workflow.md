@@ -76,10 +76,10 @@ code reviews, then consolidate.
 
 ### Phase 1: PR self-review + CI (parallel)
 
-Launch both in the background (`run_in_background: true`):
+Launch both in a single assistant message so they execute concurrently:
 
 - `/pr-selfcheck <PR number>` — PR presentation review.
-- `gh pr checks --watch` — CI monitoring.
+- `gh pr checks --watch` — CI monitoring. Run with `run_in_background: true`.
 
 If either fails:
 - Fix self-review "Must Fix" / "Should Fix" items.
