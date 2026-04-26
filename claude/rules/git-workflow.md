@@ -76,10 +76,18 @@ code reviews, then consolidate.
 
 ### Phase 1: PR self-review + CI (parallel)
 
-Launch both in the background (`run_in_background: true`):
+Launch both in a single assistant message so they execute concurrently.
+Each uses a different mechanism:
 
-- `/pr-selfcheck <PR number>` — PR presentation review.
-- `gh pr checks --watch` — CI monitoring.
+- `/pr-selfcheck <PR number>` — PR presentation review. Invoked through
+  the `Skill` tool. The skill is configured with `context: fork`, so it
+  runs in a forked subagent and returns its result as a tool result.
+  The `Skill` tool does not accept `run_in_background`; the assistant
+  continues to the next step in the same turn once the tool result
+  arrives.
+- `gh pr checks --watch` — CI monitoring. Invoked through the `Bash`
+  tool with `run_in_background: true`. Output is read later from the
+  background process.
 
 If either fails:
 - Fix self-review "Must Fix" / "Should Fix" items.
