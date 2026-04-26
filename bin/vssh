@@ -10,9 +10,9 @@ fi
 ssh_config_path=./ssh-config
 hostname=default
 
-if [ ! -s $ssh_config_path ]; then
+if [ ! -s "$ssh_config_path" ]; then
   echo "Creating ssh-config file..."
-  vagrant ssh-config >$ssh_config_path
+  vagrant ssh-config >"$ssh_config_path"
   echo "Done."
 fi
 
