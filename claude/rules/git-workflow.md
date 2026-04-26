@@ -125,7 +125,10 @@ Once both reviews finish, review the combined results:
 1. Fix issues found by code reviews.
 2. Push fixes if any code was changed, then re-run
    `/pr-selfcheck` and `gh pr checks --watch` to confirm the PR
-   is still consistent and CI passes.
+   is still consistent and CI passes. Use the same two-mechanism
+   pattern as Phase 1 (Skill tool for `/pr-selfcheck`, Bash with
+   `run_in_background: true` for `gh pr checks --watch`, both in
+   one message).
 
 Code reviews are single-pass — do not re-run after fixes.
 `/pr-selfcheck` runs again in Phase 3 to catch inconsistencies
