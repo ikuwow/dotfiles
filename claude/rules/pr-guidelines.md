@@ -15,6 +15,61 @@ and when reviewing your own PR.
   restated in the body. Focus on context the diff cannot convey: why the
   change was made, trade-offs considered, and things to watch out for.
 
+### Essence-first principle
+
+A PR body is not a complete record of the change — it is a summary that
+helps a reviewer make a decision. Over-writing buries the signal, and
+duplicating context that lives elsewhere causes the two copies to drift
+apart over time. Compose the body around the following established
+principles.
+
+#### Why over what
+
+The diff already shows *what* changed. The body concentrates on *why*
+the change is needed and the shape of the decision (the approach taken
+vs. approaches rejected, what was deliberately left out of scope).
+
+References:
+- Tim Pope, *A Note About Git Commit Messages*: <https://cbea.ms/git-commit/>
+- Linux kernel, *Documentation/process/submitting-patches.rst*
+
+#### Single source of truth (DRY)
+
+If the design rationale, background, or requirements already live
+elsewhere (issue, design doc, ADR, prior PR, official spec), do not
+duplicate the content into the PR body. Replace it with a one-line
+summary plus a link. Duplication creates a sync cost; whichever copy
+is updated next will leave the other stale.
+
+Example:
+- ✗ "Legal flagged session token storage on YYYY-MM-DD because… (paragraph
+  retelling the history)"
+- ✓ "Compliance-driven change. Background: <issue #456>"
+
+#### Inverted pyramid
+
+Place the most important information first (the point of the change and
+the major design decisions). A reviewer reading only the first few lines
+should be able to tell what kind of PR this is and where to focus.
+
+#### Information hiding (Parnas)
+
+Surface only the information a reviewer needs to approve or reject the
+PR. Implementation details and the raw log of how the decision was
+reached should be hidden, or moved behind a link.
+
+#### Filter before writing
+
+Run each sentence and section through these filters before keeping it.
+Drop anything that fails:
+
+1. Is this a restatement of facts the diff already shows?
+2. Is this content that already lives elsewhere (issue, design doc,
+   prior PR, official spec)?
+   → If yes, replace with one line + link.
+3. Does the reviewer need this to approve or reject the PR?
+4. Am I describing verification that CI already performs automatically?
+
 ## PR Body Checklist
 
 When writing a PR body, cover every applicable item:
@@ -74,10 +129,16 @@ Used by `/pr-selfcheck` to evaluate a PR after creation.
    - Does the PR body account for all files and changes in the diff?
    - Are there unexplained changes?
 
-7. Conciseness
+7. Conciseness (Essence-first principle)
+   - Does the body follow the Essence-first principle in *Writing Style*
+     (why over what, single source of truth, inverted pyramid,
+     information hiding)?
    - Is the body a high-level summary rather than a line-by-line restatement
      of the diff?
    - Are bullet points few and meaningful, each conveying a distinct point?
+   - Is content that lives in another document (issue, design doc, prior
+     PR, official spec) replaced with a one-line summary + link rather
+     than duplicated?
 
 8. Verification completeness
    - Is every changed code path covered by CI, manual test steps in the
