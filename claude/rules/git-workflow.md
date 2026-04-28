@@ -56,6 +56,10 @@ Note: `.worktrees/` is covered by the global gitignore.
    `mktemp --suffix=.md`
    Run this as a standalone Bash command (no command substitution).
    Read the output to obtain the generated path.
+   Then call the Read tool on that path once — `mktemp` creates an empty
+   file, and the Write tool requires the file be Read first if it exists.
+   The Read returns a "shorter than offset" warning, which is expected;
+   the subsequent Write succeeds.
 2. Write the PR body to the generated path using the Write tool:
    `Write(<path from mktemp>)`
    - Follow the repository's PR template if one exists.
@@ -136,6 +140,9 @@ introduced by review fix changes.
   3. Generate a unique temp file path:
      `mktemp --suffix=.md`
      Run this as a standalone Bash command and read the output.
+     Then call the Read tool on that path once — `mktemp` creates an
+     empty file, and the Write tool requires the file be Read first if
+     it exists.
   4. Write the new body to the generated path:
      `Write(<path from mktemp>)`
   5. Execute the edit:
