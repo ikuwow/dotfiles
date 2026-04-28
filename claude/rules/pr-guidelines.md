@@ -52,11 +52,18 @@ Place the most important information first (the point of the change and
 the major design decisions). A reviewer reading only the first few lines
 should be able to tell what kind of PR this is and where to focus.
 
-#### Information hiding (Parnas)
+Reference: Nielsen Norman Group, *Inverted Pyramid: Writing for
+Comprehension*: <https://www.nngroup.com/articles/inverted-pyramid/>
+
+#### Progressive disclosure
 
 Surface only the information a reviewer needs to approve or reject the
 PR. Implementation details and the raw log of how the decision was
-reached should be hidden, or moved behind a link.
+reached should be hidden, or moved behind a link, so they remain
+recoverable without competing for attention.
+
+Reference: Nielsen Norman Group, *Progressive Disclosure*:
+<https://www.nngroup.com/articles/progressive-disclosure/>
 
 #### Filter before writing
 
@@ -130,15 +137,12 @@ Used by `/pr-selfcheck` to evaluate a PR after creation.
    - Are there unexplained changes?
 
 7. Conciseness (Essence-first principle)
-   - Does the body follow the Essence-first principle in *Writing Style*
-     (why over what, single source of truth, inverted pyramid,
-     information hiding)?
+   - Does the body follow the *Essence-first principle* defined in
+     *Writing Style*? (Apply each of the four sub-principles and the
+     "Filter before writing" checklist there.)
    - Is the body a high-level summary rather than a line-by-line restatement
      of the diff?
    - Are bullet points few and meaningful, each conveying a distinct point?
-   - Is content that lives in another document (issue, design doc, prior
-     PR, official spec) replaced with a one-line summary + link rather
-     than duplicated?
 
 8. Verification completeness
    - Is every changed code path covered by CI, manual test steps in the
