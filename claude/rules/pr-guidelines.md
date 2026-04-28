@@ -31,7 +31,9 @@ vs. approaches rejected, what was deliberately left out of scope).
 
 References:
 - Chris Beams, *How to Write a Git Commit Message*: <https://cbea.ms/git-commit/>
-- Linux kernel, *Documentation/process/submitting-patches.rst*
+- Linux kernel, *Submitting patches: the essential guide to getting your
+  code into the kernel*:
+  <https://www.kernel.org/doc/html/latest/process/submitting-patches.html>
 
 #### Single source of truth (DRY)
 
