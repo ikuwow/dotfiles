@@ -76,7 +76,7 @@ Note: `.worktrees/` is covered by the global gitignore.
 ## 5. CI Wait & Review
 
 Three-phase review: pass all mechanical checks first, then run
-code reviews, then consolidate.
+the code review, then consolidate.
 
 ### Phase 1: PR self-review + CI (parallel)
 
@@ -92,38 +92,26 @@ If either fails:
 
 Note: `/pr-selfcheck` is a mechanical check, not a code review.
 Re-running it after fixes is expected. The "single-pass" policy
-applies only to code reviews in Phase 2.
+applies only to the code review in Phase 2.
 
-### Phase 2: Code reviews (parallel)
+### Phase 2: Code review
 
-Once Phase 1 passes, launch both:
+Once Phase 1 passes, launch:
 
-- `/codex:adversarial-review` — challenges design decisions via Codex.
-  Always run in the background (`run_in_background: true`) without
-  asking the user for the execution mode. Do not use `AskUserQuestion`
-  for foreground/background selection.
-  After receiving the review output, immediately provide your own
-  assessment of each finding (agree/disagree with reasoning) and
-  propose concrete next actions. Never output the review verbatim
-  and stop.
-  If it fails with `disable-model-invocation` error, skip and continue
-  with Phase 3. This is a known upstream issue
-  (openai/codex-plugin-cc#211, anthropics/claude-code#43809) — once
-  fixed, this command should work directly via the Skill tool.
 - `/pr-review-toolkit:review-pr` — multi-agent code review (CLAUDE.md
   compliance, bug detection, error handling, test coverage).
   Reports findings in the conversation, does not post PR comments.
 
 ### Phase 3: Consolidate and fix
 
-Once both reviews finish, review the combined results:
+Once the review finishes, review the results:
 
-1. Fix issues found by code reviews.
+1. Fix issues found by the code review.
 2. Push fixes if any code was changed, then re-run
    `/pr-selfcheck` and `gh pr checks --watch` to confirm the PR
    is still consistent and CI passes.
 
-Code reviews are single-pass — do not re-run after fixes.
+The code review is single-pass — do not re-run after fixes.
 `/pr-selfcheck` runs again in Phase 3 to catch inconsistencies
 introduced by review fix changes.
 
