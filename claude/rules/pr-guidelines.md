@@ -30,7 +30,7 @@ the change is needed and the shape of the decision (the approach taken
 vs. approaches rejected, what was deliberately left out of scope).
 
 References:
-- Tim Pope, *A Note About Git Commit Messages*: <https://cbea.ms/git-commit/>
+- Chris Beams, *How to Write a Git Commit Message*: <https://cbea.ms/git-commit/>
 - Linux kernel, *Documentation/process/submitting-patches.rst*
 
 #### Single source of truth (DRY)
