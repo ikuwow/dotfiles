@@ -156,7 +156,7 @@ the user to re-engage.
    self-pace via `ScheduleWakeup`):
 
    ```
-   /loop Watch PR #<number>: each iteration, run all polling commands listed in git-workflow.md Phase 5 step (1). On new activity, react per the rules in Phase 5. Exit when state becomes MERGED or CLOSED.
+   /loop Watch PR #<number>: read `~/.claude/rules/git-workflow.md` Phase 5 step (1) and run each polling command listed there every iteration; react per the action / cap / pacing / exit / conflict rules in the rest of Phase 5; exit when state becomes MERGED or CLOSED.
    ```
 
    Polling commands (run all three every iteration so no signal is
