@@ -156,7 +156,7 @@ the user to re-engage.
    self-pace via `ScheduleWakeup`):
 
    ```
-   /loop Watch PR #<number>: poll `gh pr view <number> --json state,reviewDecision,latestReviews,statusCheckRollup,comments,updatedAt,mergedAt`. On new activity, react per the rules in git-workflow.md Phase 5. Exit when state becomes MERGED or CLOSED.
+   /loop Watch PR #<number>: poll `gh pr view <number> --json state,reviewDecision,latestReviews,statusCheckRollup,comments,updatedAt,mergedAt,headRefName` AND `gh api repos/<owner>/<repo>/pulls/<number>/comments` (inline review comments are not in `gh pr view --json` output and must be fetched separately). On new activity, react per the rules in git-workflow.md Phase 5. Exit when state becomes MERGED or CLOSED.
    ```
 
 2. Before any push (every iteration that would write to origin):
@@ -210,8 +210,9 @@ the user to re-engage.
    - If the user gives a new instruction that supersedes the watch,
      pause / cancel the loop and prioritize the user request.
 
-This step is the final stage of the workflow. It is best-effort by
-design — for event-driven reliability use GitHub Actions instead.
+This is the final phase of Step 5; Step 7 (Cleanup) still runs when
+the loop exits on `MERGED`. The watch is best-effort by design — for
+event-driven reliability use GitHub Actions instead.
 
 ## 6. Update a PR / issue (title / body)
 
@@ -251,6 +252,6 @@ After the PR is merged (or the task is fully done):
 2. Remove the worktree:
    `git worktree remove .worktrees/<branch>`
    - Skip this step if the project rules prohibit worktrees and the
-     branch was created via `git checkout -b` only. Just leave the
-     branch behind for the user to delete (or run `git branch -d
-     <branch>` if explicitly requested).
+     branch was created via `git checkout -b` only. Leave the branch
+     for the user to delete, or run `git branch -d <branch>` if
+     explicitly requested.
