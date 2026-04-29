@@ -75,8 +75,9 @@ Note: `.worktrees/` is covered by the global gitignore.
 
 ## 5. CI Wait & Review
 
-Four phases: pass all mechanical checks, run the code review,
-consolidate fixes, then finalize the PR for review readiness.
+Five phases: pass all mechanical checks, run the code review,
+consolidate fixes, finalize the PR for review readiness, then watch
+PR activity until merge.
 
 ### Phase 1: PR self-review + CI (parallel)
 
@@ -141,6 +142,56 @@ the very end to do all of it at once.
 This step is not optional. Execute it autonomously instead of waiting
 for the user to remind you. Use the section 6 procedure
 (`gh pr edit --body-file`) for body edits.
+
+### Phase 5: Watch PR activity until merge
+
+After Phase 4 marks the PR ready for review, start a `/loop` to watch
+the PR until it is merged or closed. Reviewers (human, Devin, Copilot)
+often act soon after ready, and CI may still be running — the watch
+loop catches activity and reacts autonomously instead of waiting for
+the user to re-engage.
+
+1. Start the watch loop in dynamic mode (no interval — let Claude
+   self-pace via `ScheduleWakeup`):
+
+   ```
+   /loop Watch PR #<number>: poll `gh pr view <number> --json state,reviewDecision,latestReviews,statusCheckRollup,comments,updatedAt,mergedAt`. On new activity, react per the rules in git-workflow.md Phase 5. Exit when state becomes MERGED or CLOSED.
+   ```
+
+2. Each iteration, check for new activity and act:
+   - **Review with `CHANGES_REQUESTED`** or new inline review comment
+     (human, Devin, Copilot, etc.): read the content, modify code,
+     push the fix. Reply via `gh pr comment` only when the comment is
+     a question rather than a fix request.
+   - **Review with `APPROVED`** (no further action requested): report
+     to the user in the next assistant turn, do not act.
+   - **CI failure** (`statusCheckRollup` contains FAILURE): inspect
+     with `gh run view --log-failed`, fix, push.
+   - **CI in progress** (`PENDING` / `IN_PROGRESS`): no action, wait.
+   - **No change since last check**: no action.
+
+3. Pacing guidance for `ScheduleWakeup`:
+   - Recent activity (within last hour): 2–3 minute interval (120–180s).
+   - Quiet: 20–30 minute interval (1200–1800s).
+   - Tool clamps to [60, 3600]s.
+
+4. Exit conditions:
+   - `state` becomes `MERGED` → execute Step 7 (Cleanup) inside the
+     same loop iteration, then end the loop.
+   - `state` becomes `CLOSED` without merge → end the loop, skip
+     cleanup (user may reopen).
+   - Session ends (PC sleep, Claude Code closed) → loop terminates
+     silently. This is accepted as best-effort.
+
+5. Conflict handling:
+   - If the user pushes commits manually while the loop is running,
+     just acknowledge in the next iteration and continue watching.
+     Do not try to revert or duplicate the user's work.
+   - If the user gives a new instruction that supersedes the watch,
+     pause / cancel the loop and prioritize the user request.
+
+This step is the final stage of the workflow. It is best-effort by
+design — for event-driven reliability use GitHub Actions instead.
 
 ## 6. Update a PR / issue (title / body)
 
