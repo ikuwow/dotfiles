@@ -156,8 +156,24 @@ the user to re-engage.
    self-pace via `ScheduleWakeup`):
 
    ```
-   /loop Watch PR #<number>: poll `gh pr view <number> --json state,reviewDecision,latestReviews,statusCheckRollup,comments,updatedAt,mergedAt,headRefName` AND `gh api repos/<owner>/<repo>/pulls/<number>/comments` (inline review comments are not in `gh pr view --json` output and must be fetched separately). On new activity, react per the rules in git-workflow.md Phase 5. Exit when state becomes MERGED or CLOSED.
+   /loop Watch PR #<number>: each iteration, run all polling commands listed in git-workflow.md Phase 5 step (1). On new activity, react per the rules in Phase 5. Exit when state becomes MERGED or CLOSED.
    ```
+
+   Polling commands (run all three every iteration so no signal is
+   missed — top-level fields, threads, and run history each carry
+   information the others lack):
+
+   - PR top-level state:
+     `gh pr view <number> --json state,reviewDecision,latestReviews,statusCheckRollup,comments,updatedAt,mergedAt,headRefName`
+   - Review threads with `isResolved` / `isOutdated` (REST
+     `/pulls/<num>/comments` does not expose resolution status, so
+     use GraphQL):
+     ```
+     gh api graphql -f query='query($owner:String!,$repo:String!,$num:Int!){repository(owner:$owner,name:$repo){pullRequest(number:$num){reviewThreads(first:100){nodes{isResolved isOutdated comments(first:100){nodes{id author{login} body createdAt path line}}}}}}}' -f owner=<owner> -f repo=<repo> -F num=<number>
+     ```
+   - Workflow run history on the PR branch (catches CI cycles
+     `statusCheckRollup` doesn't show — e.g. older runs, re-run jobs):
+     `gh run list --branch <headRefName> --json databaseId,name,status,conclusion,createdAt,headSha,workflowName --limit 20`
 
 2. Before any push (every iteration that would write to origin):
    - Verify the current branch matches the PR's `headRefName`.
@@ -166,17 +182,24 @@ the user to re-engage.
    - Skip the push if either check fails; surface the conflict to the
      user instead of trying to reconcile silently.
 
-3. Each iteration, check for new activity and act:
-   - Review with `CHANGES_REQUESTED` or a new inline review comment
+3. Each iteration, compare against the previous iteration's snapshot
+   (in-session memory; full state tracking is out of scope) and act:
+   - Review with `CHANGES_REQUESTED`, or a new inline review comment
+     in a thread where `isResolved == false` and `isOutdated == false`
      that is clearly a fix request (human, Devin, Copilot, etc.):
      read the content, modify code, push the fix. When the intent is
-     ambiguous (could be question, nit, or discussion), reply via
-     `gh pr comment` instead of pushing code.
+     ambiguous (question, nit, discussion), reply via `gh pr comment`
+     instead of pushing code. Threads with `isResolved == true` or
+     `isOutdated == true` are already addressed or no longer
+     applicable — skip them so previously-fixed comments don't
+     re-trigger work.
    - Review with `APPROVED` (no further action requested): report to
      the user in the next assistant turn, do not act.
-   - CI failure (`statusCheckRollup` contains FAILURE): inspect with
-     `gh run view --log-failed`, fix, push.
-   - CI in progress (`PENDING` / `IN_PROGRESS`): no action, wait.
+   - CI / workflow failure (any `FAILURE` in `statusCheckRollup` or
+     a new `FAILURE` run from `gh run list`): inspect with
+     `gh run view --log-failed <databaseId>`, fix, push.
+   - CI in progress (any `PENDING` / `IN_PROGRESS` / `QUEUED`): no
+     action, wait.
    - No change since last check: no action.
 
 4. Iteration cap for autonomous fix pushes:
