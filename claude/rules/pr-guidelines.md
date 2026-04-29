@@ -14,6 +14,13 @@ and when reviewing your own PR.
 - Anything a reviewer can see by reading the diff does not need to be
   restated in the body. Focus on context the diff cannot convey: why the
   change was made, trade-offs considered, and things to watch out for.
+- Do not hard-wrap paragraphs or list items at a fixed column width.
+  GitHub Flavored Markdown renders soft line breaks inside a paragraph
+  as visible breaks (or runs them together awkwardly), so a body
+  wrapped at ~70 chars looks broken on the web. Write each paragraph
+  as a single line and let the browser wrap it. Use blank lines for
+  paragraph breaks. The same rule applies to issue bodies and PR /
+  issue comments.
 
 ## PR Body Checklist
 
