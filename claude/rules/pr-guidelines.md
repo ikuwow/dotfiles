@@ -15,6 +15,16 @@ and when reviewing your own PR.
   restated in the body. Focus on context the diff cannot convey: why the
   change was made, trade-offs considered, and things to watch out for.
 
+## Body formatting (GitHub PR / issue)
+
+GitHub renders soft line breaks inside paragraphs as visible line breaks
+in issue / PR / comment bodies (unlike standard CommonMark, which folds
+them into spaces). When writing a PR or issue body, put each paragraph
+and each list item on a single source line, no matter how long. Do not
+insert soft line breaks inside a paragraph or list item — they will
+appear as visible line breaks in the rendered body and make the source
+hard to skim and quote in review comments.
+
 ## PR Body Checklist
 
 When writing a PR body, cover every applicable item:
