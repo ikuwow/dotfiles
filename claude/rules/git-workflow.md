@@ -75,8 +75,8 @@ Note: `.worktrees/` is covered by the global gitignore.
 
 ## 5. CI Wait & Review
 
-Three-phase review: pass all mechanical checks first, then run
-the code review, then consolidate.
+Four phases: pass all mechanical checks, run the code review,
+consolidate fixes, then finalize the PR for review readiness.
 
 ### Phase 1: PR self-review + CI (parallel)
 
@@ -114,6 +114,33 @@ Once the review finishes, review the results:
 The code review is single-pass — do not re-run after fixes.
 `/pr-selfcheck` runs again in Phase 3 to catch inconsistencies
 introduced by review fix changes.
+
+### Phase 4: Finalize PR for review readiness
+
+Bring the PR into a state where a human reviewer can act on it. This
+covers three things:
+
+1. Reflect actual verification in the PR body. Update the body to
+   describe what was confirmed, with evidence (HTTP status, Location
+   header, Lambda runtime value, log excerpt, command output summary,
+   etc.) so each claim is auditable later. If the body has checkbox
+   items, sync `[ ]` to `[x]` as each item's condition is confirmed;
+   if not, edit the Verification section text directly. Items still
+   pending stay as `[ ]` (or noted explicitly as pending).
+2. Confirm acceptance criteria are met. Cross-check the PR body and
+   any linked issue against the actual change. If something is unmet,
+   either address it or call it out as out-of-scope / follow-up.
+3. Mark the PR ready for review. Run `gh pr ready <number>` to take it
+   out of draft. Skip if the user asked to keep it as draft.
+
+Update incrementally as conditions are confirmed (e.g., after Phase 1
+CI passes, after apply / deploy succeeds, after post-deploy
+verification with `curl`, `aws logs tail`, etc.) — do not wait until
+the very end to do all of it at once.
+
+This step is not optional. Execute it autonomously instead of waiting
+for the user to remind you. Use the section 6 procedure
+(`gh pr edit --body-file`) for body edits.
 
 ## 6. Update a PR / issue (title / body)
 
