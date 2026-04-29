@@ -159,16 +159,16 @@ the user to re-engage.
    ```
 
 2. Each iteration, check for new activity and act:
-   - **Review with `CHANGES_REQUESTED`** or new inline review comment
+   - Review with `CHANGES_REQUESTED` or new inline review comment
      (human, Devin, Copilot, etc.): read the content, modify code,
      push the fix. Reply via `gh pr comment` only when the comment is
      a question rather than a fix request.
-   - **Review with `APPROVED`** (no further action requested): report
-     to the user in the next assistant turn, do not act.
-   - **CI failure** (`statusCheckRollup` contains FAILURE): inspect
-     with `gh run view --log-failed`, fix, push.
-   - **CI in progress** (`PENDING` / `IN_PROGRESS`): no action, wait.
-   - **No change since last check**: no action.
+   - Review with `APPROVED` (no further action requested): report to
+     the user in the next assistant turn, do not act.
+   - CI failure (`statusCheckRollup` contains FAILURE): inspect with
+     `gh run view --log-failed`, fix, push.
+   - CI in progress (`PENDING` / `IN_PROGRESS`): no action, wait.
+   - No change since last check: no action.
 
 3. Pacing guidance for `ScheduleWakeup`:
    - Recent activity (within last hour): 2–3 minute interval (120–180s).
