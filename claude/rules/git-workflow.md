@@ -14,8 +14,9 @@ Follow each step in order. Skip steps that don't apply.
   leads to redundant copy-and-delete work.
 - Never modify commits that have already been pushed.
 - Implementation plans MUST include the full workflow from Step 1
-  through Step 5. Never produce a plan that ends at "edit the file"
-  without covering commit, push, PR creation, and CI review.
+  through Step 7 (cleanup). Never produce a plan that ends at "edit
+  the file" without covering commit, push, PR creation, CI review,
+  the post-ready watch loop, and cleanup.
 
 ## 1. Start Work
 
@@ -158,11 +159,19 @@ the user to re-engage.
    /loop Watch PR #<number>: poll `gh pr view <number> --json state,reviewDecision,latestReviews,statusCheckRollup,comments,updatedAt,mergedAt`. On new activity, react per the rules in git-workflow.md Phase 5. Exit when state becomes MERGED or CLOSED.
    ```
 
-2. Each iteration, check for new activity and act:
-   - Review with `CHANGES_REQUESTED` or new inline review comment
-     (human, Devin, Copilot, etc.): read the content, modify code,
-     push the fix. Reply via `gh pr comment` only when the comment is
-     a question rather than a fix request.
+2. Before any push (every iteration that would write to origin):
+   - Verify the current branch matches the PR's `headRefName`.
+   - `git fetch` and confirm local HEAD is still ahead of
+     `origin/<branch>` (no manual user push has happened in between).
+   - Skip the push if either check fails; surface the conflict to the
+     user instead of trying to reconcile silently.
+
+3. Each iteration, check for new activity and act:
+   - Review with `CHANGES_REQUESTED` or a new inline review comment
+     that is clearly a fix request (human, Devin, Copilot, etc.):
+     read the content, modify code, push the fix. When the intent is
+     ambiguous (could be question, nit, or discussion), reply via
+     `gh pr comment` instead of pushing code.
    - Review with `APPROVED` (no further action requested): report to
      the user in the next assistant turn, do not act.
    - CI failure (`statusCheckRollup` contains FAILURE): inspect with
@@ -170,12 +179,23 @@ the user to re-engage.
    - CI in progress (`PENDING` / `IN_PROGRESS`): no action, wait.
    - No change since last check: no action.
 
-3. Pacing guidance for `ScheduleWakeup`:
-   - Recent activity (within last hour): 2–3 minute interval (120–180s).
-   - Quiet: 20–30 minute interval (1200–1800s).
+4. Iteration cap for autonomous fix pushes:
+   - Stop pushing autonomous fixes after 3 fix commits in this
+     loop. Beyond that, switch to reply-only mode and notify the
+     user that the PR appears to need human attention. This
+     prevents runaway loops when an automated reviewer keeps
+     re-requesting changes on each push.
+
+5. Pacing guidance for `ScheduleWakeup` (Anthropic prompt cache has a
+   5-minute TTL — sleeping past 300s costs a full cache rebuild on
+   wake-up):
+   - Recent activity (within last hour): 120–270s. Stays inside the
+     cache TTL so the next iteration is cheap. Never pick exactly
+     300s — it pays the cache miss without amortizing the wait.
+   - Quiet: 1200–1800s. One cache miss buys a much longer wait.
    - Tool clamps to [60, 3600]s.
 
-4. Exit conditions:
+6. Exit conditions:
    - `state` becomes `MERGED` → execute Step 7 (Cleanup) inside the
      same loop iteration, then end the loop.
    - `state` becomes `CLOSED` without merge → end the loop, skip
@@ -183,7 +203,7 @@ the user to re-engage.
    - Session ends (PC sleep, Claude Code closed) → loop terminates
      silently. This is accepted as best-effort.
 
-5. Conflict handling:
+7. Conflict handling:
    - If the user pushes commits manually while the loop is running,
      just acknowledge in the next iteration and continue watching.
      Do not try to revert or duplicate the user's work.
@@ -230,3 +250,7 @@ After the PR is merged (or the task is fully done):
    `cd <repository root>`
 2. Remove the worktree:
    `git worktree remove .worktrees/<branch>`
+   - Skip this step if the project rules prohibit worktrees and the
+     branch was created via `git checkout -b` only. Just leave the
+     branch behind for the user to delete (or run `git branch -d
+     <branch>` if explicitly requested).
