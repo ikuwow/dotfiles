@@ -14,8 +14,9 @@ Follow each step in order. Skip steps that don't apply.
   leads to redundant copy-and-delete work.
 - Never modify commits that have already been pushed.
 - Implementation plans MUST include the full workflow from Step 1
-  through Step 5. Never produce a plan that ends at "edit the file"
-  without covering commit, push, PR creation, and CI review.
+  through Step 7 (cleanup). Never produce a plan that ends at "edit
+  the file" without covering commit, push, PR creation, CI review,
+  the post-ready watch loop, and cleanup.
 
 ## 1. Start Work
 
@@ -75,8 +76,9 @@ Note: `.worktrees/` is covered by the global gitignore.
 
 ## 5. CI Wait & Review
 
-Four phases: pass all mechanical checks, run the code review,
-consolidate fixes, then finalize the PR for review readiness.
+Five phases: pass all mechanical checks, run the code review,
+consolidate fixes, finalize the PR for review readiness, then watch
+PR activity until merge.
 
 ### Phase 1: PR self-review + CI (parallel)
 
@@ -142,6 +144,99 @@ This step is not optional. Execute it autonomously instead of waiting
 for the user to remind you. Use the section 6 procedure
 (`gh pr edit --body-file`) for body edits.
 
+### Phase 5: Watch PR activity until merge
+
+After Phase 4 marks the PR ready for review, start a `/loop` to watch
+the PR until it is merged or closed. Reviewers (human, Devin, Copilot)
+often act soon after ready, and CI may still be running — the watch
+loop catches activity and reacts autonomously instead of waiting for
+the user to re-engage.
+
+1. Start the watch loop in dynamic mode (no interval — let Claude
+   self-pace via `ScheduleWakeup`):
+
+   ```
+   /loop Watch PR #<number>: read `~/.claude/rules/git-workflow.md` Phase 5 step (1) and run each polling command listed there every iteration; react per the action / cap / pacing / exit / conflict rules in the rest of Phase 5; exit when state becomes MERGED or CLOSED.
+   ```
+
+   Polling commands (run all three every iteration so no signal is
+   missed — top-level fields, threads, and run history each carry
+   information the others lack):
+
+   - PR top-level state:
+     `gh pr view <number> --json state,reviewDecision,latestReviews,statusCheckRollup,comments,updatedAt,mergedAt,headRefName`
+   - Review threads with `isResolved` / `isOutdated` (REST
+     `/pulls/<num>/comments` does not expose resolution status, so
+     use GraphQL):
+     ```
+     gh api graphql -f query='query($owner:String!,$repo:String!,$num:Int!){repository(owner:$owner,name:$repo){pullRequest(number:$num){reviewThreads(first:100){nodes{isResolved isOutdated comments(first:100){nodes{id author{login} body createdAt path line}}}}}}}' -f owner=<owner> -f repo=<repo> -F num=<number>
+     ```
+   - Workflow run history on the PR branch (catches CI cycles
+     `statusCheckRollup` doesn't show — e.g. older runs, re-run jobs):
+     `gh run list --branch <headRefName> --json databaseId,name,status,conclusion,createdAt,headSha,workflowName --limit 20`
+
+2. Before any push (every iteration that would write to origin):
+   - Verify the current branch matches the PR's `headRefName`.
+   - `git fetch` and confirm local HEAD is still ahead of
+     `origin/<branch>` (no manual user push has happened in between).
+   - Skip the push if either check fails; surface the conflict to the
+     user instead of trying to reconcile silently.
+
+3. Each iteration, compare against the previous iteration's snapshot
+   (in-session memory; full state tracking is out of scope) and act:
+   - Review with `CHANGES_REQUESTED`, or a new inline review comment
+     in a thread where `isResolved == false` and `isOutdated == false`
+     that is clearly a fix request (human, Devin, Copilot, etc.):
+     read the content, modify code, push the fix. When the intent is
+     ambiguous (question, nit, discussion), reply via `gh pr comment`
+     instead of pushing code. Threads with `isResolved == true` or
+     `isOutdated == true` are already addressed or no longer
+     applicable — skip them so previously-fixed comments don't
+     re-trigger work.
+   - Review with `APPROVED` (no further action requested): report to
+     the user in the next assistant turn, do not act.
+   - CI / workflow failure (any `FAILURE` in `statusCheckRollup` or
+     a new `FAILURE` run from `gh run list`): inspect with
+     `gh run view --log-failed <databaseId>`, fix, push.
+   - CI in progress (any `PENDING` / `IN_PROGRESS` / `QUEUED`): no
+     action, wait.
+   - No change since last check: no action.
+
+4. Iteration cap for autonomous fix pushes:
+   - Stop pushing autonomous fixes after 3 fix commits in this
+     loop. Beyond that, switch to reply-only mode and notify the
+     user that the PR appears to need human attention. This
+     prevents runaway loops when an automated reviewer keeps
+     re-requesting changes on each push.
+
+5. Pacing guidance for `ScheduleWakeup` (Anthropic prompt cache has a
+   5-minute TTL — sleeping past 300s costs a full cache rebuild on
+   wake-up):
+   - Recent activity (within last hour): 120–270s. Stays inside the
+     cache TTL so the next iteration is cheap. Never pick exactly
+     300s — it pays the cache miss without amortizing the wait.
+   - Quiet: 1200–1800s. One cache miss buys a much longer wait.
+   - Tool clamps to [60, 3600]s.
+
+6. Exit conditions:
+   - `state` becomes `MERGED` → execute Step 7 (Cleanup) inside the
+     same loop iteration, then end the loop.
+   - `state` becomes `CLOSED` without merge → end the loop, skip
+     cleanup (user may reopen).
+   - Session ends (PC sleep, Claude Code closed) → loop terminates
+     silently. This is accepted as best-effort.
+
+7. Conflict handling:
+   - If the user pushes commits manually while the loop is running,
+     just acknowledge in the next iteration and continue watching.
+     Do not try to revert or duplicate the user's work.
+   - If the user gives a new instruction that supersedes the watch,
+     pause / cancel the loop and prioritize the user request.
+
+This is the final phase of Step 5; Step 7 (Cleanup) still runs when
+the loop exits on `MERGED`. The watch is best-effort by design — for
+event-driven reliability use GitHub Actions instead.
+
 ## 6. Update a PR / issue (title / body)
 
 - Update title:
@@ -179,3 +274,7 @@ After the PR is merged (or the task is fully done):
    `cd <repository root>`
 2. Remove the worktree:
    `git worktree remove .worktrees/<branch>`
+   - Skip this step if the project rules prohibit worktrees and the
+     branch was created via `git checkout -b` only. Leave the branch
+     for the user to delete, or run `git branch -d <branch>` if
+     explicitly requested.
