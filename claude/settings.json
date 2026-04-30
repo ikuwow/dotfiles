@@ -31,6 +31,8 @@
       "Bash(gh pr ready *)",
       "Bash(gh pr create *)",
       "Bash(gh pr edit *)",
+      "Bash(gh pr update-branch)",
+      "Bash(gh pr update-branch *)",
       "Bash(gh issue create *)",
       "Bash(gh api *)",
       "Bash(docker compose ps *)",
