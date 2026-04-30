@@ -14,6 +14,8 @@ and when reviewing your own PR.
 - Anything a reviewer can see by reading the diff does not need to be
   restated in the body. Focus on context the diff cannot convey: why the
   change was made, trade-offs considered, and things to watch out for.
+- If a linked issue or doc already explains the background, keep the PR
+  body to a brief pointer and delegate detail there. Do not restate.
 - Do not hard-wrap paragraphs or list items at a fixed column width.
   GitHub Flavored Markdown renders soft line breaks inside a paragraph
   as visible breaks (or runs them together awkwardly), so a body
@@ -33,6 +35,10 @@ When writing a PR body, cover every applicable item:
 2. Scope
    - Clearly describe the boundary of the change.
    - Call out anything intentionally left out of scope.
+   - A PR should be a self-contained unit. Verification items, acceptance
+     criteria, and follow-up actions that depend on changes outside this
+     PR's diff (other repos, downstream releases, E2E flows) belong in
+     the parent issue, not in the PR body.
 
 3. Sources and references
    - Provide official documentation URLs or other authoritative sources
@@ -85,6 +91,8 @@ Used by `/pr-selfcheck` to evaluate a PR after creation.
    - Is the body a high-level summary rather than a line-by-line restatement
      of the diff?
    - Are bullet points few and meaningful, each conveying a distinct point?
+   - Is content duplicated from a linked issue or doc? If so, remove it
+     and let the linked source explain.
 
 8. Verification completeness
    - Is every changed code path covered by CI, manual test steps in the
@@ -92,3 +100,5 @@ Used by `/pr-selfcheck` to evaluate a PR after creation.
    - Are there paths that only run in a specific target environment
      (e.g., Claude Code web, external services) without a stated plan
      to verify them?
+   - Are all verification items scoped to this PR's diff alone?
+     Cross-component or E2E items belong in the parent issue.
