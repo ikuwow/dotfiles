@@ -9,19 +9,33 @@ disambiguate legitimate uses (名詞 like 「正直者」, 事実開示 like
 Stop chain: the second invocation arrives with stop_hook_active=true and
 is allowed through, preventing infinite loops.
 
-I/O failures (stdin parse, missing transcript_path, transcript read) are
-swallowed and the hook exits 0 — a Stop hook that wedges the assistant
-is far worse than one that silently no-ops. A short stderr message is
-emitted on each fall-through so the operator can grep hook logs to
-distinguish "rule not violated" from "hook silently broken".
+I/O failures (stdin parse, missing transcript_path, transcript read,
+poll timeout) are swallowed and the hook exits 0 — a Stop hook that
+wedges the assistant is far worse than one that silently no-ops. A
+short stderr message is emitted on each terminal fall-through so the
+operator can grep hook logs to distinguish "rule not violated" from
+"hook silently broken". Transient read failures inside the poll loop
+are retried silently; the last one is surfaced via the timeout
+breadcrumb if the loop exhausts.
+
+For pure-text turns (no tool calls), Claude Code can invoke the Stop
+hook before the assistant event is flushed to the transcript JSONL.
+When the initial read returns no current-turn assistant text, the
+hook polls the transcript at POLL_INTERVAL_S intervals up to
+POLL_MAX_ITERATIONS iterations before giving up fail-open. See PR
+#153 for the empirical basis of these values.
 
 Spec: https://code.claude.com/docs/en/hooks
 """
 import json
 import re
 import sys
+import time
 
 FORBIDDEN_PATTERN = re.compile(r"正直|実は|本当のところ")
+
+POLL_INTERVAL_S = 0.05
+POLL_MAX_ITERATIONS = 10
 
 REASON = (
     "Your response contains one of 「正直」「実は」「本当のところ」.\n\n"
@@ -187,6 +201,32 @@ def main():
         sys.exit(0)
 
     text = collect_current_turn_assistant_text(events)
+
+    if not text:
+        poll_start = time.monotonic()
+        last_err = None
+        for _ in range(POLL_MAX_ITERATIONS):
+            time.sleep(POLL_INTERVAL_S)
+            try:
+                with open(transcript_path, encoding="utf-8") as f:
+                    events = [json.loads(line) for line in f if line.strip()]
+            except (OSError, json.JSONDecodeError) as e:
+                last_err = e
+                continue
+            text = collect_current_turn_assistant_text(events)
+            if text:
+                break
+
+        if not text:
+            elapsed_ms = int((time.monotonic() - poll_start) * 1000)
+            err_suffix = f" last_err={last_err!r}" if last_err else ""
+            print(
+                f"block_excuse_phrases: poll timeout after {elapsed_ms}ms "
+                f"events={len(events)} transcript={transcript_path}{err_suffix}",
+                file=sys.stderr,
+            )
+            sys.exit(0)
+
     if is_forbidden(text):
         print(json.dumps({"decision": "block", "reason": REASON}))
     sys.exit(0)
