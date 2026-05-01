@@ -295,6 +295,10 @@
         "hooks": [
           {
             "type": "command",
+            "command": "python3 ~/.claude/hooks/block_excuse_phrases.py"
+          },
+          {
+            "type": "command",
             "command": "noti --title 'Claude Code' --message 'Done! Yay!'"
           }
         ]
