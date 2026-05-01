@@ -13,10 +13,15 @@ Follow each step in order. Skip steps that don't apply.
   worktree (or feature branch) first. Creating files before branching
   leads to redundant copy-and-delete work.
 - Never modify commits that have already been pushed.
-- Implementation plans MUST include the full workflow from Step 1
-  through Step 7 (cleanup). Never produce a plan that ends at "edit
-  the file" without covering commit, push, PR creation, CI review,
-  the post-ready watch loop, and cleanup.
+- Implementation plans MUST reference this workflow as a checklist
+  rather than restating its detailed steps. The full content is
+  already in system context, so plans MUST NOT duplicate it (and
+  MUST NOT instruct you to re-Read this file). Recommended phrasing:
+  "After implementation, follow git-workflow.md Steps 2–7 (commit /
+  push / PR creation / CI wait / Phase 5 watch loop / cleanup)."
+  Plans must still surface scope-specific deviations explicitly —
+  e.g., "skip Step 7 because the project rules prohibit worktrees"
+  or "stop after Step 4, this PR stays as draft".
 
 ## 1. Start Work
 
