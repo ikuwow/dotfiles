@@ -13,10 +13,23 @@ Follow each step in order. Skip steps that don't apply.
   worktree (or feature branch) first. Creating files before branching
   leads to redundant copy-and-delete work.
 - Never modify commits that have already been pushed.
-- Implementation plans MUST include the full workflow from Step 1
-  through Step 7 (cleanup). Never produce a plan that ends at "edit
-  the file" without covering commit, push, PR creation, CI review,
-  the post-ready watch loop, and cleanup.
+- Implementation plans MUST cover the full workflow as a bullet-list
+  checklist — from branch setup (Step 1, before implementation)
+  through cleanup (Step 7) — not just the post-edit steps. The
+  detailed procedures (mktemp usage, gh commands, polling commands,
+  etc.) live in this file and are already in system context, so plans
+  MUST NOT restate them and MUST NOT instruct you to re-Read this
+  file. Recommended bullet form:
+  - Step 1: branch creation (note worktree vs branch-only per project rules)
+  - Step 2: commit
+  - Step 3: push
+  - Step 4: draft PR creation
+  - Step 5: CI wait & review (Phases 1–5)
+  - Step 7: cleanup after merge
+  (Step 6 is a utility section; reference it only if the plan involves
+  editing an existing PR/issue body.) Plans must still surface
+  scope-specific deviations explicitly — e.g., "skip Step 7 because
+  the branch is kept" or "stop after Step 4, this PR stays as draft".
 
 ## 1. Start Work
 
