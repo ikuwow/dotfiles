@@ -14,8 +14,10 @@ and when reviewing your own PR.
 - Anything a reviewer can see by reading the diff does not need to be
   restated in the body. Focus on context the diff cannot convey: why the
   change was made, trade-offs considered, and things to watch out for.
-- If a linked issue or doc already explains the background, keep the PR
-  body to a brief pointer and delegate detail there. Do not restate.
+- If a linked issue, doc, or companion PR (multi-repo change with a
+  primary PR carrying the rationale) already explains the background,
+  keep the PR body to a brief pointer and delegate detail there. Do
+  not restate.
 - Do not hard-wrap paragraphs or list items at a fixed column width.
   GitHub Flavored Markdown renders soft line breaks inside a paragraph
   as visible breaks (or runs them together awkwardly), so a body
