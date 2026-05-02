@@ -259,7 +259,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ~/.claude/hooks/block_cd_chaining.py"
+            "command": "f=~/.claude/hooks/block_cd_chaining.py; if [ -f \"$f\" ] && command -v python3 >/dev/null; then python3 \"$f\"; fi"
           }
         ]
       }
@@ -270,11 +270,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ~/.claude/hooks/approve_git_gh_commands.py"
+            "command": "f=~/.claude/hooks/approve_git_gh_commands.py; if [ -f \"$f\" ] && command -v python3 >/dev/null; then python3 \"$f\"; fi"
           },
           {
             "type": "command",
-            "command": "python3 ~/.claude/hooks/approve_gh_graphql_readonly.py"
+            "command": "f=~/.claude/hooks/approve_gh_graphql_readonly.py; if [ -f \"$f\" ] && command -v python3 >/dev/null; then python3 \"$f\"; fi"
           }
         ]
       }
@@ -285,7 +285,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "noti --title 'Claude Code' --message 'Requires response.'"
+            "command": "if command -v noti >/dev/null; then noti --title 'Claude Code' --message 'Requires response.'; fi"
           }
         ]
       }
@@ -296,11 +296,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ~/.claude/hooks/block_excuse_phrases.py"
+            "command": "f=~/.claude/hooks/block_excuse_phrases.py; if [ -f \"$f\" ] && command -v python3 >/dev/null; then python3 \"$f\"; fi"
           },
           {
             "type": "command",
-            "command": "noti --title 'Claude Code' --message 'Done! Yay!'"
+            "command": "if command -v noti >/dev/null; then noti --title 'Claude Code' --message 'Done! Yay!'; fi"
           }
         ]
       }
