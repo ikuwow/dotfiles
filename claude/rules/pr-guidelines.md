@@ -25,6 +25,18 @@ and when reviewing your own PR.
   as a single line and let the browser wrap it. Use blank lines for
   paragraph breaks. The same rule applies to issue bodies and PR /
   issue comments.
+- Do not paraphrase the diff. Lists of files changed, "added X to Y",
+  "renamed A → B", per-file change summaries — anything a reviewer
+  recovers by reading the diff itself — does not belong in the body.
+  Refer to the diff for "what changed"; the body explains "why" and
+  the decisions the diff cannot show.
+- Separate PR-direct content from supplementary context. The main
+  body covers only what the reviewer needs to evaluate this PR
+  (purpose, decisions made, verification). Background not required
+  to evaluate the diff (incident history, the full alternatives
+  exploration, design narrative) goes in a separate "Notes" or
+  "Background" section at the end, or in a linked issue, so the
+  reviewer can skip it.
 
 ## PR Body Checklist
 
@@ -52,12 +64,21 @@ When writing a PR body, cover every applicable item:
    - Do NOT use auto-close keywords (`Closes`, `Fixes`, `Resolves`).
 
 5. Verification
-   - Describe only what was actually verified under "confirmed" items.
-   - Do not claim verification that was not performed.
-   - When the change affects environments that CI cannot replicate
-     (e.g., Claude Code web, external services), include manual test
-     steps the reviewer can follow to verify in the real environment
-     before merging.
+   - Actively attempt every verification within reach before drafting
+     the Verification section: shell commands, API calls, file
+     inspection, mocked reproduction of the failure mode, simulated
+     missing-config tests, etc. The most common failure mode this
+     rule prevents is the author overestimating what is "untestable"
+     and underestimating what shell-level reproduction can cover.
+     Reaching for "Pending" / "deferred" without first attempting
+     is itself the violation.
+   - The Verification section lists only items actually verified,
+     with evidence (command output, exit code, log excerpt).
+   - Items that genuinely require interactive UI, user-only
+     credentials, target environments unreachable from a shell, or
+     the live session itself go under a separate "User to verify"
+     subsection with explicit reproduction steps and a one-line
+     reason why the author could not verify them.
 
 ## Review Criteria
 
@@ -92,13 +113,23 @@ Used by `/pr-selfcheck` to evaluate a PR after creation.
 7. Conciseness
    - Is the body a high-level summary rather than a line-by-line restatement
      of the diff?
+   - Does the body paraphrase the diff (file lists, "added X to Y",
+     per-file summaries)? If so, remove — the reviewer reads the diff.
    - Are bullet points few and meaningful, each conveying a distinct point?
+   - Is supplementary context (background, full alternatives narrative,
+     incident history) mixed into the main body? If so, move it to a
+     "Notes" / "Background" section at the end, or link an external doc.
    - Is content duplicated from a linked issue or doc? If so, remove it
      and let the linked source explain.
 
 8. Verification completeness
    - Is every changed code path covered by CI, manual test steps in the
      PR body, or another verification mechanism?
+   - Did the author actually attempt the verifications they could reach
+     (shell-level reproduction, API calls, mocked failure modes), or
+     did they punt verifiable items to "Pending" / "deferred" / "User
+     to verify"? Items mechanically reachable from a shell or API
+     belong in the author-verified list, not "User to verify".
    - Are there paths that only run in a specific target environment
      (e.g., Claude Code web, external services) without a stated plan
      to verify them?
