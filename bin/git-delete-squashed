@@ -2,7 +2,7 @@
 
 # ref: https://github.com/not-an-aardvark/git-delete-squashed#sh
 
-set -e
+set -eu
 
 default_branch=main
 if [ ! "$(git rev-parse --verify "$default_branch" 2>/dev/null)" ];then
