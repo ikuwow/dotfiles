@@ -71,12 +71,20 @@ When writing a PR body, cover every applicable item:
    - Do NOT use auto-close keywords (`Closes`, `Fixes`, `Resolves`).
 
 5. Verification
-   - Describe only what was actually verified under "confirmed" items.
-   - Do not claim verification that was not performed.
-   - When the change affects environments that CI cannot replicate
-     (e.g., Claude Code web, external services), include manual test
-     steps the reviewer can follow to verify in the real environment
-     before merging.
+   - Attempt every verification within reach before drafting this
+     section: shell commands, API calls, file inspection, mocked
+     failure modes, simulated missing-config tests. Punting verifiable
+     items to "Pending" or "User to verify" without first attempting
+     is itself the violation — the common failure mode is overstating
+     what is "untestable" and underestimating what shell-level
+     reproduction can cover.
+   - List only items actually verified, with evidence (command output,
+     exit code, log excerpt).
+   - Items that genuinely require interactive UI, user-only
+     credentials, target environments unreachable from a shell, or
+     the live session itself go under a separate "User to verify"
+     subsection with reproduction steps and a one-line reason why the
+     author could not verify them.
 
 ## Review Criteria
 
@@ -126,6 +134,10 @@ Used by `/pr-selfcheck` to evaluate a PR after creation.
      point?
 
 8. Verification completeness
+   - Did the author attempt the verifications they could reach
+     (shell, API, mocked failures), or punt them to "Pending" /
+     "User to verify"? Items reachable from a shell or API belong
+     in the verified list.
    - Is every changed code path covered by CI, manual test steps in the
      PR body, or another verification mechanism?
    - Are there paths that only run in a specific target environment
