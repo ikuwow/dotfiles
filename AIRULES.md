@@ -58,7 +58,7 @@
 6. 作業開始・ブランチ・push・PR の作成・更新は `~/.claude/rules/git-workflow.md` に従う
     - Claude Code の `--worktree` オプション・EnterWorktree ツールは使用しない（既知の不具合あり）
     - default branch への直接コミットは禁止
-    - コミット作成時はメッセージ末尾に空行を入れて `Co-authored-by` を記載する（具体形式は git-workflow.md）
+    - コミット作成時はメッセージをシングルクォートで渡し、末尾に空行を入れて `Co-authored-by` を記載する（具体形式・heredoc fallback は git-workflow.md）
     - `gh pr create --body` / `gh issue create --body` ではなく `--body-file` を使う（"quoted newline + #" security pre-check が hooks で回避不可能なため。手順は git-workflow.md）
     - PR 本文・issue コメント等のリモートコンテンツ編集前は最新内容を取得し、変更前後の差分を会話中に出力する（手順は git-workflow.md）
 7. シェルコマンドは `&&` や `;` で連結せず、1コマンドずつ個別に実行する（パーミッション制御を正しく機能させるため）
