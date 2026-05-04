@@ -83,6 +83,8 @@ if [ -f "$CLOUDSDK_CONFIG/active_config" ]; then
   export GC_ACTIVE_CONFIG
 fi
 
+export COLIMA_HOME="$XDG_CONFIG_HOME/colima"
+
 # Version managers (mise, aqua)
 export PATH="${AQUA_ROOT_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/aquaproj-aqua}/bin:$PATH"
 [[ $(command -v mise) ]] && eval "$(mise activate bash)"
