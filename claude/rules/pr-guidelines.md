@@ -5,19 +5,38 @@ and when reviewing your own PR.
 
 ## Writing Style
 
-- Summarize the change at a high level. Do not mirror the diff line-by-line.
+A PR body is a summary that helps a reviewer decide, not a complete
+record of the change. Follow the Essence-first principle: surface
+what a reviewer needs to approve or reject the PR; everything else
+lives in the diff, the issue, or a linked source.
+
+### Four principles
+
+- Why over what — The diff already shows what changed. The body
+  explains why, and the shape of the decision (the approach taken
+  vs. approaches rejected, what was deliberately left out of scope,
+  risks or things a reviewer should watch out for). Do not paraphrase
+  the diff (file lists, "added X to Y", per-file summaries).
+- Single source of truth (DRY) — If the rationale, background, or
+  requirements live elsewhere (issue, design doc, ADR, prior PR,
+  official spec), do not duplicate them. Replace with a one-line
+  summary plus a link. Two copies drift apart over time.
+- Inverted pyramid — Place the most important information first. A
+  reviewer reading only the first few lines should be able to tell
+  what kind of PR this is and where to focus.
+- Progressive disclosure — Surface only what a reviewer needs to
+  decide. Move implementation details, history, or full alternatives
+  narrative behind a link or to a "Notes" / "Background" section at
+  the end.
+
+### Style rules
+
 - Keep bullet points few and meaningful. Each bullet should convey a
   distinct decision or outcome, not an individual code change.
-- Focus on what changes from the user's or system's perspective — behavior
-  changes, new capabilities, removed limitations, etc. — rather than
-  listing implementation details (resources added, files touched).
-- Anything a reviewer can see by reading the diff does not need to be
-  restated in the body. Focus on context the diff cannot convey: why the
-  change was made, trade-offs considered, and things to watch out for.
-- If a linked issue, doc, or companion PR (multi-repo change with a
-  primary PR carrying the rationale) already explains the background,
-  keep the PR body to a brief pointer and delegate detail there. Do
-  not restate.
+- Focus on what changes from the user's or system's perspective —
+  behavior changes, new capabilities, removed limitations, etc. —
+  rather than listing implementation details (resources added, files
+  touched).
 - Do not hard-wrap paragraphs or list items at a fixed column width.
   GitHub Flavored Markdown renders soft line breaks inside a paragraph
   as visible breaks (or runs them together awkwardly), so a body
@@ -89,12 +108,22 @@ Used by `/pr-selfcheck` to evaluate a PR after creation.
    - Does the PR body account for all files and changes in the diff?
    - Are there unexplained changes?
 
-7. Conciseness
-   - Is the body a high-level summary rather than a line-by-line restatement
-     of the diff?
-   - Are bullet points few and meaningful, each conveying a distinct point?
-   - Is content duplicated from a linked issue or doc? If so, remove it
-     and let the linked source explain.
+7. Conciseness (Essence-first)
+   - Is the body a high-level summary rather than a line-by-line
+     restatement of the diff?
+   - Does any sentence paraphrase facts the diff already shows
+     (file lists, "added X to Y", per-file summaries)? If so,
+     remove it. (Why over what)
+   - Is content duplicated from a linked issue, doc, or prior PR?
+     Replace with a one-line summary plus link. (Single source of
+     truth)
+   - Does the reader hit the most important information in the first
+     few lines? (Inverted pyramid)
+   - Is implementation detail, history, or alternatives narrative
+     mixed into the main body? Move it to a "Notes" / "Background"
+     section at the end. (Progressive disclosure)
+   - Are bullet points few and meaningful, each conveying a distinct
+     point?
 
 8. Verification completeness
    - Is every changed code path covered by CI, manual test steps in the
