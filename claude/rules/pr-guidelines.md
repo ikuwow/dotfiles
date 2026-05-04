@@ -73,18 +73,19 @@ When writing a PR body, cover every applicable item:
 5. Verification
    - Attempt every verification within reach before drafting this
      section: shell commands, API calls, file inspection, mocked
-     failure modes, simulated missing-config tests. Punting verifiable
-     items to "Pending" or "User to verify" without first attempting
-     is itself the violation — the common failure mode is overstating
-     what is "untestable" and underestimating what shell-level
-     reproduction can cover.
+     failure modes, simulated missing-config tests. Punting reachable
+     items to "Pending" or "User to verify" (see below) is itself the
+     violation — overstating what is "untestable" is the common
+     failure mode.
    - List only items actually verified, with evidence (command output,
      exit code, log excerpt).
    - Items that genuinely require interactive UI, user-only
      credentials, target environments unreachable from a shell, or
      the live session itself go under a separate "User to verify"
      subsection with reproduction steps and a one-line reason why the
-     author could not verify them.
+     author could not verify them. Scope still applies (§2): items
+     that depend on changes outside this PR's diff belong in the
+     parent issue, not here.
 
 ## Review Criteria
 
