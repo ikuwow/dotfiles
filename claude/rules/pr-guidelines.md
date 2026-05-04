@@ -14,9 +14,9 @@ lives in the diff, the issue, or a linked source.
 
 - Why over what — The diff already shows what changed. The body
   explains why, and the shape of the decision (the approach taken
-  vs. approaches rejected, what was deliberately left out of scope).
-  Do not paraphrase the diff (file lists, "added X to Y", per-file
-  summaries).
+  vs. approaches rejected, what was deliberately left out of scope,
+  risks or things a reviewer should watch out for). Do not paraphrase
+  the diff (file lists, "added X to Y", per-file summaries).
 - Single source of truth (DRY) — If the rationale, background, or
   requirements live elsewhere (issue, design doc, ADR, prior PR,
   official spec), do not duplicate them. Replace with a one-line
