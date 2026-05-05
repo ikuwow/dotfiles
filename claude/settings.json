@@ -320,20 +320,13 @@
     "skill-creator@claude-plugins-official": true,
     "claude-code-setup@claude-plugins-official": true,
     "hookify@claude-plugins-official": true,
-    "security-guidance@claude-plugins-official": true,
-    "superpowers@superpowers-marketplace": true
+    "security-guidance@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
     "openai-codex": {
       "source": {
         "source": "github",
         "repo": "openai/codex-plugin-cc"
-      }
-    },
-    "superpowers-marketplace": {
-      "source": {
-        "source": "github",
-        "repo": "obra/superpowers-marketplace"
       }
     }
   },

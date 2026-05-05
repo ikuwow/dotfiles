@@ -41,5 +41,3 @@ claude plugin install skill-creator@claude-plugins-official
 claude plugin install claude-code-setup@claude-plugins-official
 claude plugin install hookify@claude-plugins-official
 claude plugin install security-guidance@claude-plugins-official
-claude plugin marketplace add obra/superpowers-marketplace
-claude plugin install superpowers@superpowers-marketplace
