@@ -325,8 +325,10 @@
     }
   },
   "autoUpdatesChannel": "stable",
-  "voiceEnabled": true,
+  "theme": "auto",
   "remoteControlAtStartup": true,
+  "agentPushNotifEnabled": true,
+  "voiceEnabled": true,
   "feedbackSurveyState": {
     "lastShownTime": 1754272823676
   },
