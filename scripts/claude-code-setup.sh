@@ -34,3 +34,12 @@ mcp_add Context7 '{"command":"npx","args":["-y","@upstash/context7-mcp"]}'
 claude plugin marketplace add openai/codex-plugin-cc
 claude plugin install codex@openai-codex
 claude plugin install pr-review-toolkit@claude-plugins-official
+claude plugin install gopls-lsp@claude-plugins-official
+claude plugin install session-report@claude-plugins-official
+claude plugin install claude-md-management@claude-plugins-official
+claude plugin install skill-creator@claude-plugins-official
+claude plugin install claude-code-setup@claude-plugins-official
+claude plugin install hookify@claude-plugins-official
+claude plugin install security-guidance@claude-plugins-official
+claude plugin marketplace add obra/superpowers-marketplace
+claude plugin install superpowers@superpowers-marketplace
