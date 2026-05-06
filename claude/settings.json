@@ -364,9 +364,10 @@
   "theme": "auto",
   "remoteControlAtStartup": true,
   "agentPushNotifEnabled": true,
+  "skipAutoPermissionPrompt": true,
   "voiceEnabled": true,
   "feedbackSurveyState": {
     "lastShownTime": 1754272823676
   },
-  "skipAutoPermissionPrompt": true
+  "inputNeededNotifEnabled": true
 }
