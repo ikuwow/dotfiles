@@ -253,6 +253,36 @@
       "Bash(copilot update *)"
     ]
   },
+  "sandbox": {
+    "enabled": true,
+    "filesystem": {
+      "denyRead": [
+        "~/.ssh",
+        "~/.gnupg",
+        "~/.aws/credentials",
+        "~/.config/gh/hosts.yml",
+        "~/.config/gcloud/credentials.db",
+        "~/.config/gcloud/access_tokens.db",
+        "~/.config/gcloud/legacy_credentials",
+        "~/.netrc",
+        "~/.docker/config.json",
+        "~/.zsh_history",
+        "~/.bash_history"
+      ]
+    },
+    "network": {
+      "allowedDomains": [
+        "github.com",
+        "*.github.com",
+        "*.githubusercontent.com",
+        "registry.npmjs.org",
+        "proxy.golang.org",
+        "sum.golang.org",
+        "pypi.org",
+        "files.pythonhosted.org"
+      ]
+    }
+  },
   "hooks": {
     "PreToolUse": [
       {
