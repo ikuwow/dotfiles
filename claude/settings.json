@@ -260,8 +260,10 @@
         "~/.ssh",
         "~/.gnupg",
         "~/.aws/credentials",
-        "~/.aws/config",
         "~/.config/gh/hosts.yml",
+        "~/.config/gcloud/credentials.db",
+        "~/.config/gcloud/access_tokens.db",
+        "~/.config/gcloud/legacy_credentials",
         "~/.netrc",
         "~/.docker/config.json",
         "~/.zsh_history",
@@ -271,17 +273,15 @@
     "network": {
       "allowedDomains": [
         "github.com",
-        "raw.githubusercontent.com",
-        "objects.githubusercontent.com",
-        "api.github.com",
+        "*.github.com",
+        "*.githubusercontent.com",
         "registry.npmjs.org",
         "proxy.golang.org",
         "sum.golang.org",
         "pypi.org",
         "files.pythonhosted.org"
       ]
-    },
-    "excludedCommands": ["docker *"]
+    }
   },
   "hooks": {
     "PreToolUse": [
