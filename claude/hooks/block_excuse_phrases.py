@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """Stop hook: pause once when the assistant emits excuse-preamble phrases.
 
-AIRULES.md (the 「正直」「実は」「本当のところ」 ban under 応答の姿勢と判断)
+AIRULES.md (the 「正直」「本当のところ」 ban under 応答の姿勢と判断)
 forbids these as 断り書き (preamble that softens or qualifies an opinion).
 The model knows the rule but slips. A literal substring match cannot
-disambiguate legitimate uses (名詞 like 「正直者」, 事実開示 like
-「実は〜だった」), so this hook does not try. It blocks at most once per
-Stop chain: the second invocation arrives with stop_hook_active=true and
-is allowed through, preventing infinite loops.
+disambiguate legitimate uses (名詞 like 「正直者」), so this hook does
+not try. It blocks at most once per Stop chain: the second invocation
+arrives with stop_hook_active=true and is allowed through, preventing
+infinite loops.
 
 I/O failures (stdin parse, missing transcript_path, transcript read,
 poll timeout) are swallowed and the hook exits 0 — a Stop hook that
@@ -32,13 +32,13 @@ import re
 import sys
 import time
 
-FORBIDDEN_PATTERN = re.compile(r"正直|実は|本当のところ")
+FORBIDDEN_PATTERN = re.compile(r"正直|本当のところ")
 
 POLL_INTERVAL_S = 0.05
 POLL_MAX_ITERATIONS = 10
 
 REASON = (
-    "Your response contains one of 「正直」「実は」「本当のところ」.\n\n"
+    "Your response contains one of 「正直」「本当のところ」.\n\n"
     "The string match alone cannot tell whether you used it as 断り書き "
     "(preamble softening or qualifying an opinion, banned by AIRULES.md) "
     "or in a sense the rule does not target. Reconsider.\n\n"
@@ -46,7 +46,7 @@ REASON = (
     "plants the doubt that everything else you have said was not honest. "
     "The damage is retroactive (it taints prior statements) and "
     "prospective (it taints future ones), and it cannot be unplanted. "
-    "「実は」 and 「本当のところ」 carry the same structural harm.\n\n"
+    "「本当のところ」 carries the same structural harm.\n\n"
     "Judge your own usage and rewrite if it was 断り書き."
 )
 
@@ -58,8 +58,6 @@ def is_forbidden(text):
 
     >>> is_forbidden("正直それは下がると思う")
     True
-    >>> is_forbidden("実は昨日指摘された")
-    True
     >>> is_forbidden("本当のところ判断が難しい")
     True
 
@@ -68,8 +66,6 @@ def is_forbidden(text):
     the regex breaks the test:
 
     >>> is_forbidden("彼は正直者だ")
-    True
-    >>> is_forbidden("実は昨日雨だった")
     True
 
     Negatives:
