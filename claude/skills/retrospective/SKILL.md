@@ -54,13 +54,17 @@ self-corrects are not penalized.
 |---|---|
 | high | Misjudgment that caused a direction change / User had to redo work manually / Errors introduced into deliverables / Confidently wrong assertion that misled the user |
 | medium | User correction or course adjustment needed / Disproportionately many confirmations relative to task complexity / Communication or judgment mistakes that could affect deliverable quality / Silent failure: appeared to succeed but the result was subtly wrong |
-| low | AI resolved the issue autonomously (including trial-and-error) / Proceeded without user intervention / Minor inefficiency only |
+| low | AI resolved the issue autonomously without user intervention — including trial-and-error, rule violations caught by hooks, and short-time self-corrections / Minor inefficiency only |
 
 Adjustment rules:
 
-- If the pattern is likely to recur across sessions, raise one level
-- If the volume of interaction is justified by inherent task complexity,
-  do not raise
+- Recurrence alone does not change severity. A self-corrected issue
+  stays at low even when the same pattern shows up a few times.
+- Excessive recurrence within a session that visibly degrades overall
+  response quality can warrant medium, even when each instance is
+  self-corrected.
+- If high interaction volume is justified by inherent task complexity,
+  do not rate it as medium.
 
 ### Countermeasure Specificity
 
