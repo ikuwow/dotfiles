@@ -44,12 +44,6 @@ link .default-gems            "$HOME/.default-gems"
 link .default-npm-packages    "$HOME/.default-npm-packages"
 link .default-python-packages "$HOME/.default-python-packages"
 
-# Infrastructure
-link .terraformrc   "$HOME/.terraformrc"
-
-# Linting
-link .shellcheckrc  "$HOME/.shellcheckrc"
-
 # XDG config: all subdirs in xdg-config/ auto-discovered
 mkdir -p "$XDG_CONFIG_HOME"
 find "$DOTPATH/xdg-config" -maxdepth 1 -mindepth 1 ! -type f ! -name '.*' -exec ln -fvns {} "$XDG_CONFIG_HOME/" \;

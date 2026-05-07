@@ -76,6 +76,13 @@ export NPM_CONFIG_FUND=false
 export NPM_CONFIG_MIN_RELEASE_AGE=7
 export NPM_CONFIG_IGNORE_SCRIPTS=true
 
+# ShellCheck
+export SHELLCHECK_OPTS='--exclude=SC1090,SC1091,SC2039,SC3010,SC3060,SC3028'
+
+# terraform
+export TF_PLUGIN_CACHE_DIR="$HOME/.terraform.d/plugin-cache"
+export CHECKPOINT_DISABLE=1
+
 # AWS Profile Switcher
 if [ -f ~/.aws/current_profile ]; then
   AWS_PROFILE="$(cat ~/.aws/current_profile)"
