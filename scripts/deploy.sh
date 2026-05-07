@@ -29,14 +29,6 @@ link .functions     "$HOME/.functions"
 link .inputrc       "$HOME/.inputrc"
 link .sshrc         "$HOME/.sshrc"
 
-# Editor
-link .vimrc         "$HOME/.vimrc"
-link .gvimrc        "$HOME/.gvimrc"
-link .ideavimrc     "$HOME/.ideavimrc"
-
-# Terminal
-link .tmux.conf     "$HOME/.tmux.conf"
-
 # Version / package managers
 link .tool-versions           "$HOME/.tool-versions"
 link .gemrc                   "$HOME/.gemrc"
