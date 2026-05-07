@@ -1,1 +1,1 @@
-../../.gvimrc
+../xdg-config/vim/gvimrc
