@@ -81,11 +81,19 @@ When writing a PR body, cover every applicable item:
      exit code, log excerpt).
    - Items that genuinely require interactive UI, user-only
      credentials, target environments unreachable from a shell, or
-     the live session itself go under a separate "User to verify"
-     subsection with reproduction steps and a one-line reason why the
-     author could not verify them. Scope still applies (§2): items
-     that depend on changes outside this PR's diff belong in the
-     parent issue, not here.
+     the live session itself must be clearly distinguished from the
+     already-verified ones, with reproduction steps and a one-line
+     reason why the author could not verify them. Follow the
+     repository's PR template if it defines a structure; otherwise
+     use any organization that makes the distinction unambiguous
+     (separate subsection, prefix, etc.) — the section name itself
+     is not prescribed. Scope still applies (§2): items that depend
+     on changes outside this PR's diff belong in the parent issue,
+     not here.
+   - Use `- [ ] …` markdown checkboxes for items the user is
+     expected to verify or act on later, so they can be ticked off
+     after completion. This applies regardless of section name or
+     structure.
 
 ## Review Criteria
 
