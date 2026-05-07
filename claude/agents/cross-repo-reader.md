@@ -1,15 +1,6 @@
 ---
 name: cross-repo-reader
-description: |
-  Use to read or search code in another local Git repository that is ALREADY cloned via ghq, separate from the current working tree. The agent locates the existing clone, optionally syncs the default branch with `git pull --ff-only`, and reads files via the Read tool / `git -C <path> grep`. The agent does NOT clone, fetch, or hit GitHub — if the repo is not in ghq, it returns "not available locally" and the parent decides what to do next.
-  When to call:
-  - Multi-file or deep code reads in a repo already in ghq ("how does upstream X implement Y", "find usages of Z across foo/bar", "summarize the architecture of foo/bar").
-  When NOT to call (the parent should handle these directly instead):
-  - The repo is not in ghq and a single shallow lookup is enough — use `gh api` or a raw URL. If the lookup will be deep enough to justify a clone, run `ghq get -p <owner>/<repo>` first, then call this agent.
-  - A specific single file path is already known — read it directly via Read/Grep without delegating.
-  - Monorepo subdirectories or git submodules inside the current working tree.
-  - Non-file data (PR/issue metadata, CI logs, repo settings, commit comparison) — use `gh`.
-  Read-only on remote/external systems; the only local mutation is `git pull --ff-only` to sync an existing clone.
+description: Use when the parent needs to read or search code in another GitHub repository that is already cloned locally via ghq. The agent only reads existing clones; if the repo is not in ghq, it returns "not available locally" and the parent decides next steps. Examples — "how does upstream X implement Y", "find usages of Z across foo/bar", "summarize the architecture of foo/bar".
 tools: Bash, Read, Grep, Glob
 model: sonnet
 ---
