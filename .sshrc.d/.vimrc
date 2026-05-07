@@ -1,1 +1,1 @@
-../.vimrc
+../xdg-config/vim/vimrc
