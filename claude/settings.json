@@ -270,6 +270,9 @@
         "~/.docker/config.json",
         "~/.zsh_history",
         "~/.bash_history"
+      ],
+      "allowRead": [
+        "~/.ssh/known_hosts"
       ]
     },
     "network": {
