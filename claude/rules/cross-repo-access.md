@@ -14,9 +14,8 @@ parent calls it.
 Pass the agent enough context about what to look for and why, so it
 can make judgment calls about which files to read.
 
-Exception: when a single specific file path is already known and the
-content is small, the main agent may read it directly via Read/Grep
-without delegating.
+Exception: when a single specific file path is already known, the
+main agent may read it directly via Read/Grep without delegating.
 
 ## When to Use GitHub API Instead
 
