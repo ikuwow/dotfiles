@@ -6,10 +6,15 @@ working directory, prefer local clones over GitHub API access.
 ## File reading
 
 Delegate to the `cross-repo-reader` subagent. It owns ghq lookup,
-optional fast-forward sync, and file reading via Read/Grep/Glob, and
-returns a summary with citations. The agent's frontmatter pins
-`model: sonnet`, so the model is enforced regardless of how the
-parent calls it.
+optional fast-forward sync, and file reading, and returns a summary
+with citations.
+
+Do not pass a `model` parameter when invoking this agent. The
+agent's frontmatter sets `model: sonnet` as the default, and the
+Agent tool's per-call `model` argument takes precedence over the
+frontmatter when supplied. Letting the frontmatter default apply is
+how this agent stays on Sonnet without the parent having to
+remember the model on every call.
 
 Pass the agent enough context about what to look for and why, so it
 can make judgment calls about which files to read.
