@@ -71,6 +71,11 @@ export XDG_CONFIG_HOME=~/.config # Some tools hardcode this path; do not change 
 export XDG_DATA_HOME=~/.local/share
 export QUOTING_STYLE=literal # for GNU ls
 
+# npm
+export NPM_CONFIG_FUND=false
+export NPM_CONFIG_MIN_RELEASE_AGE=7
+export NPM_CONFIG_IGNORE_SCRIPTS=true
+
 # AWS Profile Switcher
 if [ -f ~/.aws/current_profile ]; then
   AWS_PROFILE="$(cat ~/.aws/current_profile)"
