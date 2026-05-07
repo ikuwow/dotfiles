@@ -22,7 +22,11 @@ Follow this order to locate the repository:
 
 1. Check if the repo is already cloned locally:
    `ghq list | grep <owner>/<repo>`
-2. If found, derive the path from ghq root: `$(ghq root)/github.com/<owner>/<repo>`
+2. If found, get the ghq root path by running `ghq root` as a standalone
+   Bash call, read the output, then construct the full path:
+   `<ghq root output>/github.com/<owner>/<repo>`. Do NOT use shell
+   command substitution (`$(ghq root)` or backticks) — that violates
+   the global rule against command substitution in Bash invocations.
 3. If not found, clone it via SSH: `ghq get -p <owner>/<repo>`
    - Do NOT clone known-huge repositories (linux, chromium, webkit, etc.).
      If the target is one of these, stop and report back to the parent
