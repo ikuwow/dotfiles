@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Stop hook: pause once when the assistant emits excuse-preamble phrases.
 
-AIRULES.md (the 「正直」「本当のところ」 ban under 応答の姿勢と判断)
-forbids these as 断り書き (preamble that softens or qualifies an opinion).
+AIRULES.md (the 「正直」「本当のところ」「ぶっちゃけ」 ban under
+応答の姿勢と判断) forbids these as 断り書き (preamble that softens
+or qualifies an opinion).
 The model knows the rule but slips. A literal substring match cannot
 disambiguate legitimate uses (名詞 like 「正直者」), so this hook does
 not try. It blocks at most once per Stop chain: the second invocation
@@ -32,13 +33,13 @@ import re
 import sys
 import time
 
-FORBIDDEN_PATTERN = re.compile(r"正直|本当のところ")
+FORBIDDEN_PATTERN = re.compile(r"正直|本当のところ|ぶっちゃけ")
 
 POLL_INTERVAL_S = 0.05
 POLL_MAX_ITERATIONS = 10
 
 REASON = (
-    "Your response contains one of 「正直」「本当のところ」.\n\n"
+    "Your response contains one of 「正直」「本当のところ」「ぶっちゃけ」.\n\n"
     "The string match alone cannot tell whether you used it as 断り書き "
     "(preamble softening or qualifying an opinion, banned by AIRULES.md) "
     "or in a sense the rule does not target. Reconsider.\n\n"
@@ -46,7 +47,7 @@ REASON = (
     "plants the doubt that everything else you have said was not honest. "
     "The damage is retroactive (it taints prior statements) and "
     "prospective (it taints future ones), and it cannot be unplanted. "
-    "「本当のところ」 carries the same structural harm.\n\n"
+    "「本当のところ」「ぶっちゃけ」 carry the same structural harm.\n\n"
     "Judge your own usage and rewrite if it was 断り書き."
 )
 
@@ -59,6 +60,8 @@ def is_forbidden(text):
     >>> is_forbidden("正直それは下がると思う")
     True
     >>> is_forbidden("本当のところ判断が難しい")
+    True
+    >>> is_forbidden("ぶっちゃけ無理やと思う")
     True
 
     The regex deliberately matches legitimate uses too — these
