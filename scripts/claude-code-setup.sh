@@ -30,10 +30,7 @@ mcp_add deepwiki '{"type":"http","url":"https://mcp.deepwiki.com/mcp"}'
 mcp_add Context7 '{"command":"npx","args":["-y","@upstash/context7-mcp"]}'
 
 # --- Plugins ---
-# marketplace add and plugin install are both idempotent.
-# claude-plugins-official is built-in, but on Claude Code web the cache is
-# not populated until `marketplace add` is run, so install would fail with
-# "Plugin not found in marketplace" without this line.
+# Ensure marketplaces exist (required on fresh environments like Claude Code web).
 claude plugin marketplace add anthropics/claude-plugins-official
 claude plugin marketplace add openai/codex-plugin-cc
 claude plugin install codex@openai-codex
