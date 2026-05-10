@@ -65,6 +65,12 @@ Adjustment rules:
   self-corrected.
 - If high interaction volume is justified by inherent task complexity,
   do not rate it as medium.
+- When a checkpoint (plan-mode review, PR review, hook rejection) catches
+  an issue, judge severity by the impact the mistake would have had if
+  shipped, not by the fact that a checkpoint caught it. Cosmetic or
+  "could be cleaned up post-merge" issues stay low even when user
+  correction was visible; functionally broken or risky proposals warrant
+  medium even when caught early.
 
 ### Countermeasure Specificity
 
