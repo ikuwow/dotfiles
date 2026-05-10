@@ -37,13 +37,31 @@ lives in the diff, the issue, or a linked source.
   behavior changes, new capabilities, removed limitations, etc. —
   rather than listing implementation details (resources added, files
   touched).
-- Do not hard-wrap paragraphs or list items at a fixed column width.
-  GitHub Flavored Markdown renders soft line breaks inside a paragraph
-  as visible breaks (or runs them together awkwardly), so a body
-  wrapped at ~70 chars looks broken on the web. Write each paragraph
-  as a single line and let the browser wrap it. Use blank lines for
-  paragraph breaks. The same rule applies to issue bodies and PR /
-  issue comments.
+- Inside GitHub PR / issue bodies and PR / issue comments only — that
+  is, Markdown posted through the GitHub web UI — do not hard-wrap
+  paragraphs or list items. Write each paragraph as a single line and
+  let the browser wrap it; use blank lines for paragraph breaks. GitHub
+  Flavored Markdown renders soft line breaks inside a paragraph as
+  visible breaks (or runs lines together awkwardly) only in these
+  contexts, so a body wrapped at ~70 chars looks broken on the web.
+  Plain Markdown files (READMEs, ADRs, this guidelines file itself,
+  and any other in-repo documentation) follow standard Markdown
+  rendering — single line breaks inside a paragraph are ignored — so
+  they may be hard-wrapped for file-side readability.
+- DO / DON'T example for a paragraph in a PR / issue body:
+
+  DO (single line, the browser wraps it):
+
+  ````
+  Fix the broken X path so Y stops emitting spurious diffs.
+  ````
+
+  DON'T (paragraph hard-wrapped at column width):
+
+  ````
+  Fix the broken X path so Y stops emitting
+  spurious diffs.
+  ````
 
 ## PR Body Checklist
 
