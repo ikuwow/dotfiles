@@ -295,8 +295,8 @@ flushdns() {
     return 1
   fi
 
-  # Restart mDNSResponder
-  if sudo killall -HUP mDNSResponder; then
+  # SIGTERM (full restart by launchd) — SIGHUP leaves resolver selection state intact, which is the failure mode flushdns is meant to clear.
+  if sudo killall mDNSResponder; then
     echo "mDNSResponder: Restarted successfully"
   else
     echo "Error: Failed to restart mDNSResponder"
