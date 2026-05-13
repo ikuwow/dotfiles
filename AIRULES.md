@@ -58,7 +58,7 @@
 
 - Web 検索より MCP サーバー等の外部情報ツールを優先する
 - 通常の Web サイトよりもプレーンテキスト・Markdown ファイルの取得を優先する
-- GitHub の場合は `gh` コマンドや `raw.githubusercontent.com` を優先する
+- GitHub の操作はコーディングタスクの場合 `gh` コマンドを使う。gh が使えない環境や gh で実現できない操作の場合のみ `raw.githubusercontent.com` や GitHub MCP サーバー（`mcp__*_GitHub_MCP_Server__*` ツール群）等を使ってよい
 
 ---
 
