@@ -22,7 +22,7 @@ short_git_ps1() {
   [ -z "$branch" ] && return
 
   max_len=20
-  if [ ${#branch} -le $max_len ]; then
+  if [ "${#branch}" -le "$max_len" ]; then
     echo " ($branch)"
     return
   fi
@@ -116,7 +116,7 @@ if [ ! "$(command -v aps)" ]; then
   aps() {
     if [ ! "$(command -v fzf)" ]; then
       echo "Error: ${FUNCNAME} requires fzf executable."
-      exit 1
+      return 1
     fi
     query="$1"
 
@@ -182,7 +182,7 @@ EOF
     if [ -n "$SSO_ACCOUNT_ID" ]; then
       echo "SSO detected. Checking SSO session..."
       SSO_ACCOUNT="$(aws sts get-caller-identity --query "Account")"
-      if [ ${#SSO_ACCOUNT} != 14 ]; then
+      if [ "${#SSO_ACCOUNT}" -ne 14 ]; then
         aws sso login
       fi
     fi
@@ -193,7 +193,7 @@ if [ ! "$(command -v gps)" ]; then
   gps() {
     if [ ! "$(command -v fzf)" ]; then
       echo "Error: ${FUNCNAME} requires fzf executable."
-      exit 1
+      return 1
     fi
     query="$1"
 
