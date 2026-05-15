@@ -28,6 +28,9 @@ mcp_add() {
 # IDE-local servers (intellij-index, goland-index) are intentionally omitted
 mcp_add deepwiki '{"type":"http","url":"https://mcp.deepwiki.com/mcp"}'
 mcp_add Context7 '{"command":"npx","args":["-y","@upstash/context7-mcp"]}'
+# Claude Code expands ${VAR} from its process env at MCP server launch time.
+# shellcheck disable=SC2016
+mcp_add mcp-obsidian '{"command":"uvx","args":["mcp-obsidian"],"env":{"OBSIDIAN_API_KEY":"${OBSIDIAN_API_KEY}","OBSIDIAN_HOST":"${OBSIDIAN_HOST}","OBSIDIAN_PORT":"${OBSIDIAN_PORT}"}}'
 
 # --- Plugins ---
 # Ensure marketplaces exist (required on fresh environments like Claude Code web).
