@@ -101,13 +101,13 @@ dotfiles/
 
 `xdg-config/git/hooks/prepare-commit-msg` drafts a commit message (subject + 2-5 line body) via `claude --model haiku` whenever `git commit` opens the editor interactively. The staged diff is piped on stdin and the last 10 commit subjects are included as a style / language reference, so the suggestion matches the repository's existing tone.
 
-The hook is opt-in per repository. From inside the target repo, run:
+The hook is opt-in per repository. From inside the target repo, run (requires `~/bin` on `$PATH`, set up by this repository's deploy):
 
 ```bash
 install-aimsg-hook.sh
 ```
 
-(or symlink manually: `mkdir -p .git/hooks && ln -snf ~/.config/git/hooks/prepare-commit-msg .git/hooks/prepare-commit-msg`)
+(or symlink manually if `~/bin` is not on PATH: `mkdir -p .git/hooks && ln -snf ~/.config/git/hooks/prepare-commit-msg .git/hooks/prepare-commit-msg`)
 
 Disable per-invocation with `GIT_AI_COMMIT_MSG=0 git commit`, or remove the symlink to disable entirely:
 
@@ -115,7 +115,7 @@ Disable per-invocation with `GIT_AI_COMMIT_MSG=0 git commit`, or remove the syml
 rm "$(git rev-parse --git-path hooks)/prepare-commit-msg"
 ```
 
-The hook is a no-op for `git commit -m ...`, merges, squashes, amends, when `claude` is missing, and after the 25-second claude timeout. On any failure it exits silently (with a one-line stderr diagnostic) and leaves the original buffer untouched, so `git commit` is never blocked.
+The hook only runs for plain interactive `git commit` with staged changes. It is a no-op when any of: a message source is already set (`-m`, `-F`, `-t`, `commit.template`, merge, squash, amend), nothing is staged, `claude` is missing, the 25-second claude timeout fires, or `GIT_AI_COMMIT_MSG=0`. On any failure it exits silently (with a one-line stderr diagnostic) and leaves the original buffer untouched, so `git commit` is never blocked.
 
 Per-repo install (rather than `core.hooksPath`) was chosen so this hook never shadows the per-repo `.git/hooks/<name>` of other repositories — `core.hooksPath` REPLACES the default hooks lookup, which would silently disable `pre-commit` framework / husky / lefthook etc. on every repo on the host.
 

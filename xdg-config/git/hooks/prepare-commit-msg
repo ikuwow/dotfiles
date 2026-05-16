@@ -3,10 +3,9 @@
 # buffer for interactive commits. Always exits 0 so a hook failure can
 # never block git commit.
 #
-# Designed for per-repo install (no core.hooksPath). Enable in a repo:
-#   ln -s ~/.config/git/hooks/prepare-commit-msg .git/hooks/prepare-commit-msg
-# Disable:
-#   rm .git/hooks/prepare-commit-msg
+# Per-repo install (no core.hooksPath) so this hook never shadows another
+# repo's .git/hooks/. See README.md "AI-Assisted Commit Messages" and
+# bin/install-aimsg-hook.sh.
 
 set -eu
 
@@ -23,10 +22,15 @@ if [ "${GIT_AI_COMMIT_MSG:-1}" = "0" ]; then
 fi
 
 if ! command -v claude >/dev/null 2>&1; then
+  echo "prepare-commit-msg: claude not on PATH, skipping AI draft" >&2
   exit 0
 fi
 
-if git diff --cached --quiet; then
+# Snapshot the staged diff once so the size check, the empty check, and
+# the claude call all see the same content (avoids racing with concurrent
+# git add / git reset between separate `git diff --cached` calls).
+DIFF=$(git diff --cached)
+if [ -z "$DIFF" ]; then
   exit 0
 fi
 
@@ -48,31 +52,32 @@ No markdown, no quotes, no preamble. Output ONLY the commit message.
 $RECENT
 --- end ---"
 
-# Fall back to no timeout on macOS without coreutils (no gtimeout/timeout).
+# macOS BSD has no timeout(1); fall back to no timeout if coreutils isn't installed.
 TIMEOUT_BIN=""
 if command -v gtimeout >/dev/null 2>&1; then
   TIMEOUT_BIN="gtimeout"
 elif command -v timeout >/dev/null 2>&1; then
   TIMEOUT_BIN="timeout"
+else
+  echo "prepare-commit-msg: no gtimeout/timeout available, claude will run unbounded" >&2
 fi
 
 echo "prepare-commit-msg: drafting commit message via claude haiku..." >&2
 
-ERR_FILE=$(mktemp -t prepare-commit-msg.err.XXXXXX) || exit 0
+ERR_FILE=$(mktemp -t prepare-commit-msg.err.XXXXXX) || {
+  echo "prepare-commit-msg: mktemp failed for stderr capture, skipping AI draft" >&2
+  exit 0
+}
 trap 'rm -f "$ERR_FILE"' EXIT
 
-# pipefail so a `git diff --cached` failure surfaces as RC, not masked by
-# claude returning rc=0 on truncated input.
 set +e
-set -o pipefail
 if [ -n "$TIMEOUT_BIN" ]; then
-  MSG=$(git diff --cached | "$TIMEOUT_BIN" 25s claude --model haiku -p "$PROMPT" 2>"$ERR_FILE")
+  MSG=$(printf '%s' "$DIFF" | "$TIMEOUT_BIN" 25s claude --model haiku -p "$PROMPT" 2>"$ERR_FILE")
   RC=$?
 else
-  MSG=$(git diff --cached | claude --model haiku -p "$PROMPT" 2>"$ERR_FILE")
+  MSG=$(printf '%s' "$DIFF" | claude --model haiku -p "$PROMPT" 2>"$ERR_FILE")
   RC=$?
 fi
-set +o pipefail
 set -e
 
 if [ "$RC" -ne 0 ] || [ -z "$MSG" ]; then
@@ -80,7 +85,7 @@ if [ "$RC" -ne 0 ] || [ -z "$MSG" ]; then
     124) echo "prepare-commit-msg: claude timed out after 25s, skipping AI draft" >&2 ;;
     0) echo "prepare-commit-msg: claude returned empty output, skipping AI draft" >&2 ;;
     *)
-      ERR_HEAD=$(head -c 200 "$ERR_FILE" 2>/dev/null | head -n 1 || true)
+      ERR_HEAD=$(head -n 1 "$ERR_FILE" 2>/dev/null | cut -c1-200 || true)
       if [ -n "$ERR_HEAD" ]; then
         echo "prepare-commit-msg: claude failed rc=$RC ($ERR_HEAD), skipping AI draft" >&2
       else
@@ -91,17 +96,37 @@ if [ "$RC" -ne 0 ] || [ -z "$MSG" ]; then
   exit 0
 fi
 
+# Strip a single layer of wrapping quotes/backticks from the first line —
+# common claude output shapes that would otherwise land literally in the buffer.
+FIRST=$(printf '%s\n' "$MSG" | head -n 1)
+case "$FIRST" in
+  \"*\"|\'*\'|\`*\`)
+    REST=$(printf '%s\n' "$MSG" | tail -n +2)
+    FIRST=${FIRST#?}; FIRST=${FIRST%?}
+    if [ -n "$REST" ]; then
+      MSG=$(printf '%s\n%s' "$FIRST" "$REST")
+    else
+      MSG="$FIRST"
+    fi
+    ;;
+esac
+
 # Write via temp + rename so git/editor never sees a half-written buffer,
 # and so an FS failure mid-write leaves the original buffer intact.
-TMP=$(mktemp "${MSG_FILE}.aimsg.XXXXXX") || exit 0
+TMP=$(mktemp "${MSG_FILE}.aimsg.XXXXXX") || {
+  echo "prepare-commit-msg: mktemp failed for buffer, skipping AI draft" >&2
+  exit 0
+}
 if ! {
   printf '%s\n\n' "$MSG"
   cat "$MSG_FILE"
 } >"$TMP"; then
+  echo "prepare-commit-msg: failed to assemble draft buffer, leaving original message intact" >&2
   rm -f "$TMP"
   exit 0
 fi
 if ! mv "$TMP" "$MSG_FILE"; then
+  echo "prepare-commit-msg: failed to install draft buffer, original preserved" >&2
   rm -f "$TMP"
   exit 0
 fi

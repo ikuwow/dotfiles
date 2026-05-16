@@ -11,7 +11,7 @@ if [ ! -x "$SRC" ]; then
   exit 1
 fi
 
-HOOKS_DIR=$(git rev-parse --git-path hooks 2>/dev/null) || {
+HOOKS_DIR=$(git rev-parse --git-path hooks) || {
   echo "install-aimsg-hook: not inside a git repository" >&2
   exit 1
 }
