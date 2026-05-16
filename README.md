@@ -97,6 +97,10 @@ dotfiles/
 └── ... (other dotfiles)
 ```
 
+### AI-Assisted Commit Messages
+
+`xdg-config/git/hooks/prepare-commit-msg` drafts a commit message via `claude --model haiku` when `git commit` opens the editor. Per-repo opt-in: run `install-aimsg-hook.sh` inside the target repo. Disable per-invocation with `GIT_AI_COMMIT_MSG=0 git commit`, or remove `"$(git rev-parse --git-path hooks)/prepare-commit-msg"` to uninstall. See the script header for skip conditions and design notes.
+
 ### Machine-Local Overrides
 
 To define settings that apply only to a specific machine (not tracked by this repository),

@@ -1,0 +1,93 @@
+#!/usr/bin/env bash
+# Drafts an AI commit message (subject + optional body) into the commit
+# buffer for interactive commits. claude failures skip the AI draft
+# silently; any other unexpected failure (mktemp / cat / mv) propagates
+# under set -eu and git aborts the commit with bash's error message —
+# the user sees what went wrong instead of a silent half-fix.
+#
+# Per-repo install (no core.hooksPath) so this hook never shadows another
+# repo's .git/hooks/. See README.md "AI-Assisted Commit Messages" and
+# bin/install-aimsg-hook.sh.
+
+set -eu
+
+MSG_FILE="$1"
+MSG_SOURCE="${2:-}"
+
+# $2 is empty only for interactive `git commit` (no -m/--amend/merge/squash/template).
+if [ -n "$MSG_SOURCE" ]; then exit 0; fi
+
+if [ "${GIT_AI_COMMIT_MSG:-1}" = "0" ]; then exit 0; fi
+
+if ! command -v claude >/dev/null 2>&1; then exit 0; fi
+
+# Snapshot the staged diff once so the empty check and the claude call
+# see the same content (avoids racing with concurrent git add / reset).
+DIFF=$(git diff --cached)
+if [ -z "$DIFF" ]; then exit 0; fi
+
+# || true: git log fails on the very first commit; empty RECENT is fine.
+RECENT=$(git log -n 10 --pretty=format:'%s' 2>/dev/null || true)
+
+PROMPT="Draft a git commit message for the staged diff piped on stdin.
+
+Format:
+- First line: short subject (~50 chars, imperative mood).
+- Blank line.
+- Body: 2-5 lines explaining what changed and why, wrapped around 72 chars.
+- No Co-authored-by or any other trailer.
+
+Match the style and language of the recent subjects below
+(English-only repo -> English; Japanese-mixed repo -> use that style).
+No markdown, no quotes, no preamble. Output ONLY the commit message.
+
+--- recent commit subjects (style + language reference) ---
+$RECENT
+--- end ---"
+
+# Startup-overhead flags: --no-session-persistence skips session disk writes,
+# --strict-mcp-config + --mcp-config={empty} prevents loading the user's MCP
+# servers (the dominant startup cost), --system-prompt replaces the default
+# system prompt so claude does NOT auto-discover CLAUDE.md.
+# Requires `timeout` on PATH (GNU coreutils).
+CLAUDE_SYSTEM_PROMPT="You write git commit messages. Output the message only — no preamble, no markdown, no quotes, no trailers."
+
+echo "prepare-commit-msg: drafting commit message via claude haiku..." >&2
+
+# VAR=$(...) assignment swallows the substitution's non-zero exit under
+# set -e (POSIX), so $? on the next line captures the pipe RC.
+MSG=$(printf '%s' "$DIFF" | timeout 25s claude \
+  --model haiku \
+  --no-session-persistence \
+  --strict-mcp-config --mcp-config='{"mcpServers":{}}' \
+  --system-prompt "$CLAUDE_SYSTEM_PROMPT" \
+  -p "$PROMPT")
+RC=$?
+if [ "$RC" -ne 0 ] || [ -z "$MSG" ]; then
+  echo "prepare-commit-msg: claude failed rc=$RC, skipping AI draft" >&2
+  exit 0
+fi
+
+# Strip a single layer of wrapping quotes/backticks from the first line —
+# common claude output shapes that would otherwise land literally in the buffer.
+FIRST=$(printf '%s\n' "$MSG" | head -n 1)
+case "$FIRST" in
+  \"*\"|\'*\'|\`*\`)
+    REST=$(printf '%s\n' "$MSG" | tail -n +2)
+    FIRST=${FIRST#?}; FIRST=${FIRST%?}
+    if [ -n "$REST" ]; then
+      MSG=$(printf '%s\n%s' "$FIRST" "$REST")
+    else
+      MSG="$FIRST"
+    fi
+    ;;
+esac
+
+# Atomic write via temp + rename. Failures here propagate under set -eu
+# and git aborts the commit with bash's error — no silent half-fix.
+TMP=$(mktemp "${MSG_FILE}.aimsg.XXXXXX")
+{
+  printf '%s\n\n' "$MSG"
+  cat "$MSG_FILE"
+} >"$TMP"
+mv "$TMP" "$MSG_FILE"
