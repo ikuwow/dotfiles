@@ -43,6 +43,7 @@ Format:
 - First line: short subject (~50 chars, imperative mood).
 - Blank line.
 - Body: 2-5 lines explaining what changed and why, wrapped around 72 chars.
+- No Co-authored-by or any other trailer.
 
 Match the style and language of the recent subjects below
 (English-only repo -> English; Japanese-mixed repo -> use that style).
@@ -70,12 +71,29 @@ ERR_FILE=$(mktemp -t prepare-commit-msg.err.XXXXXX) || {
 }
 trap 'rm -f "$ERR_FILE"' EXIT
 
+# Startup-overhead flags: --no-session-persistence skips session disk writes,
+# --strict-mcp-config + --mcp-config={empty} prevents loading the user's MCP
+# servers (the dominant startup cost — ~5s on this host), --system-prompt
+# replaces the default system prompt so claude does NOT auto-discover
+# CLAUDE.md / read project context for what is otherwise a pure text task.
+CLAUDE_SYSTEM_PROMPT="You write git commit messages. Output the message only — no preamble, no markdown, no quotes, no trailers."
+
 set +e
 if [ -n "$TIMEOUT_BIN" ]; then
-  MSG=$(printf '%s' "$DIFF" | "$TIMEOUT_BIN" 25s claude --model haiku -p "$PROMPT" 2>"$ERR_FILE")
+  MSG=$(printf '%s' "$DIFF" | "$TIMEOUT_BIN" 25s claude \
+    --model haiku \
+    --no-session-persistence \
+    --strict-mcp-config --mcp-config='{"mcpServers":{}}' \
+    --system-prompt "$CLAUDE_SYSTEM_PROMPT" \
+    -p "$PROMPT" 2>"$ERR_FILE")
   RC=$?
 else
-  MSG=$(printf '%s' "$DIFF" | claude --model haiku -p "$PROMPT" 2>"$ERR_FILE")
+  MSG=$(printf '%s' "$DIFF" | claude \
+    --model haiku \
+    --no-session-persistence \
+    --strict-mcp-config --mcp-config='{"mcpServers":{}}' \
+    --system-prompt "$CLAUDE_SYSTEM_PROMPT" \
+    -p "$PROMPT" 2>"$ERR_FILE")
   RC=$?
 fi
 set -e
