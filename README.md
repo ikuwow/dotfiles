@@ -97,6 +97,14 @@ dotfiles/
 └── ... (other dotfiles)
 ```
 
+### AI-Assisted Commit Messages
+
+Running `git commit` interactively (no `-m`) opens the editor with an AI-drafted subject line prefilled. The hook calls `claude --model haiku` with the staged diff piped on stdin and the last 10 commit subjects as a style reference, so the suggestion matches the repository's existing tone and language.
+
+The hook is a no-op for `git commit -m ...`, merges, squashes, amends, when `claude` is not on PATH, when the staged diff exceeds 200 KB, and when invoked with `GIT_AI_COMMIT_MSG=0`. On any failure it exits silently and leaves the original buffer untouched, so `git commit` is never blocked.
+
+Defined in `xdg-config/git/hooks/prepare-commit-msg` and wired by `core.hooksPath = ~/.config/git/hooks` in `xdg-config/git/config`. For an interactive alternative that commits in one shot via `codex`, see `bin/git-ai-commit.sh` (aliased as `git aic`).
+
 ### Machine-Local Overrides
 
 To define settings that apply only to a specific machine (not tracked by this repository),

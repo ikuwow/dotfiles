@@ -1,0 +1,92 @@
+#!/usr/bin/env bash
+# Drafts an AI-generated subject line into the commit message buffer
+# for interactive commits only (no -m, no merge/squash/amend/template).
+# Always exits 0 so a hook failure never blocks git commit.
+
+set -eu
+
+MSG_FILE="$1"
+MSG_SOURCE="${2:-}"
+
+# Skip non-interactive sources: message, template, merge, squash, commit.
+# Only an empty $2 means "user invoked git commit interactively".
+if [ -n "$MSG_SOURCE" ]; then
+  exit 0
+fi
+
+# Opt-out: GIT_AI_COMMIT_MSG=0 disables for this invocation. Default is on.
+if [ "${GIT_AI_COMMIT_MSG:-1}" = "0" ]; then
+  exit 0
+fi
+
+# Require claude on PATH.
+if ! command -v claude >/dev/null 2>&1; then
+  exit 0
+fi
+
+# Nothing staged -> nothing to summarize (git will abort anyway).
+if git diff --cached --quiet; then
+  exit 0
+fi
+
+# Skip oversized diffs (haiku context + latency concerns).
+DIFF_BYTES=$(git diff --cached | wc -c | tr -d ' ')
+if [ "$DIFF_BYTES" -gt 200000 ]; then
+  echo "prepare-commit-msg: staged diff is ${DIFF_BYTES} bytes, skipping AI draft" >&2
+  exit 0
+fi
+
+# Recent subjects as style + language reference (fails gracefully on first commit).
+RECENT=$(git log -n 10 --pretty=format:'%s' 2>/dev/null || true)
+
+PROMPT="Generate a single-line git commit subject for the staged diff piped on stdin.
+
+Rules:
+- One line only. No body. No trailing newline.
+- Match the style and language of the recent commit subjects shown below
+  (English-only repo -> English; Japanese-mixed repo -> use that style).
+- 'verb: description' or 'Verb description' - follow the existing pattern.
+- No surrounding quotes, no markdown, no preamble. Output ONLY the subject.
+
+--- recent commit subjects (style + language reference) ---
+$RECENT
+--- end ---"
+
+# Prefer GNU timeout if available; fall back to no timeout.
+TIMEOUT_BIN=""
+if command -v gtimeout >/dev/null 2>&1; then
+  TIMEOUT_BIN="gtimeout"
+elif command -v timeout >/dev/null 2>&1; then
+  TIMEOUT_BIN="timeout"
+fi
+
+set +e
+if [ -n "$TIMEOUT_BIN" ]; then
+  GENERATED=$(git diff --cached | "$TIMEOUT_BIN" 25s claude --model haiku -p "$PROMPT" 2>/dev/null)
+  RC=$?
+else
+  GENERATED=$(git diff --cached | claude --model haiku -p "$PROMPT" 2>/dev/null)
+  RC=$?
+fi
+set -e
+
+if [ "$RC" -ne 0 ] || [ -z "$GENERATED" ]; then
+  echo "prepare-commit-msg: claude draft skipped (rc=$RC)" >&2
+  exit 0
+fi
+
+# First non-empty line only (defensive — model may emit extras).
+SUBJECT=$(printf '%s\n' "$GENERATED" | awk 'NF{print; exit}')
+if [ -z "$SUBJECT" ]; then
+  exit 0
+fi
+
+# Atomic write: SUBJECT + blank line, then original buffer (template comments).
+TMP=$(mktemp "${MSG_FILE}.aimsg.XXXXXX")
+{
+  printf '%s\n\n' "$SUBJECT"
+  cat "$MSG_FILE"
+} >"$TMP"
+mv "$TMP" "$MSG_FILE"
+
+exit 0

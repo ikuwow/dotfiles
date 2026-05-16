@@ -46,6 +46,13 @@ check_symlink "${XDG_CONFIG_HOME:-$HOME/.config}/nvim"
 check_symlink "${XDG_CONFIG_HOME:-$HOME/.config}/tmux"
 check_symlink "${XDG_CONFIG_HOME:-$HOME/.config}/vim"
 check_symlink "${XDG_CONFIG_HOME:-$HOME/.config}/ideavim"
+# Global git hook reached via xdg-config/git/ → ~/.config/git/ symlink
+if [ -x "${XDG_CONFIG_HOME:-$HOME/.config}/git/hooks/prepare-commit-msg" ]; then
+  echo "OK: ~/.config/git/hooks/prepare-commit-msg is executable"
+else
+  echo "FAIL: ~/.config/git/hooks/prepare-commit-msg missing or not executable"
+  errors=$((errors + 1))
+fi
 
 echo ""
 echo "=== bin (auto-discovered) ==="

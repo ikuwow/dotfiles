@@ -4,6 +4,7 @@
 [core]
     editor = nvim
     quotepath = false
+    hooksPath = ~/.config/git/hooks
 [color]
     ui = true
 [grep]
