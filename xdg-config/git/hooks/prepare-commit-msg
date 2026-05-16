@@ -53,16 +53,6 @@ No markdown, no quotes, no preamble. Output ONLY the commit message.
 $RECENT
 --- end ---"
 
-# macOS BSD has no timeout(1); fall back to no timeout if coreutils isn't installed.
-TIMEOUT_BIN=""
-if command -v gtimeout >/dev/null 2>&1; then
-  TIMEOUT_BIN="gtimeout"
-elif command -v timeout >/dev/null 2>&1; then
-  TIMEOUT_BIN="timeout"
-else
-  echo "prepare-commit-msg: no gtimeout/timeout available, claude will run unbounded" >&2
-fi
-
 echo "prepare-commit-msg: drafting commit message via claude haiku..." >&2
 
 ERR_FILE=$(mktemp -t prepare-commit-msg.err.XXXXXX) || {
@@ -76,26 +66,17 @@ trap 'rm -f "$ERR_FILE"' EXIT
 # servers (the dominant startup cost — ~5s on this host), --system-prompt
 # replaces the default system prompt so claude does NOT auto-discover
 # CLAUDE.md / read project context for what is otherwise a pure text task.
+# Requires `timeout` on PATH (GNU coreutils, ships with Linux and brew on macOS).
 CLAUDE_SYSTEM_PROMPT="You write git commit messages. Output the message only — no preamble, no markdown, no quotes, no trailers."
 
 set +e
-if [ -n "$TIMEOUT_BIN" ]; then
-  MSG=$(printf '%s' "$DIFF" | "$TIMEOUT_BIN" 25s claude \
-    --model haiku \
-    --no-session-persistence \
-    --strict-mcp-config --mcp-config='{"mcpServers":{}}' \
-    --system-prompt "$CLAUDE_SYSTEM_PROMPT" \
-    -p "$PROMPT" 2>"$ERR_FILE")
-  RC=$?
-else
-  MSG=$(printf '%s' "$DIFF" | claude \
-    --model haiku \
-    --no-session-persistence \
-    --strict-mcp-config --mcp-config='{"mcpServers":{}}' \
-    --system-prompt "$CLAUDE_SYSTEM_PROMPT" \
-    -p "$PROMPT" 2>"$ERR_FILE")
-  RC=$?
-fi
+MSG=$(printf '%s' "$DIFF" | timeout 25s claude \
+  --model haiku \
+  --no-session-persistence \
+  --strict-mcp-config --mcp-config='{"mcpServers":{}}' \
+  --system-prompt "$CLAUDE_SYSTEM_PROMPT" \
+  -p "$PROMPT" 2>"$ERR_FILE")
+RC=$?
 set -e
 
 if [ "$RC" -ne 0 ] || [ -z "$MSG" ]; then
