@@ -97,6 +97,28 @@ dotfiles/
 └── ... (other dotfiles)
 ```
 
+### AI-Assisted Commit Messages
+
+`xdg-config/git/hooks/prepare-commit-msg` drafts a commit message (subject + 2-5 line body) via `claude --model haiku` whenever `git commit` opens the editor interactively. The staged diff is piped on stdin and the last 10 commit subjects are included as a style / language reference, so the suggestion matches the repository's existing tone.
+
+The hook is opt-in per repository. From inside the target repo, run:
+
+```bash
+install-aimsg-hook.sh
+```
+
+(or symlink manually: `mkdir -p .git/hooks && ln -snf ~/.config/git/hooks/prepare-commit-msg .git/hooks/prepare-commit-msg`)
+
+Disable per-invocation with `GIT_AI_COMMIT_MSG=0 git commit`, or remove the symlink to disable entirely:
+
+```bash
+rm "$(git rev-parse --git-path hooks)/prepare-commit-msg"
+```
+
+The hook is a no-op for `git commit -m ...`, merges, squashes, amends, when `claude` is missing, and after the 25-second claude timeout. On any failure it exits silently (with a one-line stderr diagnostic) and leaves the original buffer untouched, so `git commit` is never blocked.
+
+Per-repo install (rather than `core.hooksPath`) was chosen so this hook never shadows the per-repo `.git/hooks/<name>` of other repositories — `core.hooksPath` REPLACES the default hooks lookup, which would silently disable `pre-commit` framework / husky / lefthook etc. on every repo on the host.
+
 ### Machine-Local Overrides
 
 To define settings that apply only to a specific machine (not tracked by this repository),
