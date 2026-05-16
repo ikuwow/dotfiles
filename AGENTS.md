@@ -51,3 +51,28 @@ pre-commit run --all-files
 - Bootstrap scripts use `/bin/bash` (not `/usr/bin/env bash`) for compatibility
 - All scripts must pass shellcheck validation (see `.shellcheckrc` for disabled rules)
 - Use `set -eu` for error handling in critical scripts
+
+## Personal Tool Defaults
+
+This repository is a personal dotfiles repo. Scripts here may assume:
+
+- The host environment (PATH, brew packages like coreutils, shell,
+  editor) is set up by this repository's own bootstrap. Probing for
+  `gtimeout` vs `timeout` vs no-timeout fallback is over-engineering —
+  assume `timeout` is on PATH.
+- "Best-effort" failure is acceptable for discretionary helpers. Let
+  bash propagate errors under `set -eu` so the user sees the real
+  failure, instead of wrapping every step in `|| { stderr; exit 0; }`
+  defensive handlers. Reserve always-exit-0 contracts for scripts
+  that would block a user-critical operation on failure.
+- An automated test harness (bats, shunit2, etc.) is NOT required for
+  short shell utilities even when reviewers recommend one. The user
+  exercises these scripts on every commit; regressions surface
+  immediately and can be fixed inline.
+
+Reviewer agents (silent-failure-hunter, pr-test-analyzer, etc.) are
+calibrated for production code and will recommend defensive handlers
+and test coverage that are over-engineering for personal-dotfiles
+scope. Weigh those recommendations against this section before
+accepting them — and when in doubt, prefer the simpler version and
+let the user push back if it's wrong.
