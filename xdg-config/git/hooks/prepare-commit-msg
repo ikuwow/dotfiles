@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 # Drafts an AI commit message (subject + optional body) into the commit
-# buffer for interactive commits. Always exits 0 so a hook failure can
-# never block git commit.
+# buffer for interactive commits. claude failures skip the AI draft
+# silently; any other unexpected failure (mktemp / cat / mv) propagates
+# under set -eu and git aborts the commit with bash's error message —
+# the user sees what went wrong instead of a silent half-fix.
 #
 # Per-repo install (no core.hooksPath) so this hook never shadows another
 # repo's .git/hooks/. See README.md "AI-Assisted Commit Messages" and
@@ -13,26 +15,16 @@ MSG_FILE="$1"
 MSG_SOURCE="${2:-}"
 
 # $2 is empty only for interactive `git commit` (no -m/--amend/merge/squash/template).
-if [ -n "$MSG_SOURCE" ]; then
-  exit 0
-fi
+if [ -n "$MSG_SOURCE" ]; then exit 0; fi
 
-if [ "${GIT_AI_COMMIT_MSG:-1}" = "0" ]; then
-  exit 0
-fi
+if [ "${GIT_AI_COMMIT_MSG:-1}" = "0" ]; then exit 0; fi
 
-if ! command -v claude >/dev/null 2>&1; then
-  echo "prepare-commit-msg: claude not on PATH, skipping AI draft" >&2
-  exit 0
-fi
+if ! command -v claude >/dev/null 2>&1; then exit 0; fi
 
-# Snapshot the staged diff once so the size check, the empty check, and
-# the claude call all see the same content (avoids racing with concurrent
-# git add / git reset between separate `git diff --cached` calls).
+# Snapshot the staged diff once so the empty check and the claude call
+# see the same content (avoids racing with concurrent git add / reset).
 DIFF=$(git diff --cached)
-if [ -z "$DIFF" ]; then
-  exit 0
-fi
+if [ -z "$DIFF" ]; then exit 0; fi
 
 # || true: git log fails on the very first commit; empty RECENT is fine.
 RECENT=$(git log -n 10 --pretty=format:'%s' 2>/dev/null || true)
@@ -53,45 +45,26 @@ No markdown, no quotes, no preamble. Output ONLY the commit message.
 $RECENT
 --- end ---"
 
-echo "prepare-commit-msg: drafting commit message via claude haiku..." >&2
-
-ERR_FILE=$(mktemp -t prepare-commit-msg.err.XXXXXX) || {
-  echo "prepare-commit-msg: mktemp failed for stderr capture, skipping AI draft" >&2
-  exit 0
-}
-trap 'rm -f "$ERR_FILE"' EXIT
-
 # Startup-overhead flags: --no-session-persistence skips session disk writes,
 # --strict-mcp-config + --mcp-config={empty} prevents loading the user's MCP
-# servers (the dominant startup cost — ~5s on this host), --system-prompt
-# replaces the default system prompt so claude does NOT auto-discover
-# CLAUDE.md / read project context for what is otherwise a pure text task.
-# Requires `timeout` on PATH (GNU coreutils, ships with Linux and brew on macOS).
+# servers (the dominant startup cost), --system-prompt replaces the default
+# system prompt so claude does NOT auto-discover CLAUDE.md.
+# Requires `timeout` on PATH (GNU coreutils).
 CLAUDE_SYSTEM_PROMPT="You write git commit messages. Output the message only — no preamble, no markdown, no quotes, no trailers."
 
-set +e
+echo "prepare-commit-msg: drafting commit message via claude haiku..." >&2
+
+# VAR=$(...) assignment swallows the substitution's non-zero exit under
+# set -e (POSIX), so $? on the next line captures the pipe RC.
 MSG=$(printf '%s' "$DIFF" | timeout 25s claude \
   --model haiku \
   --no-session-persistence \
   --strict-mcp-config --mcp-config='{"mcpServers":{}}' \
   --system-prompt "$CLAUDE_SYSTEM_PROMPT" \
-  -p "$PROMPT" 2>"$ERR_FILE")
+  -p "$PROMPT")
 RC=$?
-set -e
-
 if [ "$RC" -ne 0 ] || [ -z "$MSG" ]; then
-  case "$RC" in
-    124) echo "prepare-commit-msg: claude timed out after 25s, skipping AI draft" >&2 ;;
-    0) echo "prepare-commit-msg: claude returned empty output, skipping AI draft" >&2 ;;
-    *)
-      ERR_HEAD=$(head -n 1 "$ERR_FILE" 2>/dev/null | cut -c1-200 || true)
-      if [ -n "$ERR_HEAD" ]; then
-        echo "prepare-commit-msg: claude failed rc=$RC ($ERR_HEAD), skipping AI draft" >&2
-      else
-        echo "prepare-commit-msg: claude failed rc=$RC, skipping AI draft" >&2
-      fi
-      ;;
-  esac
+  echo "prepare-commit-msg: claude failed rc=$RC, skipping AI draft" >&2
   exit 0
 fi
 
@@ -110,24 +83,11 @@ case "$FIRST" in
     ;;
 esac
 
-# Write via temp + rename so git/editor never sees a half-written buffer,
-# and so an FS failure mid-write leaves the original buffer intact.
-TMP=$(mktemp "${MSG_FILE}.aimsg.XXXXXX") || {
-  echo "prepare-commit-msg: mktemp failed for buffer, skipping AI draft" >&2
-  exit 0
-}
-if ! {
+# Atomic write via temp + rename. Failures here propagate under set -eu
+# and git aborts the commit with bash's error — no silent half-fix.
+TMP=$(mktemp "${MSG_FILE}.aimsg.XXXXXX")
+{
   printf '%s\n\n' "$MSG"
   cat "$MSG_FILE"
-} >"$TMP"; then
-  echo "prepare-commit-msg: failed to assemble draft buffer, leaving original message intact" >&2
-  rm -f "$TMP"
-  exit 0
-fi
-if ! mv "$TMP" "$MSG_FILE"; then
-  echo "prepare-commit-msg: failed to install draft buffer, original preserved" >&2
-  rm -f "$TMP"
-  exit 0
-fi
-
-exit 0
+} >"$TMP"
+mv "$TMP" "$MSG_FILE"
