@@ -101,7 +101,7 @@ dotfiles/
 
 `xdg-config/git/hooks/prepare-commit-msg` drafts a commit message (subject + 2-5 line body) via `claude --model haiku` whenever `git commit` opens the editor interactively. The staged diff is piped on stdin and the last 10 commit subjects are included as a style / language reference, so the suggestion matches the repository's existing tone.
 
-The hook is opt-in per repository. From inside the target repo, run (requires `~/bin` on `$PATH`, set up by this repository's deploy):
+The hook is opt-in per repository. After running `./scripts/deploy.sh` once (which sets up `~/bin/` and `~/.config/git/`), enable it inside the target repo with:
 
 ```bash
 install-aimsg-hook.sh
