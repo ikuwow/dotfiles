@@ -16,7 +16,7 @@
     b = branch
     d = diff
     a = add
-    c = commit
+    c = !$HOME/bin/git-aicommit-edit.sh
     ch = checkout
     sw = switch
     l = log
@@ -36,8 +36,6 @@
     '"
     oops = commit --all --amend --no-edit
     ce = "commit --allow-empty"
-	aicommit = !$HOME/bin/git-ai-commit.sh
-	aic = !git aicommit
 [credential]
     helper = cache
 [filter "lfs"]
