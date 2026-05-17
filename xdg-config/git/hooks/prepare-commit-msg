@@ -49,7 +49,6 @@ $DIFF
 MODEL="claude-haiku-4-5"
 echo "prepare-commit-msg: drafting commit message via Anthropic API ($MODEL)..." >&2
 
-# jq --arg / --argjson avoids manual JSON escaping for control chars in the diff.
 REQUEST=$(jq -n \
   --arg model "$MODEL" \
   --argjson max_tokens 1024 \
@@ -57,8 +56,6 @@ REQUEST=$(jq -n \
   --arg user "$USER_CONTENT" \
   '{model:$model, max_tokens:$max_tokens, system:$system, messages:[{role:"user", content:$user}]}')
 
-# --fail-with-body: non-zero rc on HTTP >=400, body still printed for stderr.
-# --data-binary @-: stream stdin to dodge ARG_MAX on large diffs.
 RESP=$(printf '%s' "$REQUEST" | curl --silent --show-error --fail-with-body \
   --max-time 8 --connect-timeout 3 \
   -X POST https://api.anthropic.com/v1/messages \
@@ -67,8 +64,8 @@ RESP=$(printf '%s' "$REQUEST" | curl --silent --show-error --fail-with-body \
   -H "content-type: application/json" \
   --data-binary @-)
 
-# jq -e: null/missing field exits non-zero so set -eu kills the hook
-# instead of writing "null" to the buffer.
+# -er instead of -r: a null/missing field exits non-zero so set -eu kills
+# the hook instead of writing "null" to the commit buffer.
 MSG=$(printf '%s' "$RESP" | jq -er '.content[0].text')
 
 # Strip a single layer of wrapping quotes/backticks — Haiku occasionally wraps output.
