@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # Drafts an AI commit message (subject + optional body) into the commit
 # buffer for interactive commits by calling the Anthropic Messages API
-# directly via curl. No-op unless GIT_AI_COMMIT_ANTHROPIC_API_KEY is set —
-# without the env var git opens the usual empty editor template.
+# directly via curl. No-op unless GIT_AI_COMMIT_ANTHROPIC_API_KEY is set
+# (and not disabled via GIT_AI_COMMIT_MSG=0) — without the env var
+# git opens the usual empty editor template.
 #
 # Any API-side failure (network, auth, timeout, missing jq/curl, malformed
 # response) propagates under set -eu, so git aborts the commit with bash's
@@ -52,12 +53,13 @@ USER_CONTENT="$PROMPT
 $DIFF
 --- end diff ---"
 
-echo "prepare-commit-msg: drafting commit message via Anthropic API (claude-haiku-4-5)..." >&2
+MODEL="claude-haiku-4-5"
+echo "prepare-commit-msg: drafting commit message via Anthropic API ($MODEL)..." >&2
 
 # jq --arg / --argjson keep quotes, backslashes, newlines, and control
 # chars from the diff out of trouble — no manual JSON escaping needed.
 REQUEST=$(jq -n \
-  --arg model "claude-haiku-4-5" \
+  --arg model "$MODEL" \
   --argjson max_tokens 1024 \
   --arg system "$SYSTEM_PROMPT" \
   --arg user "$USER_CONTENT" \
