@@ -19,9 +19,13 @@ if [ -n "$MSG_SOURCE" ]; then exit 0; fi
 
 if [ "${GIT_AI_COMMIT_MSG:-1}" = "0" ]; then exit 0; fi
 
-if ! command -v claude >/dev/null 2>&1; then exit 0; fi
+# Detect which backends are available; exit only if neither path can run.
+# Fast path: GIT_AI_COMMIT_ANTHROPIC_API_KEY -> direct Anthropic API via curl.
+# Fallback: `claude` CLI -p (also used when the API call fails mid-flow).
+if command -v claude >/dev/null 2>&1; then HAS_CLAUDE=1; else HAS_CLAUDE=0; fi
+if [ "$HAS_CLAUDE" = "0" ] && [ -z "${GIT_AI_COMMIT_ANTHROPIC_API_KEY:-}" ]; then exit 0; fi
 
-# Snapshot the staged diff once so the empty check and the claude call
+# Snapshot the staged diff once so the empty check and both backends
 # see the same content (avoids racing with concurrent git add / reset).
 DIFF=$(git diff --cached)
 if [ -z "$DIFF" ]; then exit 0; fi
@@ -29,7 +33,7 @@ if [ -z "$DIFF" ]; then exit 0; fi
 # || true: git log fails on the very first commit; empty RECENT is fine.
 RECENT=$(git log -n 10 --pretty=format:'%s' 2>/dev/null || true)
 
-PROMPT="Draft a git commit message for the staged diff piped on stdin.
+PROMPT="Draft a git commit message for the staged diff.
 
 Format:
 - First line: short subject (~50 chars, imperative mood).
@@ -45,27 +49,93 @@ No markdown, no quotes, no preamble. Output ONLY the commit message.
 $RECENT
 --- end ---"
 
-# Startup-overhead flags: --no-session-persistence skips session disk writes,
-# --strict-mcp-config + --mcp-config={empty} prevents loading the user's MCP
-# servers (the dominant startup cost), --system-prompt replaces the default
-# system prompt so claude does NOT auto-discover CLAUDE.md.
-# Requires `timeout` on PATH (GNU coreutils).
+# System prompt shared by both backends so output shape matches.
 CLAUDE_SYSTEM_PROMPT="You write git commit messages. Output the message only — no preamble, no markdown, no quotes, no trailers."
 
-echo "prepare-commit-msg: drafting commit message via claude haiku..." >&2
+MSG=""
 
-# VAR=$(...) assignment swallows the substitution's non-zero exit under
-# set -e (POSIX), so $? on the next line captures the pipe RC.
-MSG=$(printf '%s' "$DIFF" | timeout 25s claude \
-  --model haiku \
-  --no-session-persistence \
-  --strict-mcp-config --mcp-config='{"mcpServers":{}}' \
-  --system-prompt "$CLAUDE_SYSTEM_PROMPT" \
-  -p "$PROMPT")
-RC=$?
-if [ "$RC" -ne 0 ] || [ -z "$MSG" ]; then
-  echo "prepare-commit-msg: claude failed rc=$RC, skipping AI draft" >&2
-  exit 0
+# Fast path: call Anthropic Messages API directly via curl. Saves the
+# claude CLI startup (~1s) and OAuth subscription-tier routing overhead
+# (~3s on this user's host vs ~600ms public Haiku TTFT). Falls back to
+# claude -p on any failure so the commit is never blocked.
+if [ -n "${GIT_AI_COMMIT_ANTHROPIC_API_KEY:-}" ]; then
+  echo "prepare-commit-msg: drafting commit message via Anthropic API (claude-haiku-4-5)..." >&2
+
+  USER_CONTENT="$PROMPT
+
+--- staged diff ---
+$DIFF
+--- end diff ---"
+
+  # jq --arg handles quotes / backslashes / newlines in the diff safely.
+  REQUEST=$(jq -n \
+    --arg model "claude-haiku-4-5" \
+    --argjson max_tokens 1024 \
+    --arg system "$CLAUDE_SYSTEM_PROMPT" \
+    --arg user "$USER_CONTENT" \
+    '{model:$model, max_tokens:$max_tokens, system:$system, messages:[{role:"user", content:$user}]}')
+
+  # --fail-with-body: non-zero rc on HTTP >=400 AND still print body so we can
+  # log Anthropic's error envelope in the fallback warning.
+  # --max-time 8: 5s target is for success case; 8s tolerates slow networks
+  # before triggering fallback (a too-tight curl timeout that fell back to
+  # claude would push the worst case past the unoptimized baseline).
+  # --data-binary @-: pipe body via stdin to avoid ARG_MAX on large diffs.
+  #
+  # `|| CURL_RC=$?` is required because bash DOES fire set -e on `VAR=$(...)`
+  # when the substitution exits non-zero — the POSIX carve-out is shell-
+  # dependent and doesn't apply here. The `||` provides a successful outer
+  # exit so set -e stays quiet while we capture the rc for branching.
+  RESP=""
+  CURL_RC=0
+  RESP=$(printf '%s' "$REQUEST" | curl --silent --show-error --fail-with-body \
+    --max-time 8 --connect-timeout 3 \
+    -X POST https://api.anthropic.com/v1/messages \
+    -H "x-api-key: $GIT_AI_COMMIT_ANTHROPIC_API_KEY" \
+    -H "anthropic-version: 2023-06-01" \
+    -H "content-type: application/json" \
+    --data-binary @- 2>&1) || CURL_RC=$?
+
+  REASON=""
+  if [ "$CURL_RC" -ne 0 ]; then
+    REASON="curl rc=$CURL_RC: $(printf '%s' "$RESP" | head -c 200 | tr '\n' ' ')"
+  else
+    # Anthropic error envelope: {"type":"error","error":{"type":"...","message":"..."}}
+    TYPE=$(printf '%s' "$RESP" | jq -r '.type // empty' 2>/dev/null || true)
+    if [ "$TYPE" = "error" ]; then
+      REASON="API error: $(printf '%s' "$RESP" | jq -r '.error.message // "unknown"' 2>/dev/null || true)"
+    else
+      MSG=$(printf '%s' "$RESP" | jq -r '.content[0].text // empty' 2>/dev/null || true)
+      if [ -z "$MSG" ]; then REASON="empty content in response"; fi
+    fi
+  fi
+
+  if [ -z "$MSG" ]; then
+    echo "prepare-commit-msg: API call failed ($REASON), falling back to claude -p" >&2
+  fi
+fi
+
+# Fallback path: invoke `claude` CLI. Same flags as before — see #177 for
+# why each one matters (MCP / plugin / CLAUDE.md auto-discovery suppression).
+if [ -z "$MSG" ]; then
+  if [ "$HAS_CLAUDE" = "0" ]; then exit 0; fi
+
+  echo "prepare-commit-msg: drafting commit message via claude haiku..." >&2
+
+  # `|| RC=$?` keeps set -e quiet on claude failure (timeout, auth, etc.) while
+  # still capturing the rc for the error-message branch below. Bash fires
+  # set -e on `VAR=$(failing_cmd)` despite the often-cited POSIX carve-out.
+  RC=0
+  MSG=$(printf '%s' "$DIFF" | timeout 25s claude \
+    --model haiku \
+    --no-session-persistence \
+    --strict-mcp-config --mcp-config='{"mcpServers":{}}' \
+    --system-prompt "$CLAUDE_SYSTEM_PROMPT" \
+    -p "$PROMPT") || RC=$?
+  if [ "$RC" -ne 0 ] || [ -z "$MSG" ]; then
+    echo "prepare-commit-msg: claude failed rc=$RC, skipping AI draft" >&2
+    exit 0
+  fi
 fi
 
 # Strip a single layer of wrapping quotes/backticks from the first line —

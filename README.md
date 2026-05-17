@@ -101,6 +101,8 @@ dotfiles/
 
 `xdg-config/git/hooks/prepare-commit-msg` drafts a commit message via `claude --model haiku` when `git commit` opens the editor. Per-repo opt-in: run `install-aimsg-hook.sh` inside the target repo. Disable per-invocation with `GIT_AI_COMMIT_MSG=0 git commit`, or remove `"$(git rev-parse --git-path hooks)/prepare-commit-msg"` to uninstall. See the script header for skip conditions and design notes.
 
+For faster drafts (~2-4s vs ~10s on the OAuth-routed `claude` path), set `GIT_AI_COMMIT_ANTHROPIC_API_KEY` to an Anthropic API key — the hook then calls `api.anthropic.com` directly via `curl` using `claude-haiku-4-5`. The scoped variable name (not the canonical `ANTHROPIC_API_KEY`) avoids overriding the `claude` CLI's Claude Max OAuth for unrelated invocations. On any API failure (network, auth, timeout), the hook prints a one-line stderr warning and falls back to the `claude -p` path automatically. Requires `curl` and `jq` on PATH.
+
 ### Machine-Local Overrides
 
 To define settings that apply only to a specific machine (not tracked by this repository),
