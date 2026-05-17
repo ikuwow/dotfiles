@@ -1,35 +1,28 @@
 #!/usr/bin/env bash
-# Drafts an AI commit message (subject + optional body) into the commit
-# buffer for interactive commits. claude failures skip the AI draft
-# silently; any other unexpected failure (mktemp / cat / mv) propagates
-# under set -eu and git aborts the commit with bash's error message —
-# the user sees what went wrong instead of a silent half-fix.
-#
-# Per-repo install (no core.hooksPath) so this hook never shadows another
-# repo's .git/hooks/. See README.md "AI-Assisted Commit Messages" and
-# bin/install-aimsg-hook.sh.
+# AI-draft a commit message via the Anthropic Messages API. No-op unless
+# GIT_AI_COMMIT_ANTHROPIC_API_KEY is set; any API failure propagates
+# under set -eu so git aborts the commit. See README.md.
 
 set -eu
 
 MSG_FILE="$1"
 MSG_SOURCE="${2:-}"
 
-# $2 is empty only for interactive `git commit` (no -m/--amend/merge/squash/template).
+# Skip non-interactive commits (-m, --amend, merge, squash, template).
 if [ -n "$MSG_SOURCE" ]; then exit 0; fi
-
 if [ "${GIT_AI_COMMIT_MSG:-1}" = "0" ]; then exit 0; fi
+if [ -z "${GIT_AI_COMMIT_ANTHROPIC_API_KEY:-}" ]; then
+  echo "prepare-commit-msg: GIT_AI_COMMIT_ANTHROPIC_API_KEY not set, skipping AI draft" >&2
+  exit 0
+fi
 
-if ! command -v claude >/dev/null 2>&1; then exit 0; fi
-
-# Snapshot the staged diff once so the empty check and the claude call
-# see the same content (avoids racing with concurrent git add / reset).
 DIFF=$(git diff --cached)
 if [ -z "$DIFF" ]; then exit 0; fi
 
-# || true: git log fails on the very first commit; empty RECENT is fine.
+# git log fails on the very first commit; empty RECENT is fine.
 RECENT=$(git log -n 10 --pretty=format:'%s' 2>/dev/null || true)
 
-PROMPT="Draft a git commit message for the staged diff piped on stdin.
+PROMPT="Draft a git commit message for the staged diff.
 
 Format:
 - First line: short subject (~50 chars, imperative mood).
@@ -45,31 +38,37 @@ No markdown, no quotes, no preamble. Output ONLY the commit message.
 $RECENT
 --- end ---"
 
-# Startup-overhead flags: --no-session-persistence skips session disk writes,
-# --strict-mcp-config + --mcp-config={empty} prevents loading the user's MCP
-# servers (the dominant startup cost), --system-prompt replaces the default
-# system prompt so claude does NOT auto-discover CLAUDE.md.
-# Requires `timeout` on PATH (GNU coreutils).
-CLAUDE_SYSTEM_PROMPT="You write git commit messages. Output the message only — no preamble, no markdown, no quotes, no trailers."
+SYSTEM_PROMPT="You write git commit messages. Output the message only — no preamble, no markdown, no quotes, no trailers."
 
-echo "prepare-commit-msg: drafting commit message via claude haiku..." >&2
+USER_CONTENT="$PROMPT
 
-# VAR=$(...) assignment swallows the substitution's non-zero exit under
-# set -e (POSIX), so $? on the next line captures the pipe RC.
-MSG=$(printf '%s' "$DIFF" | timeout 25s claude \
-  --model haiku \
-  --no-session-persistence \
-  --strict-mcp-config --mcp-config='{"mcpServers":{}}' \
-  --system-prompt "$CLAUDE_SYSTEM_PROMPT" \
-  -p "$PROMPT")
-RC=$?
-if [ "$RC" -ne 0 ] || [ -z "$MSG" ]; then
-  echo "prepare-commit-msg: claude failed rc=$RC, skipping AI draft" >&2
-  exit 0
-fi
+--- staged diff ---
+$DIFF
+--- end diff ---"
 
-# Strip a single layer of wrapping quotes/backticks from the first line —
-# common claude output shapes that would otherwise land literally in the buffer.
+MODEL="claude-haiku-4-5"
+echo "prepare-commit-msg: drafting commit message via Anthropic API ($MODEL)..." >&2
+
+REQUEST=$(jq -n \
+  --arg model "$MODEL" \
+  --argjson max_tokens 1024 \
+  --arg system "$SYSTEM_PROMPT" \
+  --arg user "$USER_CONTENT" \
+  '{model:$model, max_tokens:$max_tokens, system:$system, messages:[{role:"user", content:$user}]}')
+
+RESP=$(printf '%s' "$REQUEST" | curl --silent --show-error --fail-with-body \
+  --max-time 8 --connect-timeout 3 \
+  -X POST https://api.anthropic.com/v1/messages \
+  -H "x-api-key: $GIT_AI_COMMIT_ANTHROPIC_API_KEY" \
+  -H "anthropic-version: 2023-06-01" \
+  -H "content-type: application/json" \
+  --data-binary @-)
+
+# -er instead of -r: a null/missing field exits non-zero so set -eu kills
+# the hook instead of writing "null" to the commit buffer.
+MSG=$(printf '%s' "$RESP" | jq -er '.content[0].text')
+
+# Strip a single layer of wrapping quotes/backticks — Haiku occasionally wraps output.
 FIRST=$(printf '%s\n' "$MSG" | head -n 1)
 case "$FIRST" in
   \"*\"|\'*\'|\`*\`)
@@ -83,8 +82,6 @@ case "$FIRST" in
     ;;
 esac
 
-# Atomic write via temp + rename. Failures here propagate under set -eu
-# and git aborts the commit with bash's error — no silent half-fix.
 TMP=$(mktemp "${MSG_FILE}.aimsg.XXXXXX")
 {
   printf '%s\n\n' "$MSG"
