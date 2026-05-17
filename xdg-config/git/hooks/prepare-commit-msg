@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
 # Drafts an AI commit message (subject + optional body) into the commit
-# buffer for interactive commits. claude failures skip the AI draft
-# silently; any other unexpected failure (mktemp / cat / mv) propagates
-# under set -eu and git aborts the commit with bash's error message —
-# the user sees what went wrong instead of a silent half-fix.
+# buffer for interactive commits by calling the Anthropic Messages API
+# directly via curl. No-op unless GIT_AI_COMMIT_ANTHROPIC_API_KEY is set —
+# without the env var git opens the usual empty editor template.
+#
+# Any API-side failure (network, auth, timeout, missing jq/curl, malformed
+# response) propagates under set -eu, so git aborts the commit with bash's
+# error message instead of silently dropping the AI draft.
 #
 # Per-repo install (no core.hooksPath) so this hook never shadows another
 # repo's .git/hooks/. See README.md "AI-Assisted Commit Messages" and
@@ -16,17 +19,9 @@ MSG_SOURCE="${2:-}"
 
 # $2 is empty only for interactive `git commit` (no -m/--amend/merge/squash/template).
 if [ -n "$MSG_SOURCE" ]; then exit 0; fi
-
 if [ "${GIT_AI_COMMIT_MSG:-1}" = "0" ]; then exit 0; fi
+if [ -z "${GIT_AI_COMMIT_ANTHROPIC_API_KEY:-}" ]; then exit 0; fi
 
-# Detect which backends are available; exit only if neither path can run.
-# Fast path: GIT_AI_COMMIT_ANTHROPIC_API_KEY -> direct Anthropic API via curl.
-# Fallback: `claude` CLI -p (also used when the API call fails mid-flow).
-if command -v claude >/dev/null 2>&1; then HAS_CLAUDE=1; else HAS_CLAUDE=0; fi
-if [ "$HAS_CLAUDE" = "0" ] && [ -z "${GIT_AI_COMMIT_ANTHROPIC_API_KEY:-}" ]; then exit 0; fi
-
-# Snapshot the staged diff once so the empty check and both backends
-# see the same content (avoids racing with concurrent git add / reset).
 DIFF=$(git diff --cached)
 if [ -z "$DIFF" ]; then exit 0; fi
 
@@ -49,116 +44,43 @@ No markdown, no quotes, no preamble. Output ONLY the commit message.
 $RECENT
 --- end ---"
 
-# System prompt shared by both backends so output shape matches.
-CLAUDE_SYSTEM_PROMPT="You write git commit messages. Output the message only — no preamble, no markdown, no quotes, no trailers."
+SYSTEM_PROMPT="You write git commit messages. Output the message only — no preamble, no markdown, no quotes, no trailers."
 
-MSG=""
-
-# Fast path: call Anthropic Messages API directly via curl. Saves the
-# claude CLI startup (~1s) and OAuth subscription-tier routing overhead
-# (~3s on this user's host vs ~600ms public Haiku TTFT — see #178 for
-# the hyperfine breakdown). Falls back to claude -p on any failure so
-# the commit is never blocked.
-if [ -n "${GIT_AI_COMMIT_ANTHROPIC_API_KEY:-}" ]; then
-  if ! command -v jq >/dev/null 2>&1 || ! command -v curl >/dev/null 2>&1; then
-    # Honour the "never block commit" contract even when the host is missing
-    # the API-path tools: skip silently to the claude fallback instead of
-    # letting set -e kill the script at the first jq/curl invocation.
-    echo "prepare-commit-msg: API key set but jq or curl not on PATH, falling back to claude -p" >&2
-  else
-    echo "prepare-commit-msg: drafting commit message via Anthropic API (claude-haiku-4-5)..." >&2
-
-    USER_CONTENT="$PROMPT
+USER_CONTENT="$PROMPT
 
 --- staged diff ---
 $DIFF
 --- end diff ---"
 
-    # jq --arg / --argjson keep quotes, backslashes, newlines, and control
-    # chars from the diff out of trouble — no manual JSON escaping needed.
-    REQUEST=$(jq -n \
-      --arg model "claude-haiku-4-5" \
-      --argjson max_tokens 1024 \
-      --arg system "$CLAUDE_SYSTEM_PROMPT" \
-      --arg user "$USER_CONTENT" \
-      '{model:$model, max_tokens:$max_tokens, system:$system, messages:[{role:"user", content:$user}]}')
+echo "prepare-commit-msg: drafting commit message via Anthropic API (claude-haiku-4-5)..." >&2
 
-    # --fail-with-body: non-zero rc on HTTP >=400 AND still print body, so the
-    # fallback warning can quote Anthropic's error envelope verbatim.
-    # --max-time 8 / --connect-timeout 3: budget chosen to comfortably contain
-    # success (Haiku TTFT ~600ms-1.2s plus completion) while still failing
-    # fast enough that the fallback-to-claude worst case stays bounded.
-    # --data-binary @-: stream the body via stdin to dodge ARG_MAX on large diffs.
-    # stderr is intentionally NOT merged into stdout — curl's own warnings
-    # (TLS retries etc.) would otherwise pollute $RESP and break jq parsing
-    # on responses that were otherwise successful.
-    #
-    # `|| CURL_RC=$?` keeps set -e quiet on curl failure while still capturing
-    # the rc for branching. Verified on macOS bash 3.2.57 and 5.3.9: plain
-    # `VAR=$(failing_cmd)` triggers set -e (no implicit POSIX carve-out for
-    # the assignment-with-substitution form). Reproduce with:
-    #   bash -c 'set -e; X=$(false); echo got-here'   # exits 1, no output.
-    RESP=""
-    CURL_RC=0
-    RESP=$(printf '%s' "$REQUEST" | curl --silent --show-error --fail-with-body \
-      --max-time 8 --connect-timeout 3 \
-      -X POST https://api.anthropic.com/v1/messages \
-      -H "x-api-key: $GIT_AI_COMMIT_ANTHROPIC_API_KEY" \
-      -H "anthropic-version: 2023-06-01" \
-      -H "content-type: application/json" \
-      --data-binary @-) || CURL_RC=$?
+# jq --arg / --argjson keep quotes, backslashes, newlines, and control
+# chars from the diff out of trouble — no manual JSON escaping needed.
+REQUEST=$(jq -n \
+  --arg model "claude-haiku-4-5" \
+  --argjson max_tokens 1024 \
+  --arg system "$SYSTEM_PROMPT" \
+  --arg user "$USER_CONTENT" \
+  '{model:$model, max_tokens:$max_tokens, system:$system, messages:[{role:"user", content:$user}]}')
 
-    # Always seed REASON so the fallback warning never reads "API call failed ()".
-    REASON="unknown failure"
-    if [ "$CURL_RC" -ne 0 ]; then
-      REASON="curl rc=$CURL_RC: $(printf '%s' "$RESP" | head -c 500 | tr '\n' ' ')"
-    else
-      # Success envelope: {"type":"message", "content":[{"type":"text","text":"..."}], ...}
-      # Error envelope:   {"type":"error",   "error":{"type":"...","message":"..."}, ...}
-      # jq stderr is left visible (no 2>/dev/null) so genuine parse bugs surface
-      # in the terminal; `|| true` is set -e safety, not error suppression.
-      TYPE=$(printf '%s' "$RESP" | jq -r '.type // empty') || TYPE=""
-      if [ "$TYPE" = "error" ]; then
-        REASON="API error: $(printf '%s' "$RESP" | jq -r '.error.message // "unknown"' || echo unknown)"
-      else
-        MSG=$(printf '%s' "$RESP" | jq -r '.content[0].text // empty') || MSG=""
-        if [ -z "$MSG" ]; then
-          REASON="unexpected response shape: $(printf '%s' "$RESP" | head -c 500 | tr '\n' ' ')"
-        fi
-      fi
-    fi
+# --fail-with-body: non-zero rc on HTTP >=400 AND still print body, so the
+# stderr line from curl --show-error includes Anthropic's error envelope.
+# --max-time 8 / --connect-timeout 3: bound the worst case for interactive use.
+# --data-binary @-: stream the body via stdin to dodge ARG_MAX on large diffs.
+RESP=$(printf '%s' "$REQUEST" | curl --silent --show-error --fail-with-body \
+  --max-time 8 --connect-timeout 3 \
+  -X POST https://api.anthropic.com/v1/messages \
+  -H "x-api-key: $GIT_AI_COMMIT_ANTHROPIC_API_KEY" \
+  -H "anthropic-version: 2023-06-01" \
+  -H "content-type: application/json" \
+  --data-binary @-)
 
-    if [ -z "$MSG" ]; then
-      echo "prepare-commit-msg: API call failed ($REASON), falling back to claude -p" >&2
-    fi
-  fi
-fi
-
-# Fallback path: invoke `claude` CLI. Same flags as before — see #177 for
-# why each one matters (MCP / plugin / CLAUDE.md auto-discovery suppression).
-if [ -z "$MSG" ]; then
-  if [ "$HAS_CLAUDE" = "0" ]; then exit 0; fi
-
-  echo "prepare-commit-msg: drafting commit message via claude haiku..." >&2
-
-  # `|| RC=$?` keeps set -e quiet on claude failure (timeout, auth, etc.)
-  # while still capturing the rc for the diagnostic below. See the longer
-  # comment on the API curl call above for the bash set -e verification.
-  RC=0
-  MSG=$(printf '%s' "$DIFF" | timeout 25s claude \
-    --model haiku \
-    --no-session-persistence \
-    --strict-mcp-config --mcp-config='{"mcpServers":{}}' \
-    --system-prompt "$CLAUDE_SYSTEM_PROMPT" \
-    -p "$PROMPT") || RC=$?
-  if [ "$RC" -ne 0 ] || [ -z "$MSG" ]; then
-    echo "prepare-commit-msg: claude failed rc=$RC, skipping AI draft" >&2
-    exit 0
-  fi
-fi
+# `jq -e` makes null / missing field exit non-zero so set -eu kills the
+# script (and git aborts the commit) instead of writing "null" to the buffer.
+MSG=$(printf '%s' "$RESP" | jq -er '.content[0].text')
 
 # Strip a single layer of wrapping quotes/backticks from the first line —
-# common claude output shapes that would otherwise land literally in the buffer.
+# Haiku occasionally wraps its output despite the system prompt.
 FIRST=$(printf '%s\n' "$MSG" | head -n 1)
 case "$FIRST" in
   \"*\"|\'*\'|\`*\`)
@@ -173,7 +95,7 @@ case "$FIRST" in
 esac
 
 # Atomic write via temp + rename. Failures here propagate under set -eu
-# and git aborts the commit with bash's error — no silent half-fix.
+# and git aborts the commit.
 TMP=$(mktemp "${MSG_FILE}.aimsg.XXXXXX")
 {
   printf '%s\n\n' "$MSG"
