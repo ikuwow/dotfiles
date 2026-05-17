@@ -1,32 +1,25 @@
 #!/usr/bin/env bash
-# Drafts an AI commit message (subject + optional body) into the commit
-# buffer for interactive commits by calling the Anthropic Messages API
-# directly via curl. No-op unless GIT_AI_COMMIT_ANTHROPIC_API_KEY is set
-# (and not disabled via GIT_AI_COMMIT_MSG=0) — without the env var
-# git opens the usual empty editor template.
-#
-# Any API-side failure (network, auth, timeout, missing jq/curl, malformed
-# response) propagates under set -eu, so git aborts the commit with bash's
-# error message instead of silently dropping the AI draft.
-#
-# Per-repo install (no core.hooksPath) so this hook never shadows another
-# repo's .git/hooks/. See README.md "AI-Assisted Commit Messages" and
-# bin/install-aimsg-hook.sh.
+# AI-draft a commit message via the Anthropic Messages API. No-op unless
+# GIT_AI_COMMIT_ANTHROPIC_API_KEY is set; any API failure propagates
+# under set -eu so git aborts the commit. See README.md.
 
 set -eu
 
 MSG_FILE="$1"
 MSG_SOURCE="${2:-}"
 
-# $2 is empty only for interactive `git commit` (no -m/--amend/merge/squash/template).
+# Skip non-interactive commits (-m, --amend, merge, squash, template).
 if [ -n "$MSG_SOURCE" ]; then exit 0; fi
 if [ "${GIT_AI_COMMIT_MSG:-1}" = "0" ]; then exit 0; fi
-if [ -z "${GIT_AI_COMMIT_ANTHROPIC_API_KEY:-}" ]; then exit 0; fi
+if [ -z "${GIT_AI_COMMIT_ANTHROPIC_API_KEY:-}" ]; then
+  echo "prepare-commit-msg: GIT_AI_COMMIT_ANTHROPIC_API_KEY not set, skipping AI draft" >&2
+  exit 0
+fi
 
 DIFF=$(git diff --cached)
 if [ -z "$DIFF" ]; then exit 0; fi
 
-# || true: git log fails on the very first commit; empty RECENT is fine.
+# git log fails on the very first commit; empty RECENT is fine.
 RECENT=$(git log -n 10 --pretty=format:'%s' 2>/dev/null || true)
 
 PROMPT="Draft a git commit message for the staged diff.
@@ -56,8 +49,7 @@ $DIFF
 MODEL="claude-haiku-4-5"
 echo "prepare-commit-msg: drafting commit message via Anthropic API ($MODEL)..." >&2
 
-# jq --arg / --argjson keep quotes, backslashes, newlines, and control
-# chars from the diff out of trouble — no manual JSON escaping needed.
+# jq --arg / --argjson avoids manual JSON escaping for control chars in the diff.
 REQUEST=$(jq -n \
   --arg model "$MODEL" \
   --argjson max_tokens 1024 \
@@ -65,10 +57,8 @@ REQUEST=$(jq -n \
   --arg user "$USER_CONTENT" \
   '{model:$model, max_tokens:$max_tokens, system:$system, messages:[{role:"user", content:$user}]}')
 
-# --fail-with-body: non-zero rc on HTTP >=400 AND still print body, so the
-# stderr line from curl --show-error includes Anthropic's error envelope.
-# --max-time 8 / --connect-timeout 3: bound the worst case for interactive use.
-# --data-binary @-: stream the body via stdin to dodge ARG_MAX on large diffs.
+# --fail-with-body: non-zero rc on HTTP >=400, body still printed for stderr.
+# --data-binary @-: stream stdin to dodge ARG_MAX on large diffs.
 RESP=$(printf '%s' "$REQUEST" | curl --silent --show-error --fail-with-body \
   --max-time 8 --connect-timeout 3 \
   -X POST https://api.anthropic.com/v1/messages \
@@ -77,12 +67,11 @@ RESP=$(printf '%s' "$REQUEST" | curl --silent --show-error --fail-with-body \
   -H "content-type: application/json" \
   --data-binary @-)
 
-# `jq -e` makes null / missing field exit non-zero so set -eu kills the
-# script (and git aborts the commit) instead of writing "null" to the buffer.
+# jq -e: null/missing field exits non-zero so set -eu kills the hook
+# instead of writing "null" to the buffer.
 MSG=$(printf '%s' "$RESP" | jq -er '.content[0].text')
 
-# Strip a single layer of wrapping quotes/backticks from the first line —
-# Haiku occasionally wraps its output despite the system prompt.
+# Strip a single layer of wrapping quotes/backticks — Haiku occasionally wraps output.
 FIRST=$(printf '%s\n' "$MSG" | head -n 1)
 case "$FIRST" in
   \"*\"|\'*\'|\`*\`)
@@ -96,8 +85,6 @@ case "$FIRST" in
     ;;
 esac
 
-# Atomic write via temp + rename. Failures here propagate under set -eu
-# and git aborts the commit.
 TMP=$(mktemp "${MSG_FILE}.aimsg.XXXXXX")
 {
   printf '%s\n\n' "$MSG"
