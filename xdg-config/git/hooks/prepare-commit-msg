@@ -56,62 +56,81 @@ MSG=""
 
 # Fast path: call Anthropic Messages API directly via curl. Saves the
 # claude CLI startup (~1s) and OAuth subscription-tier routing overhead
-# (~3s on this user's host vs ~600ms public Haiku TTFT). Falls back to
-# claude -p on any failure so the commit is never blocked.
+# (~3s on this user's host vs ~600ms public Haiku TTFT — see #178 for
+# the hyperfine breakdown). Falls back to claude -p on any failure so
+# the commit is never blocked.
 if [ -n "${GIT_AI_COMMIT_ANTHROPIC_API_KEY:-}" ]; then
-  echo "prepare-commit-msg: drafting commit message via Anthropic API (claude-haiku-4-5)..." >&2
+  if ! command -v jq >/dev/null 2>&1 || ! command -v curl >/dev/null 2>&1; then
+    # Honour the "never block commit" contract even when the host is missing
+    # the API-path tools: skip silently to the claude fallback instead of
+    # letting set -e kill the script at the first jq/curl invocation.
+    echo "prepare-commit-msg: API key set but jq or curl not on PATH, falling back to claude -p" >&2
+  else
+    echo "prepare-commit-msg: drafting commit message via Anthropic API (claude-haiku-4-5)..." >&2
 
-  USER_CONTENT="$PROMPT
+    USER_CONTENT="$PROMPT
 
 --- staged diff ---
 $DIFF
 --- end diff ---"
 
-  # jq --arg handles quotes / backslashes / newlines in the diff safely.
-  REQUEST=$(jq -n \
-    --arg model "claude-haiku-4-5" \
-    --argjson max_tokens 1024 \
-    --arg system "$CLAUDE_SYSTEM_PROMPT" \
-    --arg user "$USER_CONTENT" \
-    '{model:$model, max_tokens:$max_tokens, system:$system, messages:[{role:"user", content:$user}]}')
+    # jq --arg / --argjson keep quotes, backslashes, newlines, and control
+    # chars from the diff out of trouble — no manual JSON escaping needed.
+    REQUEST=$(jq -n \
+      --arg model "claude-haiku-4-5" \
+      --argjson max_tokens 1024 \
+      --arg system "$CLAUDE_SYSTEM_PROMPT" \
+      --arg user "$USER_CONTENT" \
+      '{model:$model, max_tokens:$max_tokens, system:$system, messages:[{role:"user", content:$user}]}')
 
-  # --fail-with-body: non-zero rc on HTTP >=400 AND still print body so we can
-  # log Anthropic's error envelope in the fallback warning.
-  # --max-time 8: 5s target is for success case; 8s tolerates slow networks
-  # before triggering fallback (a too-tight curl timeout that fell back to
-  # claude would push the worst case past the unoptimized baseline).
-  # --data-binary @-: pipe body via stdin to avoid ARG_MAX on large diffs.
-  #
-  # `|| CURL_RC=$?` is required because bash DOES fire set -e on `VAR=$(...)`
-  # when the substitution exits non-zero — the POSIX carve-out is shell-
-  # dependent and doesn't apply here. The `||` provides a successful outer
-  # exit so set -e stays quiet while we capture the rc for branching.
-  RESP=""
-  CURL_RC=0
-  RESP=$(printf '%s' "$REQUEST" | curl --silent --show-error --fail-with-body \
-    --max-time 8 --connect-timeout 3 \
-    -X POST https://api.anthropic.com/v1/messages \
-    -H "x-api-key: $GIT_AI_COMMIT_ANTHROPIC_API_KEY" \
-    -H "anthropic-version: 2023-06-01" \
-    -H "content-type: application/json" \
-    --data-binary @- 2>&1) || CURL_RC=$?
+    # --fail-with-body: non-zero rc on HTTP >=400 AND still print body, so the
+    # fallback warning can quote Anthropic's error envelope verbatim.
+    # --max-time 8 / --connect-timeout 3: budget chosen to comfortably contain
+    # success (Haiku TTFT ~600ms-1.2s plus completion) while still failing
+    # fast enough that the fallback-to-claude worst case stays bounded.
+    # --data-binary @-: stream the body via stdin to dodge ARG_MAX on large diffs.
+    # stderr is intentionally NOT merged into stdout — curl's own warnings
+    # (TLS retries etc.) would otherwise pollute $RESP and break jq parsing
+    # on responses that were otherwise successful.
+    #
+    # `|| CURL_RC=$?` keeps set -e quiet on curl failure while still capturing
+    # the rc for branching. Verified on macOS bash 3.2.57 and 5.3.9: plain
+    # `VAR=$(failing_cmd)` triggers set -e (no implicit POSIX carve-out for
+    # the assignment-with-substitution form). Reproduce with:
+    #   bash -c 'set -e; X=$(false); echo got-here'   # exits 1, no output.
+    RESP=""
+    CURL_RC=0
+    RESP=$(printf '%s' "$REQUEST" | curl --silent --show-error --fail-with-body \
+      --max-time 8 --connect-timeout 3 \
+      -X POST https://api.anthropic.com/v1/messages \
+      -H "x-api-key: $GIT_AI_COMMIT_ANTHROPIC_API_KEY" \
+      -H "anthropic-version: 2023-06-01" \
+      -H "content-type: application/json" \
+      --data-binary @-) || CURL_RC=$?
 
-  REASON=""
-  if [ "$CURL_RC" -ne 0 ]; then
-    REASON="curl rc=$CURL_RC: $(printf '%s' "$RESP" | head -c 200 | tr '\n' ' ')"
-  else
-    # Anthropic error envelope: {"type":"error","error":{"type":"...","message":"..."}}
-    TYPE=$(printf '%s' "$RESP" | jq -r '.type // empty' 2>/dev/null || true)
-    if [ "$TYPE" = "error" ]; then
-      REASON="API error: $(printf '%s' "$RESP" | jq -r '.error.message // "unknown"' 2>/dev/null || true)"
+    # Always seed REASON so the fallback warning never reads "API call failed ()".
+    REASON="unknown failure"
+    if [ "$CURL_RC" -ne 0 ]; then
+      REASON="curl rc=$CURL_RC: $(printf '%s' "$RESP" | head -c 500 | tr '\n' ' ')"
     else
-      MSG=$(printf '%s' "$RESP" | jq -r '.content[0].text // empty' 2>/dev/null || true)
-      if [ -z "$MSG" ]; then REASON="empty content in response"; fi
+      # Success envelope: {"type":"message", "content":[{"type":"text","text":"..."}], ...}
+      # Error envelope:   {"type":"error",   "error":{"type":"...","message":"..."}, ...}
+      # jq stderr is left visible (no 2>/dev/null) so genuine parse bugs surface
+      # in the terminal; `|| true` is set -e safety, not error suppression.
+      TYPE=$(printf '%s' "$RESP" | jq -r '.type // empty') || TYPE=""
+      if [ "$TYPE" = "error" ]; then
+        REASON="API error: $(printf '%s' "$RESP" | jq -r '.error.message // "unknown"' || echo unknown)"
+      else
+        MSG=$(printf '%s' "$RESP" | jq -r '.content[0].text // empty') || MSG=""
+        if [ -z "$MSG" ]; then
+          REASON="unexpected response shape: $(printf '%s' "$RESP" | head -c 500 | tr '\n' ' ')"
+        fi
+      fi
     fi
-  fi
 
-  if [ -z "$MSG" ]; then
-    echo "prepare-commit-msg: API call failed ($REASON), falling back to claude -p" >&2
+    if [ -z "$MSG" ]; then
+      echo "prepare-commit-msg: API call failed ($REASON), falling back to claude -p" >&2
+    fi
   fi
 fi
 
@@ -122,9 +141,9 @@ if [ -z "$MSG" ]; then
 
   echo "prepare-commit-msg: drafting commit message via claude haiku..." >&2
 
-  # `|| RC=$?` keeps set -e quiet on claude failure (timeout, auth, etc.) while
-  # still capturing the rc for the error-message branch below. Bash fires
-  # set -e on `VAR=$(failing_cmd)` despite the often-cited POSIX carve-out.
+  # `|| RC=$?` keeps set -e quiet on claude failure (timeout, auth, etc.)
+  # while still capturing the rc for the diagnostic below. See the longer
+  # comment on the API curl call above for the bash set -e verification.
   RC=0
   MSG=$(printf '%s' "$DIFF" | timeout 25s claude \
     --model haiku \
