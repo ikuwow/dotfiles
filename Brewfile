@@ -113,6 +113,7 @@ brew "direnv"
 brew "ansible"
 brew "ipv6toolkit"
 brew "yt-dlp"
+brew "hyperfine"
 
 brew "actionlint"
 brew "yamllint"
