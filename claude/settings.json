@@ -68,6 +68,8 @@
       "Bash(ghq get -p *)",
       "Bash(git worktree remove *)",
       "Bash(which *)",
+      "Bash(command -v *)",
+      "Bash(command -V *)",
       "Bash(wc *)",
       "Bash(nl *)",
       "Bash(uname)",
