@@ -219,7 +219,22 @@
       "WebFetch(domain:*.local)",
       "WebFetch(domain:*.internal)",
       "WebFetch(domain:169.254.169.254)",
-      "mcp__claude_ai_GitHub_MCP"
+      "mcp__claude_ai_GitHub_MCP",
+      "Read(**/.env)",
+      "Read(**/.env.local)",
+      "Read(**/.env.*.local)",
+      "Read(**/.envrc)",
+      "Read(**/.netrc)",
+      "Read(**/.aws/credentials)",
+      "Read(**/credentials.json)",
+      "Read(**/secrets.yaml)",
+      "Read(**/secrets.yml)",
+      "Read(**/*.pem)",
+      "Read(**/*.key)",
+      "Read(**/id_rsa)",
+      "Read(**/id_ed25519)",
+      "Read(**/kubeconfig)",
+      "Read(**/serviceAccount.json)"
     ],
     "ask": [
       "Bash(git merge *)",
