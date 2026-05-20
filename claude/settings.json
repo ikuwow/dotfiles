@@ -382,6 +382,9 @@
       ]
     }
   },
+  "env": {
+    "DISABLE_AUTOUPDATER": "1"
+  },
   "autoUpdatesChannel": "stable",
   "theme": "auto",
   "remoteControlAtStartup": true,
