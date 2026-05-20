@@ -225,7 +225,7 @@
       "Read(**/.env.*.local)",
       "Read(**/.envrc)",
       "Read(**/.netrc)",
-      "Read(**/credentials)",
+      "Read(**/.aws/credentials)",
       "Read(**/credentials.json)",
       "Read(**/secrets.yaml)",
       "Read(**/secrets.yml)",
