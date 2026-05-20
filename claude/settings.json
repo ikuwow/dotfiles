@@ -232,9 +232,7 @@
       "Read(**/*.pem)",
       "Read(**/*.key)",
       "Read(**/id_rsa)",
-      "Read(**/id_rsa.pub)",
       "Read(**/id_ed25519)",
-      "Read(**/id_ed25519.pub)",
       "Read(**/kubeconfig)",
       "Read(**/serviceAccount.json)"
     ],
