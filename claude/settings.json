@@ -282,6 +282,16 @@
     ]
   },
   "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "date '+%Y-%m-%dT%H:%M:%S%z' | sed 's/..$/:&/' | jq -R '{hookSpecificOutput:{hookEventName:\"UserPromptSubmit\",additionalContext:(\"Current datetime: \"+.)}}' || true"
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
         "matcher": "Bash",
