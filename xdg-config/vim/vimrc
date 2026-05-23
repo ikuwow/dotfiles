@@ -293,6 +293,8 @@ if has('nvim')
     Plug 'kassio/neoterm'
     Plug 'folke/snacks.nvim'
     Plug 'coder/claudecode.nvim'
+    " Neovide IME inline preedit; self-detects Neovide, no-op in terminal nvim
+    Plug 'sevenc-nanashi/neov-ime.nvim'
 endif
 
 " This automatically executes `filetype plugin indent on` and `syntax enable`.
