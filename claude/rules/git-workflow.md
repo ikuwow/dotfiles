@@ -285,9 +285,15 @@ After the PR is merged (or the task is fully done):
 
 1. Move back to the repository root:
    `cd <repository root>`
-2. Remove the worktree:
+2. Remove the worktree (worktree-based workflows only):
    `git worktree remove .worktrees/<branch>`
-   - Skip this step if the project rules prohibit worktrees and the
-     branch was created via `git checkout -b` only. Leave the branch
-     for the user to delete, or run `git branch -d <branch>` if
-     explicitly requested.
+   - Skip if the project prohibits worktrees and the branch was created
+     via `git checkout -b` only.
+3. Delete the merged local branch:
+   `git delete-squashed`
+   - Removes local branches whose content is already in the default
+     branch, including squash-merged ones that `git branch -d` refuses
+     ("not fully merged"). Unmerged branches are left untouched, and the
+     script aborts on a dirty working tree.
+   - Use the space form (`git delete-squashed`); it is already covered by
+     the `Bash(git *)` allow rule, so no extra permission is needed.
