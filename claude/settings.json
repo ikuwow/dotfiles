@@ -1,5 +1,8 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "env": {
+    "DISABLE_AUTOUPDATER": "1"
+  },
   "permissions": {
     "allow": [
       "Read(~/.local/share/sre-knowledge-base/**)",
@@ -220,6 +223,7 @@
       "WebFetch(domain:*.internal)",
       "WebFetch(domain:169.254.169.254)",
       "mcp__claude_ai_GitHub_MCP",
+      "mcp__claude_ai_GitHub_MCP_Server__*",
       "Read(**/.env)",
       "Read(**/.env.local)",
       "Read(**/.env.*.local)",
@@ -406,9 +410,6 @@
         "~/.ssh/known_hosts"
       ]
     }
-  },
-  "env": {
-    "DISABLE_AUTOUPDATER": "1"
   },
   "autoUpdatesChannel": "stable",
   "theme": "auto",
