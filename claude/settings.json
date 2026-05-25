@@ -220,6 +220,7 @@
       "WebFetch(domain:*.internal)",
       "WebFetch(domain:169.254.169.254)",
       "mcp__claude_ai_GitHub_MCP",
+      "mcp__claude_ai_GitHub_MCP_Server__*",
       "Read(**/.env)",
       "Read(**/.env.local)",
       "Read(**/.env.*.local)",
