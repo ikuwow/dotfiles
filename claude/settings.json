@@ -1,8 +1,5 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
-  "env": {
-    "DISABLE_AUTOUPDATER": "1"
-  },
   "permissions": {
     "allow": [
       "Read(~/.local/share/sre-knowledge-base/**)",
@@ -410,6 +407,9 @@
         "~/.ssh/known_hosts"
       ]
     }
+  },
+  "env": {
+    "DISABLE_AUTOUPDATER": "1"
   },
   "autoUpdatesChannel": "stable",
   "theme": "auto",
