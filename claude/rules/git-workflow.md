@@ -216,8 +216,8 @@ on every tick regardless of change).
 
 2. On each event notification, re-fetch full detail with the three
    polling commands in step 1 (the event line is only a signal), then
-   handle it per steps 4-6. The notification is not a user reply —
-   keep working.
+   handle it per steps 3-7 below. The notification is not a user
+   reply — keep working.
 
 3. Before any push (any reaction that would write to origin):
    - Verify the current branch matches the PR's `headRefName`.
