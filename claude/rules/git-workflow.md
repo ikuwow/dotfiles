@@ -173,9 +173,11 @@ on every tick regardless of change).
    - `STATE: MERGED` / `STATE: CLOSED` — top-level `state` changed.
    - `REVIEW: CHANGES_REQUESTED` / `REVIEW: APPROVED` —
      `reviewDecision` changed.
-   - `NEW_COMMENT: <author> <path>:<line>` — a comment ID not seen
-     before, in a thread where `isResolved == false` and
-     `isOutdated == false`.
+   - `NEW_COMMENT: <author> <path>:<line>` — a review-thread comment
+     (GraphQL `reviewThreads` query) whose ID was not seen before, in
+     a thread where `isResolved == false` and `isOutdated == false`.
+     Top-level PR comments aren't gated by resolution state — read them
+     from the `comments` field when you re-fetch detail.
    - `CI_FAILURE: <check name>` — a new `FAILURE` in
      `statusCheckRollup` or a new failed run from `gh run list`.
 
@@ -187,12 +189,14 @@ on every tick regardless of change).
    - Coverage (silence ≠ success): the emit set must cover CI failure
      and both terminal states, not just the happy path. Guard each
      `gh` call with `|| true` (or `continue`) so one failed poll does
-     not kill the monitor.
+     not kill the monitor; a failed or empty fetch must not be read as
+     a state change (no spurious event).
    - Exit the loop (or `TaskStop` from the reaction turn) once `state`
      is `MERGED` or `CLOSED`.
    - 60s interval is fine for a remote API and within rate limits.
      There is no `ScheduleWakeup` prompt-cache concern here because
-     the poll loop runs in the background shell and does not wake you.
+     the poll loop's own ticks run in the background shell and do not
+     wake you (only an emitted line does).
 
    Polling commands (reused inside the Monitor script and again when
    you re-fetch detail on an event — top-level fields, threads, and
@@ -211,8 +215,9 @@ on every tick regardless of change).
      `gh run list --branch <headRefName> --json databaseId,name,status,conclusion,createdAt,headSha,workflowName --limit 20`
 
 2. On each event notification, re-fetch full detail with the three
-   commands above (the event line is only a signal), then react per
-   steps 4-6. The notification is not a user reply — keep working.
+   polling commands in step 1 (the event line is only a signal), then
+   handle it per steps 4-6. The notification is not a user reply —
+   keep working.
 
 3. Before any push (any reaction that would write to origin):
    - Verify the current branch matches the PR's `headRefName`.
@@ -232,8 +237,10 @@ on every tick regardless of change).
      applicable — skip them.
    - `REVIEW: APPROVED` (no further action requested): report to the
      user in the next turn, do not act.
-   - `CI_FAILURE`: inspect with
-     `gh run view --log-failed <databaseId>`, fix, push.
+   - `CI_FAILURE`: get the `databaseId` from `gh run list` at re-fetch
+     (`statusCheckRollup` check names don't always map 1:1 to run
+     names), inspect with `gh run view --log-failed <databaseId>`, fix,
+     push.
    - CI still in progress (`PENDING` / `IN_PROGRESS` / `QUEUED` seen
      when you re-fetch): no action, the Monitor will emit again when
      it resolves.
