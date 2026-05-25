@@ -159,22 +159,44 @@ for the user to remind you. Use the section 6 procedure
 
 ### Phase 5: Watch PR activity until merge
 
-After Phase 4 marks the PR ready for review, start a `/loop` to watch
-the PR until it is merged or closed. Reviewers (human, Devin, Copilot)
-often act soon after ready, and CI may still be running — the watch
-loop catches activity and reacts autonomously instead of waiting for
-the user to re-engage.
+After Phase 4 marks the PR ready for review, arm a persistent
+`Monitor` to watch the PR until it is merged or closed. Reviewers
+(human, Devin, Copilot) often act soon after ready, and CI may still
+be running. The Monitor runs a background poll loop whose stdout
+lines become notifications, so only an actionable change wakes you —
+quiet periods stay silent (unlike a timer-based `/loop`, which wakes
+on every tick regardless of change).
 
-1. Start the watch loop in dynamic mode (no interval — let Claude
-   self-pace via `ScheduleWakeup`):
+1. Arm a persistent Monitor (`persistent: true`) running a poll loop
+   that re-runs the three polling commands below every 60s and emits
+   exactly ONE stdout line per actionable change:
+   - `STATE: MERGED` / `STATE: CLOSED` — top-level `state` changed.
+   - `REVIEW: CHANGES_REQUESTED` / `REVIEW: APPROVED` —
+     `reviewDecision` changed.
+   - `NEW_COMMENT: <author> <path>:<line>` — a comment ID not seen
+     before, in a thread where `isResolved == false` and
+     `isOutdated == false`.
+   - `CI_FAILURE: <check name>` — a new `FAILURE` in
+     `statusCheckRollup` or a new failed run from `gh run list`.
 
-   ```
-   /loop Watch PR #<number>: read `~/.claude/rules/git-workflow.md` Phase 5 step (1) and run each polling command listed there every iteration; react per the action / cap / pacing / exit / conflict rules in the rest of Phase 5; exit when state becomes MERGED or CLOSED.
-   ```
+   Script requirements:
+   - Dedup new comments against a `mktemp` seen-IDs file
+     (`comm -13`); track the previous top-level state / reviewDecision
+     in shell vars. Emit nothing on a no-op poll — this silence is the
+     whole point of the switch.
+   - Coverage (silence ≠ success): the emit set must cover CI failure
+     and both terminal states, not just the happy path. Guard each
+     `gh` call with `|| true` (or `continue`) so one failed poll does
+     not kill the monitor.
+   - Exit the loop (or `TaskStop` from the reaction turn) once `state`
+     is `MERGED` or `CLOSED`.
+   - 60s interval is fine for a remote API and within rate limits.
+     There is no `ScheduleWakeup` prompt-cache concern here because
+     the poll loop runs in the background shell and does not wake you.
 
-   Polling commands (run all three every iteration so no signal is
-   missed — top-level fields, threads, and run history each carry
-   information the others lack):
+   Polling commands (reused inside the Monitor script and again when
+   you re-fetch detail on an event — top-level fields, threads, and
+   run history each carry information the others lack):
 
    - PR top-level state:
      `gh pr view <number> --json state,reviewDecision,latestReviews,statusCheckRollup,comments,updatedAt,mergedAt,headRefName`
@@ -188,66 +210,65 @@ the user to re-engage.
      `statusCheckRollup` doesn't show — e.g. older runs, re-run jobs):
      `gh run list --branch <headRefName> --json databaseId,name,status,conclusion,createdAt,headSha,workflowName --limit 20`
 
-2. Before any push (every iteration that would write to origin):
+2. On each event notification, re-fetch full detail with the three
+   commands above (the event line is only a signal), then react per
+   steps 4-6. The notification is not a user reply — keep working.
+
+3. Before any push (any reaction that would write to origin):
    - Verify the current branch matches the PR's `headRefName`.
    - `git fetch` and confirm local HEAD is still ahead of
      `origin/<branch>` (no manual user push has happened in between).
    - Skip the push if either check fails; surface the conflict to the
      user instead of trying to reconcile silently.
 
-3. Each iteration, compare against the previous iteration's snapshot
-   (in-session memory; full state tracking is out of scope) and act:
-   - Review with `CHANGES_REQUESTED`, or a new inline review comment
-     in a thread where `isResolved == false` and `isOutdated == false`
-     that is clearly a fix request (human, Devin, Copilot, etc.):
-     read the content, modify code, push the fix. When the intent is
-     ambiguous (question, nit, discussion), reply via `gh pr comment`
-     instead of pushing code. Threads with `isResolved == true` or
+4. React to the event:
+   - `REVIEW: CHANGES_REQUESTED`, or a `NEW_COMMENT` in a thread where
+     `isResolved == false` and `isOutdated == false` that is clearly a
+     fix request (human, Devin, Copilot, etc.): read the content,
+     modify code, push the fix. When the intent is ambiguous
+     (question, nit, discussion), reply via `gh pr comment` instead of
+     pushing code. Threads with `isResolved == true` or
      `isOutdated == true` are already addressed or no longer
-     applicable — skip them so previously-fixed comments don't
-     re-trigger work.
-   - Review with `APPROVED` (no further action requested): report to
-     the user in the next assistant turn, do not act.
-   - CI / workflow failure (any `FAILURE` in `statusCheckRollup` or
-     a new `FAILURE` run from `gh run list`): inspect with
+     applicable — skip them.
+   - `REVIEW: APPROVED` (no further action requested): report to the
+     user in the next turn, do not act.
+   - `CI_FAILURE`: inspect with
      `gh run view --log-failed <databaseId>`, fix, push.
-   - CI in progress (any `PENDING` / `IN_PROGRESS` / `QUEUED`): no
-     action, wait.
-   - No change since last check: no action.
+   - CI still in progress (`PENDING` / `IN_PROGRESS` / `QUEUED` seen
+     when you re-fetch): no action, the Monitor will emit again when
+     it resolves.
 
-4. Iteration cap for autonomous fix pushes:
-   - Stop pushing autonomous fixes after 3 fix commits in this
-     loop. Beyond that, switch to reply-only mode and notify the
-     user that the PR appears to need human attention. This
+5. Cap for autonomous fix pushes:
+   - Stop pushing autonomous fixes after 3 fix commits for this PR in
+     this session. Beyond that, switch to reply-only mode and notify
+     the user that the PR appears to need human attention. This
      prevents runaway loops when an automated reviewer keeps
      re-requesting changes on each push.
 
-5. Pacing guidance for `ScheduleWakeup` (Anthropic prompt cache has a
-   5-minute TTL — sleeping past 300s costs a full cache rebuild on
-   wake-up):
-   - Recent activity (within last hour): 120–270s. Stays inside the
-     cache TTL so the next iteration is cheap. Never pick exactly
-     300s — it pays the cache miss without amortizing the wait.
-   - Quiet: 1200–1800s. One cache miss buys a much longer wait.
-   - Tool clamps to [60, 3600]s.
-
 6. Exit conditions:
-   - `state` becomes `MERGED` → execute Step 7 (Cleanup) inside the
-     same loop iteration, then end the loop.
-   - `state` becomes `CLOSED` without merge → end the loop, skip
+   - `STATE: MERGED` → execute Step 7 (Cleanup), then `TaskStop` the
+     monitor.
+   - `STATE: CLOSED` without merge → `TaskStop` the monitor, skip
      cleanup (user may reopen).
-   - Session ends (PC sleep, Claude Code closed) → loop terminates
-     silently. This is accepted as best-effort.
+   - Session ends (PC sleep, Claude Code closed) → the Monitor
+     terminates with the session. This is accepted as best-effort.
 
 7. Conflict handling:
-   - If the user pushes commits manually while the loop is running,
-     just acknowledge in the next iteration and continue watching.
-     Do not try to revert or duplicate the user's work.
+   - If the user pushes commits manually while the Monitor is running,
+     just acknowledge on the next event and continue watching. Do not
+     try to revert or duplicate the user's work.
    - If the user gives a new instruction that supersedes the watch,
-     pause / cancel the loop and prioritize the user request.
+     `TaskStop` the monitor and prioritize the user request.
 
-This is the final phase of Step 5; Step 7 (Cleanup) still runs when
-the loop exits on `MERGED`. The watch is best-effort by design — for
+Notifications follow the Monitor tool's default guidance: an event
+landing in chat (and the existing `noti` Notification hook firing when
+you wake) is enough; reserve any explicit `PushNotification` for events
+that change what the user would do next (e.g. merge, or "needs human
+attention" after the fix cap). Do not push on routine CI / comment
+events.
+
+This is the final phase of Step 5; Step 7 (Cleanup) still runs when the
+Monitor exits on `MERGED`. The watch is best-effort by design — for
 event-driven reliability use GitHub Actions instead.
 
 ## 6. Update a PR / issue (title / body)
