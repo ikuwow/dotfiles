@@ -32,7 +32,8 @@ color_for_pct() {
   fi
 }
 
-# Higher effort costs more latency/budget, so color by intensity.
+# Higher effort costs more latency/budget, so color by intensity
+# (default green covers low/medium and any future/unknown level).
 color_for_effort() {
   case "$1" in
     xhigh|max) printf '%s' "$RED" ;;
@@ -41,8 +42,8 @@ color_for_effort() {
   esac
 }
 
-# effort.level is absent when the model does not support the parameter;
-# drop the whole segment in that case rather than printing a placeholder.
+# The effort object is absent on models without the parameter, so
+# .effort.level // "" yields ""; drop the segment instead of a placeholder.
 EFFORT_SEG=""
 if [ -n "$EFFORT" ]; then
   EFFORT_COLOR=$(color_for_effort "$EFFORT")
