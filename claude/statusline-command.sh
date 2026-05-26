@@ -15,6 +15,8 @@ SEP="${GREY} | ${RESET}"
 INPUT=$(cat)
 
 MODEL=$(echo "$INPUT" | jq -r '.model.display_name // "Unknown"')
+EFFORT=$(echo "$INPUT" | jq -r '.effort.level // ""')
+THINKING=$(echo "$INPUT" | jq -r '.thinking.enabled // false')
 CONTEXT_PCT=$(echo "$INPUT" | jq -r '.context_window.used_percentage // 0')
 LINES_ADDED=$(echo "$INPUT" | jq -r '.cost.total_lines_added // 0')
 LINES_REMOVED=$(echo "$INPUT" | jq -r '.cost.total_lines_removed // 0')
@@ -30,6 +32,30 @@ color_for_pct() {
   fi
 }
 
-# Line 1: model, context, lines changed
+# Higher effort costs more latency/budget, so color by intensity
+# (default green covers low/medium and any future/unknown level).
+color_for_effort() {
+  case "$1" in
+    xhigh|max) printf '%s' "$RED" ;;
+    high) printf '%s' "$YELLOW" ;;
+    *) printf '%s' "$GREEN" ;;
+  esac
+}
+
+# The effort object is absent on models without the parameter, so
+# .effort.level // "" yields ""; drop the segment instead of a placeholder.
+EFFORT_SEG=""
+if [ -n "$EFFORT" ]; then
+  EFFORT_COLOR=$(color_for_effort "$EFFORT")
+  EFFORT_SEG="⚡ ${EFFORT_COLOR}${EFFORT}${RESET}${SEP}"
+fi
+
+if [ "$THINKING" = "true" ]; then
+  THINKING_SEG="🧠 ${GREEN}on${RESET}${SEP}"
+else
+  THINKING_SEG="🧠 ${GREY}off${RESET}${SEP}"
+fi
+
+# Line 1: model, effort, thinking, context, lines changed
 CTX_COLOR=$(color_for_pct "$CONTEXT_PCT")
-printf '%b' "🤖 ${MODEL}${SEP}📊 ${CTX_COLOR}${CONTEXT_PCT}%${RESET}${SEP}✏️ +${LINES_ADDED}/-${LINES_REMOVED}${SEP}\n"
+printf '%b' "🤖 ${MODEL}${SEP}${EFFORT_SEG}${THINKING_SEG}📊 ${CTX_COLOR}${CONTEXT_PCT}%${RESET}${SEP}✏️ +${LINES_ADDED}/-${LINES_REMOVED}${SEP}\n"
