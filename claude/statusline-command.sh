@@ -47,13 +47,13 @@ color_for_effort() {
 EFFORT_SEG=""
 if [ -n "$EFFORT" ]; then
   EFFORT_COLOR=$(color_for_effort "$EFFORT")
-  EFFORT_SEG="⚡${EFFORT_COLOR}${EFFORT}${RESET}${SEP}"
+  EFFORT_SEG="⚡ ${EFFORT_COLOR}${EFFORT}${RESET}${SEP}"
 fi
 
 if [ "$THINKING" = "true" ]; then
-  THINKING_SEG="🧠${GREEN}on${RESET}${SEP}"
+  THINKING_SEG="🧠 ${GREEN}on${RESET}${SEP}"
 else
-  THINKING_SEG="🧠${GREY}off${RESET}${SEP}"
+  THINKING_SEG="🧠 ${GREY}off${RESET}${SEP}"
 fi
 
 # Line 1: model, effort, thinking, context, lines changed
