@@ -78,3 +78,5 @@ find "$DOTPATH/codex/rules" -maxdepth 1 -mindepth 1 -type f -name '*.rules' -exe
 
 # Junie CLI (JetBrains)
 link AIRULES.md  "$HOME/.junie/AGENTS.md"
+mkdir -p "$HOME/.junie/skills"
+find "$DOTPATH/claude/skills" -maxdepth 1 -mindepth 1 -type d -exec ln -fvns {} "$HOME/.junie/skills/" \;
