@@ -1,4 +1,5 @@
 ---
+name: pr-selfcheck
 description: Perform a self-review of a PR before requesting human review. TRIGGER when user invokes /pr-selfcheck or when the git workflow reaches the self-review step after PR creation. Accepts a PR number as an argument.
 model: sonnet
 effort: medium

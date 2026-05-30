@@ -9,6 +9,7 @@ tap "keidarcy/tap"
 tap "oven-sh/bun"
 tap "configcat/tap"
 tap "pipe-cd/homebrew-tap"
+tap "jetbrains/junie"
 
 brew "mas"
 
@@ -47,6 +48,7 @@ brew "grep"
 cask "codex"
 cask "claude-code"
 brew "gemini-cli"
+brew "junie"
 
 # required by vim
 brew "python"

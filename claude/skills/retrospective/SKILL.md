@@ -1,4 +1,5 @@
 ---
+name: retrospective
 description: Use when the user wants to reflect on AI communication quality and get improvement suggestions for rule files or the project itself. TRIGGER when user invokes /retrospective or asks to review the session.
 model: opus
 effort: xhigh
