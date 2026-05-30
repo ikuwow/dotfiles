@@ -77,5 +77,4 @@ mkdir -p "$HOME/.codex/rules"
 find "$DOTPATH/codex/rules" -maxdepth 1 -mindepth 1 -type f -name '*.rules' -exec ln -fvns {} "$HOME/.codex/rules/" \;
 
 # Junie CLI (JetBrains)
-mkdir -p "$HOME/.junie"
 link AIRULES.md  "$HOME/.junie/AGENTS.md"
