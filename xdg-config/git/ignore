@@ -22,3 +22,7 @@ CLAUDE.local.md
 .claude/settings.local.json
 .claude/scheduled_tasks.lock
 .claude/worktrees/
+
+# Junie session/user data (project-level AGENTS.md / skills etc. stay trackable)
+.junie/memory/
+.junie/plans/
