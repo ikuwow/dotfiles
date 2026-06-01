@@ -1,5 +1,8 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "env": {
+    "DISABLE_AUTOUPDATER": "1"
+  },
   "permissions": {
     "allow": [
       "Read(~/.local/share/sre-knowledge-base/**)",
@@ -32,6 +35,7 @@
       "Bash(gh pr ready *)",
       "Bash(gh pr create *)",
       "Bash(gh pr edit *)",
+      "Bash(gh pr checkout *)",
       "Bash(gh pr update-branch)",
       "Bash(gh pr update-branch *)",
       "Bash(gh issue list)",
@@ -408,9 +412,7 @@
       ]
     }
   },
-  "env": {
-    "DISABLE_AUTOUPDATER": "1"
-  },
+  "effortLevel": "high",
   "autoUpdatesChannel": "stable",
   "theme": "auto",
   "remoteControlAtStartup": true,
