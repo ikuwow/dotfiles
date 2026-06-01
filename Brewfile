@@ -116,6 +116,7 @@ brew "ansible"
 brew "ipv6toolkit"
 brew "yt-dlp"
 brew "hyperfine"
+brew "gopls"
 
 brew "actionlint"
 brew "yamllint"
