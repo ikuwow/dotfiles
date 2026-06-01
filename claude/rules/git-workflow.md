@@ -171,21 +171,43 @@ on every tick regardless of change).
    that re-runs the three polling commands below every 60s and emits
    exactly ONE stdout line per actionable change:
    - `STATE: MERGED` / `STATE: CLOSED` — top-level `state` changed.
-   - `REVIEW: CHANGES_REQUESTED` / `REVIEW: APPROVED` —
-     `reviewDecision` changed.
-   - `NEW_COMMENT: <author> <path>:<line>` — a review-thread comment
-     (GraphQL `reviewThreads` query) whose ID was not seen before, in
-     a thread where `isResolved == false` and `isOutdated == false`.
-     Top-level PR comments aren't gated by resolution state — read them
-     from the `comments` field when you re-fetch detail.
+   - `REVIEW: CHANGES_REQUESTED` / `REVIEW: APPROVED` /
+     `REVIEW: COMMENTED` — a new `PullRequestReview` has been
+     submitted (i.e. its `state` is not `PENDING`). This is the only
+     signal that batches all of the inline thread comments belonging
+     to that review. Treat as the trigger to re-read every
+     `isResolved == false && isOutdated == false` thread and handle
+     them together (step 4). `CHANGES_REQUESTED` and `APPROVED` also
+     flip `reviewDecision`; `COMMENTED` does not, so detection must
+     key off new review IDs in `latestReviews`, not off
+     `reviewDecision` alone.
+   - `NEW_TOP_COMMENT: <author>` — a new top-level PR comment
+     (`.comments` field, an `IssueComment`). These are never drafts,
+     so they are safe to emit per-comment.
    - `CI_FAILURE: <check name>` — a new `FAILURE` in
      `statusCheckRollup` or a new failed run from `gh run list`.
 
+   Do NOT emit per-thread `NEW_COMMENT` events for inline review
+   threads. Inline comments may still be drafts of an in-progress
+   review — the `reviewThreads` GraphQL field exposes them to the
+   author's auth even before submission. Reacting per-comment and
+   pushing fixes shifts file line numbers and breaks anchoring of
+   subsequent draft comments in the same review pass (real incident:
+   tacoms-inc-dev/camel-documents#134). Always wait for the
+   `REVIEW:` event (which fires only once the parent review's
+   `state` leaves `PENDING`) and batch-handle. Top-level PR comments
+   (`.comments`, distinct from `.reviewThreads`) have no draft
+   state, so `NEW_TOP_COMMENT` is emitted directly.
+
    Script requirements:
-   - Dedup new comments against a `mktemp` seen-IDs file
-     (`comm -13`); track the previous top-level state / reviewDecision
-     in shell vars. Emit nothing on a no-op poll — this silence is the
+   - Track previous top-level state / `reviewDecision` / last seen
+     `latestReviews` review ID / last seen `.comments` comment ID in
+     shell vars (or a `mktemp` seen-IDs file if you prefer set
+     semantics). Emit nothing on a no-op poll — this silence is the
      whole point of the switch.
+   - Filter `latestReviews` to entries whose `state != PENDING`
+     before deciding what's new. A `PENDING` review is the
+     reviewer's own draft and must never trigger a `REVIEW:` event.
    - Coverage (silence ≠ success): the emit set must cover CI failure
      and both terminal states, not just the happy path. Guard each
      `gh` call with `|| true` (or `continue`) so one failed poll does
@@ -227,16 +249,31 @@ on every tick regardless of change).
      user instead of trying to reconcile silently.
 
 4. React to the event:
-   - `REVIEW: CHANGES_REQUESTED`, or a `NEW_COMMENT` in a thread where
-     `isResolved == false` and `isOutdated == false` that is clearly a
-     fix request (human, Devin, Copilot, etc.): read the content,
-     modify code, push the fix. When the intent is ambiguous
-     (question, nit, discussion), reply via `gh pr comment` instead of
-     pushing code. Threads with `isResolved == true` or
-     `isOutdated == true` are already addressed or no longer
-     applicable — skip them.
+   - `REVIEW: CHANGES_REQUESTED` or `REVIEW: COMMENTED`: re-fetch
+     all review threads via the `reviewThreads` GraphQL query (step
+     1), collect every thread where `isResolved == false &&
+     isOutdated == false`, and handle them in one batched pass —
+     one fix commit covering all fix-request threads, with replies
+     via `gh pr comment` or thread replies for ambiguous items
+     (question, nit, discussion). Batching is mandatory: do not push
+     for the first thread, then re-fetch and push for the next —
+     that re-introduces the line drift this section exists to
+     prevent. Threads with `isResolved == true` or `isOutdated ==
+     true` are already addressed or no longer applicable — skip
+     them. After the batched push, resolve the threads you addressed
+     via the GraphQL `resolveReviewThread` mutation (with a one-line
+     reply summarizing the fix) so the reviewer sees what was
+     handled. `COMMENTED` reviews are often pure question /
+     discussion with no fix-request threads — in that case reply
+     only, do not push.
    - `REVIEW: APPROVED` (no further action requested): report to the
      user in the next turn, do not act.
+   - `NEW_TOP_COMMENT`: read the comment body. If it is clearly a
+     fix request, treat it like a single-thread version of the
+     `REVIEW:` flow (modify code, push, reply). If it is a question
+     / nit / discussion, reply via `gh pr comment` only. Unlike
+     inline threads, top-level comments are not draft-gated and have
+     no line anchoring, so single-comment reaction is safe.
    - `CI_FAILURE`: get the `databaseId` from `gh run list` at re-fetch
      (`statusCheckRollup` check names don't always map 1:1 to run
      names), inspect with `gh run view --log-failed <databaseId>`, fix,
