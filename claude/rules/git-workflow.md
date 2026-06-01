@@ -173,14 +173,17 @@ on every tick regardless of change).
    - `STATE: MERGED` / `STATE: CLOSED` — top-level `state` changed.
    - `REVIEW: CHANGES_REQUESTED` / `REVIEW: APPROVED` /
      `REVIEW: COMMENTED` — a new `PullRequestReview` has been
-     submitted (i.e. its `state` is not `PENDING`). This is the only
-     signal that batches all of the inline thread comments belonging
-     to that review. Treat as the trigger to re-read every
-     `isResolved == false && isOutdated == false` thread and handle
-     them together (step 4). `CHANGES_REQUESTED` and `APPROVED` also
-     flip `reviewDecision`; `COMMENTED` does not, so detection must
-     key off new review IDs in `latestReviews`, not off
-     `reviewDecision` alone.
+     submitted with a fix-request, approval, or comment-only state.
+     This is the only signal that batches all of the inline thread
+     comments belonging to that review. Treat as the trigger to
+     re-read every `isResolved == false && isOutdated == false`
+     thread and handle them together (step 4). `CHANGES_REQUESTED`
+     and `APPROVED` also flip `reviewDecision`; `COMMENTED` does
+     not, so detection must key off new review IDs in
+     `latestReviews`, not off `reviewDecision` alone. `DISMISSED`
+     reviews are filtered out at emit time (see script
+     requirements) — an admin dismissing a stale review is not new
+     reviewer activity, so no event fires.
    - `NEW_TOP_COMMENT: <author>` — a new top-level PR comment
      (`.comments` field, an `IssueComment`). These are never drafts,
      so they are safe to emit per-comment.
@@ -200,14 +203,18 @@ on every tick regardless of change).
    state, so `NEW_TOP_COMMENT` is emitted directly.
 
    Script requirements:
-   - Track previous top-level state / `reviewDecision` / last seen
-     `latestReviews` review ID / last seen `.comments` comment ID in
-     shell vars (or a `mktemp` seen-IDs file if you prefer set
-     semantics). Emit nothing on a no-op poll — this silence is the
-     whole point of the switch.
-   - Filter `latestReviews` to entries whose `state != PENDING`
-     before deciding what's new. A `PENDING` review is the
-     reviewer's own draft and must never trigger a `REVIEW:` event.
+   - Track the set of seen IDs from `latestReviews` and `.comments`
+     (one ID per reviewer entry in `latestReviews` — multi-reviewer
+     PRs return multiple entries, so a single "last ID" variable is
+     wrong; use a `mktemp` seen-IDs file with `comm -13` or a shell
+     associative array). Also track previous top-level `state` and
+     `reviewDecision` in scalar vars. Emit nothing on a no-op poll —
+     this silence is the whole point of the switch.
+   - Filter `latestReviews` to entries whose `state` is one of
+     `APPROVED`, `CHANGES_REQUESTED`, or `COMMENTED` before deciding
+     what's new. `PENDING` is the reviewer's own draft and must
+     never trigger a `REVIEW:` event; `DISMISSED` is an admin
+     overriding a prior review and is not new reviewer activity.
    - Coverage (silence ≠ success): the emit set must cover CI failure
      and both terminal states, not just the happy path. Guard each
      `gh` call with `|| true` (or `continue`) so one failed poll does
@@ -269,11 +276,13 @@ on every tick regardless of change).
    - `REVIEW: APPROVED` (no further action requested): report to the
      user in the next turn, do not act.
    - `NEW_TOP_COMMENT`: read the comment body. If it is clearly a
-     fix request, treat it like a single-thread version of the
-     `REVIEW:` flow (modify code, push, reply). If it is a question
-     / nit / discussion, reply via `gh pr comment` only. Unlike
-     inline threads, top-level comments are not draft-gated and have
-     no line anchoring, so single-comment reaction is safe.
+     fix request, modify code, push, then reply via `gh pr comment`
+     to close the loop. If it is a question / nit / discussion,
+     reply via `gh pr comment` only. Top-level comments have no
+     `resolveReviewThread` equivalent — the only way to acknowledge
+     them is the reply itself. Unlike inline threads, top-level
+     comments are not draft-gated and have no line anchoring, so
+     single-comment reaction is safe.
    - `CI_FAILURE`: get the `databaseId` from `gh run list` at re-fetch
      (`statusCheckRollup` check names don't always map 1:1 to run
      names), inspect with `gh run view --log-failed <databaseId>`, fix,
