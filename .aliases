@@ -18,7 +18,7 @@ alias watch='watch --color'
 [[ "$(command -v tmux)" ]] && [[ -n "$TMUX_CONF" ]] && alias tmux='tmux -f "$TMUX_CONF"'
 
 ## Overriding aliases
-[[ "$(command -v nvim)" ]] && alias vim='nvim'
+[[ "$(command -v nvim)" ]] && alias vim='nvim' && alias view='nvim -R'
 [[ "$(command -v neovide)" ]] && alias gvim='neovide --fork'
 
 ## Aliases for convenience
