@@ -329,7 +329,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "if command -v noti >/dev/null; then noti --title 'Claude Code' --message 'Requires response.'; fi"
+            "command": "if command -v noti >/dev/null; then NOTI_NSUSER_SOUNDNAME=Blow noti --title 'Claude Code' --message 'Requires response.'; fi"
           }
         ]
       }
@@ -344,7 +344,7 @@
           },
           {
             "type": "command",
-            "command": "if command -v noti >/dev/null; then noti --title 'Claude Code' --message 'Done! Yay!'; fi"
+            "command": "if command -v noti >/dev/null; then NOTI_NSUSER_SOUNDNAME=Glass noti --title 'Claude Code' --message 'Done! Yay!'; fi"
           }
         ]
       }
