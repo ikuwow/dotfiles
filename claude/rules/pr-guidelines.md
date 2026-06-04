@@ -21,6 +21,10 @@ lives in the diff, the issue, or a linked source.
   requirements live elsewhere (issue, design doc, ADR, prior PR,
   official spec), do not duplicate them. Replace with a one-line
   summary plus a link. Two copies drift apart over time.
+  This also applies to information that CI or automation posts on
+  the PR (build status, terraform/CDK plan output, lint results,
+  type check results): do not restate those facts in the body —
+  let the bot comments and checks panel speak for themselves.
 - Inverted pyramid — Place the most important information first. A
   reviewer reading only the first few lines should be able to tell
   what kind of PR this is and where to focus.
@@ -37,6 +41,18 @@ lives in the diff, the issue, or a linked source.
   behavior changes, new capabilities, removed limitations, etc. —
   rather than listing implementation details (resources added, files
   touched).
+- Tables must stand alone. Give each table a caption or a one-line
+  lead-in that tells the reader what it shows (e.g., "Alert firings
+  in the past 7 days"). A reader who skips the surrounding prose
+  should still understand what the table represents. Avoid placing
+  tables mid-sentence where their meaning depends on parsing the
+  prose around them.
+- Future work, out-of-scope follow-ups, and "next PR" notes belong
+  at the end of the body (e.g., in a "Follow-up" / "Notes" section).
+  Do not surface them in the opening sections (purpose, scope,
+  summary), where they compete with the approve/reject decision.
+  Reviewer attention is limited; the most-actionable information for
+  this PR should reach the reader first.
 - Inside GitHub PR / issue bodies and PR / issue comments only — that
   is, Markdown posted through the GitHub web UI — do not hard-wrap
   paragraphs or list items. Write each paragraph as a single line and
