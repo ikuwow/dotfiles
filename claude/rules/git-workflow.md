@@ -313,7 +313,7 @@ After the PR is merged (or the task is fully done):
 
 1. Move back to the repository root:
    `cd <repository root>`
-2. Delete the merged local branch (and its worktree, if any):
+2. Delete the merged local branch and its worktree (if any):
    `git delete-squashed`
    - Use the space form (`git delete-squashed`); it is already covered by
      the `Bash(git *)` allow rule, so no extra permission is needed.
