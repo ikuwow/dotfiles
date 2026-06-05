@@ -40,7 +40,7 @@ pre-commit run --all-files
 
 - Always create a branch before making changes (direct commits to main are prohibited)
 - Do NOT create git worktrees — branch only, no worktree
-- Clean up merged local branches with `bin/git-delete-squashed` (PRs are squash-merged, which `git branch -d` does not recognize).
+- Clean up merged local branches with `bin/git-delete-squashed` (PRs are squash-merged, which `git branch -d` rejects as "not fully merged").
 
 ## Language
 
