@@ -23,7 +23,7 @@ if [ "$os" = "Linux" ]; then
   exit 0
 fi
 
-if [ "$(xcode-select -p 1>/dev/null; echo $?)" != 0 ]; then
+if ! xcode-select -p >/dev/null 2>&1; then
   echo 'Command line tool is not installed.'
   echo 'Invoked installation.'
   echo 'Please follow prompt window.'
