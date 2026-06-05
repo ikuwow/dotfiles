@@ -117,6 +117,7 @@ brew "ipv6toolkit"
 brew "yt-dlp"
 brew "hyperfine"
 brew "gopls"
+brew "golangci-lint"
 
 brew "actionlint"
 brew "yamllint"
