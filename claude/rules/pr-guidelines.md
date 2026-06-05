@@ -10,6 +10,23 @@ record of the change. Follow the Essence-first principle: surface
 what a reviewer needs to approve or reject the PR; everything else
 lives in the diff, the issue, or a linked source.
 
+### Title
+
+The title is the one-line summary shown in the PR list. Write it so
+a reviewer can decide whether to open the PR.
+
+- Write in the team's review language (Japanese for Japanese teams,
+  English otherwise).
+- Summarize the change from the user's or system's perspective. Avoid
+  implementation jargon when possible.
+- Conventional Commits prefixes (`feat:` / `fix:` / `docs:` /
+  `refactor:` / `chore:` etc.) are fine where the team uses them, but
+  do not let the prefix replace a meaningful summary.
+- Place issue references (`#123`, `org/repo#123`) in the body — the
+  first line of the body or the "Issue linking" section — not in the
+  title. `gh pr view` and the GitHub UI already surface the linked
+  issue panel.
+
 ### Four principles
 
 - Why over what — The diff already shows what changed. The body
@@ -128,6 +145,12 @@ When writing a PR body, cover every applicable item:
      expected to verify or act on later, so they can be ticked off
      after completion. This applies regardless of section name or
      structure.
+   - Why over what applies to Verification too. Do not record items
+     that the diff or GitHub UI already shows: line counts,
+     percentage of lines removed, `wc -l` of a file you edited, the
+     list of changed files, or a paraphrase of your own edits. List
+     only what an external resource confirms — command output, API
+     responses, log excerpts, UI behavior, etc.
 
 ## Review Criteria
 
