@@ -12,8 +12,7 @@ lives in the diff, the issue, or a linked source.
 
 ### Title
 
-- One-line summary in the team's review language (Japanese for
-  Japanese teams, English otherwise).
+- One-line summary in the team's review language.
 - Place issue references (`#123`, `org/repo#123`) in the body, not
   the title — GitHub already surfaces the linked issue panel.
 
