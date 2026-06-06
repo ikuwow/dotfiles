@@ -10,11 +10,9 @@ record of the change. Follow the Essence-first principle: surface
 what a reviewer needs to approve or reject the PR; everything else
 lives in the diff, the issue, or a linked source.
 
-### Title
-
-- One-line summary in the team's review language.
-- Place issue references (`#123`, `org/repo#123`) in the body, not
-  the title — GitHub already surfaces the linked issue panel.
+The title is a one-line summary in the team's review language. Any
+content that doesn't fit on one line — including issue references
+(`#123`, `org/repo#123`) — belongs in the body, not the title.
 
 ### Four principles
 
