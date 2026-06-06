@@ -12,20 +12,10 @@ lives in the diff, the issue, or a linked source.
 
 ### Title
 
-The title is the one-line summary shown in the PR list. Write it so
-a reviewer can decide whether to open the PR.
-
-- Write in the team's review language (Japanese for Japanese teams,
-  English otherwise).
-- Summarize the change from the user's or system's perspective. Avoid
-  implementation jargon when possible.
-- Conventional Commits prefixes (`feat:` / `fix:` / `docs:` /
-  `refactor:` / `chore:` etc.) are fine where the team uses them, but
-  do not let the prefix replace a meaningful summary.
-- Place issue references (`#123`, `org/repo#123`) in the body — the
-  first line of the body or the "Issue linking" section — not in the
-  title. `gh pr view` and the GitHub UI already surface the linked
-  issue panel.
+- One-line summary in the team's review language (Japanese for
+  Japanese teams, English otherwise).
+- Place issue references (`#123`, `org/repo#123`) in the body, not
+  the title — GitHub already surfaces the linked issue panel.
 
 ### Four principles
 
