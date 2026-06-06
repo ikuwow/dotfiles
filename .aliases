@@ -19,7 +19,7 @@ alias watch='watch --color'
 
 ## Overriding aliases
 [[ "$(command -v nvim)" ]] && alias vim='nvim' && alias view='nvim -R'
-[[ "$(command -v neovide)" ]] && alias gvim='neovide --fork'
+[[ "$(command -v vimr)" ]] && alias gvim='vimr'
 
 ## Aliases for convenience
 alias be='bundle exec'
