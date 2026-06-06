@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # Delete local branches that are no longer needed and prune stale
-# worktree entries. A branch is removed if it matches any of:
+# worktree entries. A branch is removed if it matches any of the
+# following, checked in this priority order (first match wins):
 #   - merged:   reachable from the default branch (git branch --merged)
 #   - squashed: tree already in default but commit not reachable
 #               (the cherry-pick-id trick)
@@ -12,7 +13,7 @@
 # Origin of the squash-merge detection trick:
 # https://github.com/not-an-aardvark/git-delete-squashed#sh
 
-set -eu
+set -euo pipefail
 
 if [ -n "$(git status --porcelain)" ]; then
   echo "git-cleanup-branches: uncommitted changes present; commit or stash first." >&2
@@ -26,9 +27,9 @@ fi
 
 git checkout -q "$default_branch"
 
-# Reap stale worktree entries (working dir gone, admin dir orphaned, etc.)
-# `-v` prints one line per pruned entry to stdout; redirect stderr just
-# in case future git versions change that.
+# Reap stale worktree entries (working dir gone, admin dir orphaned, etc.).
+# `-v` writes one line per pruned entry to stderr; merge it into stdout so
+# `wc -l` can count them.
 pruned_count=$(git worktree prune -v 2>&1 | wc -l | tr -d ' ')
 
 # Build branch -> worktree path map once.
@@ -74,12 +75,19 @@ while read -r branch; do
   category=""
   if printf '%s\n' "$merged_set" | grep -qxF "$branch"; then
     category=merged
-  else
-    mergeBase=$(git merge-base "$default_branch" "$branch")
-    if [[ $(git cherry "$default_branch" "$(git commit-tree "$(git rev-parse "$branch^{tree}")" -p "$mergeBase" -m _)") == "-"* ]]; then
+  elif printf '%s\n' "$gone_set" | grep -qxF "$branch"; then
+    # Try the squash check first; fall back to gone if histories are
+    # unrelated (no merge-base) since the cherry trick can't run there.
+    if mergeBase=$(git merge-base "$default_branch" "$branch" 2>/dev/null) \
+       && [[ $(git cherry "$default_branch" "$(git commit-tree "$(git rev-parse "$branch^{tree}")" -p "$mergeBase" -m _)") == "-"* ]]; then
       category=squashed
-    elif printf '%s\n' "$gone_set" | grep -qxF "$branch"; then
+    else
       category=gone
+    fi
+  else
+    if mergeBase=$(git merge-base "$default_branch" "$branch" 2>/dev/null) \
+       && [[ $(git cherry "$default_branch" "$(git commit-tree "$(git rev-parse "$branch^{tree}")" -p "$mergeBase" -m _)") == "-"* ]]; then
+      category=squashed
     fi
   fi
 
