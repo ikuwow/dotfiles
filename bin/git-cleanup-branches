@@ -1,0 +1,111 @@
+#!/bin/bash
+
+# Delete local branches that are no longer needed and prune stale
+# worktree entries. A branch is removed if it matches any of:
+#   - merged:   reachable from the default branch (git branch --merged)
+#   - squashed: tree already in default but commit not reachable
+#               (the cherry-pick-id trick)
+#   - gone:     upstream-tracking ref deleted (%(upstream:track) == [gone])
+# Worktrees attached to removable branches are removed first, without
+# --force; a dirty worktree skips that branch and the loop continues.
+#
+# Origin of the squash-merge detection trick:
+# https://github.com/not-an-aardvark/git-delete-squashed#sh
+
+set -eu
+
+if [ -n "$(git status --porcelain)" ]; then
+  echo "git-cleanup-branches: uncommitted changes present; commit or stash first." >&2
+  exit 1
+fi
+
+default_branch=main
+if [ ! "$(git rev-parse --verify "$default_branch" 2>/dev/null)" ]; then
+  default_branch=master
+fi
+
+git checkout -q "$default_branch"
+
+# Reap stale worktree entries (working dir gone, admin dir orphaned, etc.)
+# `-v` prints one line per pruned entry to stdout; redirect stderr just
+# in case future git versions change that.
+pruned_count=$(git worktree prune -v 2>&1 | wc -l | tr -d ' ')
+
+# Build branch -> worktree path map once.
+worktree_map=$(git worktree list --porcelain | awk '
+  /^worktree /  { path = substr($0, 10) }
+  /^branch /    {
+    ref = substr($0, 8)
+    sub(/^refs\/heads\//, "", ref)
+    print ref "\t" path
+  }
+')
+
+lookup_worktree() {
+  local branch="$1"
+  printf '%s\n' "$worktree_map" | awk -F'\t' -v b="$branch" '$1 == b { print $2; exit }'
+}
+
+# Branches reachable from the default branch (excluding the default itself).
+# `--merged` always lists the default branch; filter it out.
+merged_set=$(git branch --merged "$default_branch" --format='%(refname:short)' \
+  | grep -vxF "$default_branch" || true)
+
+# Branches whose upstream is gone (PR merged + remote branch deleted, etc.).
+gone_set=$(git for-each-ref refs/heads/ \
+    --format='%(refname:short) %(upstream:track)' \
+  | awk '$2 == "[gone]" { print $1 }' \
+  | grep -vxF "$default_branch" || true)
+
+merged_count=0
+squashed_count=0
+gone_count=0
+removed_count=0
+
+while read -r branch; do
+  [ -z "$branch" ] && continue
+  [ "$branch" = "$default_branch" ] && continue
+
+  # Classify in priority order (first match wins, counted once):
+  #   merged > squashed > gone.
+  # The cherry trick matches both squash and conventional merges, so
+  # `--merged` must be checked first to attribute conventional merges
+  # correctly.
+  category=""
+  if printf '%s\n' "$merged_set" | grep -qxF "$branch"; then
+    category=merged
+  else
+    mergeBase=$(git merge-base "$default_branch" "$branch")
+    if [[ $(git cherry "$default_branch" "$(git commit-tree "$(git rev-parse "$branch^{tree}")" -p "$mergeBase" -m _)") == "-"* ]]; then
+      category=squashed
+    elif printf '%s\n' "$gone_set" | grep -qxF "$branch"; then
+      category=gone
+    fi
+  fi
+
+  if [ -z "$category" ]; then
+    continue
+  fi
+
+  wt_path=$(lookup_worktree "$branch")
+  if [ -n "$wt_path" ]; then
+    if ! git worktree remove "$wt_path"; then
+      echo "git-cleanup-branches: skip '$branch' (worktree at $wt_path not removable; uncommitted changes?)" >&2
+      continue
+    fi
+  fi
+
+  if ! git branch -D "$branch"; then
+    echo "git-cleanup-branches: skip '$branch' (branch deletion failed)" >&2
+    continue
+  fi
+
+  case "$category" in
+    merged)   merged_count=$((merged_count + 1)) ;;
+    squashed) squashed_count=$((squashed_count + 1)) ;;
+    gone)     gone_count=$((gone_count + 1)) ;;
+  esac
+  removed_count=$((removed_count + 1))
+done < <(git for-each-ref refs/heads/ '--format=%(refname:short)')
+
+echo "removed $removed_count branches (merged: $merged_count, squashed: $squashed_count, gone: $gone_count); pruned $pruned_count worktree entries"

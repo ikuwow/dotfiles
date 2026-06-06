@@ -47,8 +47,10 @@ mkdir -p "$HOME/.ssh/config.d"
 # Kubernetes
 link .kube/kubie.yaml "$HOME/.kube/kubie.yaml"
 
-# bin: all executable files auto-discovered
+# bin: all executable files auto-discovered. Prune broken symlinks first
+# so renamed/removed scripts don't leave stale entries on PATH.
 mkdir -p "$HOME/bin"
+find "$HOME/bin/" -maxdepth 1 -type l ! -exec test -e {} \; -print -delete
 find "$DOTPATH/bin/" -type f -perm 0755 -exec ln -fvns {} "$HOME/bin/" \;
 
 # iCloud (macOS only, conditional)
