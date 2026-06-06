@@ -10,6 +10,10 @@ record of the change. Follow the Essence-first principle: surface
 what a reviewer needs to approve or reject the PR; everything else
 lives in the diff, the issue, or a linked source.
 
+The title is a one-line summary in the team's review language. Any
+content that doesn't fit on one line — including issue references
+(`#123`, `org/repo#123`) — belongs in the body, not the title.
+
 ### Four principles
 
 - Why over what — The diff already shows what changed. The body
@@ -128,6 +132,12 @@ When writing a PR body, cover every applicable item:
      expected to verify or act on later, so they can be ticked off
      after completion. This applies regardless of section name or
      structure.
+   - Why over what applies to Verification too. Do not record items
+     that the diff or GitHub UI already shows: line counts,
+     percentage of lines removed, `wc -l` of a file you edited, the
+     list of changed files, or a paraphrase of your own edits. List
+     only what an external resource confirms — command output, API
+     responses, log excerpts, UI behavior, etc.
 
 ## Review Criteria
 
