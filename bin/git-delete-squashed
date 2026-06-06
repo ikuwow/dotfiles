@@ -1,12 +1,14 @@
 #!/bin/bash
 
-# ref: https://github.com/not-an-aardvark/git-delete-squashed#sh
+# Delete local branches whose content is already in the default branch
+# (including squash-merged ones). If a deletable branch is checked out in
+# a worktree, remove that worktree first.
+#
+# Origin of the squash-merge detection trick:
+# https://github.com/not-an-aardvark/git-delete-squashed#sh
 
 set -eu
 
-# This script checks out the default branch, which would silently carry
-# uncommitted work off the current branch. Refuse to run unless clean so
-# it is safe to invoke automatically (e.g. from a cleanup workflow).
 if [ -n "$(git status --porcelain)" ]; then
   echo "git-delete-squashed: uncommitted changes present; commit or stash first." >&2
   exit 1
@@ -18,10 +20,39 @@ if [ ! "$(git rev-parse --verify "$default_branch" 2>/dev/null)" ];then
 fi
 
 git checkout -q "$default_branch"
+
+# Build branch -> worktree path map once.
+worktree_map=$(git worktree list --porcelain | awk '
+  /^worktree /  { path = substr($0, 10) }
+  /^branch /    {
+    ref = substr($0, 8)
+    sub(/^refs\/heads\//, "", ref)
+    print ref "\t" path
+  }
+')
+
+lookup_worktree() {
+  local branch="$1"
+  printf '%s\n' "$worktree_map" | awk -F'\t' -v b="$branch" '$1 == b { print $2; exit }'
+}
+
 git for-each-ref refs/heads/ "--format=%(refname:short)" | \
   while read -r branch; do
     mergeBase=$(git merge-base "$default_branch" "$branch")
-    if [[ $(git cherry "$default_branch" "$(git commit-tree "$(git rev-parse "$branch^{tree}")" -p "$mergeBase" -m _)") == "-"* ]]; then
-      git branch -D "$branch"
+    if [[ $(git cherry "$default_branch" "$(git commit-tree "$(git rev-parse "$branch^{tree}")" -p "$mergeBase" -m _)") != "-"* ]]; then
+      continue
+    fi
+
+    wt_path=$(lookup_worktree "$branch")
+    if [ -n "$wt_path" ]; then
+      if ! git worktree remove "$wt_path"; then
+        echo "git-delete-squashed: skip '$branch' (worktree at $wt_path not removable; uncommitted changes?)" >&2
+        continue
+      fi
+    fi
+
+    if ! git branch -D "$branch"; then
+      echo "git-delete-squashed: skip '$branch' (branch deletion failed)" >&2
+      continue
     fi
   done
