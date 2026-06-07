@@ -28,7 +28,7 @@ matcher="$(echo "$payload" | jq -r '.message // ""')"
 
 repo="$(basename "${cwd:-$PWD}")"
 branch=""
-if [ -n "$cwd" ] && [ -d "$cwd/.git" ] || git -C "${cwd:-$PWD}" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+if git -C "${cwd:-$PWD}" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
     branch="$(git -C "${cwd:-$PWD}" branch --show-current 2>/dev/null || true)"
 fi
 
