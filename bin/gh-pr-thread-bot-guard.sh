@@ -23,31 +23,31 @@ gh_pr_thread_assert_bot() {
   local repo="$1"
   local pr="$2"
   local thread_id="$3"
-  local owner="${repo%/*}"
-  local name="${repo#*/}"
 
+  # Thread IDs come from GitHub GraphQL and are opaque base64-style strings.
+  # Reject anything outside that charset so the value cannot influence the jq
+  # filter or the GraphQL variable binding.
+  if ! [[ "$thread_id" =~ ^[A-Za-z0-9_=/+-]+$ ]]; then
+    echo "Error: thread id contains unexpected characters: $thread_id" >&2
+    exit 1
+  fi
+
+  # Direct node(id:) lookup avoids the 100-thread pagination cap of
+  # reviewThreads(first:100) and removes the client-side jq filter on the
+  # thread id (the previous lookup would silently fail on PRs with >100
+  # threads and the id-in-jq form had a subtle quoting risk).
   local json
   # shellcheck disable=SC2016 # GraphQL query: $vars are query variables, not shell
   json="$(gh api graphql \
-    -f owner="$owner" \
-    -f repo="$name" \
-    -F num="$pr" \
     -f tid="$thread_id" \
-    -f query='query($owner:String!,$repo:String!,$num:Int!,$tid:ID!){
-      repository(owner:$owner,name:$repo){
-        pullRequest(number:$num){
-          reviewThreads(first:100){
-            nodes{
-              id
-              comments(first:1){
-                nodes{ author{ login __typename } }
-              }
-            }
-          }
+    -f query='query($tid:ID!){
+      node(id:$tid){
+        ... on PullRequestReviewThread {
+          comments(first:1){ nodes{ author{ login __typename } } }
         }
       }
     }' \
-    --jq ".data.repository.pullRequest.reviewThreads.nodes[] | select(.id == \"$thread_id\") | .comments.nodes[0].author")"
+    --jq '.data.node.comments.nodes[0].author')"
 
   if [ -z "$json" ] || [ "$json" = "null" ]; then
     echo "Error: thread $thread_id not found on $repo PR $pr" >&2
