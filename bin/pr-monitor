@@ -1,6 +1,9 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Watch a GitHub PR and emit ONE stdout line per actionable event.
+# Requires bash 4+ (associative arrays). The shebang is /usr/bin/env bash
+# so the brew-installed bash on PATH is picked up on macOS, where the
+# default /bin/bash is 3.2.
 # Designed to be armed as a Claude Code persistent Monitor; the silence
 # between events is the entire point. See claude/rules/git-workflow.md
 # Phase 5 for the reaction protocol.
