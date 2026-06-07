@@ -9,7 +9,7 @@ Read README.md for the project overview, repository structure, and how it works.
 **Files like `~/.bashrc`, `~/.bash_profile`, `~/.vimrc`, etc. in `$HOME`
 are symlinks pointing to files in this repository.**
 
-- `claude/` directory is symlinked to `~/.claude/` — always look at `claude/` in this repo first for Claude Code configuration (settings, hooks, MCP, skills, etc.)
+- `claude/` mirrors `~/.claude/` per-file (each file is symlinked individually by `scripts/deploy.sh`, not the directory as a whole). See `claude/README.md` for the source-to-target map. Always look at `claude/` in this repo first for Claude Code configuration (settings, hooks, MCP, skills, etc.). MCP server registration and plugin installation are handled by `scripts/claude-code-setup.sh`, not by symlink.
 - `AIRULES.md` is also symlinked to `~/.codex/AGENTS.md` for Codex CLI global instructions
 - When reading or editing files managed by this repository, always use the
   path within this repo (e.g., `bin/foo` not `~/bin/foo`,
