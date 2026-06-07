@@ -1,0 +1,120 @@
+#!/bin/bash
+
+# Watch a GitHub PR and emit ONE stdout line per actionable event.
+# Designed to be armed as a Claude Code persistent Monitor; the silence
+# between events is the entire point. See claude/rules/git-workflow.md
+# Phase 5 for the reaction protocol.
+#
+# Usage: pr-monitor <pr-number> [interval-seconds]
+
+set -eu
+
+if [ $# -lt 1 ] || [ $# -gt 2 ]; then
+  echo "Usage: pr-monitor <pr-number> [interval-seconds]" >&2
+  exit 1
+fi
+
+pr="$1"
+interval="${2:-60}"
+
+owner_repo="$(gh repo view --json nameWithOwner --jq .nameWithOwner)"
+owner="${owner_repo%/*}"
+repo="${owner_repo#*/}"
+
+prev_state=""
+prev_decision=""
+prev_ci_sha=""
+declare -A seen_runs=()
+seen_comments="$(mktemp)"
+trap 'rm -f "$seen_comments"' EXIT
+
+# shellcheck disable=SC2016 # GraphQL query: $vars are query variables
+threads_query='query($owner:String!,$repo:String!,$num:Int!){
+  repository(owner:$owner,name:$repo){
+    pullRequest(number:$num){
+      reviewThreads(first:100){
+        nodes{
+          isResolved
+          isOutdated
+          comments(first:100){ nodes{ id author{login} path line } }
+        }
+      }
+    }
+  }
+}'
+
+emit_new_comments() {
+  local json="$1"
+  local fresh
+  fresh="$(echo "$json" | jq -r '
+    .data.repository.pullRequest.reviewThreads.nodes[]
+    | select(.isResolved == false and .isOutdated == false)
+    | .comments.nodes[] | "\(.id)\t\(.author.login)\t\(.path // "?"):\(.line // "?")"' \
+    || true)"
+  [ -z "$fresh" ] && return 0
+  local sorted_fresh sorted_seen new
+  sorted_fresh="$(echo "$fresh" | cut -f1 | sort -u)"
+  sorted_seen="$(sort -u "$seen_comments")"
+  new="$(comm -23 <(echo "$sorted_fresh") <(echo "$sorted_seen") || true)"
+  if [ -n "$new" ]; then
+    echo "$fresh" | awk -F'\t' -v ids="$new" '
+      BEGIN { n = split(ids, a, "\n"); for (i = 1; i <= n; i++) seen[a[i]] = 1 }
+      ($1 in seen) { print "NEW_COMMENT: " $2 " " $3 }
+    '
+    echo "$sorted_fresh" >> "$seen_comments"
+  fi
+}
+
+while true; do
+  pr_json="$(gh pr view "$pr" --json state,reviewDecision,statusCheckRollup,headRefName,headRefOid 2>/dev/null || true)"
+  if [ -z "$pr_json" ]; then
+    sleep "$interval"
+    continue
+  fi
+  state="$(echo "$pr_json" | jq -r '.state // ""')"
+  decision="$(echo "$pr_json" | jq -r '.reviewDecision // ""')"
+  head_branch="$(echo "$pr_json" | jq -r '.headRefName // ""')"
+  head_sha="$(echo "$pr_json" | jq -r '.headRefOid // ""')"
+
+  if [ "$state" != "$prev_state" ]; then
+    case "$state" in
+      MERGED|CLOSED) echo "STATE: $state" ;;
+    esac
+    prev_state="$state"
+  fi
+
+  if [ -n "$decision" ] && [ "$decision" != "$prev_decision" ]; then
+    case "$decision" in
+      CHANGES_REQUESTED|APPROVED) echo "REVIEW: $decision" ;;
+    esac
+    prev_decision="$decision"
+  fi
+
+  if [ "$head_sha" != "$prev_ci_sha" ]; then
+    seen_runs=()
+    prev_ci_sha="$head_sha"
+  fi
+  runs_json="$(gh run list --branch "$head_branch" --json databaseId,name,conclusion,headSha --limit 20 2>/dev/null || true)"
+  if [ -n "$runs_json" ]; then
+    while IFS=$'\t' read -r run_id run_name; do
+      [ -z "$run_id" ] && continue
+      if [ -z "${seen_runs[$run_id]:-}" ]; then
+        echo "CI_FAILURE: $run_name"
+        seen_runs[$run_id]=1
+      fi
+    done < <(echo "$runs_json" | jq -r --arg sha "$head_sha" \
+      '.[] | select(.headSha == $sha and .conclusion == "FAILURE") | "\(.databaseId)\t\(.name)"' \
+      || true)
+  fi
+
+  threads_json="$(gh api graphql -f owner="$owner" -f repo="$repo" -F num="$pr" -f query="$threads_query" 2>/dev/null || true)"
+  if [ -n "$threads_json" ]; then
+    emit_new_comments "$threads_json"
+  fi
+
+  case "$state" in
+    MERGED|CLOSED) exit 0 ;;
+  esac
+
+  sleep "$interval"
+done

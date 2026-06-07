@@ -167,40 +167,24 @@ lines become notifications, so only an actionable change wakes you —
 quiet periods stay silent (unlike a timer-based `/loop`, which wakes
 on every tick regardless of change).
 
-1. Arm a persistent Monitor (`persistent: true`) running a poll loop
-   that re-runs the three polling commands below every 60s and emits
-   exactly ONE stdout line per actionable change:
+1. Arm a persistent Monitor (`persistent: true`) running
+   `bin/pr-monitor <PR number>`. The script polls every 60s and emits
+   exactly ONE stdout line per actionable change. Event lines:
    - `STATE: MERGED` / `STATE: CLOSED` — top-level `state` changed.
    - `REVIEW: CHANGES_REQUESTED` / `REVIEW: APPROVED` —
      `reviewDecision` changed.
    - `NEW_COMMENT: <author> <path>:<line>` — a review-thread comment
-     (GraphQL `reviewThreads` query) whose ID was not seen before, in
-     a thread where `isResolved == false` and `isOutdated == false`.
-     Top-level PR comments aren't gated by resolution state — read them
-     from the `comments` field when you re-fetch detail.
-   - `CI_FAILURE: <check name>` — a new `FAILURE` in
-     `statusCheckRollup` or a new failed run from `gh run list`.
+     whose ID was not seen before, in a thread where `isResolved ==
+     false` and `isOutdated == false`.
+   - `CI_FAILURE: <check name>` — a new `FAILURE` from `gh run list`
+     on the PR's head SHA.
 
-   Script requirements:
-   - Dedup new comments against a `mktemp` seen-IDs file
-     (`comm -13`); track the previous top-level state / reviewDecision
-     in shell vars. Emit nothing on a no-op poll — this silence is the
-     whole point of the switch.
-   - Coverage (silence ≠ success): the emit set must cover CI failure
-     and both terminal states, not just the happy path. Guard each
-     `gh` call with `|| true` (or `continue`) so one failed poll does
-     not kill the monitor; a failed or empty fetch must not be read as
-     a state change (no spurious event).
-   - Exit the loop (or `TaskStop` from the reaction turn) once `state`
-     is `MERGED` or `CLOSED`.
-   - 60s interval is fine for a remote API and within rate limits.
-     There is no `ScheduleWakeup` prompt-cache concern here because
-     the poll loop's own ticks run in the background shell and do not
-     wake you (only an emitted line does).
+   Quiet periods stay silent. The script exits on its own when the PR
+   reaches MERGED or CLOSED; otherwise stop it with `TaskStop` from a
+   reaction turn.
 
-   Polling commands (reused inside the Monitor script and again when
-   you re-fetch detail on an event — top-level fields, threads, and
-   run history each carry information the others lack):
+   When you re-fetch detail on an event (the line itself is only a
+   signal), the polling commands the script uses are:
 
    - PR top-level state:
      `gh pr view <number> --json state,reviewDecision,latestReviews,statusCheckRollup,comments,updatedAt,mergedAt,headRefName`
