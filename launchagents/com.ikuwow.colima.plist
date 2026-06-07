@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>com.ikuwow.colima</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/Users/ikuwow/bin/colima-clean-start</string>
+	</array>
+	<key>EnvironmentVariables</key>
+	<dict>
+		<key>PATH</key>
+		<string>/opt/homebrew/bin:/opt/homebrew/sbin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+	</dict>
+	<key>RunAtLoad</key>
+	<true/>
+	<key>KeepAlive</key>
+	<dict>
+		<key>SuccessfulExit</key>
+		<true/>
+	</dict>
+	<key>StandardErrorPath</key>
+	<string>/opt/homebrew/var/log/colima.log</string>
+	<key>StandardOutPath</key>
+	<string>/opt/homebrew/var/log/colima.log</string>
+	<key>WorkingDirectory</key>
+	<string>/Users/ikuwow</string>
+</dict>
+</plist>

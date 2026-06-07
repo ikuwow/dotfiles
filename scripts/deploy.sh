@@ -73,6 +73,11 @@ find "$DOTPATH/claude/agents" -maxdepth 1 -mindepth 1 -type f -name '*.md' -exec
 mkdir -p "$HOME/.claude/rules"
 find "$DOTPATH/claude/rules" -maxdepth 1 -mindepth 1 -type f -name '*.md' -exec ln -fvns {} "$HOME/.claude/rules/" \;
 
+# LaunchAgents (macOS only, conditional)
+if [[ -d "$HOME/Library/LaunchAgents" ]]; then
+  find "$DOTPATH/launchagents" -maxdepth 1 -mindepth 1 -type f -name '*.plist' -exec ln -fvns {} "$HOME/Library/LaunchAgents/" \;
+fi
+
 # Codex CLI
 link AIRULES.md  "$HOME/.codex/AGENTS.md"
 mkdir -p "$HOME/.codex/rules"

@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# Wrapper around `colima start -f` that clears stale state from a non-clean
+# shutdown of the vz vmType driver before starting.
+#
+# Symptom this guards against:
+#   level=fatal msg="errors inspecting instance: [vz driver is running but host agent is not]"
+#   level=fatal msg="failed to run attach disk \"colima\", in use by instance \"colima\""
+#
+# Caused by the vz driver leaving disk attach state behind across macOS reboot.
+#
+# Upstream: https://github.com/abiosoft/colima/issues/985
+
+set -eu
+
+colima stop --force >/dev/null 2>&1 || true
+exec colima start -f "$@"
