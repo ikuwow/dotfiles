@@ -10,7 +10,7 @@ here only takes effect after a corresponding line is added to
 
 | Source                        | Symlinks to                       | Purpose                                                                                                       |
 | ----------------------------- | --------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| `.mcp.json`                   | `~/.claude/.mcp.json`             | MCP server registry. Edit through `scripts/claude-code-setup.sh`, not by hand.                                |
+| `.mcp.json`                   | `~/.claude/.mcp.json`             | MCP server registry the `claude` CLI reads. The file itself is edited by hand; server registration runs through `scripts/claude-code-setup.sh`. |
 | `settings.json`               | `~/.claude/settings.json`         | Permissions (`allow` / `ask` / `deny`), hooks, env. Schema: <https://json.schemastore.org/claude-code-settings.json>. |
 | `statusline-command.sh`       | `~/.claude/statusline-command.sh` | Renders the status line.                                                                                      |
 | `../AIRULES.md`               | `~/.claude/CLAUDE.md`             | Global instructions Claude reads on every session. Also linked to `~/.codex/AGENTS.md` and `~/.junie/AGENTS.md`. |
