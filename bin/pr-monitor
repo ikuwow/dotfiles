@@ -29,7 +29,8 @@ prev_decision=""
 prev_ci_sha=""
 declare -A seen_runs=()
 seen_comments="$(mktemp)"
-trap 'rm -f "$seen_comments"' EXIT
+seen_top_comments="$(mktemp)"
+trap 'rm -f "$seen_comments" "$seen_top_comments"' EXIT
 
 # First-poll seeding: do not emit events for state that already held at
 # arm time. Only transitions during this monitor's lifetime should wake
@@ -75,8 +76,28 @@ emit_new_comments() {
   fi
 }
 
+emit_new_top_comments() {
+  local json="$1"
+  local fresh
+  fresh="$(echo "$json" | jq -r '.comments[]? | "\(.id)\t\(.author.login)"' || true)"
+  [ -z "$fresh" ] && return 0
+  local sorted_fresh sorted_seen new
+  sorted_fresh="$(echo "$fresh" | cut -f1 | sort -u)"
+  sorted_seen="$(sort -u "$seen_top_comments")"
+  new="$(comm -23 <(echo "$sorted_fresh") <(echo "$sorted_seen") || true)"
+  if [ -n "$new" ]; then
+    if [ "$first_poll" -eq 0 ]; then
+      echo "$fresh" | awk -F'\t' -v ids="$new" '
+        BEGIN { n = split(ids, a, "\n"); for (i = 1; i <= n; i++) seen[a[i]] = 1 }
+        ($1 in seen) { print "NEW_TOP_COMMENT: " $2 }
+      '
+    fi
+    echo "$sorted_fresh" >> "$seen_top_comments"
+  fi
+}
+
 while true; do
-  pr_json="$(gh pr view "$pr" --json state,reviewDecision,statusCheckRollup,headRefName,headRefOid 2>/dev/null || true)"
+  pr_json="$(gh pr view "$pr" --json state,reviewDecision,statusCheckRollup,headRefName,headRefOid,comments 2>/dev/null || true)"
   if [ -z "$pr_json" ]; then
     sleep "$interval"
     continue
@@ -125,6 +146,8 @@ while true; do
   if [ -n "$threads_json" ]; then
     emit_new_comments "$threads_json"
   fi
+
+  emit_new_top_comments "$pr_json"
 
   case "$state" in
     MERGED|CLOSED) exit 0 ;;
