@@ -20,6 +20,8 @@
 		<key>SuccessfulExit</key>
 		<true/>
 	</dict>
+	<key>ThrottleInterval</key>
+	<integer>300</integer>
 	<key>StandardErrorPath</key>
 	<string>/opt/homebrew/var/log/colima.log</string>
 	<key>StandardOutPath</key>
