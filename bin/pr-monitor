@@ -28,6 +28,11 @@ declare -A seen_runs=()
 seen_comments="$(mktemp)"
 trap 'rm -f "$seen_comments"' EXIT
 
+# First-poll seeding: do not emit events for state that already held at
+# arm time. Only transitions during this monitor's lifetime should wake
+# the operator. The flag is flipped after the first successful poll.
+first_poll=1
+
 # shellcheck disable=SC2016 # GraphQL query: $vars are query variables
 threads_query='query($owner:String!,$repo:String!,$num:Int!){
   repository(owner:$owner,name:$repo){
@@ -57,10 +62,12 @@ emit_new_comments() {
   sorted_seen="$(sort -u "$seen_comments")"
   new="$(comm -23 <(echo "$sorted_fresh") <(echo "$sorted_seen") || true)"
   if [ -n "$new" ]; then
-    echo "$fresh" | awk -F'\t' -v ids="$new" '
-      BEGIN { n = split(ids, a, "\n"); for (i = 1; i <= n; i++) seen[a[i]] = 1 }
-      ($1 in seen) { print "NEW_COMMENT: " $2 " " $3 }
-    '
+    if [ "$first_poll" -eq 0 ]; then
+      echo "$fresh" | awk -F'\t' -v ids="$new" '
+        BEGIN { n = split(ids, a, "\n"); for (i = 1; i <= n; i++) seen[a[i]] = 1 }
+        ($1 in seen) { print "NEW_COMMENT: " $2 " " $3 }
+      '
+    fi
     echo "$sorted_fresh" >> "$seen_comments"
   fi
 }
@@ -77,16 +84,20 @@ while true; do
   head_sha="$(echo "$pr_json" | jq -r '.headRefOid // ""')"
 
   if [ "$state" != "$prev_state" ]; then
-    case "$state" in
-      MERGED|CLOSED) echo "STATE: $state" ;;
-    esac
+    if [ "$first_poll" -eq 0 ]; then
+      case "$state" in
+        MERGED|CLOSED) echo "STATE: $state" ;;
+      esac
+    fi
     prev_state="$state"
   fi
 
   if [ -n "$decision" ] && [ "$decision" != "$prev_decision" ]; then
-    case "$decision" in
-      CHANGES_REQUESTED|APPROVED) echo "REVIEW: $decision" ;;
-    esac
+    if [ "$first_poll" -eq 0 ]; then
+      case "$decision" in
+        CHANGES_REQUESTED|APPROVED) echo "REVIEW: $decision" ;;
+      esac
+    fi
     prev_decision="$decision"
   fi
 
@@ -99,7 +110,7 @@ while true; do
     while IFS=$'\t' read -r run_id run_name; do
       [ -z "$run_id" ] && continue
       if [ -z "${seen_runs[$run_id]:-}" ]; then
-        echo "CI_FAILURE: $run_name"
+        [ "$first_poll" -eq 0 ] && echo "CI_FAILURE: $run_name"
         seen_runs[$run_id]=1
       fi
     done < <(echo "$runs_json" | jq -r --arg sha "$head_sha" \
@@ -116,5 +127,6 @@ while true; do
     MERGED|CLOSED) exit 0 ;;
   esac
 
+  first_poll=0
   sleep "$interval"
 done

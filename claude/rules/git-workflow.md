@@ -175,7 +175,9 @@ on every tick regardless of change).
      `reviewDecision` changed.
    - `NEW_COMMENT: <author> <path>:<line>` — a review-thread comment
      whose ID was not seen before, in a thread where `isResolved ==
-     false` and `isOutdated == false`.
+     false` and `isOutdated == false`. Top-level PR comments are not
+     gated by resolution state and are not emitted as their own event
+     — read them from the `comments` field when you re-fetch detail.
    - `CI_FAILURE: <check name>` — a new `FAILURE` from `gh run list`
      on the PR's head SHA.
 
