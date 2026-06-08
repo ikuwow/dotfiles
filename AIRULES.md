@@ -56,9 +56,11 @@
 - 冗長な記述は省くのを基本とする
 - 特定の AI agent に依存した書き方をしない
 - scope（global / project）を把握し、変更時に明示する
-- Rule file 間の cross-file path 参照は基本入れない（auto-load 同士なら情報追加ゼロ、rename で壊れる、相対パスが symlink 経由だと解決しない）。skill / workflow → rule の framework 名参照（"X defined in `file.md`" 等）は skill が評価対象を名付けるために load-bearing なので残す
+- Rule file 間の cross-file path 参照は基本入れない（auto-load 同士なら情報追加ゼロ、rename で壊れる、相対パスが symlink 経由だと解決しない）
+    - 例外: skill / workflow → rule の framework 名参照（"X defined in `file.md`" 等）は skill が評価対象を名付けるために load-bearing なので残す
 - Loading mechanism についての meta-statement（"already in context"、"auto-loaded as global rule" 等）はどこにも入れない。mechanism 変更で drift し、rule としては noise
-- 番号付き list は Markdown ordered list 構文（`1. 1. 1.`）で書きレンダラーに連番させる。番号を hardcode した見出し（`## 1. Foo` 等）は要素削除時に gap が出ないか確認、出るなら placeholder section で繋ぐか renumber + cross-reference 更新
+- 番号付き list は Markdown ordered list 構文（`1. 1. 1.`）で書きレンダラーに連番させる（要素削除で gap が出ない）
+    - 番号を hardcode した見出し（`## 1. Foo` 等）の場合は要素削除時に gap が出ないか確認、出るなら placeholder section で繋ぐか renumber + cross-reference 更新
 
 ## セッション終了時
 
