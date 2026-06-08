@@ -21,11 +21,10 @@ Follow each step in order. Skip steps that don't apply.
   MUST NOT restate them and MUST NOT instruct you to re-Read this
   file. Recommended bullet form:
   - Step 1: branch creation (note worktree vs branch-only per project rules)
+  - Step 2: implement, commit, push
   - Step 4: draft PR creation
   - Step 5: CI wait & review (Phases 1–5)
   - Step 7: cleanup after merge
-  (Commit and push are governed by `git-essentials.md` and apply
-  automatically per turn; plans do not need to list them.)
   (Step 6 is a utility section; reference it only if the plan involves
   editing an existing PR/issue body.) Plans must still surface
   scope-specific deviations explicitly — e.g., "skip Step 7 because
@@ -42,6 +41,12 @@ Follow each step in order. Skip steps that don't apply.
    `git checkout -b <branch-name>`
 
 Note: `.worktrees/` is covered by the global gitignore.
+
+## 2. Implement, commit, push
+
+The implementation work for this branch happens here. Commit and
+push conventions live in `git-essentials.md` (always-on, already in
+context).
 
 ## 4. Create a PR
 
