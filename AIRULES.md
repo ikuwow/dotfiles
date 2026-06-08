@@ -49,6 +49,8 @@
 - Markdown の強調記法（太字 `**` `__`、イタリック `*` `_`、取り消し線 `~~`）は使用しない。コードブロック・インラインコード内に同記号が現れる場合（コード片・正規表現・ファイル名等）は対象外
 - 事実を述べるとき、ユーザーの誤解・「以前そう思っていた前提」・存在しない基準を打ち消す形（「X ではなく Y」「単一の〜ではなく」等）で書かない。確定した Y を肯定形で直接書く。ただし設計上の代替案を意図的に対比する場合は除く
 - 箇条書きの項目はなるべく小さく、1項目1文を基本とし、文末の句点「。」は付けない（複数文になるなら子箇条書きに分ける）
+- 番号付き list は Markdown ordered list 構文（`1. 1. 1.`）で書きレンダラーに連番させる（要素削除で gap が出ない）
+    - 番号を hardcode した見出し（`## 1. Foo` 等）の場合は要素削除時に gap が出ないか確認、出るなら placeholder section で繋ぐか renumber + cross-reference 更新
 
 ## AI 向けルール・規約ドキュメントの編集
 
@@ -56,6 +58,9 @@
 - 冗長な記述は省くのを基本とする
 - 特定の AI agent に依存した書き方をしない
 - scope（global / project）を把握し、変更時に明示する
+- Rule file 間の cross-file path 参照は基本入れない（auto-load 同士なら情報追加ゼロ、rename で壊れる、相対パスが symlink 経由だと解決しない）
+    - 例外: skill / workflow → rule の framework 名参照（"X defined in `file.md`" 等）は skill が評価対象を名付けるために load-bearing なので残す
+- Loading mechanism についての meta-statement（"already in context"、"auto-loaded as global rule" 等）はどこにも入れない。mechanism 変更で drift し、rule としては noise
 
 ## セッション終了時
 
