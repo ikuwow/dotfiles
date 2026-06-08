@@ -1,22 +1,30 @@
 # Git Essentials
 
-Always-on git rules — apply to every code-touching turn. For
-task-onset operations (branch creation, PR creation, CI watch, PR /
-issue body edits, cleanup), see `claude/rules/git-workflow.md`. For
-PR body authoring or self-review, see `claude/rules/pr-guidelines.md`.
+Always-on git rules. Task-onset workflow (branch creation, PR
+creation, CI watch, PR / issue body edits, cleanup) lives in
+`git-workflow.md`. PR body authoring and self-review style lives in
+`pr-guidelines.md`.
+
+Shell quoting discipline (single quotes, no `$()` / backticks,
+heredoc fallback for embedded single quotes) is governed by the
+general shell rules in `AIRULES.md` and applies to git commands too.
+
+## Branch
+
+- Claude Code's `--worktree` flag and the EnterWorktree tool must
+  never be used (known bugs). Start work with `git checkout -b`
+  unless the project's own rules prescribe a different tool such
+  as `git-worktree-create`.
 
 ## Commit
 
-- Pass the message in single quotes. Fall back to a heredoc only
-  when the message itself contains single quotes.
-- Never use command substitution (`$()` or backticks) inside the
-  command.
-- Append a blank line and `Co-authored-by:` trailer:
-  ```
-  git commit -m 'Short summary
+Append a blank line and `Co-authored-by:` trailer:
 
-  Co-authored-by: Claude Opus 4.6 <noreply@anthropic.com>'
-  ```
+```
+git commit -m 'Short summary
+
+Co-authored-by: Claude Opus 4.6 <noreply@anthropic.com>'
+```
 
 ## Push
 
