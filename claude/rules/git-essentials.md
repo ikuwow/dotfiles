@@ -1,14 +1,5 @@
 # Git Essentials
 
-Always-on git rules. Task-onset workflow (branch creation, PR
-creation, CI watch, PR / issue body edits, cleanup) lives in
-`git-workflow.md`. PR body authoring and self-review style lives in
-`pr-guidelines.md`.
-
-Shell quoting discipline (single quotes, no `$()` / backticks,
-heredoc fallback for embedded single quotes) is governed by the
-general shell rules in `AIRULES.md` and applies to git commands too.
-
 ## Branch
 
 - Claude Code's `--worktree` flag and the EnterWorktree tool must
