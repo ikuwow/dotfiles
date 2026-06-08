@@ -14,7 +14,7 @@ The title is a one-line summary in the team's review language. Any
 content that doesn't fit on one line — including issue references
 (`#123`, `org/repo#123`) — belongs in the body, not the title.
 
-### Four principles
+### Principles
 
 - Why over what — The diff already shows what changed. The body
   explains why, and the shape of the decision (the approach taken
@@ -36,6 +36,15 @@ content that doesn't fit on one line — including issue references
   decide. Move implementation details, history, or full alternatives
   narrative behind a link or to a "Notes" / "Background" section at
   the end.
+- Diff scope discipline — The PR diff itself is a deliverable.
+  Edits, reformats, renames, and "while I'm here" cleanups that fall
+  outside the PR's stated scope should not appear in the diff. Out-
+  of-scope hunks force the reviewer to separate "intent vs incidental"
+  and inflate review load. Adjacent incidental fixes (an obvious
+  typo) are tolerable in moderation, but the default is to leave them
+  for a separate PR. The body should convey the holistic intent of
+  the change — what the PR is trying to achieve across the whole
+  diff — and the diff should reflect only that intent.
 
 ### Style rules
 
@@ -138,6 +147,21 @@ When writing a PR body, cover every applicable item:
      list of changed files, or a paraphrase of your own edits. List
      only what an external resource confirms — command output, API
      responses, log excerpts, UI behavior, etc.
+
+6. Never include in the initial draft
+   - The following are visible elsewhere and must not be restated:
+     - Enumerations of added rules, linters, settings, constants, or
+       values (visible in the diff)
+     - CI job pass/fail, lint results, type-check results (visible
+       in the Checks panel and bot comments)
+     - Self-paraphrase of own edits ("edited file X", "bumped value
+       from A to B", "added N items", "raised timeout to M")
+     - File lists, line counts, percentage of lines removed
+     - Per-item rendering of a pre-flight checklist when every item
+       is "N/A" — collapse to one line
+   - Write what a reviewer needs to grasp the holistic intent of the
+     PR (what the change is trying to achieve across the whole diff),
+     not a narration of the diff itself.
 
 ## Review Criteria
 
