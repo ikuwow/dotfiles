@@ -21,8 +21,7 @@ Follow each step in order. Skip steps that don't apply.
   MUST NOT restate them and MUST NOT instruct you to re-Read this
   file. Recommended bullet form:
   - Step 1: branch creation (note worktree vs branch-only per project rules)
-  - Step 2: commit
-  - Step 3: push
+  - Step 2: implement, commit, push
   - Step 4: draft PR creation
   - Step 5: CI wait & review (Phases 1–5)
   - Step 7: cleanup after merge
@@ -43,26 +42,9 @@ Follow each step in order. Skip steps that don't apply.
 
 Note: `.worktrees/` is covered by the global gitignore.
 
-## 2. Commit
+## 2. Implement, commit, push
 
-- Pass the message in single quotes. Fall back to a heredoc only when the
-  message itself contains single quotes.
-- Never use command substitution (`$()` or backticks) inside the command.
-- Append a blank line and `Co-authored-by:` trailer:
-  ```
-  git commit -m 'Short summary
-
-  Co-authored-by: Claude Opus 4.6 <noreply@anthropic.com>'
-  ```
-
-## 3. Push
-
-- First push (set upstream):
-  `git push -u origin HEAD`
-- Subsequent pushes:
-  `git push`
-- `git push --force` / `git push -f` is absolutely prohibited.
-  If a force push is needed, ask the user to do it.
+The implementation work for this branch happens here.
 
 ## 4. Create a PR
 
