@@ -24,7 +24,7 @@ Perform a self-review of the specified PR to catch issues before a human reviewe
 
 ## Review Criteria
 
-Evaluate the PR against the PR Body Checklist (already in context as part of the user's global rules).
+Evaluate the PR against the PR Body Checklist.
 
 ## Output Format
 
