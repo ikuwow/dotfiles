@@ -143,6 +143,13 @@ once and applies to both perspectives.
      - Per-item rendering of a pre-flight checklist when every item
        is "N/A" — collapse to one line
    - Bullets are few and meaningful, each conveying a distinct point.
+   - Length budget: the main description section (実装内容 or
+     equivalent) stays within roughly 10 lines — one background
+     paragraph plus change bullets. When the whole body excluding
+     template-mandated sections exceeds ~30 lines, treat it as a
+     Progressive disclosure violation: compress mechanism deep-dives,
+     history, and repeated explanations into a link or delete them.
+     `/pr-selfcheck` reports budget overruns as Should Fix.
 
 6. Title / body / diff consistency
    - The title accurately reflects the change.
