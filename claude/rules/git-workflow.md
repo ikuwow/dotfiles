@@ -28,7 +28,7 @@ Follow each step in order. Skip steps that don't apply.
   (Step 6 is a utility section; reference it only if the plan involves
   editing an existing PR/issue body.) Plans must still surface
   scope-specific deviations explicitly — e.g., "skip Step 7 because
-  the branch is kept" or "stop after Step 4, this PR stays as draft".
+  the branch is kept" or "stop after Step 4, skip CI wait & review".
 
 ## 1. Start Work
 
@@ -72,7 +72,7 @@ The implementation work for this branch happens here.
 ## 5. CI Wait & Review
 
 Five phases: pass all mechanical checks, run the code review,
-consolidate fixes, finalize the PR for review readiness, then watch
+consolidate fixes, finalize the PR while it stays in draft, then watch
 PR activity until merge.
 
 ### Phase 1: PR self-review + CI (parallel)
@@ -112,10 +112,10 @@ The code review is single-pass — do not re-run after fixes.
 `/pr-selfcheck` runs again in Phase 3 to catch inconsistencies
 introduced by review fix changes.
 
-### Phase 4: Finalize PR for review readiness
+### Phase 4: Finalize PR (stays draft)
 
-Bring the PR into a state where a human reviewer can act on it. This
-covers three things:
+Bring the PR into a state where the user can confirm it and mark it
+ready for review themselves. This covers three things:
 
 1. Reflect actual verification in the PR body. Update the body to
    describe what was confirmed, with evidence (HTTP status, Location
@@ -127,8 +127,11 @@ covers three things:
 2. Confirm acceptance criteria are met. Cross-check the PR body and
    any linked issue against the actual change. If something is unmet,
    either address it or call it out as out-of-scope / follow-up.
-3. Mark the PR ready for review. Run `gh pr ready <number>` to take it
-   out of draft. Skip if the user asked to keep it as draft.
+3. Report completion to the user, keeping the PR in draft. Marking the
+   PR ready for review is the user's gate: the user confirms the
+   finished PR and runs `gh pr ready` themselves. Never run
+   `gh pr ready <number>` autonomously — only when the user explicitly
+   instructs it.
 
 Update incrementally as conditions are confirmed (e.g., after Phase 1
 CI passes, after apply / deploy succeeds, after post-deploy
@@ -141,9 +144,10 @@ for the user to remind you. Use the section 6 procedure
 
 ### Phase 5: Watch PR activity until merge
 
-After Phase 4 marks the PR ready for review, arm a persistent
-`Monitor` to watch the PR until it is merged or closed. Reviewers
-(human, Devin, Copilot) often act soon after ready, and CI may still
+After Phase 4 completes, arm a persistent `Monitor` to watch the PR
+until it is merged or closed. The PR is still a draft at this point;
+the user marks it ready out-of-band after confirming, and reviewers
+(human, Devin, Copilot) often act soon after that, while CI may still
 be running. The Monitor runs a background poll loop whose stdout
 lines become notifications, so only an actionable change wakes you —
 quiet periods stay silent (unlike a timer-based `/loop`, which wakes
