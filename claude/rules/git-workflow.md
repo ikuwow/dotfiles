@@ -72,8 +72,8 @@ The implementation work for this branch happens here.
 ## 5. CI Wait & Review
 
 Five phases: pass all mechanical checks, run the code review,
-consolidate fixes, finalize the PR, then watch PR activity until
-merge.
+consolidate fixes, finalize the PR for review readiness, then watch
+PR activity until merge.
 
 ### Phase 1: PR self-review + CI (parallel)
 
@@ -112,10 +112,10 @@ The code review is single-pass — do not re-run after fixes.
 `/pr-selfcheck` runs again in Phase 3 to catch inconsistencies
 introduced by review fix changes.
 
-### Phase 4: Finalize PR
+### Phase 4: Finalize PR for review readiness
 
-Bring the PR into a state where the user can give it a final
-confirmation. This covers three things:
+Bring the PR into a state where a human reviewer can act on it. This
+covers three things:
 
 1. Reflect actual verification in the PR body. Update the body to
    describe what was confirmed, with evidence (HTTP status, Location
@@ -156,6 +156,8 @@ on every tick regardless of change).
    - `STATE: MERGED` / `STATE: CLOSED` — top-level `state` changed.
    - `REVIEW: CHANGES_REQUESTED` / `REVIEW: APPROVED` —
      `reviewDecision` changed.
+   - `READY_FOR_REVIEW` — `isDraft` changed from true to false (the
+     user marked the PR ready).
    - `NEW_COMMENT: <author> <path>:<line>` — a review-thread comment
      (GraphQL `reviewThreads` query) whose ID was not seen before, in
      a thread where `isResolved == false` and `isOutdated == false`.
@@ -186,7 +188,7 @@ on every tick regardless of change).
    run history each carry information the others lack):
 
    - PR top-level state:
-     `gh pr view <number> --json state,reviewDecision,latestReviews,statusCheckRollup,comments,updatedAt,mergedAt,headRefName`
+     `gh pr view <number> --json state,isDraft,reviewDecision,latestReviews,statusCheckRollup,comments,updatedAt,mergedAt,headRefName`
    - Review threads with `isResolved` / `isOutdated` (REST
      `/pulls/<num>/comments` does not expose resolution status, so
      use GraphQL):
@@ -220,6 +222,8 @@ on every tick regardless of change).
      applicable — skip them.
    - `REVIEW: APPROVED` (no further action requested): report to the
      user in the next turn, do not act.
+   - `READY_FOR_REVIEW`: the user took the PR out of draft. No action
+     needed — register that review activity is now expected.
    - `CI_FAILURE`: get the `databaseId` from `gh run list` at re-fetch
      (`statusCheckRollup` check names don't always map 1:1 to run
      names), inspect with `gh run view --log-failed <databaseId>`, fix,
