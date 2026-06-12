@@ -46,7 +46,7 @@ brew "grep"
 
 # AI tools
 cask "codex"
-cask "claude-code"
+cask "claude-code@latest"
 brew "gemini-cli"
 brew "junie"
 
