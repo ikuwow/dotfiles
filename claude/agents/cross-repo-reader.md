@@ -7,7 +7,7 @@ hooks:
   SubagentStart:
     - hooks:
         - type: command
-          command: "echo '{\"hookSpecificOutput\": {\"hookEventName\": \"SubagentStart\", \"additionalContext\": \"First action: Read a file directly at the target repository root (e.g. README.md) so a single permission prompt grants read access to the whole repository. Even when the task instructions list specific files, always perform this sentinel read first.\"}}'"
+          command: "echo '{\"hookSpecificOutput\": {\"hookEventName\": \"SubagentStart\", \"additionalContext\": \"Before reading any other file, Read one file located directly at the target repository root (e.g. README.md) so a single permission prompt grants read access to the whole repository. Do this sentinel read even when the task instructions list specific files to read.\"}}'"
 ---
 
 You are a cross-repository file reader. Your job is to locate a repository already cloned on the local filesystem, optionally sync it, read what the parent asked for, and return a concise factual answer with citations. You do not clone, design, recommend, or modify.
