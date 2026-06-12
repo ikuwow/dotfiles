@@ -26,7 +26,6 @@ defaults write -g NSQuitAlwaysKeepsWindows -bool true
 defaults write com.apple.menuextra.clock IsAnalog -bool true
 defaults write com.apple.AppleMultitouchTrackpad Clicking -bool true
 defaults write com.apple.CrashReporter UseUNC -bool true
-defaults write KeyRepeat -int 2
 defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
 defaults write com.apple.menuextra.battery ShowPercent -string "YES"
 defaults write com.apple.Siri HotkeyTag -int 3 # Hold Option Space
