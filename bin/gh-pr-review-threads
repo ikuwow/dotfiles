@@ -1,0 +1,47 @@
+#!/bin/bash
+
+# List review threads of a PR as JSON, including each thread's first comment
+# author (login + __typename) and resolution state. Read-only.
+#
+# Usage: gh-pr-review-threads <owner/repo> <pr-number>
+
+set -eu
+
+if [ $# -ne 2 ]; then
+  echo "Usage: gh-pr-review-threads <owner/repo> <pr-number>" >&2
+  exit 1
+fi
+
+repo="$1"
+pr="$2"
+owner="${repo%/*}"
+name="${repo#*/}"
+
+# shellcheck disable=SC2016 # GraphQL query: $vars are query variables, not shell
+gh api graphql \
+  -f owner="$owner" \
+  -f repo="$name" \
+  -F num="$pr" \
+  -f query='query($owner:String!,$repo:String!,$num:Int!){
+    repository(owner:$owner,name:$repo){
+      pullRequest(number:$num){
+        reviewThreads(first:100){
+          nodes{
+            id
+            isResolved
+            isOutdated
+            comments(first:100){
+              nodes{
+                id
+                author{ login __typename }
+                body
+                path
+                line
+                createdAt
+              }
+            }
+          }
+        }
+      }
+    }
+  }'

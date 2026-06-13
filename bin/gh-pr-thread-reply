@@ -1,0 +1,35 @@
+#!/bin/bash
+
+# Reply to a PR review thread. Refuses to act on threads whose first
+# comment author is not a bot, so this script can sit in the allow list
+# without enabling replies on human review comments.
+#
+# Usage: gh-pr-thread-reply <owner/repo> <pr-number> <thread-id> <body>
+
+set -eu
+
+if [ $# -ne 4 ]; then
+  echo "Usage: gh-pr-thread-reply <owner/repo> <pr-number> <thread-id> <body>" >&2
+  exit 1
+fi
+
+repo="$1"
+pr="$2"
+thread_id="$3"
+body="$4"
+
+script_dir="$(cd "$(dirname "$(realpath "$0")")" && pwd)"
+# shellcheck source=./gh-pr-thread-bot-guard.sh
+. "$script_dir/gh-pr-thread-bot-guard.sh"
+
+gh_pr_thread_assert_bot "$repo" "$pr" "$thread_id"
+
+# shellcheck disable=SC2016 # GraphQL query: $vars are query variables, not shell
+gh api graphql \
+  -f thread="$thread_id" \
+  -f body="$body" \
+  -f query='mutation($thread:ID!,$body:String!){
+    addPullRequestReviewThreadReply(input:{pullRequestReviewThreadId:$thread,body:$body}){
+      comment{ id url }
+    }
+  }'
