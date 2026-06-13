@@ -150,42 +150,28 @@ lines become notifications, so only an actionable change wakes you —
 quiet periods stay silent (unlike a timer-based `/loop`, which wakes
 on every tick regardless of change).
 
-1. Arm a persistent Monitor (`persistent: true`) running a poll loop
-   that re-runs the three polling commands below every 60s and emits
-   exactly ONE stdout line per actionable change:
+1. Arm a persistent Monitor (`persistent: true`) running
+   `bin/pr-monitor <PR number>`. The script polls every 60s and emits
+   exactly ONE stdout line per actionable change. Event lines:
    - `STATE: MERGED` / `STATE: CLOSED` — top-level `state` changed.
    - `REVIEW: CHANGES_REQUESTED` / `REVIEW: APPROVED` —
      `reviewDecision` changed.
    - `READY_FOR_REVIEW` — `isDraft` changed from true to false (the
      user marked the PR ready).
    - `NEW_COMMENT: <author> <path>:<line>` — a review-thread comment
-     (GraphQL `reviewThreads` query) whose ID was not seen before, in
-     a thread where `isResolved == false` and `isOutdated == false`.
-     Top-level PR comments aren't gated by resolution state — read them
-     from the `comments` field when you re-fetch detail.
-   - `CI_FAILURE: <check name>` — a new `FAILURE` in
-     `statusCheckRollup` or a new failed run from `gh run list`.
+     whose ID was not seen before, in a thread where `isResolved ==
+     false` and `isOutdated == false`.
+   - `NEW_TOP_COMMENT: <author>` — a top-level PR comment whose ID
+     was not seen before. Not gated by resolution state.
+   - `CI_FAILURE: <check name>` — a new `FAILURE` from `gh run list`
+     on the PR's head SHA.
 
-   Script requirements:
-   - Dedup new comments against a `mktemp` seen-IDs file
-     (`comm -13`); track the previous top-level state / reviewDecision
-     in shell vars. Emit nothing on a no-op poll — this silence is the
-     whole point of the switch.
-   - Coverage (silence ≠ success): the emit set must cover CI failure
-     and both terminal states, not just the happy path. Guard each
-     `gh` call with `|| true` (or `continue`) so one failed poll does
-     not kill the monitor; a failed or empty fetch must not be read as
-     a state change (no spurious event).
-   - Exit the loop (or `TaskStop` from the reaction turn) once `state`
-     is `MERGED` or `CLOSED`.
-   - 60s interval is fine for a remote API and within rate limits.
-     There is no `ScheduleWakeup` prompt-cache concern here because
-     the poll loop's own ticks run in the background shell and do not
-     wake you (only an emitted line does).
+   Quiet periods stay silent. The script exits on its own when the PR
+   reaches MERGED or CLOSED; otherwise stop it with `TaskStop` from a
+   reaction turn.
 
-   Polling commands (reused inside the Monitor script and again when
-   you re-fetch detail on an event — top-level fields, threads, and
-   run history each carry information the others lack):
+   When you re-fetch detail on an event (the line itself is only a
+   signal), the polling commands the script uses are:
 
    - PR top-level state:
      `gh pr view <number> --json state,isDraft,reviewDecision,latestReviews,statusCheckRollup,comments,updatedAt,mergedAt,headRefName`
@@ -211,26 +197,30 @@ on every tick regardless of change).
    - Skip the push if either check fails; surface the conflict to the
      user instead of trying to reconcile silently.
 
-4. React to the event:
-   - `REVIEW: CHANGES_REQUESTED`, or a `NEW_COMMENT` in a thread where
-     `isResolved == false` and `isOutdated == false` that is clearly a
-     fix request (human, Devin, Copilot, etc.): read the content,
-     modify code, push the fix. When the intent is ambiguous
-     (question, nit, discussion), reply via `gh pr comment` instead of
-     pushing code. Threads with `isResolved == true` or
-     `isOutdated == true` are already addressed or no longer
-     applicable — skip them.
-   - `REVIEW: APPROVED` (no further action requested): report to the
-     user in the next turn, do not act.
-   - `READY_FOR_REVIEW`: the user took the PR out of draft. No action
-     needed — register that review activity is now expected.
-   - `CI_FAILURE`: get the `databaseId` from `gh run list` at re-fetch
-     (`statusCheckRollup` check names don't always map 1:1 to run
-     names), inspect with `gh run view --log-failed <databaseId>`, fix,
-     push.
-   - CI still in progress (`PENDING` / `IN_PROGRESS` / `QUEUED` seen
-     when you re-fetch): no action, the Monitor will emit again when
-     it resolves.
+4. React by content, not event type. `NEW_COMMENT` is pre-filtered by
+   the monitor to unresolved, non-outdated threads; `NEW_TOP_COMMENT`
+   is not, so classify it by content:
+   - Clear fix request (`CHANGES_REQUESTED`, a `NEW_COMMENT`, or a
+     `NEW_TOP_COMMENT` asking for a change — from a human or an
+     automated reviewer like Devin or Copilot): modify code and push,
+     subject to the step-3 pre-push checks and the step-5 cap. For a
+     `NEW_COMMENT`, if the re-fetched thread is now `isResolved` or
+     `isOutdated`, it was handled in the interim — skip it.
+   - Question, nit, or ambiguous intent: reply via `gh pr comment`,
+     do not push.
+   - `READY_FOR_REVIEW`: the user took the PR out of draft; no action,
+     just register that review activity is now expected.
+   - Informational (`APPROVED`, or CI still `PENDING` / `IN_PROGRESS` /
+     `QUEUED`): no action; surface it to the user on the next turn.
+
+   Event-specific notes:
+   - `STATE: MERGED` / `CLOSED` is terminal — handled in step 6 (Exit
+     conditions), not here.
+   - `NEW_TOP_COMMENT` carries only the author; re-fetch the body from
+     the `comments` field before classifying.
+   - `CI_FAILURE`: get the `databaseId` from `gh run list` (check names
+     don't always map 1:1 to run names), inspect with
+     `gh run view --log-failed <databaseId>`, then fix and push.
 
 5. Cap for autonomous fix pushes:
    - Stop pushing autonomous fixes after 3 fix commits for this PR in

@@ -1,0 +1,160 @@
+#!/usr/bin/env bash
+
+# Watch a GitHub PR and emit ONE stdout line per actionable event.
+# Requires bash 4+ (associative arrays). The shebang is /usr/bin/env bash
+# so the brew-installed bash on PATH is picked up on macOS, where the
+# default /bin/bash is 3.2.
+# Designed to be armed as a Claude Code persistent Monitor; the silence
+# between events is the entire point. See claude/rules/git-workflow.md
+# Phase 5 for the reaction protocol.
+#
+# Usage: pr-monitor <pr-number> [interval-seconds]
+
+set -eu
+
+if [ $# -lt 1 ] || [ $# -gt 2 ]; then
+  echo "Usage: pr-monitor <pr-number> [interval-seconds]" >&2
+  exit 1
+fi
+
+pr="$1"
+interval="${2:-60}"
+
+owner_repo="$(gh repo view --json nameWithOwner --jq .nameWithOwner)"
+owner="${owner_repo%/*}"
+repo="${owner_repo#*/}"
+
+# The monitor's own account: exclude its own comments so that replies it
+# posts via `gh pr comment` (a step-4 reaction) do not re-emit as fresh
+# events on the next poll. Empty `me` (lookup failed) filters nothing.
+me="$(gh api user --jq .login 2>/dev/null || true)"
+
+prev_state=""
+prev_decision=""
+prev_isdraft=""
+prev_ci_sha=""
+declare -A seen_runs=()
+seen_comments="$(mktemp)"
+seen_top_comments="$(mktemp)"
+trap 'rm -f "$seen_comments" "$seen_top_comments"' EXIT
+
+# First-poll seeding: do not emit events for state that already held at
+# arm time. Only transitions during this monitor's lifetime should wake
+# the operator. The flag is flipped after the first successful poll.
+first_poll=1
+
+# shellcheck disable=SC2016 # GraphQL query: $vars are query variables
+threads_query='query($owner:String!,$repo:String!,$num:Int!){
+  repository(owner:$owner,name:$repo){
+    pullRequest(number:$num){
+      reviewThreads(first:100){
+        nodes{
+          isResolved
+          isOutdated
+          comments(first:100){ nodes{ id author{login} path line } }
+        }
+      }
+    }
+  }
+}'
+
+# Emit one line per not-yet-seen comment ID. `fresh` is tab-separated
+# "id<TAB>author[<TAB>extra]" lines; the optional extra field (e.g.
+# "path:line") is appended to the label when present. Seen IDs persist in
+# seen_file across polls so each comment fires exactly once.
+emit_new() {
+  local fresh="$1" seen_file="$2" label="$3"
+  [ -z "$fresh" ] && return 0
+  local sorted_fresh sorted_seen new
+  sorted_fresh="$(echo "$fresh" | cut -f1 | sort -u)"
+  sorted_seen="$(sort -u "$seen_file")"
+  new="$(comm -23 <(echo "$sorted_fresh") <(echo "$sorted_seen") || true)"
+  [ -z "$new" ] && return 0
+  if [ "$first_poll" -eq 0 ]; then
+    # `new` is newline-separated; pass it via the environment, not `awk -v`,
+    # because BWK awk (the macOS default) rejects a literal newline in a
+    # -v assignment ("awk: newline in string").
+    ids_nl="$new" awk -F'\t' -v label="$label" '
+      BEGIN { n = split(ENVIRON["ids_nl"], a, "\n"); for (i = 1; i <= n; i++) seen[a[i]] = 1 }
+      ($1 in seen) { print label ": " $2 ($3 != "" ? " " $3 : "") }
+    '
+  fi
+  echo "$sorted_fresh" >> "$seen_file"
+}
+
+while true; do
+  pr_json="$(gh pr view "$pr" --json state,isDraft,reviewDecision,statusCheckRollup,headRefName,headRefOid,comments 2>/dev/null || true)"
+  # Skip the poll on an empty OR malformed fetch: a non-empty but truncated
+  # response would make the unguarded `jq -r` extractions below exit nonzero
+  # and, under `set -e`, kill the monitor silently.
+  if [ -z "$pr_json" ] || ! echo "$pr_json" | jq -e . >/dev/null 2>&1; then
+    sleep "$interval"
+    continue
+  fi
+  state="$(echo "$pr_json" | jq -r '.state // ""')"
+  isdraft="$(echo "$pr_json" | jq -r '.isDraft // ""')"
+  decision="$(echo "$pr_json" | jq -r '.reviewDecision // ""')"
+  head_branch="$(echo "$pr_json" | jq -r '.headRefName // ""')"
+  head_sha="$(echo "$pr_json" | jq -r '.headRefOid // ""')"
+
+  if [ "$state" != "$prev_state" ]; then
+    if [ "$first_poll" -eq 0 ]; then
+      case "$state" in
+        MERGED|CLOSED) echo "STATE: $state" ;;
+      esac
+    fi
+    prev_state="$state"
+  fi
+
+  if [ -n "$isdraft" ] && [ "$isdraft" != "$prev_isdraft" ]; then
+    if [ "$first_poll" -eq 0 ] && [ "$isdraft" = "false" ]; then
+      echo "READY_FOR_REVIEW"
+    fi
+    prev_isdraft="$isdraft"
+  fi
+
+  if [ -n "$decision" ] && [ "$decision" != "$prev_decision" ]; then
+    if [ "$first_poll" -eq 0 ]; then
+      case "$decision" in
+        CHANGES_REQUESTED|APPROVED) echo "REVIEW: $decision" ;;
+      esac
+    fi
+    prev_decision="$decision"
+  fi
+
+  if [ "$head_sha" != "$prev_ci_sha" ]; then
+    seen_runs=()
+    prev_ci_sha="$head_sha"
+  fi
+  runs_json="$(gh run list --branch "$head_branch" --json databaseId,name,conclusion,headSha --limit 20 2>/dev/null || true)"
+  if [ -n "$runs_json" ]; then
+    while IFS=$'\t' read -r run_id run_name; do
+      [ -z "$run_id" ] && continue
+      if [ -z "${seen_runs[$run_id]:-}" ]; then
+        [ "$first_poll" -eq 0 ] && echo "CI_FAILURE: $run_name"
+        seen_runs[$run_id]=1
+      fi
+    done < <(echo "$runs_json" | jq -r --arg sha "$head_sha" \
+      '.[] | select(.headSha == $sha and .conclusion == "FAILURE") | "\(.databaseId)\t\(.name)"' \
+      || true)
+  fi
+
+  threads_json="$(gh api graphql -f owner="$owner" -f repo="$repo" -F num="$pr" -f query="$threads_query" 2>/dev/null || true)"
+  fresh_comments="$(echo "$threads_json" | jq -r --arg me "$me" '
+    .data.repository.pullRequest.reviewThreads.nodes[]
+    | select(.isResolved == false and .isOutdated == false)
+    | .comments.nodes[] | select(.author.login != $me)
+    | "\(.id)\t\(.author.login)\t\(.path // "?"):\(.line // "?")"' \
+    2>/dev/null || true)"
+  emit_new "$fresh_comments" "$seen_comments" "NEW_COMMENT"
+
+  fresh_top="$(echo "$pr_json" | jq -r --arg me "$me" '.comments[]? | select(.author.login != $me) | "\(.id)\t\(.author.login)"' 2>/dev/null || true)"
+  emit_new "$fresh_top" "$seen_top_comments" "NEW_TOP_COMMENT"
+
+  case "$state" in
+    MERGED|CLOSED) exit 0 ;;
+  esac
+
+  first_poll=0
+  sleep "$interval"
+done
