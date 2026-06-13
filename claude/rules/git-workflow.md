@@ -211,6 +211,10 @@ on every tick regardless of change).
      user in the next turn, do not act.
    - `READY_FOR_REVIEW`: the user took the PR out of draft. No action
      needed — register that review activity is now expected.
+   - `NEW_TOP_COMMENT: <author>`: read the full comment body from the
+     `comments` field on re-fetch. Reply via `gh pr comment` if it is a
+     question or nit; take action (modify code, push) if it is a clear
+     fix request.
    - `CI_FAILURE`: get the `databaseId` from `gh run list` at re-fetch
      (`statusCheckRollup` check names don't always map 1:1 to run
      names), inspect with `gh run view --log-failed <databaseId>`, fix,

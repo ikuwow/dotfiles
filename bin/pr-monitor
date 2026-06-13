@@ -26,6 +26,7 @@ repo="${owner_repo#*/}"
 
 prev_state=""
 prev_decision=""
+prev_isdraft=""
 prev_ci_sha=""
 declare -A seen_runs=()
 seen_comments="$(mktemp)"
@@ -97,12 +98,13 @@ emit_new_top_comments() {
 }
 
 while true; do
-  pr_json="$(gh pr view "$pr" --json state,reviewDecision,statusCheckRollup,headRefName,headRefOid,comments 2>/dev/null || true)"
+  pr_json="$(gh pr view "$pr" --json state,isDraft,reviewDecision,statusCheckRollup,headRefName,headRefOid,comments 2>/dev/null || true)"
   if [ -z "$pr_json" ]; then
     sleep "$interval"
     continue
   fi
   state="$(echo "$pr_json" | jq -r '.state // ""')"
+  isdraft="$(echo "$pr_json" | jq -r '.isDraft // ""')"
   decision="$(echo "$pr_json" | jq -r '.reviewDecision // ""')"
   head_branch="$(echo "$pr_json" | jq -r '.headRefName // ""')"
   head_sha="$(echo "$pr_json" | jq -r '.headRefOid // ""')"
@@ -114,6 +116,13 @@ while true; do
       esac
     fi
     prev_state="$state"
+  fi
+
+  if [ -n "$isdraft" ] && [ "$isdraft" != "$prev_isdraft" ]; then
+    if [ "$first_poll" -eq 0 ] && [ "$isdraft" = "false" ]; then
+      echo "READY_FOR_REVIEW"
+    fi
+    prev_isdraft="$isdraft"
   fi
 
   if [ -n "$decision" ] && [ "$decision" != "$prev_decision" ]; then
