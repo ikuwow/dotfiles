@@ -59,7 +59,7 @@ elif [ "${archname}" = "arm64" ]; then
 fi
 
 if [ -n "${CI+x}" ]; then
-  echo "Warning: You are on CI. Skip some setup lke 'brew bundle'."
+  echo "Warning: You are on CI. Skip some setup like 'brew bundle'."
   exit 0
 fi
 
