@@ -21,15 +21,14 @@ Follow each step in order. Skip steps that don't apply.
   MUST NOT restate them and MUST NOT instruct you to re-Read this
   file. Recommended bullet form:
   - Step 1: branch creation (note worktree vs branch-only per project rules)
-  - Step 2: commit
-  - Step 3: push
+  - Step 2: implement, commit, push
   - Step 4: draft PR creation
   - Step 5: CI wait & review (Phases 1–5)
   - Step 7: cleanup after merge
   (Step 6 is a utility section; reference it only if the plan involves
   editing an existing PR/issue body.) Plans must still surface
   scope-specific deviations explicitly — e.g., "skip Step 7 because
-  the branch is kept" or "stop after Step 4, this PR stays as draft".
+  the branch is kept" or "stop after Step 4, skip CI wait & review".
 
 ## 1. Start Work
 
@@ -43,26 +42,9 @@ Follow each step in order. Skip steps that don't apply.
 
 Note: `.worktrees/` is covered by the global gitignore.
 
-## 2. Commit
+## 2. Implement, commit, push
 
-- Pass the message in single quotes. Fall back to a heredoc only when the
-  message itself contains single quotes.
-- Never use command substitution (`$()` or backticks) inside the command.
-- Append a blank line and `Co-authored-by:` trailer:
-  ```
-  git commit -m 'Short summary
-
-  Co-authored-by: Claude Opus 4.6 <noreply@anthropic.com>'
-  ```
-
-## 3. Push
-
-- First push (set upstream):
-  `git push -u origin HEAD`
-- Subsequent pushes:
-  `git push`
-- `git push --force` / `git push -f` is absolutely prohibited.
-  If a force push is needed, ask the user to do it.
+The implementation work for this branch happens here.
 
 ## 4. Create a PR
 
@@ -77,7 +59,7 @@ Note: `.worktrees/` is covered by the global gitignore.
 2. Write the PR body to the generated path using the Write tool:
    `Write(<path from mktemp>)`
    - Follow the repository's PR template if one exists.
-   - Follow the PR Body Checklist and Review Criteria.
+   - Follow the PR Body Checklist.
 3. Create the PR as a draft:
    `gh pr create --draft --body-file <path from mktemp>`
    - Never use `--body` for PR creation. The `#`-prefixed lines in the body
@@ -145,8 +127,9 @@ covers three things:
 2. Confirm acceptance criteria are met. Cross-check the PR body and
    any linked issue against the actual change. If something is unmet,
    either address it or call it out as out-of-scope / follow-up.
-3. Mark the PR ready for review. Run `gh pr ready <number>` to take it
-   out of draft. Skip if the user asked to keep it as draft.
+3. Report completion to the user. Marking the PR ready for review is
+   the user's decision — do not run `gh pr ready` unless explicitly
+   instructed.
 
 Update incrementally as conditions are confirmed (e.g., after Phase 1
 CI passes, after apply / deploy succeeds, after post-deploy
@@ -159,10 +142,10 @@ for the user to remind you. Use the section 6 procedure
 
 ### Phase 5: Watch PR activity until merge
 
-After Phase 4 marks the PR ready for review, arm a persistent
-`Monitor` to watch the PR until it is merged or closed. Reviewers
-(human, Devin, Copilot) often act soon after ready, and CI may still
-be running. The Monitor runs a background poll loop whose stdout
+After Phase 4 completes, arm a persistent `Monitor` to watch the PR
+until it is merged or closed. Reviewers (human, Devin, Copilot) often
+act soon after the user marks the PR ready, and CI may still be
+running. The Monitor runs a background poll loop whose stdout
 lines become notifications, so only an actionable change wakes you —
 quiet periods stay silent (unlike a timer-based `/loop`, which wakes
 on every tick regardless of change).
@@ -173,6 +156,8 @@ on every tick regardless of change).
    - `STATE: MERGED` / `STATE: CLOSED` — top-level `state` changed.
    - `REVIEW: CHANGES_REQUESTED` / `REVIEW: APPROVED` —
      `reviewDecision` changed.
+   - `READY_FOR_REVIEW` — `isDraft` changed from true to false (the
+     user marked the PR ready).
    - `NEW_COMMENT: <author> <path>:<line>` — a review-thread comment
      whose ID was not seen before, in a thread where `isResolved ==
      false` and `isOutdated == false`.
@@ -190,7 +175,7 @@ on every tick regardless of change).
    signal), the polling commands the script uses are:
 
    - PR top-level state:
-     `gh pr view <number> --json state,reviewDecision,latestReviews,statusCheckRollup,comments,updatedAt,mergedAt,headRefName`
+     `gh pr view <number> --json state,isDraft,reviewDecision,latestReviews,statusCheckRollup,comments,updatedAt,mergedAt,headRefName`
    - Review threads with `isResolved` / `isOutdated` (REST
      `/pulls/<num>/comments` does not expose resolution status, so
      use GraphQL):
@@ -224,6 +209,8 @@ on every tick regardless of change).
      applicable — skip them.
    - `REVIEW: APPROVED` (no further action requested): report to the
      user in the next turn, do not act.
+   - `READY_FOR_REVIEW`: the user took the PR out of draft. No action
+     needed — register that review activity is now expected.
    - `CI_FAILURE`: get the `databaseId` from `gh run list` at re-fetch
      (`statusCheckRollup` check names don't always map 1:1 to run
      names), inspect with `gh run view --log-failed <databaseId>`, fix,

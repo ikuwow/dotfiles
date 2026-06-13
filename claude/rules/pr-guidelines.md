@@ -1,7 +1,7 @@
 # PR Guidelines
 
 Quality criteria for pull requests. Follow these when writing a PR body
-and when reviewing your own PR.
+and when self-reviewing your own PR.
 
 ## Writing Style
 
@@ -14,7 +14,7 @@ The title is a one-line summary in the team's review language. Any
 content that doesn't fit on one line — including issue references
 (`#123`, `org/repo#123`) — belongs in the body, not the title.
 
-### Four principles
+### Principles
 
 - Why over what — The diff already shows what changed. The body
   explains why, and the shape of the decision (the approach taken
@@ -36,6 +36,15 @@ content that doesn't fit on one line — including issue references
   decide. Move implementation details, history, or full alternatives
   narrative behind a link or to a "Notes" / "Background" section at
   the end.
+- Diff scope discipline — The PR diff itself is a deliverable.
+  Edits, reformats, renames, and "while I'm here" cleanups that fall
+  outside the PR's stated scope should not appear in the diff. Out-
+  of-scope hunks force the reviewer to separate "intent vs incidental"
+  and inflate review load. Adjacent incidental fixes (an obvious
+  typo) are tolerable in moderation, but the default is to leave them
+  for a separate PR. The body should convey the holistic intent of
+  the change — what the PR is trying to achieve across the whole
+  diff — and the diff should reflect only that intent.
 
 ### Style rules
 
@@ -55,146 +64,95 @@ content that doesn't fit on one line — including issue references
   at the end of the body (e.g., in a "Follow-up" / "Notes" section).
   Do not surface them in the opening sections (purpose, scope,
   summary), where they compete with the approve/reject decision.
-  Reviewer attention is limited; the most-actionable information for
-  this PR should reach the reader first.
 - Inside GitHub PR / issue bodies and PR / issue comments only — that
   is, Markdown posted through the GitHub web UI — do not hard-wrap
   paragraphs or list items. Write each paragraph as a single line and
   let the browser wrap it; use blank lines for paragraph breaks. GitHub
   Flavored Markdown renders soft line breaks inside a paragraph as
   visible breaks (or runs lines together awkwardly) only in these
-  contexts, so a body wrapped at ~70 chars looks broken on the web.
-  Plain Markdown files (READMEs, ADRs, this guidelines file itself,
-  and any other in-repo documentation) follow standard Markdown
-  rendering — single line breaks inside a paragraph are ignored — so
-  they may be hard-wrapped for file-side readability.
-- DO / DON'T example for a paragraph in a PR / issue body:
-
-  DO (single line, the browser wraps it):
-
-  ````
-  Fix the broken X path so Y stops emitting spurious diffs.
-  ````
-
-  DON'T (paragraph hard-wrapped at column width):
-
-  ````
-  Fix the broken X path so Y stops emitting
-  spurious diffs.
-  ````
+  contexts. Plain Markdown files (READMEs, ADRs, this guidelines file
+  itself, and any other in-repo documentation) follow standard Markdown
+  rendering and may be hard-wrapped for file-side readability.
 
 ## PR Body Checklist
 
-When writing a PR body, cover every applicable item:
+Used both when authoring a PR body and when self-reviewing it (via
+`/pr-selfcheck`). Cover every applicable item — each rule is stated
+once and applies to both perspectives.
 
-1. Purpose and motivation
-   - State what changed and why (bug, feature, tech debt, compliance, etc.).
-   - A reviewer should understand the intent from the body alone.
+1. Purpose, scope, intent
+   - State what changed and why (bug, feature, tech debt, compliance,
+     etc.). The body alone should convey the intent and let a reviewer
+     understand the purpose, what changed, and the impact.
+   - Describe the boundary of the change and call out anything
+     intentionally left out of scope.
+   - Keep the PR self-contained. Verification items, acceptance
+     criteria, and follow-up actions that depend on changes outside
+     this PR's diff (other repos, downstream releases, E2E flows)
+     belong in the parent issue, not in the PR body.
 
-2. Scope
-   - Clearly describe the boundary of the change.
-   - Call out anything intentionally left out of scope.
-   - A PR should be a self-contained unit. Verification items, acceptance
-     criteria, and follow-up actions that depend on changes outside this
-     PR's diff (other repos, downstream releases, E2E flows) belong in
-     the parent issue, not in the PR body.
+2. Sources and references
+   - Provide official documentation URLs or other authoritative
+     sources that justify configuration values, tool choices, or
+     version selections. Especially important for dotfiles /
+     infrastructure changes where "why this value" matters.
+   - All URLs and anchor links must resolve to the expected content.
 
-3. Sources and references
-   - Provide official documentation URLs or other authoritative sources
-     that justify configuration values, tool choices, or version selections.
-   - Especially important for dotfiles / infrastructure changes where
-     "why this value" matters.
-
-4. Issue linking
+3. Issue linking
    - Do NOT use auto-close keywords (`Closes`, `Fixes`, `Resolves`).
 
-5. Verification
+4. Verification
    - Attempt every verification within reach before drafting this
      section: shell commands, API calls, file inspection, mocked
      failure modes, simulated missing-config tests. Punting reachable
-     items to "Pending" or "User to verify" (see below) is itself the
-     violation — overstating what is "untestable" is the common
-     failure mode.
-   - List only items actually verified, with evidence (command output,
-     exit code, log excerpt).
+     items to "Pending" or "User to verify" is itself the violation —
+     overstating what is "untestable" is the common failure mode.
+   - List only items actually verified, with evidence (command
+     output, exit code, log excerpt). Never record what the diff or
+     GitHub UI already shows: line counts, `wc -l` of a file you
+     edited, the list of changed files, percentage removed,
+     paraphrase of own edits, or CI / lint / type-check results
+     (those live in the Checks panel and bot comments).
    - Items that genuinely require interactive UI, user-only
      credentials, target environments unreachable from a shell, or
-     the live session itself must be clearly distinguished from the
-     already-verified ones, with reproduction steps and a one-line
-     reason why the author could not verify them. Follow the
-     repository's PR template if it defines a structure; otherwise
-     use any organization that makes the distinction unambiguous
-     (separate subsection, prefix, etc.) — the section name itself
-     is not prescribed. Scope still applies (§2): items that depend
-     on changes outside this PR's diff belong in the parent issue,
-     not here.
+     the live session itself must be clearly distinguished with
+     reproduction steps and a one-line reason why the author could
+     not verify them.
    - Use `- [ ] …` markdown checkboxes for items the user is
      expected to verify or act on later, so they can be ticked off
-     after completion. This applies regardless of section name or
-     structure.
-   - Why over what applies to Verification too. Do not record items
-     that the diff or GitHub UI already shows: line counts,
-     percentage of lines removed, `wc -l` of a file you edited, the
-     list of changed files, or a paraphrase of your own edits. List
-     only what an external resource confirms — command output, API
-     responses, log excerpts, UI behavior, etc.
+     after completion.
+   - Every changed code path is covered by CI, manual test steps in
+     the PR body, or another verification mechanism. All verification
+     items are scoped to this PR's diff alone; cross-component or E2E
+     items belong in the parent issue.
 
-## Review Criteria
+5. Conciseness (Essence-first)
+   - The principles above (Why over what, DRY, Inverted pyramid,
+     Progressive disclosure, Diff scope discipline) apply directly
+     here — they are not restated as separate review questions.
+     A sentence that paraphrases the diff, duplicates a linked
+     source, or buries the lead is a violation regardless of which
+     principle names it.
+   - Never include in the body:
+     - Enumerations of added rules, linters, settings, constants,
+       or values (visible in the diff)
+     - CI job pass/fail, lint results, type-check results
+     - Self-paraphrase of own edits ("edited file X", "bumped value
+       from A to B", "added N items", "raised timeout to M")
+     - File lists, line counts, percentage of lines removed
+     - Per-item rendering of a pre-flight checklist when every item
+       is "N/A" — collapse to one line
+   - Bullets are few and meaningful, each conveying a distinct point.
+   - Length budget: the main description section (実装内容 or
+     equivalent) stays within roughly 10 lines — one background
+     paragraph plus change bullets. When the whole body excluding
+     template-mandated sections exceeds ~30 lines, treat it as a
+     Progressive disclosure violation: compress mechanism deep-dives,
+     history, and repeated explanations into a link or delete them.
+     `/pr-selfcheck` reports budget overruns as Should Fix.
 
-Used by `/pr-selfcheck` to evaluate a PR after creation.
-
-1. Reviewer-facing information
-   - Can a reviewer understand the purpose, what changed, and the impact
-     from the PR body alone?
-   - Is the scope of the change clear?
-
-2. Sources and references
-   - Are official documentation URLs or other authoritative sources provided
-     to justify configuration values, tool choices, or version selections?
-
-3. Intent and rationale
-   - Does the PR explain not just what changed but why?
-   - Is the motivation stated?
-
-4. Link validity
-   - Do all URLs in the PR body resolve to the expected content?
-   - Do anchor links point to the correct section?
-
-5. Title / body / diff consistency
-   - Does the PR title accurately reflect the change?
-   - Is there any contradiction between the body description and the
-     actual diff?
-
-6. Diff coverage
-   - Does the PR body account for all files and changes in the diff?
-   - Are there unexplained changes?
-
-7. Conciseness (Essence-first)
-   - Is the body a high-level summary rather than a line-by-line
-     restatement of the diff?
-   - Does any sentence paraphrase facts the diff already shows
-     (file lists, "added X to Y", per-file summaries)? If so,
-     remove it. (Why over what)
-   - Is content duplicated from a linked issue, doc, or prior PR?
-     Replace with a one-line summary plus link. (Single source of
-     truth)
-   - Does the reader hit the most important information in the first
-     few lines? (Inverted pyramid)
-   - Is implementation detail, history, or alternatives narrative
-     mixed into the main body? Move it to a "Notes" / "Background"
-     section at the end. (Progressive disclosure)
-   - Are bullet points few and meaningful, each conveying a distinct
-     point?
-
-8. Verification completeness
-   - Did the author attempt the verifications they could reach
-     (shell, API, mocked failures), or punt them to "Pending" /
-     "User to verify"? Items reachable from a shell or API belong
-     in the verified list.
-   - Is every changed code path covered by CI, manual test steps in the
-     PR body, or another verification mechanism?
-   - Are there paths that only run in a specific target environment
-     (e.g., Claude Code web, external services) without a stated plan
-     to verify them?
-   - Are all verification items scoped to this PR's diff alone?
-     Cross-component or E2E items belong in the parent issue.
+6. Title / body / diff consistency
+   - The title accurately reflects the change.
+   - The body does not contradict the diff.
+   - The body accounts for all files and changes in the diff; there
+     are no unexplained hunks.
