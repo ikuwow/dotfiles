@@ -197,15 +197,15 @@ on every tick regardless of change).
    - Skip the push if either check fails; surface the conflict to the
      user instead of trying to reconcile silently.
 
-4. React by content, not event type. The monitor only emits comment
-   events for unresolved, non-outdated threads, so no thread-state
-   filtering is needed at emit time:
+4. React by content, not event type. `NEW_COMMENT` is pre-filtered by
+   the monitor to unresolved, non-outdated threads; `NEW_TOP_COMMENT`
+   is not, so classify it by content:
    - Clear fix request (`CHANGES_REQUESTED`, a `NEW_COMMENT`, or a
      `NEW_TOP_COMMENT` asking for a change — from a human or an
      automated reviewer like Devin or Copilot): modify code and push,
-     subject to the step-3 pre-push checks and the step-5 cap. If the
-     re-fetched thread is now `isResolved` or `isOutdated`, it was
-     handled in the interim — skip it.
+     subject to the step-3 pre-push checks and the step-5 cap. For a
+     `NEW_COMMENT`, if the re-fetched thread is now `isResolved` or
+     `isOutdated`, it was handled in the interim — skip it.
    - Question, nit, or ambiguous intent: reply via `gh pr comment`,
      do not push.
    - `READY_FOR_REVIEW`: the user took the PR out of draft; no action,
@@ -214,6 +214,8 @@ on every tick regardless of change).
      `QUEUED`): no action; surface it to the user on the next turn.
 
    Event-specific notes:
+   - `STATE: MERGED` / `CLOSED` is terminal — handled in step 6 (Exit
+     conditions), not here.
    - `NEW_TOP_COMMENT` carries only the author; re-fetch the body from
      the `comments` field before classifying.
    - `CI_FAILURE`: get the `databaseId` from `gh run list` (check names
