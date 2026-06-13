@@ -162,8 +162,7 @@ on every tick regardless of change).
      whose ID was not seen before, in a thread where `isResolved ==
      false` and `isOutdated == false`.
    - `NEW_TOP_COMMENT: <author>` — a top-level PR comment whose ID
-     was not seen before. Not gated by resolution state. Read the
-     full body from the `comments` field when you re-fetch detail.
+     was not seen before. Not gated by resolution state.
    - `CI_FAILURE: <check name>` — a new `FAILURE` from `gh run list`
      on the PR's head SHA.
 
@@ -198,30 +197,28 @@ on every tick regardless of change).
    - Skip the push if either check fails; surface the conflict to the
      user instead of trying to reconcile silently.
 
-4. React to the event:
-   - `REVIEW: CHANGES_REQUESTED`, or a `NEW_COMMENT` in a thread where
-     `isResolved == false` and `isOutdated == false` that is clearly a
-     fix request (human, Devin, Copilot, etc.): read the content,
-     modify code, push the fix. When the intent is ambiguous
-     (question, nit, discussion), reply via `gh pr comment` instead of
-     pushing code. Threads with `isResolved == true` or
-     `isOutdated == true` are already addressed or no longer
-     applicable — skip them.
-   - `REVIEW: APPROVED` (no further action requested): report to the
-     user in the next turn, do not act.
-   - `READY_FOR_REVIEW`: the user took the PR out of draft. No action
-     needed — register that review activity is now expected.
-   - `NEW_TOP_COMMENT: <author>`: read the full comment body from the
-     `comments` field on re-fetch. Reply via `gh pr comment` if it is a
-     question or nit; take action (modify code, push) if it is a clear
-     fix request.
-   - `CI_FAILURE`: get the `databaseId` from `gh run list` at re-fetch
-     (`statusCheckRollup` check names don't always map 1:1 to run
-     names), inspect with `gh run view --log-failed <databaseId>`, fix,
-     push.
-   - CI still in progress (`PENDING` / `IN_PROGRESS` / `QUEUED` seen
-     when you re-fetch): no action, the Monitor will emit again when
-     it resolves.
+4. React by content, not event type. The monitor only emits comment
+   events for unresolved, non-outdated threads, so no thread-state
+   filtering is needed at emit time:
+   - Clear fix request (`CHANGES_REQUESTED`, a `NEW_COMMENT`, or a
+     `NEW_TOP_COMMENT` asking for a change — from a human or an
+     automated reviewer like Devin or Copilot): modify code and push,
+     subject to the step-3 pre-push checks and the step-5 cap. If the
+     re-fetched thread is now `isResolved` or `isOutdated`, it was
+     handled in the interim — skip it.
+   - Question, nit, or ambiguous intent: reply via `gh pr comment`,
+     do not push.
+   - `READY_FOR_REVIEW`: the user took the PR out of draft; no action,
+     just register that review activity is now expected.
+   - Informational (`APPROVED`, or CI still `PENDING` / `IN_PROGRESS` /
+     `QUEUED`): no action; surface it to the user on the next turn.
+
+   Event-specific notes:
+   - `NEW_TOP_COMMENT` carries only the author; re-fetch the body from
+     the `comments` field before classifying.
+   - `CI_FAILURE`: get the `databaseId` from `gh run list` (check names
+     don't always map 1:1 to run names), inspect with
+     `gh run view --log-failed <databaseId>`, then fix and push.
 
 5. Cap for autonomous fix pushes:
    - Stop pushing autonomous fixes after 3 fix commits for this PR in
