@@ -53,48 +53,25 @@ threads_query='query($owner:String!,$repo:String!,$num:Int!){
   }
 }'
 
-emit_new_comments() {
-  local json="$1"
-  local fresh
-  fresh="$(echo "$json" | jq -r '
-    .data.repository.pullRequest.reviewThreads.nodes[]
-    | select(.isResolved == false and .isOutdated == false)
-    | .comments.nodes[] | "\(.id)\t\(.author.login)\t\(.path // "?"):\(.line // "?")"' \
-    || true)"
+# Emit one line per not-yet-seen comment ID. `fresh` is tab-separated
+# "id<TAB>author[<TAB>extra]" lines; the optional extra field (e.g.
+# "path:line") is appended to the label when present. Seen IDs persist in
+# seen_file across polls so each comment fires exactly once.
+emit_new() {
+  local fresh="$1" seen_file="$2" label="$3"
   [ -z "$fresh" ] && return 0
   local sorted_fresh sorted_seen new
   sorted_fresh="$(echo "$fresh" | cut -f1 | sort -u)"
-  sorted_seen="$(sort -u "$seen_comments")"
+  sorted_seen="$(sort -u "$seen_file")"
   new="$(comm -23 <(echo "$sorted_fresh") <(echo "$sorted_seen") || true)"
-  if [ -n "$new" ]; then
-    if [ "$first_poll" -eq 0 ]; then
-      echo "$fresh" | awk -F'\t' -v ids="$new" '
-        BEGIN { n = split(ids, a, "\n"); for (i = 1; i <= n; i++) seen[a[i]] = 1 }
-        ($1 in seen) { print "NEW_COMMENT: " $2 " " $3 }
-      '
-    fi
-    echo "$sorted_fresh" >> "$seen_comments"
+  [ -z "$new" ] && return 0
+  if [ "$first_poll" -eq 0 ]; then
+    echo "$fresh" | awk -F'\t' -v ids="$new" -v label="$label" '
+      BEGIN { n = split(ids, a, "\n"); for (i = 1; i <= n; i++) seen[a[i]] = 1 }
+      ($1 in seen) { print label ": " $2 ($3 != "" ? " " $3 : "") }
+    '
   fi
-}
-
-emit_new_top_comments() {
-  local json="$1"
-  local fresh
-  fresh="$(echo "$json" | jq -r '.comments[]? | "\(.id)\t\(.author.login)"' || true)"
-  [ -z "$fresh" ] && return 0
-  local sorted_fresh sorted_seen new
-  sorted_fresh="$(echo "$fresh" | cut -f1 | sort -u)"
-  sorted_seen="$(sort -u "$seen_top_comments")"
-  new="$(comm -23 <(echo "$sorted_fresh") <(echo "$sorted_seen") || true)"
-  if [ -n "$new" ]; then
-    if [ "$first_poll" -eq 0 ]; then
-      echo "$fresh" | awk -F'\t' -v ids="$new" '
-        BEGIN { n = split(ids, a, "\n"); for (i = 1; i <= n; i++) seen[a[i]] = 1 }
-        ($1 in seen) { print "NEW_TOP_COMMENT: " $2 }
-      '
-    fi
-    echo "$sorted_fresh" >> "$seen_top_comments"
-  fi
+  echo "$sorted_fresh" >> "$seen_file"
 }
 
 while true; do
@@ -152,11 +129,15 @@ while true; do
   fi
 
   threads_json="$(gh api graphql -f owner="$owner" -f repo="$repo" -F num="$pr" -f query="$threads_query" 2>/dev/null || true)"
-  if [ -n "$threads_json" ]; then
-    emit_new_comments "$threads_json"
-  fi
+  fresh_comments="$(echo "$threads_json" | jq -r '
+    .data.repository.pullRequest.reviewThreads.nodes[]
+    | select(.isResolved == false and .isOutdated == false)
+    | .comments.nodes[] | "\(.id)\t\(.author.login)\t\(.path // "?"):\(.line // "?")"' \
+    2>/dev/null || true)"
+  emit_new "$fresh_comments" "$seen_comments" "NEW_COMMENT"
 
-  emit_new_top_comments "$pr_json"
+  fresh_top="$(echo "$pr_json" | jq -r '.comments[]? | "\(.id)\t\(.author.login)"' || true)"
+  emit_new "$fresh_top" "$seen_top_comments" "NEW_TOP_COMMENT"
 
   case "$state" in
     MERGED|CLOSED) exit 0 ;;
