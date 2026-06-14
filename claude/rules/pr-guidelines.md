@@ -36,7 +36,7 @@ content that doesn't fit on one line — including issue references
   decide. Move implementation details, history, or full alternatives
   narrative behind a link or to a "Notes" / "Background" section at
   the end.
-- Diff scope discipline — The PR diff itself is a deliverable.
+- Diff scope discipline — The PR diff itself is a deliverable
   Edits, reformats, renames, and "while I'm here" cleanups that fall
   outside the PR's stated scope should not appear in the diff. Out-
   of-scope hunks force the reviewer to separate "intent vs incidental"
@@ -91,17 +91,17 @@ once and applies to both perspectives.
      this PR's diff (other repos, downstream releases, E2E flows)
      belong in the parent issue, not in the PR body.
 
-2. Sources and references
+1. Sources and references
    - Provide official documentation URLs or other authoritative
      sources that justify configuration values, tool choices, or
      version selections. Especially important for dotfiles /
      infrastructure changes where "why this value" matters.
-   - All URLs and anchor links must resolve to the expected content.
+   - All URLs and anchor links must resolve to the expected content
 
-3. Issue linking
-   - Do NOT use auto-close keywords (`Closes`, `Fixes`, `Resolves`).
+1. Issue linking
+   - Do NOT use auto-close keywords (`Closes`, `Fixes`, `Resolves`)
 
-4. Verification
+1. Verification
    - Attempt every verification within reach before drafting this
      section: shell commands, API calls, file inspection, mocked
      failure modes, simulated missing-config tests. Punting reachable
@@ -126,7 +126,7 @@ once and applies to both perspectives.
      items are scoped to this PR's diff alone; cross-component or E2E
      items belong in the parent issue.
 
-5. Conciseness (Essence-first)
+1. Conciseness (Essence-first)
    - The principles above (Why over what, DRY, Inverted pyramid,
      Progressive disclosure, Diff scope discipline) apply directly
      here — they are not restated as separate review questions.
@@ -142,7 +142,7 @@ once and applies to both perspectives.
      - File lists, line counts, percentage of lines removed
      - Per-item rendering of a pre-flight checklist when every item
        is "N/A" — collapse to one line
-   - Bullets are few and meaningful, each conveying a distinct point.
+   - Bullets are few and meaningful, each conveying a distinct point
    - Length budget: the main description section (実装内容 or
      equivalent) stays within roughly 10 lines — one background
      paragraph plus change bullets. When the whole body excluding
@@ -151,8 +151,8 @@ once and applies to both perspectives.
      history, and repeated explanations into a link or delete them.
      `/pr-selfcheck` reports budget overruns as Should Fix.
 
-6. Title / body / diff consistency
-   - The title accurately reflects the change.
-   - The body does not contradict the diff.
+1. Title / body / diff consistency
+   - The title accurately reflects the change
+   - The body does not contradict the diff
    - The body accounts for all files and changes in the diff; there
      are no unexplained hunks.

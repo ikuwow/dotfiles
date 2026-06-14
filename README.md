@@ -116,8 +116,8 @@ export ANTHROPIC_MODEL=opusplan
 
 ### Bootstrap Flow
 
-1. `bootstrap.sh` — Clones the repo (or updates it). If `DOTFILES_MINIMAL=1`, runs `bootstrap/claude-code-web.sh` (symlinks only) and exits. Otherwise calls `bootstrap/main.sh`.
-2. `bootstrap/main.sh` — Detects OS/architecture, checks prerequisites, orchestrates:
+1. `bootstrap.sh` — Clones the repo (or updates it). If `DOTFILES_MINIMAL=1`, runs `bootstrap/claude-code-web.sh` (symlinks only) and exits. Otherwise calls `bootstrap/main.sh`
+1. `bootstrap/main.sh` — Detects OS/architecture, checks prerequisites, orchestrates:
    - `scripts/deploy.sh` — Creates symlinks (runs on Linux and macOS)
    - `scripts/configure.sh` — macOS system defaults (macOS only)
    - Installs Homebrew (macOS only, architecture-aware)
@@ -136,8 +136,8 @@ On Linux, the bootstrap process deploys symlinks and exits. Homebrew is not used
 When `CLAUDE_CODE_REMOTE=true` is detected (set automatically by Claude Code web), `bootstrap.sh` runs `bootstrap/claude-code-web.sh` instead of the full macOS setup. This script:
 
 1. Installs packages not in the default image (`gh`, `jq`, `fzf`)
-2. Deploys all dotfile symlinks via `deploy.sh`
-3. Registers MCP servers (`deepwiki`, `Context7`) via `claude mcp add`
+1. Deploys all dotfile symlinks via `deploy.sh`
+1. Registers MCP servers (`deepwiki`, `Context7`) via `claude mcp add`
 
 Use this as the Claude Code web setup script:
 

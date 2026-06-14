@@ -7,10 +7,10 @@ complexity to balance cost and capability.
 
 Built-in subagent types have their own defaults — do not override them:
 
-- **Explore**: defaults to Haiku (already optimized, no override needed)
-- **Plan**: inherits from the main session model (Opus — no override needed)
+- Explore: defaults to Haiku (already optimized, no override needed)
+- Plan: inherits from the main session model (Opus — no override needed)
 
-For **general-purpose** subagents, apply these rules:
+For general-purpose subagents, apply these rules:
 
 | Task type | `model` parameter |
 |---|---|
@@ -20,8 +20,8 @@ For **general-purpose** subagents, apply these rules:
 
 ## Rationale
 
-- Opus is reserved for tasks that genuinely require deep reasoning.
+- Opus is reserved for tasks that genuinely require deep reasoning
 - `CLAUDE_CODE_SUBAGENT_MODEL` env var is NOT used because it overrides
-  per-invocation model parameters and would weaken Plan agents.
+  per-invocation model parameters and would weaken Plan agents
 - Skills define their own model in frontmatter and are not affected by
-  this guideline.
+  this guideline
