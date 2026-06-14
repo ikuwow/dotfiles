@@ -65,12 +65,14 @@ check_symlink "$HOME/.claude/settings.json"
 check_symlink "$HOME/.claude/CLAUDE.md"
 check_dir "$HOME/.claude/skills"
 check_dir "$HOME/.claude/hooks"
+check_dir "$HOME/.claude/agents"
 check_dir "$HOME/.claude/rules"
-# Auto-discovered skills, hooks, and rules
+# Auto-discovered skills, hooks, agents, and rules
 check_symlink "$HOME/.claude/skills/retrospective"
 check_symlink "$HOME/.claude/hooks/approve_git_gh_commands.py"
 check_symlink "$HOME/.claude/hooks/approve_gh_graphql_readonly.py"
 check_symlink "$HOME/.claude/hooks/hook_utils.py"
+check_symlink "$HOME/.claude/agents/investigator.md"
 check_symlink "$HOME/.claude/rules/git-workflow.md"
 check_symlink "$HOME/.claude/rules/gh-graphql.md"
 

@@ -151,7 +151,7 @@ quiet periods stay silent (unlike a timer-based `/loop`, which wakes
 on every tick regardless of change).
 
 1. Arm a persistent Monitor (`persistent: true`) running
-   `bin/pr-monitor <PR number>`. The script polls every 60s and emits
+   `pr-monitor <PR number>`. The script polls every 60s and emits
    exactly ONE stdout line per actionable change. Event lines:
    - `STATE: MERGED` / `STATE: CLOSED` — top-level `state` changed.
    - `REVIEW: CHANGES_REQUESTED` / `REVIEW: APPROVED` —
