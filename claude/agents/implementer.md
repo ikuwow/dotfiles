@@ -23,7 +23,7 @@ ambiguity is blocking, stop and report instead of guessing.
 1. Match the surrounding code's style, naming conventions, and idioms. Do not
    introduce patterns that do not already exist in the codebase unless the spec
    requires it.
-1. Reuse existing utilities and patterns rather than writing new ones.
+1. Reuse existing utilities and patterns rather than writing new ones
 1. Keep every change within the spec's scope. No scope creep, no "while I'm
    here" cleanups, no incidental reformats.
 1. Make small, coherent changes. One logical unit of work per edit; prefer
@@ -82,6 +82,6 @@ default below.
 
 - Do not push, create or switch branches or worktrees, tag, open PRs, or rewrite
   existing history. The parent owns workspace and branch setup, push, and the PR.
-- Do not spawn other agents.
+- Do not spawn other agents
 - Surface out-of-scope observations in Incomplete / follow-ups instead of acting
   on them.

@@ -12,7 +12,7 @@ Follow each step in order. Skip steps that don't apply.
 - Never create or edit files on the default branch. Always move into the
   worktree (or feature branch) first. Creating files before branching
   leads to redundant copy-and-delete work.
-- Never modify commits that have already been pushed.
+- Never modify commits that have already been pushed
 - Implementation plans MUST cover the full workflow as a bullet-list
   checklist — from branch setup (Step 1, before implementation)
   through cleanup (Step 7) — not just the post-edit steps. The
@@ -34,10 +34,10 @@ Follow each step in order. Skip steps that don't apply.
 
 1. Pull the latest default branch:
    `git pull`
-2. Create a worktree and branch:
+1. Create a worktree and branch:
    `git-worktree-create <branch-name>`
-3. Follow the command shown in the script output to move into the worktree.
-4. If the project rules explicitly prohibit worktrees, create a branch only:
+1. Follow the command shown in the script output to move into the worktree
+1. If the project rules explicitly prohibit worktrees, create a branch only:
    `git checkout -b <branch-name>`
 
 Note: `.worktrees/` is covered by the global gitignore.
@@ -56,18 +56,18 @@ The implementation work for this branch happens here.
    file, and the Write tool requires the file be Read first if it exists.
    The Read returns a "shorter than offset" warning, which is expected;
    the subsequent Write succeeds.
-2. Write the PR body to the generated path using the Write tool:
+1. Write the PR body to the generated path using the Write tool:
    `Write(<path from mktemp>)`
-   - Follow the repository's PR template if one exists.
-   - Follow the PR Body Checklist.
-3. Create the PR as a draft:
+   - Follow the repository's PR template if one exists
+   - Follow the PR Body Checklist
+1. Create the PR as a draft:
    `gh pr create --draft --body-file <path from mktemp>`
    - Never use `--body` for PR creation. The `#`-prefixed lines in the body
      trigger Claude Code's security pre-check, which cannot be bypassed by
      hooks. Always go through `--body-file`.
-4. After creating the PR, display the PR URL to the user:
+1. After creating the PR, display the PR URL to the user:
    `gh pr view --json url --jq '.url'`
-5. Proceed to CI wait (step 5).
+1. Proceed to CI wait (step 5)
 
 ## 5. CI Wait & Review
 
@@ -79,13 +79,13 @@ PR activity until merge.
 
 Launch both in a single assistant message so they execute concurrently:
 
-- `/pr-selfcheck <PR number>` — PR presentation review.
-- `gh pr checks --watch` — CI monitoring. Run with `run_in_background: true`.
+- `/pr-selfcheck <PR number>` — PR presentation review
+- `gh pr checks --watch` — CI monitoring. Run with `run_in_background: true`
 
 If either fails:
-- Fix self-review "Must Fix" / "Should Fix" items.
-- Fix CI failures (`gh run view --log-failed`).
-- Push fixes, then re-run both until both pass.
+- Fix self-review "Must Fix" / "Should Fix" items
+- Fix CI failures (`gh run view --log-failed`)
+- Push fixes, then re-run both until both pass
 
 Note: `/pr-selfcheck` is a mechanical check, not a code review.
 Re-running it after fixes is expected. The "single-pass" policy
@@ -103,8 +103,8 @@ Once Phase 1 passes, launch:
 
 Once the review finishes, review the results:
 
-1. Fix issues found by the code review.
-2. Push fixes if any code was changed, then re-run
+1. Fix issues found by the code review
+1. Push fixes if any code was changed, then re-run
    `/pr-selfcheck` and `gh pr checks --watch` to confirm the PR
    is still consistent and CI passes.
 
@@ -124,10 +124,10 @@ covers three things:
    items, sync `[ ]` to `[x]` as each item's condition is confirmed;
    if not, edit the Verification section text directly. Items still
    pending stay as `[ ]` (or noted explicitly as pending).
-2. Confirm acceptance criteria are met. Cross-check the PR body and
+1. Confirm acceptance criteria are met. Cross-check the PR body and
    any linked issue against the actual change. If something is unmet,
    either address it or call it out as out-of-scope / follow-up.
-3. Report completion to the user. Marking the PR ready for review is
+1. Report completion to the user. Marking the PR ready for review is
    the user's decision — do not run `gh pr ready` unless explicitly
    instructed.
 
@@ -153,7 +153,7 @@ on every tick regardless of change).
 1. Arm a persistent Monitor (`persistent: true`) running
    `pr-monitor <PR number>`. The script polls every 60s and emits
    exactly ONE stdout line per actionable change. Event lines:
-   - `STATE: MERGED` / `STATE: CLOSED` — top-level `state` changed.
+   - `STATE: MERGED` / `STATE: CLOSED` — top-level `state` changed
    - `REVIEW: CHANGES_REQUESTED` / `REVIEW: APPROVED` —
      `reviewDecision` changed.
    - `READY_FOR_REVIEW` — `isDraft` changed from true to false (the
@@ -185,19 +185,19 @@ on every tick regardless of change).
      `statusCheckRollup` doesn't show — e.g. older runs, re-run jobs):
      `gh run list --branch <headRefName> --json databaseId,name,status,conclusion,createdAt,headSha,workflowName --limit 20`
 
-2. On each event notification, re-fetch full detail with the three
+1. On each event notification, re-fetch full detail with the three
    polling commands in step 1 (the event line is only a signal), then
    handle it per steps 3-7 below. The notification is not a user
    reply — keep working.
 
-3. Before any push (any reaction that would write to origin):
-   - Verify the current branch matches the PR's `headRefName`.
+1. Before any push (any reaction that would write to origin):
+   - Verify the current branch matches the PR's `headRefName`
    - `git fetch` and confirm local HEAD is still ahead of
      `origin/<branch>` (no manual user push has happened in between).
    - Skip the push if either check fails; surface the conflict to the
      user instead of trying to reconcile silently.
 
-4. React by content, not event type. `NEW_COMMENT` is pre-filtered by
+1. React by content, not event type. `NEW_COMMENT` is pre-filtered by
    the monitor to unresolved, non-outdated threads; `NEW_TOP_COMMENT`
    is not, so classify it by content:
    - Clear fix request (`CHANGES_REQUESTED`, a `NEW_COMMENT`, or a
@@ -222,14 +222,14 @@ on every tick regardless of change).
      don't always map 1:1 to run names), inspect with
      `gh run view --log-failed <databaseId>`, then fix and push.
 
-5. Cap for autonomous fix pushes:
+1. Cap for autonomous fix pushes:
    - Stop pushing autonomous fixes after 3 fix commits for this PR in
      this session. Beyond that, switch to reply-only mode and notify
      the user that the PR appears to need human attention. This
      prevents runaway loops when an automated reviewer keeps
      re-requesting changes on each push.
 
-6. Exit conditions:
+1. Exit conditions:
    - `STATE: MERGED` → execute Step 7 (Cleanup), then `TaskStop` the
      monitor.
    - `STATE: CLOSED` without merge → `TaskStop` the monitor, skip
@@ -237,7 +237,7 @@ on every tick regardless of change).
    - Session ends (PC sleep, Claude Code closed) → the Monitor
      terminates with the session. This is accepted as best-effort.
 
-7. Conflict handling:
+1. Conflict handling:
    - If the user pushes commits manually while the Monitor is running,
      just acknowledge on the next event and continue watching. Do not
      try to revert or duplicate the user's work.
@@ -263,17 +263,17 @@ event-driven reliability use GitHub Actions instead.
   1. Fetch the current body:
      `gh pr view <number> --json body --jq .body`
      (or `gh issue view <number> --json body --jq .body` for issues)
-  2. Output a diff between the current body and the new body in the
+  1. Output a diff between the current body and the new body in the
      conversation (so what changed is visible and recoverable).
-  3. Generate a unique temp file path:
+  1. Generate a unique temp file path:
      `mktemp --suffix=.md`
      Run this as a standalone Bash command and read the output.
      Then call the Read tool on that path once — `mktemp` creates an
      empty file, and the Write tool requires the file be Read first if
      it exists.
-  4. Write the new body to the generated path:
+  1. Write the new body to the generated path:
      `Write(<path from mktemp>)`
-  5. Execute the edit:
+  1. Execute the edit:
      `gh pr edit <number> --body-file <path from mktemp>`
      (or `gh issue edit <number> --body-file <path from mktemp>`)
   The goal is observability — always show the diff so the user can see
@@ -290,7 +290,7 @@ After the PR is merged (or the task is fully done):
 
 1. Move back to the repository root:
    `cd <repository root>`
-2. Delete unused local branches (merged, squash-merged, or upstream
+1. Delete unused local branches (merged, squash-merged, or upstream
    gone) along with their worktrees, and prune stale worktree entries:
    `git cleanup-branches`
    - Use the space form (`git cleanup-branches`); it is already covered
