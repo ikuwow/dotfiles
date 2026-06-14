@@ -421,7 +421,6 @@
     }
   },
   "effortLevel": "high",
-  "advisorModel": "opus",
   "autoUpdatesChannel": "stable",
   "theme": "auto",
   "remoteControlAtStartup": true,
