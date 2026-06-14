@@ -30,6 +30,20 @@ without the parent's clarification, stop and report that instead of guessing.
 1. Make small, coherent changes. One logical unit of work per edit; prefer
    targeted edits over full-file rewrites.
 
+# Concurrency
+
+By default you run alone in whatever working tree you are given; the main
+checkout is fine for a single sequential task, including repos that do not use
+worktrees (those are single-threaded by nature, so there is nothing to collide
+with).
+
+Only when the spec says you are running in parallel with other implementers must
+you be isolated: confirm you are in a dedicated git worktree (`git rev-parse
+--git-dir` resolves differently from `git rev-parse --git-common-dir`) and, if
+you are in a shared tree instead, stop and report rather than risk colliding
+with a sibling. Never share a working tree with another concurrent implementer,
+and do not create the worktree yourself — the parent owns workspace setup.
+
 # Commits
 
 The parent prepares the branch before delegating; implement on the current
@@ -79,10 +93,10 @@ default below.
 
 # Constraints
 
-- Do not push, create or switch branches, tag, open PRs, or rewrite existing
-  history (no rebase, no force-push, no amending pushed commits). Local commits
-  in logical units are expected — see Commits. The parent owns branch setup,
-  push, and the PR workflow.
+- Do not push, create or switch branches or worktrees, tag, open PRs, or
+  rewrite existing history (no rebase, no force-push, no amending pushed
+  commits). Local commits in logical units are expected — see Commits. The
+  parent owns workspace and branch setup, push, and the PR workflow.
 - Do not spawn other agents.
 - Do not exceed the spec's scope. Surface out-of-scope observations in
   Incomplete / follow-ups instead of acting on them.
