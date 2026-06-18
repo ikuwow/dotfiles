@@ -36,7 +36,8 @@ prev_ci_sha=""
 declare -A seen_runs=()
 seen_comments="$(mktemp)"
 seen_top_comments="$(mktemp)"
-trap 'rm -f "$seen_comments" "$seen_top_comments"' EXIT
+seen_reviews="$(mktemp)"
+trap 'rm -f "$seen_comments" "$seen_top_comments" "$seen_reviews"' EXIT
 
 # First-poll seeding: do not emit events for state that already held at
 # arm time. Only transitions during this monitor's lifetime should wake
@@ -53,6 +54,17 @@ threads_query='query($owner:String!,$repo:String!,$num:Int!){
           isOutdated
           comments(first:100){ nodes{ id author{login} path line } }
         }
+      }
+    }
+  }
+}'
+
+# shellcheck disable=SC2016 # GraphQL query: $vars are query variables
+reviews_query='query($owner:String!,$repo:String!,$num:Int!){
+  repository(owner:$owner,name:$repo){
+    pullRequest(number:$num){
+      reviews(first:100){
+        nodes{ id state body author{login} }
       }
     }
   }
@@ -150,6 +162,20 @@ while true; do
 
   fresh_top="$(echo "$pr_json" | jq -r --arg me "$me" '.comments[]? | select(.author.login != $me) | "\(.id)\t\(.author.login)"' 2>/dev/null || true)"
   emit_new "$fresh_top" "$seen_top_comments" "NEW_TOP_COMMENT"
+
+  # Reviews API surfaces `state=COMMENTED` reviews (e.g. Devin Review, or a
+  # human submitting "Comment") that neither change `reviewDecision` nor
+  # appear in reviewThreads / issue comments. Empty-body reviews are
+  # filtered out: empty APPROVED / CHANGES_REQUESTED are already covered
+  # by the `REVIEW:` decision event, and an empty COMMENTED has nothing
+  # to read.
+  reviews_json="$(gh api graphql -f owner="$owner" -f repo="$repo" -F num="$pr" -f query="$reviews_query" 2>/dev/null || true)"
+  fresh_reviews="$(echo "$reviews_json" | jq -r --arg me "$me" '
+    .data.repository.pullRequest.reviews.nodes[]
+    | select(.author.login != $me and .state != "PENDING" and (.body // "") != "")
+    | "\(.id)\t\(.author.login)\t\(.state)"' \
+    2>/dev/null || true)"
+  emit_new "$fresh_reviews" "$seen_reviews" "NEW_REVIEW"
 
   case "$state" in
     MERGED|CLOSED) exit 0 ;;
