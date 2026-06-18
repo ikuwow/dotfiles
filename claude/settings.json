@@ -202,7 +202,8 @@
       "Skill(codex:setup)",
       "Skill(codex:setup *)",
       "Skill(pr-review-toolkit:review-pr)",
-      "Skill(pr-review-toolkit:review-pr *)"
+      "Skill(pr-review-toolkit:review-pr *)",
+      "Bash(pr-monitor *)"
     ],
     "deny": [
       "Bash(git push --force *)",
