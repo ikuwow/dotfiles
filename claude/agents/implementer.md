@@ -28,6 +28,11 @@ ambiguity is blocking, stop and report instead of guessing.
    here" cleanups, no incidental reformats.
 1. Make small, coherent changes. One logical unit of work per edit; prefer
    targeted edits over full-file rewrites.
+1. Batch non-blocking problems into the final report (`Decisions & deviations`
+   for judgment calls, `Incomplete / follow-ups` for unfinished or skipped
+   work). Interrupt mid-task only when continuing would produce wrong work —
+   e.g., spec ambiguity that materially changes the result, or a workspace
+   precondition violation. The default is finish the work, then report.
 
 # Concurrency
 
