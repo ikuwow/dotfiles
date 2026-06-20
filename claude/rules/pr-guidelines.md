@@ -143,6 +143,12 @@ once and applies to both perspectives.
      - Per-item rendering of a pre-flight checklist when every item
        is "N/A" — collapse to one line
    - Bullets are few and meaningful, each conveying a distinct point
+   - When the diff is self-explanatory — documentation or config
+     edits whose changed lines a reviewer can read directly,
+     especially in the team's own language — keep the body to what
+     the diff cannot convey (rationale, scope boundary). When
+     nothing remains to add, one line such as "realigned stale
+     wording with the actual code/config" is a complete description.
    - Length budget: the main description section (実装内容 or
      equivalent) stays within roughly 10 lines — one background
      paragraph plus change bullets. When the whole body excluding

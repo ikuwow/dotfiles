@@ -202,7 +202,8 @@
       "Skill(codex:setup)",
       "Skill(codex:setup *)",
       "Skill(pr-review-toolkit:review-pr)",
-      "Skill(pr-review-toolkit:review-pr *)"
+      "Skill(pr-review-toolkit:review-pr *)",
+      "Bash(pr-monitor *)"
     ],
     "deny": [
       "Bash(git push --force *)",
@@ -294,6 +295,7 @@
       "Bash(copilot update *)"
     ]
   },
+  "model": "claude-opus-4-7[1m]",
   "hooks": {
     "UserPromptSubmit": [
       {

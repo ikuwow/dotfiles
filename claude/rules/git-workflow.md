@@ -163,6 +163,12 @@ on every tick regardless of change).
      false` and `isOutdated == false`.
    - `NEW_TOP_COMMENT: <author>` — a top-level PR comment whose ID
      was not seen before. Not gated by resolution state.
+   - `NEW_REVIEW: <author> <state>` — a PR review (summary body) whose
+     ID was not seen before. `state` is `COMMENTED` / `APPROVED` /
+     `CHANGES_REQUESTED` / `DISMISSED`. Catches reviews that do not
+     change `reviewDecision` (e.g. Devin Review posted as `COMMENTED`,
+     or a human submitting "Comment"). Empty-body reviews are filtered
+     out.
    - `CI_FAILURE: <check name>` — a new `FAILURE` from `gh run list`
      on the PR's head SHA.
 
@@ -184,6 +190,9 @@ on every tick regardless of change).
    - Workflow run history on the PR branch (catches CI cycles
      `statusCheckRollup` doesn't show — e.g. older runs, re-run jobs):
      `gh run list --branch <headRefName> --json databaseId,name,status,conclusion,createdAt,headSha,workflowName --limit 20`
+   - PR reviews (the event line carries only author + state; re-fetch
+     for body):
+     `gh api repos/<owner>/<repo>/pulls/<number>/reviews`
 
 1. On each event notification, re-fetch full detail with the three
    polling commands in step 1 (the event line is only a signal), then
@@ -200,12 +209,13 @@ on every tick regardless of change).
 1. React by content, not event type. `NEW_COMMENT` is pre-filtered by
    the monitor to unresolved, non-outdated threads; `NEW_TOP_COMMENT`
    is not, so classify it by content:
-   - Clear fix request (`CHANGES_REQUESTED`, a `NEW_COMMENT`, or a
-     `NEW_TOP_COMMENT` asking for a change — from a human or an
-     automated reviewer like Devin or Copilot): modify code and push,
-     subject to the step-3 pre-push checks and the step-5 cap. For a
-     `NEW_COMMENT`, if the re-fetched thread is now `isResolved` or
-     `isOutdated`, it was handled in the interim — skip it.
+   - Clear fix request (`CHANGES_REQUESTED`, a `NEW_COMMENT`, a
+     `NEW_TOP_COMMENT`, or a `NEW_REVIEW` asking for a change — from a
+     human or an automated reviewer like Devin or Copilot): modify code
+     and push, subject to the step-3 pre-push checks and the step-5 cap.
+     For a `NEW_COMMENT`, if the re-fetched thread is now `isResolved`
+     or `isOutdated`, it was handled in the interim — skip it. For a
+     `NEW_REVIEW`, re-fetch the review body to classify intent.
    - Question, nit, or ambiguous intent: reply via `gh pr comment`,
      do not push.
    - `READY_FOR_REVIEW`: the user took the PR out of draft; no action,
