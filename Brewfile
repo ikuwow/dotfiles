@@ -158,7 +158,7 @@ brew "virt-manager"
 brew "docker"
 brew "docker-compose"
 brew "docker-buildx"
-brew "colima", restart_service: true
+brew "colima"
 brew "lima-additional-guestagents" # https://github.com/abiosoft/colima/issues/1333
 brew "kubie"
 brew "k9s"
