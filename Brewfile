@@ -1,15 +1,16 @@
 # rubocop:disable all
 
 tap "homebrew/autoupdate"
-tap "ikuwow/ikuwow-sshrc"
-tap "Songmu/tap"
-tap "fujiwara/tap"
-tap "kayac/tap"
-tap "keidarcy/tap"
-tap "oven-sh/bun"
-tap "configcat/tap"
-tap "pipe-cd/homebrew-tap"
-tap "jetbrains/junie"
+tap "ikuwow/ikuwow-sshrc", trusted: true
+tap "Songmu/tap", trusted: true
+tap "fujiwara/tap", trusted: true
+tap "kayac/tap", trusted: true
+tap "keidarcy/tap", trusted: true
+tap "oven-sh/bun", trusted: true
+tap "configcat/tap", trusted: true
+tap "pipe-cd/tap", trusted: true
+tap "datadog-labs/pack", trusted: true
+tap "jetbrains/junie", trusted: true
 
 brew "mas"
 
@@ -170,8 +171,9 @@ brew "ecspresso"
 brew "ecschedule"
 brew "e1s"
 # kubectl and kustomize should be managed by mise
-brew "pipe-cd/homebrew-tap/pipectl"
+brew "pipe-cd/tap/pipectl"
 cask "container"
+brew "socktainer"
 
 # Browsers
 cask "google-chrome"
