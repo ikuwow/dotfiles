@@ -30,9 +30,7 @@ mas "Barbee", id: 1548711022
 mas "WireGuard", id: 1451685025
 brew "udp2raw-multiplatform"
 brew "bash"
-# Apple container: initialized by scripts/configure_brew.sh after `brew bundle`.
-# Do not use brew services: it conflicts with the LaunchAgent that
-# `container system start` registers. See apple/container#158 for upstream auto-start discussion.
+# Do not use brew services: container manages its own LaunchAgent. apple/container#158
 brew "container"
 cask "logi-options+"
 # This installation process hangs up!
