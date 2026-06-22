@@ -179,7 +179,6 @@ brew "socktainer"
 cask "google-chrome"
 cask "firefox"
 
-cask "deepl"
 cask "1password-cli"
 cask "neovide-app"
 cask "vimr"
@@ -193,7 +192,6 @@ cask "onyx"
 cask "claude"
 cask "utm"
 cask "wireshark-app"
-cask "gitify"
 cask "zotero"
 
 # Work related
