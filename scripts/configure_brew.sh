@@ -14,10 +14,11 @@ apiserver_plist="$HOME/Library/Application Support/com.apple.container/apiserver
 if [ -f "$apiserver_plist" ]; then
   echo "Apple container is already initialized. Nothing to do."
 else
-  # First run: download Kata kernel (~GB) and register Apple's own persistent
+  # First run is slow: downloads the Kata kernel and registers a persistent
   # LaunchAgent. After this, container auto-starts at login without brew services.
   /opt/homebrew/opt/container/bin/container system start --enable-kernel-install
-  # Socktainer's service may have been started before container apiserver was
-  # ready (during `brew bundle`). Restart so it picks up the running apiserver.
+  # On first boot, `brew bundle` (run before this script in bootstrap/main.sh)
+  # starts socktainer before container's apiserver is initialized, so socktainer
+  # comes up pointing at nothing. Restart it now that apiserver is running.
   brew services restart socktainer
 fi
