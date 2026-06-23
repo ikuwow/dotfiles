@@ -1,0 +1,82 @@
+#!/usr/bin/env bash
+
+# AWS Profile Switcher: pick / list / clear AWS profiles via fzf.
+#
+# This script only manages the on-disk state (~/.aws/current_profile)
+# and prints feedback. Exporting AWS_PROFILE into the parent shell is
+# the wrapper function's responsibility — see aps() in .functions.
+
+set -eu
+
+if ! command -v fzf >/dev/null 2>&1; then
+  echo "Error: aps requires fzf executable." >&2
+  exit 1
+fi
+
+query="${1:-}"
+
+if [ "$query" = "--help" ] || [ "$query" = "-h" ]; then
+  cat << 'EOF'
+Usage: aps [OPTIONS] [QUERY]
+
+AWS Profile Switcher - Switch between AWS profiles interactively
+
+OPTIONS:
+  --help, -h     Show this help message
+  --clear        Clear the current AWS profile
+  --list         List all profiles (current one marked with *)
+
+ARGUMENTS:
+  QUERY          Filter profiles by query string (optional)
+
+EXAMPLES:
+  aps                  # Interactive profile selection with fzf
+  aps prod             # Filter profiles containing "prod"
+  aps --list           # List all available profiles
+  aps --clear          # Clear current profile
+EOF
+  exit 0
+fi
+
+if [ "$query" = "--clear" ]; then
+  rm -f ~/.aws/current_profile
+  echo "AWS Profile cleared."
+  exit 0
+fi
+
+if [ "$query" = "--list" ]; then
+  current_profile="${AWS_PROFILE:-$(cat ~/.aws/current_profile 2>/dev/null || echo "")}"
+  sed -n "s/^\[profile \(.*\)\]$/\1/p" < ~/.aws/config | while read -r profile; do
+    if [ "$profile" = "$current_profile" ]; then
+      echo "* $profile"
+    else
+      echo "  $profile"
+    fi
+  done
+  exit 0
+fi
+
+if [ -n "$query" ]; then
+  profile="$(sed -n "s/^\[profile \(.*\)\]$/\1/p" < ~/.aws/config | fzf --filter "$query" | head -n 1)"
+else
+  profile="$(sed -n "s/^\[profile \(.*\)\]$/\1/p" < ~/.aws/config | fzf)"
+fi
+
+if [ -z "$profile" ]; then
+  echo "No profiles are selected."
+  exit 0
+fi
+
+echo "$profile" > ~/.aws/current_profile
+echo "AWS Profile set: $profile"
+
+# AWS_PROFILE is not yet exported in this subprocess; pass it explicitly
+# so `aws` reads from the just-selected profile.
+sso_account_id="$(AWS_PROFILE="$profile" aws configure get sso_account_id || true)"
+if [ -n "$sso_account_id" ]; then
+  echo "SSO detected. Checking SSO session..."
+  sso_account="$(AWS_PROFILE="$profile" aws sts get-caller-identity --query "Account" 2>/dev/null || echo "")"
+  if [ "${#sso_account}" -ne 14 ]; then
+    AWS_PROFILE="$profile" aws sso login
+  fi
+fi
