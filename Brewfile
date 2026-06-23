@@ -30,6 +30,8 @@ mas "Barbee", id: 1548711022
 mas "WireGuard", id: 1451685025
 brew "udp2raw-multiplatform"
 brew "bash"
+# Do not use brew services: container manages its own LaunchAgent. apple/container#158
+brew "container"
 cask "logi-options+"
 # This installation process hangs up!
 # Install by yourself from: https://www.logitechg.com/en-us/innovation/g-hub.html
@@ -172,8 +174,7 @@ brew "ecschedule"
 brew "e1s"
 # kubectl and kustomize should be managed by mise
 brew "pipe-cd/tap/pipectl"
-cask "container"
-brew "socktainer"
+brew "socktainer", start_service: true, restart_service: :changed
 
 # Browsers
 cask "google-chrome"
