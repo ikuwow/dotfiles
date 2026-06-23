@@ -62,12 +62,16 @@ brew "uv"
 brew "node"
 brew "bun"
 
-# For AWS
+# AWS
 brew "awscli"
 brew "awslogs"
 brew "cfn-lint"
 cask "session-manager-plugin"
 brew "lambroll"
+
+# GCP
+cask "gcloud-cli"
+brew "cloud-sql-proxy"
 
 brew "zlib"
 brew "mise"
@@ -184,7 +188,6 @@ cask "1password-cli"
 cask "neovide-app"
 cask "vimr"
 cask "xquartz"
-cask "gcloud-cli"
 cask "vagrant"
 cask "vlc"
 cask "zoom"
