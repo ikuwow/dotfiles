@@ -110,158 +110,30 @@ if [ "$(command -v ghq)" ] && [ "$(command -v fzf)" ]; then
   }
 fi
 
-# AWS Profile Switcher
-if [ ! "$(command -v aps)" ]; then
+# aps / gps wrappers: the heavy lifting lives in bin/aps and bin/gps.
+# These wrappers exist only because the parent shell's environment
+# variables (AWS_PROFILE, GC_ACTIVE_CONFIG) cannot be set from a
+# subprocess. They re-read the persisted state files after the script
+# runs and export accordingly.
 
-  aps() {
-    if [ ! "$(command -v fzf)" ]; then
-      echo "Error: ${FUNCNAME} requires fzf executable."
-      return 1
-    fi
-    query="$1"
+aps() {
+  command aps "$@" || return $?
+  local profile=""
+  if [ -f ~/.aws/current_profile ]; then
+    profile="$(cat ~/.aws/current_profile)"
+  fi
+  export AWS_PROFILE="$profile"
+}
 
-    if [ "$query" = "--help" ] || [ "$query" = "-h" ]; then
-      cat << 'EOF'
-Usage: aps [OPTIONS] [QUERY]
-
-AWS Profile Switcher - Switch between AWS profiles interactively
-
-OPTIONS:
-  --help, -h     Show this help message
-  --clear        Clear the current AWS profile
-  --list         List all profiles (current one marked with *)
-
-ARGUMENTS:
-  QUERY          Filter profiles by query string (optional)
-
-EXAMPLES:
-  aps                  # Interactive profile selection with fzf
-  aps prod             # Filter profiles containing "prod"
-  aps --list           # List all available profiles
-  aps --clear          # Clear current profile
-EOF
-      return
-    fi
-
-    if [ "$query" = "--clear" ]; then
-      export AWS_PROFILE=""
-      rm -f ~/.aws/current_profile
-      echo "AWS Profile cleared."
-      return
-    fi
-
-    if [ "$query" = "--list" ]; then
-      # List all profiles with current one marked with *
-      current_profile="${AWS_PROFILE:-$(cat ~/.aws/current_profile 2>/dev/null || echo "")}"
-      sed -n "s/^\[profile \(.*\)\]$/\1/p" < ~/.aws/config | while read -r profile; do
-        if [ "$profile" = "$current_profile" ]; then
-          echo "* $profile"
-        else
-          echo "  $profile"
-        fi
-      done
-      return
-    fi
-
-    if [ -n "$query" ]; then
-      profile="$(sed -n "s/^\[profile \(.*\)\]$/\1/p" < ~/.aws/config | fzf --filter "$query" | head -n 1)"
-    else
-      profile="$(sed -n "s/^\[profile \(.*\)\]$/\1/p" < ~/.aws/config | fzf)"
-    fi
-
-    if [ -z "$profile" ]; then
-      echo "No profiles are selected."
-      return
-    fi
-
-    echo "$profile" > ~/.aws/current_profile
-    export AWS_PROFILE="$profile"
-    echo "AWS Profile set: $profile"
-
-    SSO_ACCOUNT_ID="$(aws configure get sso_account_id)"
-    if [ -n "$SSO_ACCOUNT_ID" ]; then
-      echo "SSO detected. Checking SSO session..."
-      SSO_ACCOUNT="$(aws sts get-caller-identity --query "Account")"
-      if [ "${#SSO_ACCOUNT}" -ne 14 ]; then
-        aws sso login
-      fi
-    fi
-  }
-fi
-
-if [ ! "$(command -v gps)" ]; then
-  gps() {
-    if [ ! "$(command -v fzf)" ]; then
-      echo "Error: ${FUNCNAME} requires fzf executable."
-      return 1
-    fi
-    query="$1"
-
-    if [ "$query" = "--help" ] || [ "$query" = "-h" ]; then
-      cat << 'EOF'
-Usage: gps [OPTIONS] [QUERY]
-
-Google Cloud Profile Switcher - Switch between gcloud configurations interactively
-
-OPTIONS:
-  --help, -h     Show this help message
-  --clear        Clear the current gcloud configuration (set to "none")
-  --list         List all configurations (current one marked with *)
-
-ARGUMENTS:
-  QUERY          Filter configurations by query string (optional)
-
-EXAMPLES:
-  gps                  # Interactive configuration selection with fzf
-  gps prod             # Filter configurations containing "prod"
-  gps --list           # List all available configurations
-  gps --clear          # Clear current configuration
-EOF
-      return
-    fi
-
-    DUMMY_CONFIG_NAME="none"
-    if [ ! "$(gcloud config configurations list --format='value(name)' | grep "^${DUMMY_CONFIG_NAME}$")" ]; then
-      gcloud config configurations create "$DUMMY_CONFIG_NAME"
-    fi
-
-    if [ "$query" = "--clear" ]; then
-      export GC_ACTIVE_CONFIG="$DUMMY_CONFIG_NAME"
-      gcloud config configurations activate "$DUMMY_CONFIG_NAME"
-      echo "Google Cloud configuration cleared."
-      return
-    fi
-
-    if [ "$query" = "--list" ]; then
-      # List all configurations with current one marked with *
-      current_config="${GC_ACTIVE_CONFIG:-$(cat "${CLOUDSDK_CONFIG:-${XDG_CONFIG_HOME:-$HOME/.config}/gcloud}/active_config" 2>/dev/null || echo "")}"
-      gcloud config configurations list --format='value(name)' | while read -r config; do
-        if [ "$config" = "$current_config" ]; then
-          echo "* $config"
-        else
-          echo "  $config"
-        fi
-      done
-      return
-    fi
-
-    config=""
-    if [ -n "$query" ]; then
-      config="$(gcloud config configurations list --format='value(name)' | grep -v "^${DUMMY_CONFIG_NAME}$" | fzf --filter "$query" | head -n 1)"
-    else
-      config="$(gcloud config configurations list --format='value(name)' | grep -v "^${DUMMY_CONFIG_NAME}$" | fzf)"
-    fi
-
-    if [ -z "$config" ]; then
-      echo "No profiles are selected."
-      return
-    fi
-
-    gcloud config configurations activate "$config"
-    export GC_ACTIVE_CONFIG="$(cat "${CLOUDSDK_CONFIG:-${XDG_CONFIG_HOME:-$HOME/.config}/gcloud}/active_config")"
-    echo "Google Cloud config set: $config"
-  }
-fi
+gps() {
+  command gps "$@" || return $?
+  local active_config_path="${CLOUDSDK_CONFIG:-${XDG_CONFIG_HOME:-$HOME/.config}/gcloud}/active_config"
+  local config=""
+  if [ -f "$active_config_path" ]; then
+    config="$(cat "$active_config_path")"
+  fi
+  export GC_ACTIVE_CONFIG="$config"
+}
 
 
 kubecurl() {
