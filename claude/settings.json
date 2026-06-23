@@ -205,6 +205,8 @@
       "Bash(copilot * --help)",
       "Skill(pr-selfcheck)",
       "Skill(pr-selfcheck *)",
+      "Skill(gh-notif-triage)",
+      "Skill(gh-notif-triage *)",
       "Skill(codex:setup)",
       "Skill(codex:setup *)",
       "Skill(pr-review-toolkit:review-pr)",
