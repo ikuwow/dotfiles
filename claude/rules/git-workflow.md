@@ -34,8 +34,10 @@ Follow each step in order. Skip steps that don't apply.
 
 1. Pull the latest default branch:
    `git pull`
-1. Create a worktree and branch:
+1. Create a worktree and branch (defaults to branching from origin's default branch):
    `git-worktree-create <branch-name>`
+   - To branch from somewhere other than origin's default:
+     `git-worktree-create <branch-name> <base>`
 1. Follow the command shown in the script output to move into the worktree
 1. If the project rules explicitly prohibit worktrees, create a branch only:
    `git checkout -b <branch-name>`
