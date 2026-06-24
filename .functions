@@ -9,8 +9,8 @@ prompt_aws() {
 }
 
 prompt_gc() {
-  if [[ -n "${GC_ACTIVE_CONFIG}" && "${GC_ACTIVE_CONFIG}" != "none" ]]; then
-    GC_PROMPT=" <GC:${GC_ACTIVE_CONFIG}>"
+  if [[ -n "${CLOUDSDK_CORE_PROJECT}" ]]; then
+    GC_PROMPT=" <GCP:${CLOUDSDK_CORE_PROJECT}>"
   else
     GC_PROMPT=""
   fi
@@ -201,65 +201,63 @@ if [ ! "$(command -v gps)" ]; then
       cat << 'EOF'
 Usage: gps [OPTIONS] [QUERY]
 
-Google Cloud Profile Switcher - Switch between gcloud configurations interactively
+Google Cloud Project Switcher - Switch between GCP projects interactively.
+Sets CLOUDSDK_CORE_PROJECT for the current shell (per-shell, not persisted).
 
 OPTIONS:
   --help, -h     Show this help message
-  --clear        Clear the current gcloud configuration (set to "none")
-  --list         List all configurations (current one marked with *)
+  --clear        Clear the current GCP project (unset CLOUDSDK_CORE_PROJECT)
+  --list         List all projects (current one marked with *)
 
 ARGUMENTS:
-  QUERY          Filter configurations by query string (optional)
+  QUERY          Filter projects by query string (optional)
 
 EXAMPLES:
-  gps                  # Interactive configuration selection with fzf
-  gps prod             # Filter configurations containing "prod"
-  gps --list           # List all available configurations
-  gps --clear          # Clear current configuration
+  gps                  # Interactive project selection with fzf
+  gps prod             # Filter projects containing "prod"
+  gps --list           # List all available projects
+  gps --clear          # Clear current project
 EOF
       return
     fi
 
-    DUMMY_CONFIG_NAME="none"
-    if [ ! "$(gcloud config configurations list --format='value(name)' | grep "^${DUMMY_CONFIG_NAME}$")" ]; then
-      gcloud config configurations create "$DUMMY_CONFIG_NAME"
-    fi
-
     if [ "$query" = "--clear" ]; then
-      export GC_ACTIVE_CONFIG="$DUMMY_CONFIG_NAME"
-      gcloud config configurations activate "$DUMMY_CONFIG_NAME"
-      echo "Google Cloud configuration cleared."
+      unset CLOUDSDK_CORE_PROJECT
+      echo "GCP project cleared."
       return
     fi
 
+    if ! projects="$(gcloud projects list --format='value(projectId)' --sort-by=projectId)"; then
+      echo "gps: failed to list GCP projects" >&2
+      return 1
+    fi
+
     if [ "$query" = "--list" ]; then
-      # List all configurations with current one marked with *
-      current_config="${GC_ACTIVE_CONFIG:-$(cat "${CLOUDSDK_CONFIG:-${XDG_CONFIG_HOME:-$HOME/.config}/gcloud}/active_config" 2>/dev/null || echo "")}"
-      gcloud config configurations list --format='value(name)' | while read -r config; do
-        if [ "$config" = "$current_config" ]; then
-          echo "* $config"
+      current_project="${CLOUDSDK_CORE_PROJECT:-}"
+      echo "$projects" | while read -r project; do
+        if [ "$project" = "$current_project" ]; then
+          echo "* $project"
         else
-          echo "  $config"
+          echo "  $project"
         fi
       done
       return
     fi
 
-    config=""
+    project=""
     if [ -n "$query" ]; then
-      config="$(gcloud config configurations list --format='value(name)' | grep -v "^${DUMMY_CONFIG_NAME}$" | fzf --filter "$query" | head -n 1)"
+      project="$(echo "$projects" | fzf --filter "$query" | head -n 1)"
     else
-      config="$(gcloud config configurations list --format='value(name)' | grep -v "^${DUMMY_CONFIG_NAME}$" | fzf)"
+      project="$(echo "$projects" | fzf)"
     fi
 
-    if [ -z "$config" ]; then
-      echo "No profiles are selected."
+    if [ -z "$project" ]; then
+      echo "No projects are selected."
       return
     fi
 
-    gcloud config configurations activate "$config"
-    export GC_ACTIVE_CONFIG="$(cat "${CLOUDSDK_CONFIG:-${XDG_CONFIG_HOME:-$HOME/.config}/gcloud}/active_config")"
-    echo "Google Cloud config set: $config"
+    export CLOUDSDK_CORE_PROJECT="$project"
+    echo "GCP project set: $project"
   }
 fi
 
