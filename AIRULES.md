@@ -94,7 +94,7 @@
 1. シェルコマンド内でコマンド置換（`$()`、バッククォート）を使わない
     - 複数行テキストはシングルクォートで渡す。本文にシングルクォートが含まれる場合のみ heredoc にフォールバック
 1. AWS CLI を実行する際は必ず `AWS_PROFILE=<profile> aws ...` の形式で環境変数をコマンドの先頭に付与する。使用する profile は必ずユーザーに確認してから実行すること
-1. gcloud / bq / gsutil を実行する際は必ず `CLOUDSDK_CORE_PROJECT=<project> gcloud ...` の形式で環境変数をコマンドの先頭に付与する。使用する project は必ずユーザーに確認してから実行すること。project 切替は `gps` コマンドを使う
+1. gcloud / bq / gsutil を実行する際は必ず `CLOUDSDK_CORE_PROJECT=<project> <gcloud|bq|gsutil> ...` の形式で環境変数をコマンドの先頭に付与する。使用する project は必ずユーザーに確認してから実行すること。project 切替は `gps` コマンドを使う
 1. プロジェクトと無関係のファイルは `ikuwowfiles/` 以下に置く（グローバル gitignore 対象）
 1. コード・ファイル内の検索は `git grep` を第一選択とする
     - Bash の `find` コマンドではなく Glob/Grep/Read ツールを優先する。`find` は専用ツールでは実現できない場合（パーミッション・タイムスタンプ条件等）に限定する

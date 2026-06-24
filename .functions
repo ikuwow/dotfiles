@@ -227,9 +227,14 @@ EOF
       return
     fi
 
+    if ! projects="$(gcloud projects list --format='value(projectId)' --sort-by=projectId)"; then
+      echo "gps: failed to list GCP projects" >&2
+      return 1
+    fi
+
     if [ "$query" = "--list" ]; then
       current_project="${CLOUDSDK_CORE_PROJECT:-}"
-      gcloud projects list --format='value(projectId)' --sort-by=projectId | while read -r project; do
+      echo "$projects" | while read -r project; do
         if [ "$project" = "$current_project" ]; then
           echo "* $project"
         else
@@ -241,9 +246,9 @@ EOF
 
     project=""
     if [ -n "$query" ]; then
-      project="$(gcloud projects list --format='value(projectId)' --sort-by=projectId | fzf --filter "$query" | head -n 1)"
+      project="$(echo "$projects" | fzf --filter "$query" | head -n 1)"
     else
-      project="$(gcloud projects list --format='value(projectId)' --sort-by=projectId | fzf)"
+      project="$(echo "$projects" | fzf)"
     fi
 
     if [ -z "$project" ]; then
