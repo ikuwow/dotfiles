@@ -52,6 +52,7 @@
       "Bash(aps --help *)",
       "Bash(gps --list *)",
       "Bash(gps --help *)",
+      "Bash(gcloud projects list*)",
       "Bash(dog --help *)",
       "Bash(date *)",
       "Bash(aws sts get-caller-identity *)",
