@@ -45,6 +45,10 @@ content that doesn't fit on one line — including issue references
   for a separate PR. The body should convey the holistic intent of
   the change — what the PR is trying to achieve across the whole
   diff — and the diff should reflect only that intent.
+- Language follows the target repository, not the conversation —
+  honor any explicit rule in the repo's `CLAUDE.md` / `AGENTS.md`
+  first, otherwise match the existing PR / commit history. Don't let
+  the language of the chat with the user decide.
 
 ### Style rules
 
