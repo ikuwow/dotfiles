@@ -129,9 +129,9 @@ covers three things:
 1. Confirm acceptance criteria are met. Cross-check the PR body and
    any linked issue against the actual change. If something is unmet,
    either address it or call it out as out-of-scope / follow-up.
-1. Report completion to the user. Marking the PR ready for review is
-   the user's decision — do not run `gh pr ready` unless explicitly
-   instructed.
+1. Surface Phase 4 completion so the user can decide whether to mark
+   the PR ready for review. `gh pr ready` is the user's call — do
+   not run it unless explicitly instructed.
 
 Update incrementally as conditions are confirmed (e.g., after Phase 1
 CI passes, after apply / deploy succeeds, after post-deploy
