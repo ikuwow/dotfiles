@@ -115,7 +115,7 @@ if [ ! "$(command -v aps)" ]; then
 
   aps() {
     if [ ! "$(command -v fzf)" ]; then
-      echo "Error: ${FUNCNAME} requires fzf executable."
+      echo "Error: ${FUNCNAME[0]} requires fzf executable."
       return 1
     fi
     query="$1"
@@ -192,7 +192,7 @@ fi
 if [ ! "$(command -v gps)" ]; then
   gps() {
     if [ ! "$(command -v fzf)" ]; then
-      echo "Error: ${FUNCNAME} requires fzf executable."
+      echo "Error: ${FUNCNAME[0]} requires fzf executable."
       return 1
     fi
     query="$1"
@@ -221,7 +221,7 @@ EOF
     fi
 
     DUMMY_CONFIG_NAME="none"
-    if [ ! "$(gcloud config configurations list --format='value(name)' | grep "^${DUMMY_CONFIG_NAME}$")" ]; then
+    if ! gcloud config configurations list --format='value(name)' | grep -q "^${DUMMY_CONFIG_NAME}$"; then
       gcloud config configurations create "$DUMMY_CONFIG_NAME"
     fi
 
@@ -258,7 +258,8 @@ EOF
     fi
 
     gcloud config configurations activate "$config"
-    export GC_ACTIVE_CONFIG="$(cat "${CLOUDSDK_CONFIG:-${XDG_CONFIG_HOME:-$HOME/.config}/gcloud}/active_config")"
+    GC_ACTIVE_CONFIG="$(cat "${CLOUDSDK_CONFIG:-${XDG_CONFIG_HOME:-$HOME/.config}/gcloud}/active_config")"
+    export GC_ACTIVE_CONFIG
     echo "Google Cloud config set: $config"
   }
 fi
