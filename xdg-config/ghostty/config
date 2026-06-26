@@ -9,8 +9,8 @@ cursor-style = block
 cursor-style-blink = true
 
 # Default window size
-window-height = 67
-window-width = 100
+window-height = 68
+window-width = 112
 
 macos-titlebar-style = tabs
 
