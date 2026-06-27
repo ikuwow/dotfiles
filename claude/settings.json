@@ -432,6 +432,7 @@
   },
   "effortLevel": "high",
   "autoUpdatesChannel": "stable",
+  "tui": "default",
   "theme": "auto",
   "remoteControlAtStartup": true,
   "inputNeededNotifEnabled": true,
