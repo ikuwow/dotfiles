@@ -106,6 +106,7 @@
       "mcp__jetbrains",
       "mcp__Context7",
       "mcp__claude_ai_Context7",
+      "mcp__textlint",
       "mcp__notion__notion-search",
       "mcp__mcp-obsidian__obsidian_list_files_in_vault",
       "mcp__mcp-obsidian__obsidian_list_files_in_dir",
