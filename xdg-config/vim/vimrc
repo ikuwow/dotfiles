@@ -11,6 +11,19 @@ endif
 autocmd!
 set nocompatible " do not use vi compatible mode
 
+" When launched from Finder/Dock on macOS (e.g. Neovide.app, gvim cask),
+" the login shell init files do not run, so $PATH stays at the bare
+" /usr/bin:/bin:/usr/sbin:/sbin and Homebrew tools become invisible.
+" Prepend the well-known brew prefixes so executable('brew') works.
+" See ikuwow/dotfiles#73.
+if has('mac') || has('macunix')
+    for s:brew_path in ['/opt/homebrew/bin', '/usr/local/bin']
+        if isdirectory(s:brew_path) && $PATH !~# '\V' . s:brew_path
+            let $PATH = s:brew_path . ':' . $PATH
+        endif
+    endfor
+endif
+
 set langmenu=en_US.UTF-8
 set nu
 set title " display filename (not Thank you for using Vim.)
