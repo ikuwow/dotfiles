@@ -4,7 +4,7 @@ How to reply to and resolve PR review thread comments.
 Scope: review-thread comments only. Top-level PR comments
 (`gh pr comment`) are out of scope.
 
-This is the interim rule-only form of ikuwow/dotfiles#126. A future
+This is the interim rule-only form of #126. A future
 script (`bin/gh-pr-thread-{reply,resolve}`) will absorb the bot check
 and replace these instructions.
 
@@ -43,11 +43,9 @@ thread, per the rule in the previous section.
 
 ## Step 2: Reply to a bot thread
 
-Only after confirming every comment in the thread is a bot. Mutation
-is manually approved every time (`approve_gh_graphql_readonly.py` only
-auto-approves read-only queries) — re-verify the thread at the
-approval prompt. Use `-f query='...'` with single quotes; do not use
-`--field`, `-F`, or `--raw-field` for the `query` argument.
+Only after confirming every comment in the thread is a bot. Mutations
+require manual approval every time — re-verify the thread at the
+approval prompt.
 
 ```bash
 gh api graphql -f query='mutation($threadId:ID!,$body:String!){addPullRequestReviewThreadReply(input:{pullRequestReviewThreadId:$threadId,body:$body}){comment{id url}}}' -f threadId=<thread id> -f body=<reply body>
