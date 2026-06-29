@@ -225,6 +225,19 @@ on every tick regardless of change).
    - Informational (`APPROVED`, or CI still `PENDING` / `IN_PROGRESS` /
      `QUEUED`): no action; surface it to the user on the next turn.
 
+   Resolving review threads (`NEW_COMMENT` only — top-level comments
+   and review summary bodies are not threads):
+   - After a fix push that addresses a `NEW_COMMENT`, resolve the
+     originating thread so subsequent monitor passes skip it and
+     reviewers see the discussion state.
+   - After a reply that closes a question / nit / ambiguous-intent
+     comment (e.g., explaining an intentional decision), resolve the
+     thread.
+   - Leave the thread open when waiting for the reviewer's follow-up.
+   - Get the thread id from the `reviewThreads` GraphQL query in step
+     1, then run
+     `gh api graphql -f query='mutation($id:ID!){resolveReviewThread(input:{threadId:$id}){thread{isResolved}}}' -f id=<thread-id>`.
+
    Event-specific notes:
    - `STATE: MERGED` / `CLOSED` is terminal — handled in step 6 (Exit
      conditions), not here.
