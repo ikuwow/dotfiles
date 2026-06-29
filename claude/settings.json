@@ -436,6 +436,7 @@
     }
   },
   "effortLevel": "high",
+  "autoMemoryEnabled": false,
   "autoUpdatesChannel": "stable",
   "tui": "default",
   "theme": "auto",

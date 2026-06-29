@@ -77,3 +77,27 @@ and test coverage that are over-engineering for personal-dotfiles
 scope. Weigh those recommendations against this section before
 accepting them — and when in doubt, prefer the simpler version and
 let the user push back if it's wrong.
+
+## Claude Code Permission Internals
+
+Notes on Claude Code's permission system, learned the hard way:
+
+- Claude Code's security pre-check overrides `allow` rules (by design)
+- The `*` wildcard in permission patterns does not match multiline
+  commands — the underlying RegExp lacks the `s` flag
+  (anthropics/claude-code#11932)
+- The "quoted newline + `#`" pre-check runs before both
+  `PermissionRequest` and `PreToolUse` hooks, and hooks cannot bypass
+  it (verified 2026-03-08: no hook invocation, no log output)
+  - `git *` commands are exempt from this pre-check
+    (`git commit -m 'test\n# heading'` goes through without a prompt)
+  - `gh *` commands like `gh pr create` / `gh issue create` are not
+    exempt and get caught
+- `claude/hooks/approve_git_gh_commands.py` runs on
+  `PermissionRequest` and auto-approves prefixes
+  (`git commit`, `gh pr create`, `gh issue create`) via
+  single-quote-aware parsing — but, per the previous bullet, it
+  cannot help when the "quoted newline + `#`" pre-check fires
+- Workaround for `gh pr create --body` / `gh issue create --body`
+  with `#` heading lines: route through `--body-file` with a temp
+  file
