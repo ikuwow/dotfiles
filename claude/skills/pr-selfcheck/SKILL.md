@@ -26,6 +26,41 @@ Perform a self-review of the specified PR to catch issues before a human reviewe
 
 Evaluate the PR against the PR Body Checklist defined in `pr-guidelines.md`.
 
+In addition to the high-level checklist, apply the following concrete
+signals so detection does not rely on subagent interpretation alone.
+
+### Redundancy / essence-first signals
+
+Flag each as Should Fix; if multiple signals fire across the body,
+escalate to Must Fix.
+
+- Sentences or bullets that paraphrase what the diff already shows ("edited file X", "bumped value from A to B", "added N items", per-file summaries)
+- CI / lint / type-check / `go build` / `go test` / `go vet` / `pre-commit` results recorded in the Verification section (the Checks panel and bot comments are the authoritative source)
+- The same fact (environment variable name, file name, design decision, summary of a linked source) repeated in multiple places in the body
+- Bullets in the same list that restate the same decision or fact in different wording, with no distinct information per item
+- Content copied verbatim from a design doc, spec, linked issue, or primary source where a one-line summary plus link would suffice
+- Length budget as a heuristic prompt: when the implementation-summary section exceeds ~10 lines, or the whole body (excluding template-mandated sections) exceeds ~30 lines, re-examine the body against the redundancy signals above
+
+### Hard-wrap detection (GitHub-posted markdown)
+
+For PR bodies, PR comments, issue bodies, and issue comments, GitHub
+Flavored Markdown renders soft line breaks inside a paragraph as
+visible breaks. Blank lines between paragraphs serve as paragraph
+separators and are allowed. Flag each violation as Should Fix;
+multiple violations across the body escalate to Must Fix.
+
+Violations:
+
+- Two or more consecutive non-empty lines with no blank line between them (paragraph-internal soft break)
+- Continuation lines of a list item (a line beginning with whitespace indentation following a line that starts with `- `, `* `, or `1. `)
+
+Excluded from detection to avoid false positives:
+
+- Inside fenced code blocks
+- Table rows (lines whose first and last non-whitespace characters are `|`)
+- HTML comments (`<!-- ... -->`)
+- Blockquotes (lines starting with `> `)
+
 ## Output Format
 
 ```
