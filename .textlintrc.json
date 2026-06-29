@@ -1,0 +1,7 @@
+{
+  "rules": {
+    "preset-jtf-style": true,
+    "preset-ja-technical-writing": true,
+    "preset-ai-writing": true
+  }
+}
