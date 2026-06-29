@@ -352,7 +352,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "if command -v noti >/dev/null; then NOTI_NSUSER_SOUNDNAME=Blow noti --title 'Claude Code' --message 'Requires response.'; fi"
+            "command": "f=~/.claude/hooks/notify.sh; if [ -x \"$f\" ]; then bash \"$f\"; fi"
           }
         ]
       }
@@ -367,7 +367,18 @@
           },
           {
             "type": "command",
-            "command": "if command -v noti >/dev/null; then NOTI_NSUSER_SOUNDNAME=Glass noti --title 'Claude Code' --message 'Done! Yay!'; fi"
+            "command": "f=~/.claude/hooks/notify.sh; if [ -x \"$f\" ]; then bash \"$f\"; fi"
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "f=~/.claude/hooks/notify.sh; if [ -x \"$f\" ]; then bash \"$f\"; fi"
           }
         ]
       }
