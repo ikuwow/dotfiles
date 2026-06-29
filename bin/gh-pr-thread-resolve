@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# Resolve a PR review thread. Same bot guard as gh-pr-thread-reply: refuses
+# to resolve threads whose first comment author is not a bot.
+#
+# Usage: gh-pr-thread-resolve <owner/repo> <pr-number> <thread-id>
+
+set -eu
+
+if [ $# -ne 3 ]; then
+  echo "Usage: gh-pr-thread-resolve <owner/repo> <pr-number> <thread-id>" >&2
+  exit 1
+fi
+
+repo="$1"
+pr="$2"
+thread_id="$3"
+
+script_dir="$(cd "$(dirname "$(realpath "$0")")" && pwd)"
+# shellcheck source=./gh-pr-thread-bot-guard.sh
+. "$script_dir/gh-pr-thread-bot-guard.sh"
+
+gh_pr_thread_assert_bot "$repo" "$pr" "$thread_id"
+
+# shellcheck disable=SC2016 # GraphQL query: $vars are query variables, not shell
+gh api graphql \
+  -f thread="$thread_id" \
+  -f query='mutation($thread:ID!){
+    resolveReviewThread(input:{threadId:$thread}){
+      thread{ id isResolved }
+    }
+  }'
