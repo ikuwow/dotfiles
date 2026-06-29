@@ -73,3 +73,10 @@ mutation in step 2. Resolution of a human thread stays with the user.
   (top-level comments are a different surface, not a substitute reply)
 - Using `--field` / `-F` / `--raw-field` for the `query` argument
   (see `gh-graphql.md`)
+
+## References
+
+- `addPullRequestReviewThreadReply`: https://docs.github.com/en/graphql/reference/mutations#addpullrequestreviewthreadreply
+- `resolveReviewThread`: https://docs.github.com/en/graphql/reference/mutations#resolvereviewthread
+- `PullRequestReviewThread` (fields used: `id`, `isResolved`, `isOutdated`, `comments`): https://docs.github.com/en/graphql/reference/objects#pullrequestreviewthread
+- `Bot` vs `User` (`__typename` source): https://docs.github.com/en/graphql/reference/interfaces#actor
