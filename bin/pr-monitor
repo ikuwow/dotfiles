@@ -83,10 +83,11 @@ emit_new() {
   new="$(comm -23 <(echo "$sorted_fresh") <(echo "$sorted_seen") || true)"
   [ -z "$new" ] && return 0
   if [ "$first_poll" -eq 0 ]; then
-    # `new` is newline-separated; pass it via the environment, not `awk -v`,
+    # Two inputs to awk: `$fresh` on stdin supplies the records to scan;
+    # `$new` (the IDs to emit) goes via the environment, not `awk -v`,
     # because BWK awk (the macOS default) rejects a literal newline in a
     # -v assignment ("awk: newline in string").
-    ids_nl="$new" awk -F'\t' -v label="$label" '
+    echo "$fresh" | ids_nl="$new" awk -F'\t' -v label="$label" '
       BEGIN { n = split(ENVIRON["ids_nl"], a, "\n"); for (i = 1; i <= n; i++) seen[a[i]] = 1 }
       ($1 in seen) { print label ": " $2 ($3 != "" ? " " $3 : "") }
     '
