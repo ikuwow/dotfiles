@@ -134,15 +134,7 @@ On Linux, the bootstrap process deploys symlinks and exits. Homebrew is not used
 
 ### Safari Userscripts
 
-`userscripts/` holds Safari user scripts that are loaded by the [Userscripts](https://github.com/quoid/userscripts) Safari extension (installed via `mas` from the Brewfile). The extension stores its save location as a macOS security-scoped bookmark, so point it directly at the real `userscripts/` path under this repo. See [`userscripts/README.md`](userscripts/README.md) for the list of scripts and how to add new ones.
-
-Post-`brew bundle` setup (one time per Mac):
-
-1. Enable the Userscripts extension in Safari → Settings → Extensions
-1. Open the Userscripts popover from the Safari toolbar and click the gear icon to open the Settings modal
-1. Click the cogs icon next to "Save Location" — this launches the Userscripts host app
-1. In the host app, pick this repo's `userscripts/` directory as the Save Location
-1. Back in the popover, every `.user.js` in that directory (including `ime-enter-fixer.user.js`) appears in the script list and is active automatically; reload any open Safari tabs to pick them up
+`userscripts/` holds Safari user scripts loaded by the [Userscripts](https://github.com/quoid/userscripts) extension (installed via `mas` from the Brewfile). The per-Mac setup procedure, current script catalog, and how to add new scripts live in [`userscripts/README.md`](userscripts/README.md).
 
 ### Claude Code Web
 

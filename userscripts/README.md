@@ -2,9 +2,15 @@
 
 Safari user scripts loaded by the [Userscripts](https://github.com/quoid/userscripts) extension. This directory is set as the extension's Save Location so the scripts are version-controlled with the rest of the dotfiles.
 
-## Setup
+The Userscripts extension keeps its Save Location as a macOS security-scoped bookmark, so point it at the real path of this directory under the repo rather than a `$HOME` symlink — the bookmark resolves more reliably against the real path, and it must be set once per Mac via the app's UI (no way to bootstrap it from the dotfiles deploy).
 
-See the "Safari Userscripts" section in the top-level [README.md](../README.md) for the full installation and Save Location procedure, including why the extension is pointed at the real repo path.
+## Setup (one time per Mac, after `brew bundle`)
+
+1. Enable the Userscripts extension in Safari → Settings → Extensions
+1. Open the Userscripts popover from the Safari toolbar and click the gear icon to open the Settings modal
+1. Click the cogs icon next to "Save Location" — this launches the Userscripts host app
+1. In the host app, pick this repo's `userscripts/` directory as the Save Location
+1. Back in the popover, every `.user.js` in this directory appears in the script list and is active automatically; reload any open Safari tabs to pick them up
 
 ## Scripts
 
