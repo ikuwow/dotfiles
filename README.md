@@ -92,6 +92,7 @@ dotfiles/
 ├── bin/                  # Custom executable scripts → ~/bin/
 ├── xdg-config/           # XDG config files → ~/.config/
 ├── claude/               # Claude Code settings → ~/.claude/
+├── userscripts/          # Safari userscripts (Userscripts.app reads this path directly)
 ├── .bash_profile         # Login shell config → ~/
 ├── .bashrc               # Interactive shell config → ~/
 └── ... (other dotfiles)
@@ -130,6 +131,16 @@ export ANTHROPIC_MODEL=opusplan
 - Linux: Symlink deployment only
 
 On Linux, the bootstrap process deploys symlinks and exits. Homebrew is not used on Linux in this project; shell configuration (`.bash_profile`, `.bashrc`) detects whether Homebrew is installed and skips all Homebrew-dependent setup when it is absent.
+
+### Safari Userscripts
+
+`userscripts/` holds Safari user scripts that are loaded by the [Userscripts](https://github.com/quoid/userscripts) Safari extension (installed via `mas` from the Brewfile). The extension stores its save location as a macOS security-scoped bookmark, so point it directly at the real `userscripts/` path under this repo. See [`userscripts/README.md`](userscripts/README.md) for the list of scripts and how to add new ones.
+
+Post-`brew bundle` setup (one time per Mac):
+
+1. Enable the Userscripts extension in Safari → Settings → Extensions.
+1. Open Userscripts from the Safari toolbar → Settings (gear icon) → Save Location → choose this repo's `userscripts/` directory.
+1. Reload Safari tabs; the scripts in `userscripts/` are picked up automatically.
 
 ### Claude Code Web
 

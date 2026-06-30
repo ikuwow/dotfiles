@@ -201,6 +201,7 @@ cask "zotero"
 # Work related
 
 mas "Dark Reader for Safari", id: 1438243180
+mas "Userscripts", id: 1463298887
 mas "The Unarchiver", id: 425424353
 mas "Numbers", id: 409203825
 mas "Keynote", id: 409183694
