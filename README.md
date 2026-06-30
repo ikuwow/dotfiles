@@ -92,6 +92,7 @@ dotfiles/
 ├── bin/                  # Custom executable scripts → ~/bin/
 ├── xdg-config/           # XDG config files → ~/.config/
 ├── claude/               # Claude Code settings → ~/.claude/
+├── userscripts/          # Safari userscripts loaded by the Userscripts extension
 ├── .bash_profile         # Login shell config → ~/
 ├── .bashrc               # Interactive shell config → ~/
 └── ... (other dotfiles)
@@ -130,6 +131,10 @@ export ANTHROPIC_MODEL=opusplan
 - Linux: Symlink deployment only
 
 On Linux, the bootstrap process deploys symlinks and exits. Homebrew is not used on Linux in this project; shell configuration (`.bash_profile`, `.bashrc`) detects whether Homebrew is installed and skips all Homebrew-dependent setup when it is absent.
+
+### Safari Userscripts
+
+`userscripts/` holds Safari user scripts loaded by the [Userscripts](https://github.com/quoid/userscripts) extension (installed via `mas` from the Brewfile). The per-Mac setup procedure, current script catalog, and how to add new scripts live in [`userscripts/README.md`](userscripts/README.md).
 
 ### Claude Code Web
 
