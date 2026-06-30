@@ -92,7 +92,7 @@ dotfiles/
 ├── bin/                  # Custom executable scripts → ~/bin/
 ├── xdg-config/           # XDG config files → ~/.config/
 ├── claude/               # Claude Code settings → ~/.claude/
-├── userscripts/          # Safari userscripts (Userscripts.app reads this path directly)
+├── userscripts/          # Safari userscripts loaded by the Userscripts extension
 ├── .bash_profile         # Login shell config → ~/
 ├── .bashrc               # Interactive shell config → ~/
 └── ... (other dotfiles)
@@ -138,9 +138,9 @@ On Linux, the bootstrap process deploys symlinks and exits. Homebrew is not used
 
 Post-`brew bundle` setup (one time per Mac):
 
-1. Enable the Userscripts extension in Safari → Settings → Extensions.
-1. Open Userscripts from the Safari toolbar → Settings (gear icon) → Save Location → choose this repo's `userscripts/` directory.
-1. Reload Safari tabs; the scripts in `userscripts/` are picked up automatically.
+1. Enable the Userscripts extension in Safari → Settings → Extensions
+1. Open the Userscripts popover from the Safari toolbar → Settings (gear icon) → Save Location → choose this repo's `userscripts/` directory
+1. Reload any open Safari tabs to pick up the scripts
 
 ### Claude Code Web
 
