@@ -139,8 +139,10 @@ On Linux, the bootstrap process deploys symlinks and exits. Homebrew is not used
 Post-`brew bundle` setup (one time per Mac):
 
 1. Enable the Userscripts extension in Safari → Settings → Extensions
-1. Open the Userscripts popover from the Safari toolbar → Settings (gear icon) → Save Location → choose this repo's `userscripts/` directory
-1. Reload any open Safari tabs to pick up the scripts
+1. Open the Userscripts popover from the Safari toolbar and click the gear icon to open the Settings modal
+1. Click the cogs icon next to "Save Location" — this launches the Userscripts host app
+1. In the host app, pick this repo's `userscripts/` directory as the Save Location
+1. Back in the popover, every `.user.js` in that directory (including `ime-enter-fixer.user.js`) appears in the script list and is active automatically; reload any open Safari tabs to pick them up
 
 ### Claude Code Web
 
