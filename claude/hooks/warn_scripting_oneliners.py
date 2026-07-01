@@ -2,18 +2,21 @@
 """Warn on Bash one-liners that invoke arbitrary-code scripting tools.
 
 Detects ``awk``, ``sed``, ``perl -e`` / ``-E``, ``python -c``,
-``python3 -c``, and ``ruby -e`` in Bash commands. On the first occurrence per session
-per rule, denies the tool call with a suggestion to prefer purpose-
-built commands (tr, cut, head, tail, sort, uniq, grep, jq, ...). On
-subsequent occurrences of the same rule in the same session, the
-command is allowed through so the assistant can proceed after
-confirming the special tool is actually needed.
+``python3 -c``, and ``ruby -e`` in Bash commands. On the first occurrence
+per session per distinct command, denies the tool call with a suggestion
+to prefer purpose-built commands (tr, cut, head, tail, sort, uniq, grep,
+jq, ...). Re-issuing the exact same command in the same session is
+allowed through so the assistant can proceed after confirming the special
+tool is actually needed. Two commands are considered the same when they
+match after whitespace normalization (leading/trailing trim, internal
+runs of whitespace collapsed to a single space).
 
 Session state is tracked in ``~/.claude/state/scripting_warned_<session_id>.json``.
 Set ``ENABLE_SCRIPTING_WARNING=0`` to disable.
 
 Spec: https://docs.anthropic.com/en/docs/claude-code/hooks
 """
+import hashlib
 import json
 import os
 import random
@@ -236,15 +239,29 @@ def _cleanup_old_state() -> None:
         pass
 
 
+def _command_key(command: str) -> str:
+    """Return a stable state key for a command, normalizing whitespace.
+
+    >>> _command_key("awk NR==1 file") == _command_key("awk  NR==1  file")
+    True
+    >>> _command_key("awk NR==1 file") == _command_key(" awk NR==1 file ")
+    True
+    >>> _command_key("awk NR==1 file") == _command_key("awk NR==2 file")
+    False
+    """
+    normalized = re.sub(r"\s+", " ", command).strip()
+    return hashlib.sha1(normalized.encode("utf-8")).hexdigest()
+
+
 def _build_message(rule_name: str) -> str:
     label = _RULE_LABELS.get(rule_name, rule_name)
     return (
         f"Detected '{label}'. Consider a purpose-built command first:\n"
         f"{_ALTERNATIVES}\n\n"
         "If none of those fit (complex conditional logic, field arithmetic, "
-        "multi-line state tracking, etc.), re-run the same command as-is — "
+        "multi-line state tracking, etc.), re-run the exact same command as-is — "
         "this session lets it through on the second and later occurrences of "
-        "the same tool."
+        "the same command (matched with whitespace normalized)."
     )
 
 
@@ -273,17 +290,16 @@ def main() -> None:
 
     session_id = data.get("session_id", "default")
     shown = _load_state(session_id)
+    key = _command_key(command)
 
-    for rule in detected:
-        if rule in shown:
-            continue
-        shown.add(rule)
+    if key not in shown:
+        shown.add(key)
         _save_state(session_id, shown)
         print(json.dumps({
             "hookSpecificOutput": {
                 "hookEventName": "PreToolUse",
                 "permissionDecision": "deny",
-                "permissionDecisionReason": _build_message(rule),
+                "permissionDecisionReason": _build_message(detected[0]),
             },
         }))
         sys.exit(0)
