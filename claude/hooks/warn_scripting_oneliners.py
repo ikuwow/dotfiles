@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Warn on Bash one-liners that invoke arbitrary-code scripting tools.
 
-Detects ``awk``, ``sed``, ``perl -e``, ``python -c``, ``python3 -c``,
-and ``ruby -e`` in Bash commands. On the first occurrence per session
+Detects ``awk``, ``sed``, ``perl -e`` / ``-E``, ``python -c``,
+``python3 -c``, and ``ruby -e`` in Bash commands. On the first occurrence per session
 per rule, denies the tool call with a suggestion to prefer purpose-
 built commands (tr, cut, head, tail, sort, uniq, grep, jq, ...). On
 subsequent occurrences of the same rule in the same session, the
@@ -56,6 +56,8 @@ def _split_outside_quotes(command: str) -> list[str]:
     ["echo 'awk hi | sed'"]
     >>> _split_outside_quotes("a && b || c ; d")
     ['a ', ' b ', ' c ', ' d']
+    >>> _split_outside_quotes("a\\nawk x")
+    ['a', 'awk x']
     >>> _split_outside_quotes('echo "pipe | inside double"')
     ['echo "pipe | inside double"']
     """
@@ -113,13 +115,21 @@ def detect_rules(command: str) -> list[str]:
     >>> detect_rules("sed -i 's/a/b/' file")
     ['sed_oneliner']
 
-    Detected — after a pipe:
+    Detected — after a pipe, ``&&``, ``||``, ``;``, or newline:
     >>> detect_rules("cat f | awk '{print $2}'")
     ['awk_oneliner']
     >>> detect_rules("ls | sed 's/x/y/'")
     ['sed_oneliner']
+    >>> detect_rules("mkdir d && awk '{print}' f")
+    ['awk_oneliner']
+    >>> detect_rules("false || sed s/a/b/ f")
+    ['sed_oneliner']
+    >>> detect_rules("ls ; awk NR==1 f")
+    ['awk_oneliner']
+    >>> detect_rules("mkdir d\\nawk '{print}' f")
+    ['awk_oneliner']
 
-    Detected — perl/python/ruby require -e / -c:
+    Detected — perl/python/ruby require -e / -E / -c:
     >>> detect_rules("perl -e 'print 1'")
     ['perl_oneliner']
     >>> detect_rules("perl -E 'say 1'")
