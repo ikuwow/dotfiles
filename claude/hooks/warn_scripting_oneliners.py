@@ -29,13 +29,13 @@ _STATE_DIR = os.path.expanduser("~/.claude/state")
 _STATE_PREFIX = "scripting_warned_"
 
 _ALTERNATIVES = (
-    "  tr        : 文字置換・削除\n"
-    "  cut       : カラム抽出\n"
-    "  head/tail : 行数指定抽出\n"
-    "  sort/uniq : ソート・重複処理\n"
-    "  grep/rg   : パターンマッチ\n"
-    "  jq        : JSON処理\n"
-    "  yq        : YAML/TOML処理"
+    "  tr        : character translate / delete\n"
+    "  cut       : column extraction\n"
+    "  head/tail : line-count extraction\n"
+    "  sort/uniq : sort / dedupe\n"
+    "  grep/rg   : pattern matching\n"
+    "  jq        : JSON processing\n"
+    "  yq        : YAML/TOML processing"
 )
 
 _RULE_LABELS = {
@@ -239,11 +239,12 @@ def _cleanup_old_state() -> None:
 def _build_message(rule_name: str) -> str:
     label = _RULE_LABELS.get(rule_name, rule_name)
     return (
-        f"'{label}' を検出した。用途特化のコマンドで代替できないか検討してほしい：\n"
+        f"Detected '{label}'. Consider a purpose-built command first:\n"
         f"{_ALTERNATIVES}\n\n"
-        "これらで表現困難な場合（複雑な条件分岐、フィールド演算、"
-        "複数行にまたがる状態管理等）は、同じコマンドをそのまま再実行して。"
-        "このセッション内では2回目以降は通る。"
+        "If none of those fit (complex conditional logic, field arithmetic, "
+        "multi-line state tracking, etc.), re-run the same command as-is — "
+        "this session lets it through on the second and later occurrences of "
+        "the same tool."
     )
 
 
