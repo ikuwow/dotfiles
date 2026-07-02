@@ -313,7 +313,8 @@
       "Bash(copilot update *)"
     ]
   },
-  "model": "fable",
+  "model": "opus",
+  "advisorModel": "fable",
   "hooks": {
     "UserPromptSubmit": [
       {
