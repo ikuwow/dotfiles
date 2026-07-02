@@ -313,7 +313,7 @@
       "Bash(copilot update *)"
     ]
   },
-  "model": "claude-opus-4-7[1m]",
+  "model": "fable",
   "hooks": {
     "UserPromptSubmit": [
       {
@@ -332,6 +332,10 @@
           {
             "type": "command",
             "command": "f=~/.claude/hooks/block_cd_chaining.py; if [ -f \"$f\" ] && command -v python3 >/dev/null; then python3 \"$f\"; fi"
+          },
+          {
+            "type": "command",
+            "command": "f=~/.claude/hooks/warn_scripting_oneliners.py; if [ -f \"$f\" ] && command -v python3 >/dev/null; then python3 \"$f\"; fi"
           }
         ]
       }
@@ -441,9 +445,9 @@
     }
   },
   "effortLevel": "high",
-  "autoMemoryEnabled": false,
   "autoUpdatesChannel": "stable",
   "tui": "default",
+  "autoMemoryEnabled": false,
   "theme": "auto",
   "remoteControlAtStartup": true,
   "inputNeededNotifEnabled": true,
