@@ -313,7 +313,7 @@
       "Bash(copilot update *)"
     ]
   },
-  "model": "claude-opus-4-7[1m]",
+  "model": "fable",
   "hooks": {
     "UserPromptSubmit": [
       {
@@ -445,9 +445,9 @@
     }
   },
   "effortLevel": "high",
-  "autoMemoryEnabled": false,
   "autoUpdatesChannel": "stable",
   "tui": "default",
+  "autoMemoryEnabled": false,
   "theme": "auto",
   "remoteControlAtStartup": true,
   "inputNeededNotifEnabled": true,
