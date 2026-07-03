@@ -11,6 +11,7 @@ jobs:
         run: shellcheck --version
       - name: shellcheck
         run: |
+          shopt -s globstar
           shellcheck -- **/*.sh
           find bin/ -type f ! -name '*.md' -exec shellcheck {} +
           find xdg-config/git/hooks/ -type f -exec shellcheck {} +

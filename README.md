@@ -66,7 +66,7 @@ Editing any dotfile means editing the source file in this repository.
 
 | Repository source | Deployed to |
 | --- | --- |
-| `.aliases`, `.bash_profile`, `.bashrc`, `.vimrc`, etc. (19 dotfiles) | `~/` |
+| `.aliases`, `.bash_profile`, `.bashrc`, `.functions`, `.inputrc`, etc. (12 dotfiles) | `~/` |
 | `xdg-config/*` (all subdirectories) | `~/.config/` |
 | `.ssh/config` | `~/.ssh/config` |
 | `.kube/kubie.yaml` | `~/.kube/kubie.yaml` |
@@ -83,7 +83,7 @@ dotfiles/
 ├── bootstrap.sh          # Entry point (run via curl on a new Mac)
 ├── bootstrap/
 │   ├── main.sh           # OS detection, prerequisites, orchestrates full setup
-│   └── remote.sh         # Minimal bootstrap for remote environments
+│   └── claude-code-web.sh # Minimal bootstrap for Claude Code web environments
 ├── scripts/
 │   ├── deploy.sh         # Creates all symlinks (runs on Linux too)
 │   ├── configure.sh      # macOS system preferences via defaults command
@@ -117,7 +117,7 @@ export ANTHROPIC_MODEL=opusplan
 
 ### Bootstrap Flow
 
-1. `bootstrap.sh` — Clones the repo (or updates it). If `DOTFILES_MINIMAL=1`, runs `bootstrap/claude-code-web.sh` (symlinks only) and exits. Otherwise calls `bootstrap/main.sh`
+1. `bootstrap.sh` — Clones the repo (or updates it). If `CLAUDE_CODE_REMOTE=true`, runs `bootstrap/claude-code-web.sh` (symlinks only) and exits. Otherwise calls `bootstrap/main.sh`
 1. `bootstrap/main.sh` — Detects OS/architecture, checks prerequisites, orchestrates:
    - `scripts/deploy.sh` — Creates symlinks (runs on Linux and macOS)
    - `scripts/configure.sh` — macOS system defaults (macOS only)

@@ -11,5 +11,6 @@ Custom executable scripts deployed to `~/bin/` via symlinks.
 | `git-cleanup-branches` | Delete unused local branches (merged, squash-merged, upstream gone) and prune stale worktree entries |
 | `git-worktree-create` | Create a git worktree under `.worktrees/`. Defaults to branching from `origin/<default>`; pass a second argument to override the base |
 | `pipectlx` | PipeCD CLI wrapper that auto-injects API key and server address from config |
+| `pr-monitor` | Poll a GitHub PR for actionable changes (state, reviews, comments, CI) and emit one-line events to stdout |
 | `ssm` | Start an AWS SSM session by instance ID or Name tag |
 | `vssh` | SSH into a Vagrant machine using sshrc with auto-generated ssh-config |

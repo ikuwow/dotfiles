@@ -50,7 +50,7 @@ pre-commit run --all-files
 ## Script Requirements
 
 - Bootstrap scripts use `/bin/bash` (not `/usr/bin/env bash`) for compatibility
-- All scripts must pass shellcheck validation (see `.shellcheckrc` for disabled rules)
+- All scripts must pass shellcheck validation (disabled rules are set via `SHELLCHECK_OPTS` in `.bash_profile` and `.github/workflows/ci.yml`)
 - Use `set -eu` for error handling in critical scripts
 
 ## Personal Tool Defaults
