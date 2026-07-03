@@ -136,7 +136,6 @@ brew "datadog-labs/pack/pup"
 # Databases
 # brew "mysql" # Do not install mysql (server)
 brew "mysql-client"
-cask "mysqlworkbench"
 brew "postgresql"
 brew "tbls"
 brew "sqlparse"
