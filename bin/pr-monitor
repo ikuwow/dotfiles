@@ -12,13 +12,31 @@
 
 set -eu
 
-if [ $# -lt 1 ] || [ $# -gt 2 ]; then
+usage() {
   echo "Usage: pr-monitor <pr-number> [interval-seconds]" >&2
+}
+
+if [ $# -lt 1 ] || [ $# -gt 2 ]; then
+  usage
   exit 1
 fi
 
 pr="$1"
 interval="${2:-60}"
+
+# Reject anything that isn't a positive integer. Without this, flags like
+# `--help` fall through to `gh pr view --help`, whose non-JSON output makes
+# the poll loop `continue` forever instead of erroring out.
+if ! [[ "$pr" =~ ^[1-9][0-9]*$ ]]; then
+  echo "pr-monitor: <pr-number> must be a positive integer, got: $pr" >&2
+  usage
+  exit 2
+fi
+if ! [[ "$interval" =~ ^[1-9][0-9]*$ ]]; then
+  echo "pr-monitor: [interval-seconds] must be a positive integer, got: $interval" >&2
+  usage
+  exit 2
+fi
 
 owner_repo="$(gh repo view --json nameWithOwner --jq .nameWithOwner)"
 owner="${owner_repo%/*}"
