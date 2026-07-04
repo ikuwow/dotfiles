@@ -1,33 +1,46 @@
 # Git Essentials
 
+Core git/GitHub rules for all projects.
+The full procedure (worktree setup, PR body rules, CI phases,
+monitoring, cleanup) lives in the git-workflow skill. Invoke that
+skill whenever starting branch work, creating a PR, or reacting to
+PR events — do not improvise the flow from this checklist alone.
+
+## Workflow checklist
+
+- Step 1: pull default branch, create branch
+  (`git-worktree-create <branch>`, or `git checkout -b` where
+  project rules prohibit worktrees)
+- Step 2: implement, commit, push
+- Step 3: create a draft PR (`gh pr create --draft --body-file`)
+- Step 4: CI wait and review (Phases 1-5)
+- Step 6: cleanup after merge (`git cleanup-branches`)
+
+Implementation plans MUST include this checklist — from branch
+setup through cleanup — and MUST surface scope-specific deviations
+explicitly (e.g., "stop after Step 3, skip CI wait"). Plans MUST
+NOT restate the detailed procedures from the git-workflow skill.
+
 ## Branch
 
 - Claude Code's `--worktree` flag and the EnterWorktree tool must
-  never be used (known bugs). Start work with `git checkout -b`
-  unless the project's own rules prescribe a different tool such
-  as `git-worktree-create`.
+  never be used (known bugs)
+- Never create or edit files on the default branch — branch first
 
 ## Commit
 
-Append a blank line and `Co-authored-by:` trailer:
-
-```
-git commit -m 'Short summary
-
-Co-authored-by: Claude Opus 4.6 <noreply@anthropic.com>'
-```
+- Append a blank line and a
+  `Co-authored-by: Claude <model name> <noreply@anthropic.com>`
+  trailer, naming the model actually in use. When the harness
+  prescribes its own trailer format, that format wins.
+- Never modify commits that have already been pushed
 
 ## Push
 
-- First push (set upstream): `git push -u origin HEAD`
-- Subsequent pushes: `git push`
+- First push: `git push -u origin HEAD`; afterwards `git push`
 - Force push variants (`--force`, `-f`, `--force-with-lease`) are
-  absolutely prohibited unless the user explicitly instructs otherwise.
-  This is a path-selection rule, not a safety verdict on
-  `--force-with-lease` in general (which is safer than `--force`); the
-  point is that a chosen work path shouldn't require rewriting
-  published history. If the path would need any force variant or a
-  `git reset --hard` on a published branch, back out to a non-force
-  alternative — `gh pr update-branch <N>`, `git merge main` into the
-  feature branch, or a fresh commit on top. Do not auto-escalate to
-  asking the user to force-push; find the merge-based path.
+  absolutely prohibited unless the user explicitly instructs
+  otherwise. If a chosen path would require one, or `git reset
+  --hard` on a published branch, back out to a merge-based path:
+  `gh pr update-branch <N>`, merge the default branch into the
+  feature branch, or a fresh commit on top.

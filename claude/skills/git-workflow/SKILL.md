@@ -1,3 +1,8 @@
+---
+name: git-workflow
+description: Standard git/GitHub workflow - branch setup, draft PR creation, CI wait, code review phases, PR monitoring until merge, and post-merge cleanup. Use when starting any coding task that will end in a commit or PR, when creating a PR, when reacting to PR review comments or CI failures, and when cleaning up after a merge.
+---
+
 # Git Workflow
 
 Standard git/GitHub workflow for all projects.
@@ -16,22 +21,6 @@ Prerequisite: the `agynio/gh-pr-review` gh extension is installed
   worktree (or feature branch) first. Creating files before branching
   leads to redundant copy-and-delete work.
 - Never modify commits that have already been pushed
-- Implementation plans MUST cover the full workflow as a bullet-list
-  checklist — from branch setup (Step 1, before implementation)
-  through cleanup (Step 7) — not just the post-edit steps. The
-  detailed procedures (mktemp usage, gh commands, polling commands,
-  etc.) live in this file and are already in system context, so plans
-  MUST NOT restate them and MUST NOT instruct you to re-Read this
-  file. Recommended bullet form:
-  - Step 1: branch creation (note worktree vs branch-only per project rules)
-  - Step 2: implement, commit, push
-  - Step 4: draft PR creation
-  - Step 5: CI wait & review (Phases 1–5)
-  - Step 7: cleanup after merge
-  (Step 6 is a utility section; reference it only if the plan involves
-  editing an existing PR/issue body.) Plans must still surface
-  scope-specific deviations explicitly — e.g., "skip Step 7 because
-  the branch is kept" or "stop after Step 4, skip CI wait & review".
 
 ## 1. Start Work
 
@@ -51,7 +40,7 @@ Note: `.worktrees/` is covered by the global gitignore.
 
 The implementation work for this branch happens here.
 
-## 4. Create a PR
+## 3. Create a PR
 
 1. Generate a unique temp file path:
    `mktemp --suffix=.md`
@@ -72,9 +61,9 @@ The implementation work for this branch happens here.
      hooks. Always go through `--body-file`.
 1. After creating the PR, display the PR URL to the user:
    `gh pr view --json url --jq '.url'`
-1. Proceed to CI wait (step 5)
+1. Proceed to CI wait (step 4)
 
-## 5. CI Wait & Review
+## 4. CI Wait & Review
 
 Five phases: pass all mechanical checks, run the code review,
 consolidate fixes, finalize the PR for review readiness, then watch
@@ -142,7 +131,7 @@ verification with `curl`, `aws logs tail`, etc.) — do not wait until
 the very end to do all of it at once.
 
 This step is not optional. Execute it autonomously instead of waiting
-for the user to remind you. Use the section 6 procedure
+for the user to remind you. Use the section 5 procedure
 (`gh pr edit --body-file`) for body edits.
 
 ### Phase 5: Watch PR activity until merge
@@ -193,7 +182,7 @@ per actionable change; quiet periods stay silent.
    pre-push checks).
 
 1. Exit conditions:
-   - `STATE: MERGED` → execute Step 7 (Cleanup), then `TaskStop` the
+   - `STATE: MERGED` → execute Step 6 (Cleanup), then `TaskStop` the
      monitor.
    - `STATE: CLOSED` without merge → `TaskStop`, skip cleanup.
    - Session ends → Monitor terminates with the session (best-effort).
@@ -208,7 +197,7 @@ per actionable change; quiet periods stay silent.
 next (merge, or "needs human attention" after the fix cap). Skip
 routine CI / comment events.
 
-## 6. Update a PR / issue (title / body)
+## 5. Update a PR / issue (title / body)
 
 - Update title:
   `gh pr edit <number> --title '...'`
@@ -237,7 +226,7 @@ Note: Always use `--body-file` for any body update. The `#`-prefixed lines
 in PR/issue bodies trigger Claude Code's security pre-check when passed
 via `--body`, which cannot be bypassed by hooks.
 
-## 7. Cleanup After Task Completion
+## 6. Cleanup After Task Completion
 
 After the PR is merged (or the task is fully done):
 
