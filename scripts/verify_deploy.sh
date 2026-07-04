@@ -27,6 +27,32 @@ check_dir() {
   fi
 }
 
+check_no_dangling_symlinks() {
+  local dir="$1"
+  local dangling
+  dangling=$(find "$dir" -maxdepth 1 -type l ! -exec test -e {} \; -print)
+  if [ -z "$dangling" ]; then
+    echo "OK: $dir has no dangling symlinks"
+  else
+    echo "FAIL: $dir has dangling symlinks:"
+    echo "$dangling"
+    errors=$((errors + 1))
+  fi
+}
+
+check_no_untracked_real_files() {
+  local dir="$1"
+  local real_files
+  real_files=$(find "$dir" -maxdepth 1 -type f -print)
+  if [ -z "$real_files" ]; then
+    echo "OK: $dir has no untracked real files"
+  else
+    echo "FAIL: $dir has real files not managed by deploy.sh (should be symlinks):"
+    echo "$real_files"
+    errors=$((errors + 1))
+  fi
+}
+
 echo "=== Shell config ==="
 check_symlink "$HOME/.bash_profile"
 check_symlink "$HOME/.bashrc"
@@ -73,6 +99,11 @@ check_symlink "$HOME/.claude/hooks/approve_git_gh_commands.py"
 check_symlink "$HOME/.claude/hooks/hook_utils.py"
 check_symlink "$HOME/.claude/agents/investigator.md"
 check_symlink "$HOME/.claude/rules/git-workflow.md"
+check_no_dangling_symlinks "$HOME/.claude/skills"
+check_no_dangling_symlinks "$HOME/.claude/hooks"
+check_no_dangling_symlinks "$HOME/.claude/agents"
+check_no_dangling_symlinks "$HOME/.claude/rules"
+check_no_untracked_real_files "$HOME/.claude/rules"
 
 echo ""
 if [ "$errors" -gt 0 ]; then
