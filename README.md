@@ -66,13 +66,15 @@ Editing any dotfile means editing the source file in this repository.
 
 | Repository source | Deployed to |
 | --- | --- |
-| `.aliases`, `.bash_profile`, `.bashrc`, `.vimrc`, etc. (19 dotfiles) | `~/` |
+| `.aliases`, `.bash_profile`, `.bashrc`, `.inputrc`, etc. (12 dotfiles) | `~/` |
 | `xdg-config/*` (all subdirectories) | `~/.config/` |
 | `.ssh/config` | `~/.ssh/config` |
 | `.kube/kubie.yaml` | `~/.kube/kubie.yaml` |
 | `bin/*` (executable files) | `~/bin/` |
-| `claude/` (settings, hooks, skills, MCP config) | `~/.claude/` |
-| `AIRULES.md` | `~/.claude/CLAUDE.md` |
+| `claude/` config files + `skills/`, `hooks/`, `agents/`, `rules/` subdirs | `~/.claude/` |
+| `codex/rules/*.rules` | `~/.codex/rules/` |
+| `claude/skills/*` | `~/.junie/skills/` |
+| `AIRULES.md` | `~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md`, `~/.junie/AGENTS.md` |
 
 Note: Some config files (e.g. git `templateDir`) hardcode `~/.config/` because they don't support variable expansion. This assumes `XDG_CONFIG_HOME` is set to the default `~/.config`.
 
@@ -82,19 +84,22 @@ Note: Some config files (e.g. git `templateDir`) hardcode `~/.config/` because t
 dotfiles/
 ├── bootstrap.sh          # Entry point (run via curl on a new Mac)
 ├── bootstrap/
-│   ├── main.sh           # OS detection, prerequisites, orchestrates full setup
-│   └── remote.sh         # Minimal bootstrap for remote environments
+│   ├── main.sh              # OS detection, prerequisites, orchestrates full setup
+│   └── claude-code-web.sh   # Bootstrap for Claude Code web remote environments
 ├── scripts/
-│   ├── deploy.sh         # Creates all symlinks (runs on Linux too)
-│   ├── configure.sh      # macOS system preferences via defaults command
-│   └── configure_brew.sh # Homebrew post-install configuration
-├── Brewfile              # Homebrew package definitions
-├── bin/                  # Custom executable scripts → ~/bin/
-├── xdg-config/           # XDG config files → ~/.config/
-├── claude/               # Claude Code settings → ~/.claude/
-├── userscripts/          # Safari userscripts loaded by the Userscripts extension
-├── .bash_profile         # Login shell config → ~/
-├── .bashrc               # Interactive shell config → ~/
+│   ├── deploy.sh            # Creates all symlinks (runs on Linux too)
+│   ├── configure.sh         # macOS system preferences via defaults command
+│   ├── configure_brew.sh    # Homebrew post-install configuration
+│   ├── claude-code-setup.sh # Registers MCP servers and installs Claude Code plugins
+│   └── verify_deploy.sh     # Asserts deploy.sh symlink set (run by pre-commit)
+├── Brewfile                 # Homebrew package definitions
+├── bin/                     # Custom executable scripts → ~/bin/
+├── xdg-config/              # XDG config files → ~/.config/
+├── claude/                  # Claude Code settings → ~/.claude/
+├── codex/                   # Codex CLI rules → ~/.codex/
+├── userscripts/             # Safari userscripts loaded by the Userscripts extension
+├── .bash_profile            # Login shell config → ~/
+├── .bashrc                  # Interactive shell config → ~/
 └── ... (other dotfiles)
 ```
 
@@ -117,7 +122,7 @@ export ANTHROPIC_MODEL=opusplan
 
 ### Bootstrap Flow
 
-1. `bootstrap.sh` — Clones the repo (or updates it). If `DOTFILES_MINIMAL=1`, runs `bootstrap/claude-code-web.sh` (symlinks only) and exits. Otherwise calls `bootstrap/main.sh`
+1. `bootstrap.sh` — Clones the repo (or updates it). If `CLAUDE_CODE_REMOTE=true`, runs `bootstrap/claude-code-web.sh` and exits. Otherwise calls `bootstrap/main.sh`
 1. `bootstrap/main.sh` — Detects OS/architecture, checks prerequisites, orchestrates:
    - `scripts/deploy.sh` — Creates symlinks (runs on Linux and macOS)
    - `scripts/configure.sh` — macOS system defaults (macOS only)
@@ -138,7 +143,7 @@ When `CLAUDE_CODE_REMOTE=true` is detected (set automatically by Claude Code web
 
 1. Installs packages not in the default image (`gh`, `jq`, `fzf`)
 1. Deploys all dotfile symlinks via `deploy.sh`
-1. Registers MCP servers (`deepwiki`, `Context7`) via `claude mcp add`
+1. Runs `scripts/claude-code-setup.sh`, which registers MCP servers (`deepwiki`, `Context7`, `mcp-obsidian`, `textlint`) via `claude mcp add-json` and installs Claude Code plugins
 
 Use this as the Claude Code web setup script:
 
