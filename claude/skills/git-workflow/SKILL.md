@@ -1,6 +1,6 @@
 ---
 name: git-workflow
-description: Standard git/GitHub workflow - branch setup, draft PR creation, CI wait, code review phases, PR monitoring until merge, and post-merge cleanup. Use when starting any coding task that will end in a commit or PR, when creating a PR, when reacting to PR review comments or CI failures, and when cleaning up after a merge.
+description: Standard git/GitHub workflow - branch setup, implementation, draft PR creation, CI wait, code review phases, PR monitoring until merge, and post-merge cleanup. Trigger for any coding, editing, or fix task in a git repository that will end in a commit, branch, or pull request — including "just fix X" requests and documentation-only changes, not only tasks explicitly framed as workflow or release work. Also trigger when creating or updating a PR, watching CI, self-reviewing a PR, reacting to PR review comments or CI failures, or cleaning up branches after a merge.
 ---
 
 # Git Workflow
