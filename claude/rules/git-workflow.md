@@ -191,7 +191,6 @@ on every tick regardless of change).
      bulleted list; see the sibling PR. Left intentionally to avoid
      merge conflicts. -->
 
-
    - PR top-level state:
      `gh pr view <number> --json state,isDraft,reviewDecision,latestReviews,statusCheckRollup,comments,updatedAt,mergedAt,headRefName`
    - Review threads with `isResolved` / `isOutdated` (REST
