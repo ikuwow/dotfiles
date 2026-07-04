@@ -354,10 +354,6 @@
           {
             "type": "command",
             "command": "f=~/.claude/hooks/approve_git_gh_commands.py; if [ -f \"$f\" ] && command -v python3 >/dev/null; then python3 \"$f\"; fi"
-          },
-          {
-            "type": "command",
-            "command": "f=~/.claude/hooks/approve_gh_graphql_readonly.py; if [ -f \"$f\" ] && command -v python3 >/dev/null; then python3 \"$f\"; fi"
           }
         ]
       }
