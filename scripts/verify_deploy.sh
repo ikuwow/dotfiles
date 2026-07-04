@@ -70,11 +70,9 @@ check_dir "$HOME/.claude/rules"
 # Auto-discovered skills, hooks, agents, and rules
 check_symlink "$HOME/.claude/skills/retrospective"
 check_symlink "$HOME/.claude/hooks/approve_git_gh_commands.py"
-check_symlink "$HOME/.claude/hooks/approve_gh_graphql_readonly.py"
 check_symlink "$HOME/.claude/hooks/hook_utils.py"
 check_symlink "$HOME/.claude/agents/investigator.md"
 check_symlink "$HOME/.claude/rules/git-workflow.md"
-check_symlink "$HOME/.claude/rules/gh-graphql.md"
 
 echo ""
 if [ "$errors" -gt 0 ]; then
