@@ -3,6 +3,9 @@
 Standard git/GitHub workflow for all projects.
 Follow each step in order. Skip steps that don't apply.
 
+Prerequisite: the `agynio/gh-pr-review` gh extension is installed
+(used by Phase 5 review-thread reactions).
+
 ## Principles
 
 - All steps within a single workflow run are pre-authorized by the user
@@ -181,8 +184,9 @@ on every tick regardless of change).
    reaches MERGED or CLOSED; otherwise stop it with `TaskStop` from a
    reaction turn.
 
-   When you re-fetch detail on an event (the line itself is only a
-   signal), the polling commands the script uses are:
+   The event line is only a signal — re-fetch full detail with these
+   three commands (the monitor script itself still uses raw GraphQL
+   internally for dedup; these are what a reaction turn should call):
 
 <!-- The GraphQL example and `--json` field list below are stale
      against the current `bin/pr-monitor` (missing `__typename`,
@@ -193,18 +197,14 @@ on every tick regardless of change).
 
    - PR top-level state:
      `gh pr view <number> --json state,isDraft,reviewDecision,latestReviews,statusCheckRollup,comments,updatedAt,mergedAt,headRefName`
-   - Review threads with `isResolved` / `isOutdated` (REST
-     `/pulls/<num>/comments` does not expose resolution status, so
-     use GraphQL):
-     ```
-     gh api graphql -f query='query($owner:String!,$repo:String!,$num:Int!){repository(owner:$owner,name:$repo){pullRequest(number:$num){reviewThreads(first:100){nodes{isResolved isOutdated comments(first:100){nodes{id author{login} body createdAt path line}}}}}}}' -f owner=<owner> -f repo=<repo> -F num=<number>
-     ```
+   - Review threads and PR reviews in one call:
+     `gh pr-review review view -R <owner>/<repo> <number>`
+     Add `--unresolved --not_outdated` for full-PR sweeps to trim
+     already-handled threads. Drop them when inspecting a specific
+     `NEW_COMMENT` whose thread may have been resolved in the interim.
    - Workflow run history on the PR branch (catches CI cycles
      `statusCheckRollup` doesn't show — e.g. older runs, re-run jobs):
      `gh run list --branch <headRefName> --json databaseId,name,status,conclusion,createdAt,headSha,workflowName --limit 20`
-   - PR reviews (the event line carries only author + state; re-fetch
-     for body):
-     `gh api repos/<owner>/<repo>/pulls/<number>/reviews`
 
 1. On each event notification, re-fetch full detail with the three
    polling commands in step 1 (the event line is only a signal), then
@@ -225,11 +225,16 @@ on every tick regardless of change).
      `NEW_TOP_COMMENT`, or a `NEW_REVIEW` asking for a change — from a
      human or an automated reviewer like Devin or Copilot): modify code
      and push, subject to the step-3 pre-push checks and the step-5 cap.
-     For a `NEW_COMMENT`, if the re-fetched thread is now `isResolved`
-     or `isOutdated`, it was handled in the interim — skip it. For a
+     For a `NEW_COMMENT`, if the re-fetched thread is now `is_resolved`
+     or `is_outdated`, it was handled in the interim — skip it. For a
      `NEW_REVIEW`, re-fetch the review body to classify intent.
-   - Question, nit, or ambiguous intent: reply via `gh pr comment`,
-     do not push.
+   - Question, nit, or ambiguous intent: reply and do not push. Pick
+     the reply channel by event type so context stays intact:
+     - `NEW_COMMENT` (review thread comment): reply inside the thread
+       per `pr-review-response.md` — apply its bot check first, then
+       run `gh pr-review comments reply` on bot threads only.
+     - `NEW_TOP_COMMENT` / `NEW_REVIEW`: no thread to attach to; post
+       a top-level PR comment with `gh pr comment <number> --body <text>`.
    - `READY_FOR_REVIEW`: the user took the PR out of draft; no action,
      just register that review activity is now expected.
    - Informational (`APPROVED`, or CI still `PENDING` / `IN_PROGRESS` /
@@ -244,9 +249,10 @@ on every tick regardless of change).
      comment (e.g., explaining an intentional decision), resolve the
      thread.
    - Leave the thread open when waiting for the reviewer's follow-up.
-   - Get the thread id from the `reviewThreads` GraphQL query in step
-     1, then run
-     `gh api graphql -f query='mutation($id:ID!){resolveReviewThread(input:{threadId:$id}){thread{isResolved}}}' -f id=<thread-id>`.
+   - Resolve per `pr-review-response.md` — only bot-authored threads,
+     applying its bot check on the `review view` output. Get the thread
+     id from that output (`thread_id` field), then run
+     `gh pr-review threads resolve --thread-id <thread-id> -R <owner>/<repo> <number>`.
 
    Event-specific notes:
    - `STATE: MERGED` / `CLOSED` is terminal — handled in step 6 (Exit
