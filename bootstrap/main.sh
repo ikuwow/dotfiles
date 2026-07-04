@@ -66,6 +66,9 @@ fi
 brew bundle
 echo
 
+gh extension install agynio/gh-pr-review
+echo
+
 scripts/configure_brew.sh
 
 echo "Bootstrapping DONE!"
