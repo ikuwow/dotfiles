@@ -5,8 +5,9 @@ lives in `git-workflow.md` Phase 5). Covers all reaction surfaces:
 review-thread comments, top-level PR comments, and PR-review summaries.
 Also covers thread reply/resolve mechanics.
 
-All calls go through the `agynio/gh-pr-review` extension and REST
-`/pulls/<n>/comments`, both permission-friendly under the existing
+Thread reply/resolve calls go through the `agynio/gh-pr-review`
+extension and REST `/pulls/<n>/comments`; top-level PR replies use
+`gh pr comment`. All three are permission-friendly under the existing
 allowlist — no step requires an approval prompt.
 
 ## Targeting policy
@@ -56,6 +57,11 @@ each thread by walking every comment per the previous section. The
 extension's `--unresolved --not_outdated` flags filter server-side, so
 no local `is_resolved` / `is_outdated` check is needed.
 
+For `NEW_TOP_COMMENT` / `NEW_REVIEW` the Bot/User classification comes
+directly from the event line's `[BOT|USER]` tag emitted by
+`bin/pr-monitor` — no separate walk is needed since those are single-
+author events, not threads.
+
 ## Step 2: React by content, not event type
 
 `NEW_COMMENT` is pre-filtered by the monitor to unresolved,
@@ -77,7 +83,9 @@ content.
     -R <owner>/<repo> <number>`. Bot threads only per the targeting
     policy; human threads require explicit user authorization.
   - `NEW_TOP_COMMENT` / `NEW_REVIEW`: no thread to attach to; post a
-    top-level PR comment with `gh pr comment <number> --body <text>`.
+    top-level PR comment with `gh pr comment <number> --body <text>`
+    — only when the event line tag is `[BOT]`; a `[USER]` author
+    requires explicit user authorization per the targeting policy.
 - `READY_FOR_REVIEW`: the user took the PR out of draft; no action,
   just register that review activity is now expected.
 - Informational (`APPROVED`, or CI still `PENDING` / `IN_PROGRESS` /
@@ -89,9 +97,9 @@ Event-specific notes:
   Phase 5 exit conditions, not here.
 - `NEW_TOP_COMMENT` carries only the author tag and login; re-fetch
   the body from the `comments` field before classifying.
-- `CI_FAILURE`: get the `databaseId` from `gh run list` (check names
-  don't always map 1:1 to run names), inspect with `gh run view
-  --log-failed <databaseId>`, then fix and push.
+
+`CI_FAILURE` handling stays in `git-workflow.md` Phase 5 (workflow-run
+signal, not a review reaction).
 
 ## Step 3: Resolve threads
 

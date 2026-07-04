@@ -201,8 +201,8 @@ on every tick regardless of change).
 
 1. On each event notification, re-fetch full detail with the three
    polling commands in step 1 (the event line is only a signal), then
-   handle it per steps 3-7 below. The notification is not a user
-   reply — keep working.
+   handle it per the remaining steps below. The notification is not a
+   user reply — keep working.
 
 1. Before any push (any reaction that would write to origin):
    - Verify the current branch matches the PR's `headRefName`
@@ -213,6 +213,11 @@ on every tick regardless of change).
 
 1. React per `pr-reaction.md` (bot check, reply-channel routing,
    thread resolve, cap for autonomous fix pushes).
+
+1. CI_FAILURE handling: get the `databaseId` from `gh run list` (check
+   names don't always map 1:1 to run names), inspect with
+   `gh run view --log-failed <databaseId>`, then fix and push. Same
+   pre-push checks as any other reaction.
 
 1. Exit conditions:
    - `STATE: MERGED` → execute Step 7 (Cleanup), then `TaskStop` the
