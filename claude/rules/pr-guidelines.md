@@ -166,3 +166,31 @@ once and applies to both perspectives.
    - The body does not contradict the diff
    - The body accounts for all files and changes in the diff; there
      are no unexplained hunks.
+
+## PR Body Template (fallback)
+
+Use this scaffold when the target repository has no `pull_request_template.md`.
+Repository templates always win — do not overlay this on top of one.
+Section names stay English; body language follows the repo (see
+"Language follows the target repository" above). Purpose / Key
+changes / Verification is the minimum. Sources / References /
+Issue-linking (checklist items 2-3) are inlined only when applicable.
+
+```
+## Purpose
+
+<1-3 sentences on why the change is being made — problem it solves,
+what prompted it, intended outcome. Not a paraphrase of the diff.>
+
+## Key changes
+
+<3-5 bullets, each a distinct decision or user-visible outcome. Do
+not enumerate files, line counts, or per-file summaries — the diff
+already shows those.>
+
+## Verification
+
+- [x] <command executed> → <observed output excerpt>              # author-verified with evidence
+- [ ] <item still owed by author> — <reason it could not be run>  # author-owed, pending
+- [ ] <item the user will confirm later>                           # user-owed, actionable checkbox
+```

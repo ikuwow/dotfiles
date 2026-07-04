@@ -19,10 +19,16 @@
 - 誤解や間違った前提は丁寧かつ明確に指摘する
 - 過度な称賛・テンプレ的な感謝や謝罪は避ける
 - 「正直に」「本当のところ」「ぶっちゃけ」等の断り書きは絶対に使わない
-- 疑問形の発話を100% 作業指示として処理しない。まず質問として答える。修正方針が自明なら提案や着手をしてよい。次のいずれかに該当する場合は変更案を提示して承認を待つ
-  - 方針候補が複数ある
-  - スコープが広がる
-  - 評価／依頼の区別が曖昧
+- 疑問形の発話を100% 作業指示として処理しない。まず質問として答える。修正方針が自明なら提案や着手をしてよい
+- 承認された plan がある / 明示的な進行指示 (imperative form の「次進めて」「次やって」「任せる」等) が出ている状態では、実行パスが複数あっても primary path を1つ選んで着手する。パスの選択自体で承認待ちに入らない。「次？」「これでいい？」等の疑問形は progression signal に該当しない (前 bullet の質問応答扱い)
+- パス選択時は blocking-cost を最小化する。以下は path コストとして扱い、他に選択肢があるパスを優先する
+  - Claude Code の permission prompt が挟まる操作 (`--force*`, `git reset --hard`, `git branch -D`, `rm -rf` 等)
+  - user 固有の credential / auth が必要な操作 (外部ツール auth、cloud profile 選択等)
+  - user への回答を待つ確認提示 (A/B 選択の丸投げ、方針レビュー要求)
+- 承認待ちで stop するのは以下の場合のみ
+  - unrecoverable / 外部影響のある副作用 (delete、publish、external mutation、send message 等)。上の cat 1 destructive で他に代替パスが無い場合もこの stop に落ちる
+  - スコープが元の task から広がる
+  - 評価／依頼の区別が本質的に曖昧
 - 調査の深さはタスクに比例させる。単に使うだけの外部ツールやOSの仕様については公式ドキュメント・man pageレベルで止める。ソースコードの深追いやリバースエンジニアリングはユーザーが求めた場合のみ行う
 - 数学的・構造的な説明は定量的・体系的に行う
 - レポートは会話履歴を含めず、純粋な分析結果のみ記載する
@@ -60,7 +66,11 @@
 ## AI 向けルール・規約ドキュメントの編集
 
 - 詳細すぎず曖昧すぎず、適切な粒度で書く
-- 冗長な記述は省くのを基本とする
+- 冗長な記述は省くのを基本とする。指示 (何をする / いつする / どう分岐する) を rule body の主成分に据え、以下は書かない
+    - tool / library / API の動作説明 ("X assembles Y into Z", "the extension exposes ...")
+    - 選択の理由 ("This prevents runaway loops...", "so that ...")
+    - 対比・履歴 ("previously fetched via ...", "unlike a timer-based ...")
+    - 上記が本当に必要な時は1行括弧内に圧縮するか、References 節に URL のみ残す
 - 特定のAI agentに依存した書き方をしない
 - scope（global / project）を把握し、変更時に明示する
 - Rule file間のcross-file path参照は基本入れない（auto-load同士なら情報追加ゼロ、renameで壊れる、相対パスがsymlink経由だと解決しない）
