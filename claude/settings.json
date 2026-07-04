@@ -235,6 +235,10 @@
       "Bash(git push * --force *)",
       "Bash(git push * -f *)",
       "Bash(git push *--force*)",
+      "Bash(git push --force-with-lease)",
+      "Bash(git push --force-with-lease *)",
+      "Bash(git push * --force-with-lease)",
+      "Bash(git push * --force-with-lease *)",
       "Bash(git worktree remove --force *)",
       "Bash(git worktree remove * --force *)",
       "Bash(git worktree remove -f *)",
@@ -321,6 +325,7 @@
       "Bash(copilot update *)"
     ]
   },
+  "model": "claude-fable-5[1m]",
   "hooks": {
     "UserPromptSubmit": [
       {
@@ -449,7 +454,6 @@
   },
   "effortLevel": "high",
   "advisorModel": "fable",
-  "model": "claude-opus-4-7[1m]",
   "autoUpdatesChannel": "stable",
   "tui": "default",
   "autoMemoryEnabled": false,

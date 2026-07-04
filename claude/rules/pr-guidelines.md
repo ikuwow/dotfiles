@@ -166,3 +166,33 @@ once and applies to both perspectives.
    - The body does not contradict the diff
    - The body accounts for all files and changes in the diff; there
      are no unexplained hunks.
+
+## PR Body Template (fallback)
+
+Use this scaffold when the target repository has no `pull_request_template.md`.
+Repository templates always win — do not overlay this on top of one.
+Section names stay English; body language follows the repo (see
+"Language follows the target repository" above).
+
+```
+## Purpose
+
+<1-3 sentences on why the change is being made — problem it solves,
+what prompted it, intended outcome. Not a paraphrase of the diff.>
+
+## Key changes
+
+<3-5 bullets, each a distinct decision or user-visible outcome. Do
+not enumerate files, line counts, or per-file summaries — the diff
+already shows those.>
+
+## Verification
+
+- [x] <command executed> → <observed output excerpt>
+- [ ] <pending item, with a one-line reason>
+```
+
+Never insert into the body: `pre-commit` / `shellcheck` / lint / CI
+results, absolute line counts, file lists, self-paraphrase of your own
+edits, per-item rendering of a fully-N/A pre-flight checklist. Those
+are in the Checks panel and the diff.
