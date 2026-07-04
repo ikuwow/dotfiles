@@ -66,6 +66,9 @@ fi
 brew bundle
 echo
 
+scripts/install_gh_extensions.sh
+echo
+
 scripts/configure_brew.sh
 
 echo "Bootstrapping DONE!"
