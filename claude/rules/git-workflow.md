@@ -167,7 +167,7 @@ on every tick regardless of change).
      comment whose ID was not seen before, in a thread where
      `isResolved == false` and `isOutdated == false`. The `[BOT]` /
      `[USER]` tag is the comment author's GraphQL `__typename` — a
-     hint for reaction routing per `pr-review-response.md`, but not a
+     hint for reaction routing per `pr-reaction.md`, but not a
      substitute for the rule's full thread walk before mutating.
    - `NEW_TOP_COMMENT: [BOT|USER] <author>` — a top-level PR comment
      whose ID was not seen before. Not gated by resolution state.
@@ -211,57 +211,8 @@ on every tick regardless of change).
    - Skip the push if either check fails; surface the conflict to the
      user instead of trying to reconcile silently.
 
-1. React by content, not event type. `NEW_COMMENT` is pre-filtered by
-   the monitor to unresolved, non-outdated threads; `NEW_TOP_COMMENT`
-   is not, so classify it by content:
-   - Clear fix request (`CHANGES_REQUESTED`, a `NEW_COMMENT`, a
-     `NEW_TOP_COMMENT`, or a `NEW_REVIEW` asking for a change — from a
-     human or an automated reviewer like Devin or Copilot): modify code
-     and push, subject to the step-3 pre-push checks and the step-5 cap.
-     For a `NEW_COMMENT`, if the re-fetched thread is now `is_resolved`
-     or `is_outdated`, it was handled in the interim — skip it. For a
-     `NEW_REVIEW`, re-fetch the review body to classify intent.
-   - Question, nit, or ambiguous intent: reply and do not push. Pick
-     the reply channel by event type so context stays intact:
-     - `NEW_COMMENT` (review thread comment): reply inside the thread
-       per `pr-review-response.md` — apply its bot check first, then
-       run `gh pr-review comments reply` on bot threads only.
-     - `NEW_TOP_COMMENT` / `NEW_REVIEW`: no thread to attach to; post
-       a top-level PR comment with `gh pr comment <number> --body <text>`.
-   - `READY_FOR_REVIEW`: the user took the PR out of draft; no action,
-     just register that review activity is now expected.
-   - Informational (`APPROVED`, or CI still `PENDING` / `IN_PROGRESS` /
-     `QUEUED`): no action; surface it to the user on the next turn.
-
-   Resolving review threads (`NEW_COMMENT` only — top-level comments
-   and review summary bodies are not threads):
-   - After a fix push that addresses a `NEW_COMMENT`, resolve the
-     originating thread so subsequent monitor passes skip it and
-     reviewers see the discussion state.
-   - After a reply that closes a question / nit / ambiguous-intent
-     comment (e.g., explaining an intentional decision), resolve the
-     thread.
-   - Leave the thread open when waiting for the reviewer's follow-up.
-   - Resolve per `pr-review-response.md` — only bot-authored threads,
-     applying its bot check on the `review view` output. Get the thread
-     id from that output (`thread_id` field), then run
-     `gh pr-review threads resolve --thread-id <thread-id> -R <owner>/<repo> <number>`.
-
-   Event-specific notes:
-   - `STATE: MERGED` / `CLOSED` is terminal — handled in step 6 (Exit
-     conditions), not here.
-   - `NEW_TOP_COMMENT` carries only the author; re-fetch the body from
-     the `comments` field before classifying.
-   - `CI_FAILURE`: get the `databaseId` from `gh run list` (check names
-     don't always map 1:1 to run names), inspect with
-     `gh run view --log-failed <databaseId>`, then fix and push.
-
-1. Cap for autonomous fix pushes:
-   - Stop pushing autonomous fixes after 3 fix commits for this PR in
-     this session. Beyond that, switch to reply-only mode and notify
-     the user that the PR appears to need human attention. This
-     prevents runaway loops when an automated reviewer keeps
-     re-requesting changes on each push.
+1. React per `pr-reaction.md` (bot check, reply-channel routing,
+   thread resolve, cap for autonomous fix pushes).
 
 1. Exit conditions:
    - `STATE: MERGED` → execute Step 7 (Cleanup), then `TaskStop` the

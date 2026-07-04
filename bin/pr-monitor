@@ -63,7 +63,7 @@ trap 'rm -f "$seen_comments" "$seen_top_comments" "$seen_reviews"' EXIT
 first_poll=1
 
 # `__typename` on each author is the authoritative Bot/User signal per
-# `pr-review-response.md`. It flows into the event line as a `[BOT]` or
+# `pr-reaction.md`. It flows into the event line as a `[BOT]` or
 # `[USER]` prefix on the author label so a reaction turn can classify
 # without re-fetching. For review-thread comments this is a per-comment
 # hint only — the rule still requires walking every comment in the
