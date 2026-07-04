@@ -65,8 +65,9 @@ first_poll=1
 # `__typename` on each author is the authoritative Bot/User signal per
 # `pr-review-response.md`. It flows into the event line as a `[BOT]` or
 # `[USER]` prefix on the author label so a reaction turn can classify
-# without re-fetching. This is a per-comment hint — the rule still
-# requires walking every comment in the thread before mutating it.
+# without re-fetching. For review-thread comments this is a per-comment
+# hint only — the rule still requires walking every comment in the
+# thread before mutating it.
 
 # shellcheck disable=SC2016 # GraphQL query: $vars are query variables
 threads_query='query($owner:String!,$repo:String!,$num:Int!){
@@ -83,10 +84,10 @@ threads_query='query($owner:String!,$repo:String!,$num:Int!){
   }
 }'
 
-# Top-level PR comments were previously fetched via `gh pr view --json
-# comments`, whose `author` object exposes only `login`. To get the same
-# `__typename` classification as review threads and reviews, they are
-# fetched here via GraphQL and the `gh pr view` call drops `comments`.
+# Top-level PR comments are fetched via GraphQL rather than `gh pr view
+# --json comments` because that `author` object omits `__typename`, and
+# the same Bot/User classification is needed as for review threads and
+# reviews. Piggybacks on `reviews_query` to avoid an extra round-trip.
 # shellcheck disable=SC2016 # GraphQL query: $vars are query variables
 reviews_query='query($owner:String!,$repo:String!,$num:Int!){
   repository(owner:$owner,name:$repo){

@@ -184,6 +184,14 @@ on every tick regardless of change).
    When you re-fetch detail on an event (the line itself is only a
    signal), the polling commands the script uses are:
 
+<!-- The GraphQL example and `--json` field list below are stale
+     against the current `bin/pr-monitor` (missing `__typename`,
+     lists `comments` that the script no longer requests). The
+     agynio/gh-pr-review extension migration replaces the entire
+     bulleted list; see the sibling PR. Left intentionally to avoid
+     merge conflicts. -->
+
+
    - PR top-level state:
      `gh pr view <number> --json state,isDraft,reviewDecision,latestReviews,statusCheckRollup,comments,updatedAt,mergedAt,headRefName`
    - Review threads with `isResolved` / `isOutdated` (REST
