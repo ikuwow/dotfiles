@@ -1,10 +1,20 @@
 # Git Essentials
 
 Core git/GitHub rules for all projects.
+
+Every implementation plan you write — including EnterPlanMode's
+Phase 4 Final Plan — MUST include the workflow checklist below as
+an explicit section, from branch setup through cleanup. This is
+unconditional: documentation-only changes, analysis-driven edits,
+and "simple" fixes are not exceptions. State scope-specific
+deviations explicitly (e.g., "stop after Step 3, skip CI wait") —
+omitting the checklist section entirely is never correct.
+
 The full procedure (worktree setup, PR body rules, CI phases,
 monitoring, cleanup) lives in the git-workflow skill. Invoke that
 skill whenever starting branch work, creating a PR, or reacting to
 PR events — do not improvise the flow from this checklist alone.
+Plans MUST NOT restate the detailed procedures from the skill.
 
 ## Workflow checklist
 
@@ -15,11 +25,6 @@ PR events — do not improvise the flow from this checklist alone.
 - Step 3: create a draft PR (`gh pr create --draft --body-file`)
 - Step 4: CI wait and review (Phases 1-5)
 - Step 6: cleanup after merge (`git cleanup-branches`)
-
-Implementation plans MUST include this checklist — from branch
-setup through cleanup — and MUST surface scope-specific deviations
-explicitly (e.g., "stop after Step 3, skip CI wait"). Plans MUST
-NOT restate the detailed procedures from the git-workflow skill.
 
 ## Branch
 
