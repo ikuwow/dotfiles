@@ -172,7 +172,9 @@ once and applies to both perspectives.
 Use this scaffold when the target repository has no `pull_request_template.md`.
 Repository templates always win — do not overlay this on top of one.
 Section names stay English; body language follows the repo (see
-"Language follows the target repository" above).
+"Language follows the target repository" above). Purpose / Key
+changes / Verification is the minimum. Sources / References /
+Issue-linking (checklist items 2-3) are inlined only when applicable.
 
 ```
 ## Purpose
@@ -188,11 +190,7 @@ already shows those.>
 
 ## Verification
 
-- [x] <command executed> → <observed output excerpt>
-- [ ] <pending item, with a one-line reason>
+- [x] <command executed> → <observed output excerpt>              # author-verified with evidence
+- [ ] <item still owed by author> — <reason it could not be run>  # author-owed, pending
+- [ ] <item the user will confirm later>                           # user-owed, actionable checkbox
 ```
-
-Never insert into the body: `pre-commit` / `shellcheck` / lint / CI
-results, absolute line counts, file lists, self-paraphrase of your own
-edits, per-item rendering of a fully-N/A pre-flight checklist. Those
-are in the Checks panel and the diff.
