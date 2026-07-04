@@ -62,6 +62,12 @@ trap 'rm -f "$seen_comments" "$seen_top_comments" "$seen_reviews"' EXIT
 # the operator. The flag is flipped after the first successful poll.
 first_poll=1
 
+# `__typename` on each author is the authoritative Bot/User signal per
+# `pr-review-response.md`. It flows into the event line as a `[BOT]` or
+# `[USER]` prefix on the author label so a reaction turn can classify
+# without re-fetching. This is a per-comment hint — the rule still
+# requires walking every comment in the thread before mutating it.
+
 # shellcheck disable=SC2016 # GraphQL query: $vars are query variables
 threads_query='query($owner:String!,$repo:String!,$num:Int!){
   repository(owner:$owner,name:$repo){
@@ -70,19 +76,26 @@ threads_query='query($owner:String!,$repo:String!,$num:Int!){
         nodes{
           isResolved
           isOutdated
-          comments(first:100){ nodes{ id author{login} path line } }
+          comments(first:100){ nodes{ id author{login __typename} path line } }
         }
       }
     }
   }
 }'
 
+# Top-level PR comments were previously fetched via `gh pr view --json
+# comments`, whose `author` object exposes only `login`. To get the same
+# `__typename` classification as review threads and reviews, they are
+# fetched here via GraphQL and the `gh pr view` call drops `comments`.
 # shellcheck disable=SC2016 # GraphQL query: $vars are query variables
 reviews_query='query($owner:String!,$repo:String!,$num:Int!){
   repository(owner:$owner,name:$repo){
     pullRequest(number:$num){
       reviews(first:100){
-        nodes{ id state body author{login} }
+        nodes{ id state body author{login __typename} }
+      }
+      comments(first:100){
+        nodes{ id author{login __typename} }
       }
     }
   }
@@ -114,7 +127,7 @@ emit_new() {
 }
 
 while true; do
-  pr_json="$(gh pr view "$pr" --json state,isDraft,reviewDecision,statusCheckRollup,headRefName,headRefOid,comments 2>/dev/null || true)"
+  pr_json="$(gh pr view "$pr" --json state,isDraft,reviewDecision,statusCheckRollup,headRefName,headRefOid 2>/dev/null || true)"
   # Skip the poll on an empty OR malformed fetch: a non-empty but truncated
   # response would make the unguarded `jq -r` extractions below exit nonzero
   # and, under `set -e`, kill the monitor silently.
@@ -175,12 +188,9 @@ while true; do
     .data.repository.pullRequest.reviewThreads.nodes[]
     | select(.isResolved == false and .isOutdated == false)
     | .comments.nodes[] | select(.author.login != $me)
-    | "\(.id)\t\(.author.login)\t\(.path // "?"):\(.line // "?")"' \
+    | "\(.id)\t\(if .author.__typename == "Bot" then "[BOT]" else "[USER]" end) \(.author.login)\t\(.path // "?"):\(.line // "?")"' \
     2>/dev/null || true)"
   emit_new "$fresh_comments" "$seen_comments" "NEW_COMMENT"
-
-  fresh_top="$(echo "$pr_json" | jq -r --arg me "$me" '.comments[]? | select(.author.login != $me) | "\(.id)\t\(.author.login)"' 2>/dev/null || true)"
-  emit_new "$fresh_top" "$seen_top_comments" "NEW_TOP_COMMENT"
 
   # Reviews API surfaces `state=COMMENTED` reviews (e.g. Devin Review, or a
   # human submitting "Comment") that neither change `reviewDecision` nor
@@ -189,10 +199,17 @@ while true; do
   # by the `REVIEW:` decision event, and an empty COMMENTED has nothing
   # to read.
   reviews_json="$(gh api graphql -f owner="$owner" -f repo="$repo" -F num="$pr" -f query="$reviews_query" 2>/dev/null || true)"
+  fresh_top="$(echo "$reviews_json" | jq -r --arg me "$me" '
+    .data.repository.pullRequest.comments.nodes[]
+    | select(.author.login != $me)
+    | "\(.id)\t\(if .author.__typename == "Bot" then "[BOT]" else "[USER]" end) \(.author.login)"' \
+    2>/dev/null || true)"
+  emit_new "$fresh_top" "$seen_top_comments" "NEW_TOP_COMMENT"
+
   fresh_reviews="$(echo "$reviews_json" | jq -r --arg me "$me" '
     .data.repository.pullRequest.reviews.nodes[]
     | select(.author.login != $me and .state != "PENDING" and (.body // "") != "")
-    | "\(.id)\t\(.author.login)\t\(.state)"' \
+    | "\(.id)\t\(if .author.__typename == "Bot" then "[BOT]" else "[USER]" end) \(.author.login)\t\(.state)"' \
     2>/dev/null || true)"
   emit_new "$fresh_reviews" "$seen_reviews" "NEW_REVIEW"
 
