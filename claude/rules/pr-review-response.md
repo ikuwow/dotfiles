@@ -4,9 +4,10 @@ How to reply to and resolve PR review thread comments.
 Scope: review-thread comments only. Top-level PR comments
 (`gh pr comment`) are out of scope.
 
-This is the interim rule-only form of #126. A future
-script (`bin/gh-pr-thread-{reply,resolve}`) will absorb the bot check
-and replace these instructions.
+This is the interim rule-only form of #126. The mutation steps now
+delegate to the `agynio/gh-pr-review` extension so they no longer
+require per-invocation approval; the bot check itself stays in this
+rule because the extension does not expose `author.__typename`.
 
 ## Targeting policy
 
@@ -43,12 +44,12 @@ thread, per the rule in the previous section.
 
 ## Step 2: Reply to a bot thread
 
-Only after confirming every comment in the thread is a bot. Mutations
-require manual approval every time — re-verify the thread at the
-approval prompt.
+Only after confirming every comment in the thread is a bot. The
+extension performs the mutation without an approval prompt, so the
+bot check in Step 1 is the sole gate — do not skip it.
 
 ```bash
-gh api graphql -f query='mutation($threadId:ID!,$body:String!){addPullRequestReviewThreadReply(input:{pullRequestReviewThreadId:$threadId,body:$body}){comment{id url}}}' -f threadId=<thread id> -f body=<reply body>
+gh pr-review comments reply --thread-id <thread id> --body <reply body> -R <owner>/<repo> <number>
 ```
 
 ## Step 3: Resolve a bot thread
@@ -56,18 +57,18 @@ gh api graphql -f query='mutation($threadId:ID!,$body:String!){addPullRequestRev
 After the reply lands, resolve the same thread:
 
 ```bash
-gh api graphql -f query='mutation($threadId:ID!){resolveReviewThread(input:{threadId:$threadId}){thread{id isResolved}}}' -f threadId=<thread id>
+gh pr-review threads resolve --thread-id <thread id> -R <owner>/<repo> <number>
 ```
 
 ## Human threads
 
-Do not call `addPullRequestReviewThreadReply` or `resolveReviewThread`
-for a human-authored thread. Surface the comment content to the user
-with thread id, path, line, and body excerpt, then stop.
+Do not run `gh pr-review comments reply` or `gh pr-review threads
+resolve` on a human-authored thread. Surface the comment content to
+the user with thread id, path, line, and body excerpt, then stop.
 
 If the user explicitly asks to reply to a specific human thread,
-present the draft reply text, wait for approval, then issue the
-mutation in step 2. Resolution of a human thread stays with the user.
+present the draft reply text, wait for approval, then run the reply
+command in Step 2. Resolution of a human thread stays with the user.
 
 ## Forbidden shortcuts
 

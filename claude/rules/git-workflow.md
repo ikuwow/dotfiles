@@ -178,8 +178,9 @@ on every tick regardless of change).
    reaches MERGED or CLOSED; otherwise stop it with `TaskStop` from a
    reaction turn.
 
-   When you re-fetch detail on an event (the line itself is only a
-   signal), the polling commands the script uses are:
+   The event line is only a signal — re-fetch full detail with these
+   three commands (the monitor script itself still uses raw GraphQL
+   internally for dedup; these are what a reaction turn should call):
 
    - PR top-level state:
      `gh pr view <number> --json state,isDraft,reviewDecision,latestReviews,statusCheckRollup,comments,updatedAt,mergedAt,headRefName`
@@ -188,10 +189,10 @@ on every tick regardless of change).
      assembles reviews, inline comments, and thread replies into a
      single JSON payload so no separate GraphQL / REST calls are
      needed:
-     `gh pr-review review view -R <owner>/<repo> <number> --include-comment-node-id`
-     Add `--unresolved --not_outdated` to trim already-handled threads.
-     Drop those flags when a `NEW_COMMENT` may have been resolved in
-     the interim and you need to see it anyway.
+     `gh pr-review review view -R <owner>/<repo> <number>`
+     Add `--unresolved --not_outdated` for full-PR sweeps to trim
+     already-handled threads. Drop them when inspecting a specific
+     `NEW_COMMENT` whose thread may have been resolved in the interim.
    - Workflow run history on the PR branch (catches CI cycles
      `statusCheckRollup` doesn't show — e.g. older runs, re-run jobs):
      `gh run list --branch <headRefName> --json databaseId,name,status,conclusion,createdAt,headSha,workflowName --limit 20`
@@ -215,13 +216,14 @@ on every tick regardless of change).
      `NEW_TOP_COMMENT`, or a `NEW_REVIEW` asking for a change — from a
      human or an automated reviewer like Devin or Copilot): modify code
      and push, subject to the step-3 pre-push checks and the step-5 cap.
-     For a `NEW_COMMENT`, if the re-fetched thread is now `isResolved`
-     or `isOutdated`, it was handled in the interim — skip it. For a
+     For a `NEW_COMMENT`, if the re-fetched thread is now `is_resolved`
+     or `is_outdated`, it was handled in the interim — skip it. For a
      `NEW_REVIEW`, re-fetch the review body to classify intent.
    - Question, nit, or ambiguous intent: reply and do not push. Pick
      the reply channel by event type so context stays intact:
      - `NEW_COMMENT` (review thread comment): reply inside the thread
-       with `gh pr-review comments reply --thread-id <id> --body <text> -R <owner>/<repo> <number>`.
+       per `pr-review-response.md` — apply its bot check first, then
+       run `gh pr-review comments reply` on bot threads only.
      - `NEW_TOP_COMMENT` / `NEW_REVIEW`: no thread to attach to; post
        a top-level PR comment with `gh pr comment <number> --body <text>`.
    - `READY_FOR_REVIEW`: the user took the PR out of draft; no action,
@@ -238,8 +240,9 @@ on every tick regardless of change).
      comment (e.g., explaining an intentional decision), resolve the
      thread.
    - Leave the thread open when waiting for the reviewer's follow-up.
-   - Get the thread id from the `review view` output in step 1
-     (`thread_id` field), then run
+   - Resolve per `pr-review-response.md` — only bot-authored threads,
+     applying its bot check on the `review view` output. Get the thread
+     id from that output (`thread_id` field), then run
      `gh pr-review threads resolve --thread-id <thread-id> -R <owner>/<repo> <number>`.
 
    Event-specific notes:
