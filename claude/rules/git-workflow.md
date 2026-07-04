@@ -147,103 +147,66 @@ for the user to remind you. Use the section 6 procedure
 
 ### Phase 5: Watch PR activity until merge
 
-After Phase 4 completes, arm a persistent `Monitor` to watch the PR
-until it is merged or closed. Reviewers (human, Devin, Copilot) often
-act soon after the user marks the PR ready, and CI may still be
-running. The Monitor runs a background poll loop whose stdout
-lines become notifications, so only an actionable change wakes you —
-quiet periods stay silent (unlike a timer-based `/loop`, which wakes
-on every tick regardless of change).
+After Phase 4 completes, arm a persistent `Monitor` running
+`pr-monitor <PR number>`. It polls every 60s and emits one stdout line
+per actionable change; quiet periods stay silent.
 
-1. Arm a persistent Monitor (`persistent: true`) running
-   `pr-monitor <PR number>`. The script polls every 60s and emits
-   exactly ONE stdout line per actionable change. Event lines:
-   - `STATE: MERGED` / `STATE: CLOSED` — top-level `state` changed
+1. Event lines:
+   - `STATE: MERGED` / `STATE: CLOSED` — top-level `state` changed.
    - `REVIEW: CHANGES_REQUESTED` / `REVIEW: APPROVED` —
      `reviewDecision` changed.
-   - `READY_FOR_REVIEW` — `isDraft` changed from true to false (the
-     user marked the PR ready).
-   - `NEW_COMMENT: [BOT|USER] <author> <path>:<line>` — a review-thread
-     comment whose ID was not seen before, in a thread where
-     `isResolved == false` and `isOutdated == false`. The `[BOT]` /
-     `[USER]` tag is the comment author's GraphQL `__typename` — a
-     hint for reaction routing per `pr-reaction.md`, but not a
-     substitute for the rule's full thread walk before mutating.
-   - `NEW_TOP_COMMENT: [BOT|USER] <author>` — a top-level PR comment
-     whose ID was not seen before. Not gated by resolution state.
-   - `NEW_REVIEW: [BOT|USER] <author> <state>` — a PR review (summary
-     body) whose ID was not seen before. `state` is `COMMENTED` /
-     `APPROVED` / `CHANGES_REQUESTED` / `DISMISSED`. Catches reviews
-     that do not change `reviewDecision` (e.g. Devin Review posted as
-     `COMMENTED`, or a human submitting "Comment"). Empty-body reviews
-     are filtered out.
-   - `CI_FAILURE: <check name>` — a new `FAILURE` from `gh run list`
-     on the PR's head SHA.
+   - `READY_FOR_REVIEW` — `isDraft` flipped to false.
+   - `NEW_COMMENT: [BOT|USER] <author> <path>:<line>` — new review-
+     thread comment, thread `isResolved == false` and
+     `isOutdated == false`. `[BOT|USER]` is a routing hint per
+     `pr-reaction.md`; the rule's full thread walk still governs
+     mutations.
+   - `NEW_TOP_COMMENT: [BOT|USER] <author>` — new top-level PR
+     comment.
+   - `NEW_REVIEW: [BOT|USER] <author> <state>` — new PR review
+     (summary body). `state` ∈ `COMMENTED` / `APPROVED` /
+     `CHANGES_REQUESTED` / `DISMISSED`. Empty-body reviews filtered.
+   - `CI_FAILURE: <check name>` — new `FAILURE` on the PR's head SHA.
 
-   Quiet periods stay silent. The script exits on its own when the PR
-   reaches MERGED or CLOSED; otherwise stop it with `TaskStop` from a
-   reaction turn.
+1. Re-fetch detail on each event with:
+   - `gh pr view <number> --json state,isDraft,reviewDecision,latestReviews,statusCheckRollup,comments,updatedAt,mergedAt,headRefName`
+   - `gh pr-review review view -R <owner>/<repo> <number>` — add
+     `--unresolved --not_outdated` for full-PR sweeps; drop them when
+     inspecting a specific `NEW_COMMENT` that may have been resolved
+     in the interim.
+   - `gh run list --branch <headRefName> --json databaseId,name,status,conclusion,createdAt,headSha,workflowName --limit 20`
 
-   The event line is only a signal — re-fetch full detail with these
-   three commands (the monitor script itself still uses raw GraphQL
-   internally for dedup; these are what a reaction turn should call):
+   The notification is not a user reply — keep working.
 
-   - PR top-level state:
-     `gh pr view <number> --json state,isDraft,reviewDecision,latestReviews,statusCheckRollup,comments,updatedAt,mergedAt,headRefName`
-   - Review threads and PR reviews in one call:
-     `gh pr-review review view -R <owner>/<repo> <number>`
-     Add `--unresolved --not_outdated` for full-PR sweeps to trim
-     already-handled threads. Drop them when inspecting a specific
-     `NEW_COMMENT` whose thread may have been resolved in the interim.
-   - Workflow run history on the PR branch (catches CI cycles
-     `statusCheckRollup` doesn't show — e.g. older runs, re-run jobs):
-     `gh run list --branch <headRefName> --json databaseId,name,status,conclusion,createdAt,headSha,workflowName --limit 20`
-
-1. On each event notification, re-fetch full detail with the three
-   polling commands in step 1 (the event line is only a signal), then
-   handle it per the remaining steps below. The notification is not a
-   user reply — keep working.
-
-1. Before any push (any reaction that would write to origin):
-   - Verify the current branch matches the PR's `headRefName`
+1. Before any push:
+   - Verify the current branch matches the PR's `headRefName`.
    - `git fetch` and confirm local HEAD is still ahead of
-     `origin/<branch>` (no manual user push has happened in between).
+     `origin/<branch>` (no manual push in between).
    - Skip the push if either check fails; surface the conflict to the
-     user instead of trying to reconcile silently.
+     user.
 
 1. React per `pr-reaction.md` (bot check, reply-channel routing,
    thread resolve, cap for autonomous fix pushes).
 
-1. CI_FAILURE handling: get the `databaseId` from `gh run list` (check
-   names don't always map 1:1 to run names), inspect with
-   `gh run view --log-failed <databaseId>`, then fix and push. Same
-   pre-push checks as any other reaction.
+1. `CI_FAILURE`: get the `databaseId` from `gh run list`, inspect with
+   `gh run view --log-failed <databaseId>`, then fix and push (same
+   pre-push checks).
 
 1. Exit conditions:
    - `STATE: MERGED` → execute Step 7 (Cleanup), then `TaskStop` the
      monitor.
-   - `STATE: CLOSED` without merge → `TaskStop` the monitor, skip
-     cleanup (user may reopen).
-   - Session ends (PC sleep, Claude Code closed) → the Monitor
-     terminates with the session. This is accepted as best-effort.
+   - `STATE: CLOSED` without merge → `TaskStop`, skip cleanup.
+   - Session ends → Monitor terminates with the session (best-effort).
 
 1. Conflict handling:
-   - If the user pushes commits manually while the Monitor is running,
-     just acknowledge on the next event and continue watching. Do not
-     try to revert or duplicate the user's work.
-   - If the user gives a new instruction that supersedes the watch,
-     `TaskStop` the monitor and prioritize the user request.
+   - Manual user push during monitor: acknowledge on the next event,
+     keep watching. Do not revert or duplicate.
+   - New user instruction superseding the watch: `TaskStop` the
+     monitor, prioritize the user request.
 
-Notifications follow the Monitor tool's default guidance: an event
-landing in chat (and the existing `noti` Notification hook firing when
-you wake) is enough; reserve any explicit `PushNotification` for events
-that change what the user would do next (e.g. merge, or "needs human
-attention" after the fix cap). Do not push on routine CI / comment
-events.
-
-This is the final phase of Step 5; Step 7 (Cleanup) still runs when the
-Monitor exits on `MERGED`. The watch is best-effort by design — for
-event-driven reliability use GitHub Actions instead.
+`PushNotification` only for events that change what the user would do
+next (merge, or "needs human attention" after the fix cap). Skip
+routine CI / comment events.
 
 ## 6. Update a PR / issue (title / body)
 

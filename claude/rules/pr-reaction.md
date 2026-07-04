@@ -1,46 +1,26 @@
 # PR Reaction
 
-How to react to PR events surfaced by `bin/pr-monitor` (event line spec
-lives in `git-workflow.md` Phase 5). Covers all reaction surfaces:
-review-thread comments, top-level PR comments, and PR-review summaries.
-Also covers thread reply/resolve mechanics.
-
-Thread reply/resolve calls go through the `agynio/gh-pr-review`
-extension and REST `/pulls/<n>/comments`; top-level PR replies use
-`gh pr comment`. All three are permission-friendly under the existing
-allowlist — no step requires an approval prompt.
+How to react to PR events emitted by `bin/pr-monitor`. Event line spec
+lives in `git-workflow.md` Phase 5.
 
 ## Targeting policy
 
-Reply to and resolve only bot threads. Never reply to or resolve a
-thread that contains any human comment. For threads with human
-involvement, summarize the content to the user and wait for an
-explicit instruction.
+Reply / resolve threads and reply to top-level comments / reviews only
+when the author is a bot. Never touch anything with a human author
+autonomously — summarize to the user and wait for an explicit
+instruction.
 
-A thread qualifies as a bot thread only when every comment in it has
-`user.type == "Bot"` (REST) — equivalent to GraphQL
-`author.__typename == "Bot"`. A single human comment anywhere in the
-thread flips it to the human path — including the common case where a
-bot opens a thread and a human follows up.
+- Bot thread = every comment in it has `user.type == "Bot"`. Any single
+  human comment flips the thread to the human path.
+- Bot `NEW_TOP_COMMENT` / `NEW_REVIEW` = event line tag is `[BOT]`.
+- Known bot logins: `github-actions`, `dependabot`,
+  `copilot-pull-request-reviewer`, `renovate`.
+- `user.type == "User"` bots (`devin-ai-integration` etc.) go on the
+  human path.
 
-Known bot logins for cross-reference: `github-actions`, `dependabot`,
-`copilot-pull-request-reviewer`, `renovate`. `user.login` has no
-`[bot]` suffix even when the UI shows one. `user.type` is the
-authoritative signal; the login list only confirms identity at a
-glance. Some automated reviewers (e.g. `devin-ai-integration`) post
-under regular user accounts and return `user.type == "User"` — those
-go on the human path and require explicit user authorization to reply
-or resolve.
+## Step 1: List and classify threads (read-only)
 
-Anything not classified as a bot thread is treated as human. The same
-Bot/User distinction applies to `NEW_TOP_COMMENT` and `NEW_REVIEW`
-events for whether to reply autonomously.
-
-## Step 1: List and classify (read-only)
-
-Two calls, joined on comment node id: the extension gives the thread
-structure and resolution state, and REST gives `user.type` for the
-bot check.
+Run both, join on `comment_node_id` (extension) == `node_id` (REST):
 
 ```bash
 gh pr-review review view -R <owner>/<repo> <number> \
@@ -52,104 +32,71 @@ gh api /repos/<owner>/<repo>/pulls/<number>/comments \
   --jq '.[] | {node_id, user_login: .user.login, user_type: .user.type}'
 ```
 
-Join on `comment_node_id` (extension) == `node_id` (REST). Classify
-each thread by walking every comment per the previous section. The
-extension's `--unresolved --not_outdated` flags filter server-side, so
-no local `is_resolved` / `is_outdated` check is needed.
+Walk every comment in each thread to classify per the targeting policy.
 
-For `NEW_TOP_COMMENT` / `NEW_REVIEW` the Bot/User classification comes
-directly from the event line's `[BOT|USER]` tag emitted by
-`bin/pr-monitor` — no separate walk is needed since those are single-
-author events, not threads.
+`NEW_TOP_COMMENT` / `NEW_REVIEW` skip this step — take the `[BOT|USER]`
+tag directly from the event line.
 
-## Step 2: React by content, not event type
+## Step 2: React by content
 
-`NEW_COMMENT` is pre-filtered by the monitor to unresolved,
-non-outdated threads; `NEW_TOP_COMMENT` is not, so classify it by
-content.
+Classify each event by content (`NEW_TOP_COMMENT` may include either
+kind, `NEW_COMMENT` is pre-filtered to unresolved / non-outdated).
 
-- Clear fix request (`CHANGES_REQUESTED`, a `NEW_COMMENT`, a
-  `NEW_TOP_COMMENT`, or a `NEW_REVIEW` asking for a change — from a
-  human or an automated reviewer like Devin or Copilot): modify code
-  and push, subject to Phase 5's pre-push checks and the Step 5 cap
-  below. For a `NEW_COMMENT`, if the re-fetched thread is now
-  `is_resolved` or `is_outdated`, it was handled in the interim —
-  skip it. For a `NEW_REVIEW`, re-fetch the review body to classify
-  intent.
-- Question, nit, or ambiguous intent: reply and do not push. Pick the
-  reply channel by event type so context stays intact:
-  - `NEW_COMMENT` (review thread comment): reply inside the thread
-    with `gh pr-review comments reply --thread-id <id> --body <text>
-    -R <owner>/<repo> <number>`. Bot threads only per the targeting
-    policy; human threads require explicit user authorization.
-  - `NEW_TOP_COMMENT` / `NEW_REVIEW`: no thread to attach to; post a
-    top-level PR comment with `gh pr comment <number> --body <text>`
-    — only when the event line tag is `[BOT]`; a `[USER]` author
-    requires explicit user authorization per the targeting policy.
-- `READY_FOR_REVIEW`: the user took the PR out of draft; no action,
-  just register that review activity is now expected.
-- Informational (`APPROVED`, or CI still `PENDING` / `IN_PROGRESS` /
-  `QUEUED`): no action; surface it to the user on the next turn.
+- Clear fix request (`CHANGES_REQUESTED`, or a `NEW_COMMENT` /
+  `NEW_TOP_COMMENT` / `NEW_REVIEW` asking for a change): modify code
+  and push, subject to Phase 5's pre-push checks and the Step 5 cap.
+  For a `NEW_COMMENT` whose thread is now `is_resolved` / `is_outdated`
+  on re-fetch, skip it. For a `NEW_REVIEW`, re-fetch the body first.
+- Question / nit / ambiguous intent — reply, do not push. Bot author
+  only; human author requires explicit user authorization.
+  - `NEW_COMMENT` (thread): `gh pr-review comments reply --thread-id
+    <id> --body <text> -R <owner>/<repo> <number>`.
+  - `NEW_TOP_COMMENT` / `NEW_REVIEW` (top-level):
+    `gh pr comment <number> --body <text>`.
+- `READY_FOR_REVIEW`: no action; register that review activity is now
+  expected.
+- Informational (`APPROVED`, or CI `PENDING` / `IN_PROGRESS` /
+  `QUEUED`): no action; surface to the user on the next turn.
 
-Event-specific notes:
-
-- `STATE: MERGED` / `CLOSED` is terminal — handled in `git-workflow.md`
-  Phase 5 exit conditions, not here.
-- `NEW_TOP_COMMENT` carries only the author tag and login; re-fetch
-  the body from the `comments` field before classifying.
-
-`CI_FAILURE` handling stays in `git-workflow.md` Phase 5 (workflow-run
-signal, not a review reaction).
+`NEW_TOP_COMMENT` carries author + login only — re-fetch body from
+the `comments` field before classifying.
 
 ## Step 3: Resolve threads
 
-Applies to `NEW_COMMENT` only — top-level comments and review summary
-bodies are not threads. Only bot-authored threads are resolved
-autonomously per the targeting policy; human threads stay with the
-user.
+Bot-authored `NEW_COMMENT` threads only. Resolve after:
 
-- After a fix push that addresses a `NEW_COMMENT`, resolve the
-  originating thread so subsequent monitor passes skip it and reviewers
-  see the discussion state.
-- After a reply that closes a question / nit / ambiguous-intent
-  comment (e.g., explaining an intentional decision), resolve the
-  thread.
-- Leave the thread open when waiting for the reviewer's follow-up.
-- Get the thread id from Step 1's `review view` output (`thread_id`
-  field), then run
-  `gh pr-review threads resolve --thread-id <thread-id> -R <owner>/<repo> <number>`.
+- A fix push addressing the thread.
+- A reply closing a question / nit / ambiguous-intent comment.
 
-## Step 4: Human threads and human review reactions
+Leave open while waiting for the reviewer's follow-up. Take the thread
+id from Step 1's `thread_id` field:
 
-Do not run `gh pr-review comments reply` or `gh pr-review threads
-resolve` on a human-authored thread. Surface the comment content to
-the user with thread id, path, line, and body excerpt, then stop.
+```bash
+gh pr-review threads resolve --thread-id <thread-id> -R <owner>/<repo> <number>
+```
 
-Same discipline for `NEW_TOP_COMMENT` / `NEW_REVIEW` authored by a
-human: do not auto-reply via `gh pr comment` unless the user asks.
+## Step 4: Human-authored events
 
-If the user explicitly asks to reply to a specific human thread or
-comment, present the draft reply text, wait for approval, then run the
-command. Resolution of a human thread stays with the user.
+Do not auto-reply or auto-resolve. Surface the content to the user
+(thread id / path / line / body excerpt for threads; body excerpt for
+top-level) and stop.
+
+If the user explicitly asks to reply, draft the text, wait for
+approval, then run the command. Resolution stays with the user.
 
 ## Step 5: Cap for autonomous fix pushes
 
-Stop pushing autonomous fixes after 3 fix commits for this PR in this
-session. Beyond that, switch to reply-only mode and notify the user
-that the PR appears to need human attention. This prevents runaway
-loops when an automated reviewer keeps re-requesting changes on each
-push.
+Stop autonomous fix pushes after 3 fix commits for this PR in this
+session. Switch to reply-only and notify the user.
 
 ## Forbidden shortcuts
 
-- Skipping the bot check before any mutation
-- Treating a thread as a bot thread based only on its opening comment
-  when a later human comment is present
-- Using `gh pr comment` to work around the human-thread restriction
-  (top-level comments are a different surface, not a substitute reply)
+- Skipping the bot check before any mutation.
+- Treating a thread as a bot thread from its opening comment alone
+  when later comments include a human.
+- Posting a top-level `gh pr comment` in place of a review-thread
+  reply to bypass the bot-check.
 
 ## References
 
 - `agynio/gh-pr-review` extension: https://github.com/agynio/gh-pr-review
-- REST `/pulls/{n}/comments` (source of `user.type`): https://docs.github.com/en/rest/pulls/comments#list-review-comments-on-a-pull-request
-- `Bot` vs `User` semantics (GraphQL equivalent): https://docs.github.com/en/graphql/reference/interfaces#actor
