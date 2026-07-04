@@ -188,13 +188,6 @@ on every tick regardless of change).
    three commands (the monitor script itself still uses raw GraphQL
    internally for dedup; these are what a reaction turn should call):
 
-<!-- The GraphQL example and `--json` field list below are stale
-     against the current `bin/pr-monitor` (missing `__typename`,
-     lists `comments` that the script no longer requests). The
-     agynio/gh-pr-review extension migration replaces the entire
-     bulleted list; see the sibling PR. Left intentionally to avoid
-     merge conflicts. -->
-
    - PR top-level state:
      `gh pr view <number> --json state,isDraft,reviewDecision,latestReviews,statusCheckRollup,comments,updatedAt,mergedAt,headRefName`
    - Review threads and PR reviews in one call:
