@@ -163,17 +163,20 @@ on every tick regardless of change).
      `reviewDecision` changed.
    - `READY_FOR_REVIEW` — `isDraft` changed from true to false (the
      user marked the PR ready).
-   - `NEW_COMMENT: <author> <path>:<line>` — a review-thread comment
-     whose ID was not seen before, in a thread where `isResolved ==
-     false` and `isOutdated == false`.
-   - `NEW_TOP_COMMENT: <author>` — a top-level PR comment whose ID
-     was not seen before. Not gated by resolution state.
-   - `NEW_REVIEW: <author> <state>` — a PR review (summary body) whose
-     ID was not seen before. `state` is `COMMENTED` / `APPROVED` /
-     `CHANGES_REQUESTED` / `DISMISSED`. Catches reviews that do not
-     change `reviewDecision` (e.g. Devin Review posted as `COMMENTED`,
-     or a human submitting "Comment"). Empty-body reviews are filtered
-     out.
+   - `NEW_COMMENT: [BOT|USER] <author> <path>:<line>` — a review-thread
+     comment whose ID was not seen before, in a thread where
+     `isResolved == false` and `isOutdated == false`. The `[BOT]` /
+     `[USER]` tag is the comment author's GraphQL `__typename` — a
+     hint for reaction routing per `pr-review-response.md`, but not a
+     substitute for the rule's full thread walk before mutating.
+   - `NEW_TOP_COMMENT: [BOT|USER] <author>` — a top-level PR comment
+     whose ID was not seen before. Not gated by resolution state.
+   - `NEW_REVIEW: [BOT|USER] <author> <state>` — a PR review (summary
+     body) whose ID was not seen before. `state` is `COMMENTED` /
+     `APPROVED` / `CHANGES_REQUESTED` / `DISMISSED`. Catches reviews
+     that do not change `reviewDecision` (e.g. Devin Review posted as
+     `COMMENTED`, or a human submitting "Comment"). Empty-body reviews
+     are filtered out.
    - `CI_FAILURE: <check name>` — a new `FAILURE` from `gh run list`
      on the PR's head SHA.
 
