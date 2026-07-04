@@ -3,6 +3,9 @@
 Standard git/GitHub workflow for all projects.
 Follow each step in order. Skip steps that don't apply.
 
+Prerequisite: the `agynio/gh-pr-review` gh extension is installed
+(used by Phase 5 review-thread reactions).
+
 ## Principles
 
 - All steps within a single workflow run are pre-authorized by the user
@@ -184,11 +187,7 @@ on every tick regardless of change).
 
    - PR top-level state:
      `gh pr view <number> --json state,isDraft,reviewDecision,latestReviews,statusCheckRollup,comments,updatedAt,mergedAt,headRefName`
-   - Review threads (state + bodies + path/line) and PR reviews (state
-     + summary body) in one call — the `agynio/gh-pr-review` extension
-     assembles reviews, inline comments, and thread replies into a
-     single JSON payload so no separate GraphQL / REST calls are
-     needed:
+   - Review threads and PR reviews in one call:
      `gh pr-review review view -R <owner>/<repo> <number>`
      Add `--unresolved --not_outdated` for full-PR sweeps to trim
      already-handled threads. Drop them when inspecting a specific
