@@ -66,7 +66,7 @@ fi
 brew bundle
 echo
 
-scripts/install_gh_extensions.sh
+gh extension install agynio/gh-pr-review
 echo
 
 scripts/configure_brew.sh
