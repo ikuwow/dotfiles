@@ -66,13 +66,13 @@ Editing any dotfile means editing the source file in this repository.
 
 | Repository source | Deployed to |
 | --- | --- |
-| `.aliases`, `.bash_profile`, `.bashrc`, `.vimrc`, etc. (19 dotfiles) | `~/` |
+| Shell / version-manager dotfiles (`.bashrc`, `.aliases`, etc.) | `~/` |
 | `xdg-config/*` (all subdirectories) | `~/.config/` |
-| `.ssh/config` | `~/.ssh/config` |
-| `.kube/kubie.yaml` | `~/.kube/kubie.yaml` |
 | `bin/*` (executable files) | `~/bin/` |
-| `claude/` (settings, hooks, skills, MCP config) | `~/.claude/` |
-| `AIRULES.md` | `~/.claude/CLAUDE.md` |
+| `claude/` (settings, hooks, skills, agents, rules) | `~/.claude/`, plus shared parts to `~/.codex/` and `~/.junie/` |
+| `AIRULES.md` | Global AI instructions for Claude, Codex, and Junie |
+
+See `scripts/deploy.sh` for the exact mapping.
 
 Note: Some config files (e.g. git `templateDir`) hardcode `~/.config/` because they don't support variable expansion. This assumes `XDG_CONFIG_HOME` is set to the default `~/.config`.
 
@@ -80,27 +80,21 @@ Note: Some config files (e.g. git `templateDir`) hardcode `~/.config/` because t
 
 ```
 dotfiles/
-├── bootstrap.sh          # Entry point (run via curl on a new Mac)
-├── bootstrap/
-│   ├── main.sh           # OS detection, prerequisites, orchestrates full setup
-│   └── remote.sh         # Minimal bootstrap for remote environments
-├── scripts/
-│   ├── deploy.sh         # Creates all symlinks (runs on Linux too)
-│   ├── configure.sh      # macOS system preferences via defaults command
-│   └── configure_brew.sh # Homebrew post-install configuration
-├── Brewfile              # Homebrew package definitions
-├── bin/                  # Custom executable scripts → ~/bin/
-├── xdg-config/           # XDG config files → ~/.config/
-├── claude/               # Claude Code settings → ~/.claude/
-├── userscripts/          # Safari userscripts loaded by the Userscripts extension
-├── .bash_profile         # Login shell config → ~/
-├── .bashrc               # Interactive shell config → ~/
-└── ... (other dotfiles)
+├── bootstrap.sh    # Entry point (run via curl on a new Mac)
+├── bootstrap/      # OS/environment-specific bootstrap scripts
+├── scripts/        # Symlink deployment, macOS defaults, Claude Code / Homebrew setup
+├── Brewfile        # Homebrew package definitions
+├── bin/            # Custom executable scripts → ~/bin/
+├── xdg-config/     # XDG config files → ~/.config/
+├── claude/         # Claude Code settings → ~/.claude/
+├── codex/          # Codex CLI rules → ~/.codex/
+├── userscripts/    # Safari userscripts loaded by the Userscripts extension
+└── ... (dotfiles deployed to ~/, see Symlink Map)
 ```
 
 ### AI-Assisted Commit Messages
 
-`xdg-config/git/hooks/prepare-commit-msg` drafts a commit message via the Anthropic Messages API (`claude-haiku-4-5`) when `git commit` opens the editor. Set `GIT_AI_COMMIT_ANTHROPIC_API_KEY` to enable; the hook is a no-op without it. Per-repo opt-in via `install-aimsg-hook.sh`. Disable per-invocation with `GIT_AI_COMMIT_MSG=0 git commit`. Requires `curl` and `jq`.
+`xdg-config/git/hooks/prepare-commit-msg` drafts a commit message via the Anthropic Messages API when `git commit` opens the editor. Set `GIT_AI_COMMIT_ANTHROPIC_API_KEY` to enable; the hook is a no-op without it. Per-repo opt-in via `install-aimsg-hook.sh`. Disable per-invocation with `GIT_AI_COMMIT_MSG=0 git commit`. See the hook script for the model and requirements.
 
 ### Machine-Local Overrides
 
@@ -117,13 +111,12 @@ export ANTHROPIC_MODEL=opusplan
 
 ### Bootstrap Flow
 
-1. `bootstrap.sh` — Clones the repo (or updates it). If `DOTFILES_MINIMAL=1`, runs `bootstrap/claude-code-web.sh` (symlinks only) and exits. Otherwise calls `bootstrap/main.sh`
-1. `bootstrap/main.sh` — Detects OS/architecture, checks prerequisites, orchestrates:
-   - `scripts/deploy.sh` — Creates symlinks (runs on Linux and macOS)
-   - `scripts/configure.sh` — macOS system defaults (macOS only)
-   - Installs Homebrew (macOS only, architecture-aware)
-   - `brew bundle` — Installs packages from Brewfile
-   - `scripts/configure_brew.sh` — Enables Homebrew autoupdate
+`bootstrap.sh` clones or updates the repo, then dispatches based on the environment:
+
+- Claude Code web (`CLAUDE_CODE_REMOTE=true`) → `bootstrap/claude-code-web.sh`
+- Otherwise → `bootstrap/main.sh`, which deploys symlinks, applies macOS defaults, and installs Homebrew packages
+
+See each script for its exact steps.
 
 ### Platform Support
 
@@ -134,11 +127,7 @@ On Linux, the bootstrap process deploys symlinks and exits. Homebrew is not used
 
 ### Claude Code Web
 
-When `CLAUDE_CODE_REMOTE=true` is detected (set automatically by Claude Code web), `bootstrap.sh` runs `bootstrap/claude-code-web.sh` instead of the full macOS setup. This script:
-
-1. Installs packages not in the default image (`gh`, `jq`, `fzf`)
-1. Deploys all dotfile symlinks via `deploy.sh`
-1. Registers MCP servers (`deepwiki`, `Context7`) via `claude mcp add`
+When `CLAUDE_CODE_REMOTE=true` is detected (set automatically by Claude Code web), `bootstrap.sh` runs `bootstrap/claude-code-web.sh` instead of the full macOS setup. It installs a few packages missing from the default image, deploys the dotfile symlinks, and runs `scripts/claude-code-setup.sh` to register MCP servers and install Claude Code plugins. See those scripts for the exact list.
 
 Use this as the Claude Code web setup script:
 

@@ -6,11 +6,11 @@ Read README.md for the project overview, repository structure, and how it works.
 
 ## CRITICAL: Symlink Architecture
 
-Files like `~/.bashrc`, `~/.bash_profile`, `~/.vimrc`, etc. in `$HOME`
+Files like `~/.bashrc`, `~/.bash_profile`, `~/.inputrc`, etc. in `$HOME`
 are symlinks pointing to files in this repository.
 
-- `claude/` directory is symlinked to `~/.claude/` — always look at `claude/` in this repo first for Claude Code configuration (settings, hooks, MCP, skills, etc.)
-- `AIRULES.md` is also symlinked to `~/.codex/AGENTS.md` for Codex CLI global instructions
+- Files under `claude/` are symlinked into `~/.claude/` — always look at `claude/` in this repo first for Claude Code configuration (settings, hooks, MCP, skills, etc.)
+- `AIRULES.md` is also symlinked to `~/.codex/AGENTS.md` (Codex CLI) and `~/.junie/AGENTS.md` (Junie CLI) for their global instructions
 - When reading or editing files managed by this repository, always use the
   path within this repo (e.g., `bin/foo` not `~/bin/foo`,
   `claude/settings.json` not `~/.claude/settings.json`)
@@ -50,7 +50,7 @@ pre-commit run --all-files
 ## Script Requirements
 
 - Bootstrap scripts use `/bin/bash` (not `/usr/bin/env bash`) for compatibility
-- All scripts must pass shellcheck validation (see `.shellcheckrc` for disabled rules)
+- All scripts must pass shellcheck validation
 - Use `set -eu` for error handling in critical scripts
 
 ## Personal Tool Defaults
