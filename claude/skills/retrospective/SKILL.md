@@ -1,8 +1,9 @@
 ---
 name: retrospective
 description: Use when the user wants to reflect on AI communication quality and get improvement suggestions for rule files or the project itself. TRIGGER when user invokes /retrospective or asks to review the session.
-model: opus
 effort: xhigh
+context: fork
+agent: general-purpose
 ---
 
 # Session Retrospective
@@ -11,6 +12,14 @@ Review the current session and identify problematic AI behaviors with
 structural countermeasures.
 
 Focus on the interaction process, not on the task content itself.
+
+## Step 0: Load Past Retrospectives
+
+Fetch recent retrospective records before analyzing:
+`gh issue list --repo ikuwow/dotfiles --label retrospective --state all --limit 15 --json number,title,body,state`
+Use them to detect cross-session recurrence. A problem matching a
+past retrospective escalates one severity level and is marked
+"recurring", with the past issue number cited.
 
 ## Step 1: List Problem Behaviors
 
@@ -23,17 +32,23 @@ Keep each entry to 1-2 lines. Skip behaviors that had no real impact.
 
 ## Step 2: Propose Structural Countermeasures
 
-For each problem behavior, propose a countermeasure that prevents
-recurrence through external mechanisms:
+For each problem, identify the governing rule first, then pick the
+highest applicable countermeasure in this order:
 
-- Rule addition (to AIRULES.md for global, or project CLAUDE.md for project-specific)
-- Hook (pre-commit, Claude Code PreToolUse/PostToolUse/PermissionRequest hook)
-- Linter or static analysis rule
-- Script or automation
-- Template or checklist
-- Permission setting
-- CI check (GitHub Actions workflow, test assertion, etc.)
-- Project structure change
+1. Fix the existing rule that failed to prevent the behavior.
+   Diagnose why it failed — wording too vague, wrong loading tier
+   (not in context when needed), or no enforcement — and propose
+   editing, splitting, relocating, or mechanizing that rule.
+   Never add a parallel rule next to a failed one.
+2. Delete or merge rules when overlap, contradiction, or sheer
+   volume contributed to the failure.
+3. Mechanize (hook, CI check, pre-commit, script, permission
+   setting, template) when the behavior is mechanically checkable.
+   A mechanized check may replace the prose rule it enforces.
+4. Add a new rule only when no existing rule covers the problem.
+   State the net context cost: lines added, target loading tier
+   (always-loaded rule vs on-demand skill), and what compensating
+   trim keeps the tier within budget.
 
 Format as a numbered list of pairs. Include a severity rating for each:
 
@@ -60,8 +75,11 @@ self-corrects are not penalized.
 
 Adjustment rules:
 
-- Recurrence alone does not change severity. A self-corrected issue
-  stays at low even when the same pattern shows up a few times.
+- Within-session recurrence alone does not change severity; a
+  self-corrected issue stays at low even when the pattern repeats
+  a few times in the session.
+- Cross-session recurrence (the same pattern appears in a past
+  retrospective issue) escalates one level.
 - Excessive recurrence within a session that visibly degrades overall
   response quality can warrant medium, even when each instance is
   self-corrected.
@@ -129,3 +147,15 @@ remarks. Just the list of problem-countermeasure pairs.
 
 If there are no significant problem behaviors in the session, say so in
 one line and stop.
+
+## Step 3: Record the Retrospective
+
+Skip when there were no significant findings. Otherwise create one
+GitHub issue in ikuwow/dotfiles holding the problem/countermeasure
+list verbatim, via `--body-file` (never `--body`), title
+`Retrospective: <date> <one-line session summary>`, label
+`retrospective`. The label is provisioned once at setup; if
+`gh issue create` fails because it is missing, run
+`gh label create retrospective --repo ikuwow/dotfiles --force` and retry.
+The weekly-improvement routine consumes these issues — do not
+implement the countermeasures in this session unless the user asks.
