@@ -18,3 +18,9 @@ repos:
         language: script
         pass_filenames: false
         files: ^scripts/(deploy|verify_deploy)\.sh$
+      - id: check-rule-budget
+        name: Enforce line-count budget on always-loaded AI rule files
+        entry: scripts/check_rule_budget.sh
+        language: script
+        pass_filenames: false
+        files: ^(AIRULES\.md|claude/rules/.*\.md)$

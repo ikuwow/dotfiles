@@ -1,7 +1,7 @@
 # PR Reaction
 
 How to react to PR events emitted by `bin/pr-monitor`. Event line spec
-lives in `git-workflow.md` Phase 5.
+lives in the git-workflow skill's `SKILL.md` Phase 5.
 
 ## Targeting policy
 

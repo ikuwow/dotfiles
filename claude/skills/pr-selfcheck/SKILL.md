@@ -17,6 +17,7 @@ Perform a self-review of the specified PR to catch issues before a human reviewe
    `gh pr view <number> --json title,body,url,additions,deletions,files`
 1. Retrieve the diff:
    `gh pr diff <number>`
+1. Read `~/.claude/skills/git-workflow/pr-guidelines.md` to load the PR Body Checklist
 1. For each URL found in the PR body, verify accessibility with WebFetch
    If a URL is unreachable (network error, 403, etc.), report it as "unverifiable" rather than a must-fix.
 1. Analyze the PR against the review criteria below
@@ -24,7 +25,7 @@ Perform a self-review of the specified PR to catch issues before a human reviewe
 
 ## Review Criteria
 
-Evaluate the PR against the PR Body Checklist defined in `pr-guidelines.md`.
+Evaluate the PR against the PR Body Checklist loaded in Step 3 (`~/.claude/skills/git-workflow/pr-guidelines.md`).
 
 In addition to the high-level checklist, apply the following concrete
 signals so detection does not rely on subagent interpretation alone.
