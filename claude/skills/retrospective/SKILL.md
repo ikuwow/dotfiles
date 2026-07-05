@@ -2,8 +2,6 @@
 name: retrospective
 description: Use when the user wants to reflect on AI communication quality and get improvement suggestions for rule files or the project itself. TRIGGER when user invokes /retrospective or asks to review the session.
 effort: xhigh
-context: fork
-agent: general-purpose
 ---
 
 # Session Retrospective
@@ -17,9 +15,10 @@ Focus on the interaction process, not on the task content itself.
 
 Fetch recent retrospective records before analyzing:
 `gh issue list --repo ikuwow/dotfiles --label retrospective --state all --limit 15 --json number,title,body,state`
-Use them to detect cross-session recurrence. A problem matching a
-past retrospective escalates one severity level and is marked
-"recurring", with the past issue number cited.
+Use them to detect cross-session recurrence: mark any problem that
+matches a past retrospective as "recurring" and cite the past issue
+number. The severity impact of recurrence is applied once, in the
+Severity Criteria adjustment rules below — do not also apply it here.
 
 ## Step 1: List Problem Behaviors
 

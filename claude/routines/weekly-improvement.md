@@ -38,7 +38,7 @@ Look for improvements across the entire dotfiles repository:
 - Rule budget: always-loaded rule files stay within budget (`AIRULES.md` <= 140 lines, each `claude/rules/*.md` <= 100 lines). Propose consolidation or tier demotion when exceeded
 
 Modify with care:
-- `AIRULES.md`: only when implementing a countermeasure recorded in a retrospective issue; link the issue in the PR body
+- `AIRULES.md`: only when implementing a countermeasure recorded in a retrospective issue, or bringing it back within the rule budget above; cite the issue or the budget overage in the PR body
 - `CLAUDE.md` / `AGENTS.md` (only fix clear errors)
 
 ## Step 4: Create a PR
