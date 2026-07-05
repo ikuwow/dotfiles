@@ -3,7 +3,7 @@
 You are improving the ikuwow/dotfiles repository as a weekly maintenance routine.
 This file contains all instructions for the routine.
 
-## Step 1: Check Past Feedback
+## Step 1: Check Past Feedback and Retrospectives
 
 Before making any changes, check past routine PRs for feedback:
 
@@ -12,6 +12,13 @@ Before making any changes, check past routine PRs for feedback:
 1. For any closed (not merged) PRs, read the comments to understand why they were rejected:
    `gh pr view <number> --repo ikuwow/dotfiles --comments`
 1. Learn from this feedback. Avoid making similar changes that were previously rejected
+
+Then pull the retrospective backlog:
+
+1. List open retrospective issues:
+   `gh issue list --repo ikuwow/dotfiles --label retrospective --state open --json number,title,body`
+1. Treat their countermeasures as the primary improvement candidates for this run. Look for patterns across multiple issues (the same rule failing repeatedly, accumulating rule bloat) before implementing any single countermeasure verbatim.
+1. After a countermeasure is implemented (or rejected with reason), close the issue with a comment linking the PR or stating the decision.
 
 ## Step 2: Understand the Repository
 
@@ -28,9 +35,10 @@ Look for improvements across the entire dotfiles repository:
 - Security: exposed secrets, insecure defaults
 - Dead code or unused configurations
 - Documentation: only where genuinely missing or incorrect
+- Rule budget: always-loaded rule files stay within budget (`AIRULES.md` <= 140 lines, each `claude/rules/*.md` <= 100 lines). Propose consolidation or tier demotion when exceeded
 
-Do NOT modify:
-- `AIRULES.md` (global AI rules, maintained manually by the user)
+Modify with care:
+- `AIRULES.md`: only when implementing a countermeasure recorded in a retrospective issue, or bringing it back within the rule budget above; cite the issue or the budget overage in the PR body
 - `CLAUDE.md` / `AGENTS.md` (only fix clear errors)
 
 ## Step 4: Create a PR
