@@ -5,8 +5,8 @@
 # so the brew-installed bash on PATH is picked up on macOS, where the
 # default /bin/bash is 3.2.
 # Designed to be armed as a Claude Code persistent Monitor; the silence
-# between events is the entire point. See claude/rules/git-workflow.md
-# Phase 5 for the reaction protocol.
+# between events is the entire point. See the git-workflow skill
+# (claude/skills/git-workflow/SKILL.md) Phase 5 for the reaction protocol.
 #
 # Usage: pr-monitor <pr-number> [interval-seconds]
 

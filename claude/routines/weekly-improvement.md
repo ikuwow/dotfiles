@@ -41,9 +41,9 @@ If worthwhile improvements are found:
    `gh label create 'claude-routine' --repo ikuwow/dotfiles --description 'Created by Claude Code weekly routine' --color '6e40c9' --force`
 1. Create a branch: `improve/dotfiles-YYYY-MM-DD` (use today's date)
 1. Make changes and commit with clear messages
-1. Follow `claude/rules/git-workflow.md` Steps 1-4 only (push + create draft PR with `--label 'claude-routine'`)
-   Skip Step 5 entirely (CI wait, self-review, and code reviews) — this is a draft for human review.
-1. Follow `claude/rules/pr-guidelines.md` for the PR body. It must include:
+1. Follow the git-workflow skill's Steps 1-3 only (push + create draft PR with `--label 'claude-routine'`)
+   Skip Step 4 entirely (CI wait, self-review, and code reviews) — this is a draft for human review.
+1. Follow `claude/skills/git-workflow/pr-guidelines.md` for the PR body. It must include:
    - What was improved and why
    - How to verify each change
    - Reference to any past feedback that influenced decisions
