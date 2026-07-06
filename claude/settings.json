@@ -28,6 +28,8 @@
       "Bash(brew info *)",
       "Bash(gh --help)",
       "Bash(gh --help *)",
+      "Bash(gh auth status)",
+      "Bash(gh auth status *)",
       "Bash(gh * --help)",
       "Bash(gh * --help *)",
       "Bash(gh * list *)",
