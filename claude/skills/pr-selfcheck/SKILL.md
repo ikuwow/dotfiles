@@ -43,8 +43,9 @@ escalate to Must Fix.
 
 When the implementation-summary section exceeds ~10 lines, or the
 whole body (excluding template-mandated sections) exceeds ~30 lines,
-re-examine the body against the signals above before deciding their
-severity.
+report the overrun itself as Should Fix (pr-guidelines: Length
+budget), and re-examine the body against the signals above to decide
+what to cut and whether to escalate.
 
 ### Hard-wrap detection (GitHub-posted markdown)
 

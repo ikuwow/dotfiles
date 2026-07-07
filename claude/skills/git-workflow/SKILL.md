@@ -6,7 +6,10 @@ description: Standard git/GitHub workflow - branch setup, implementation, draft 
 # Git Workflow
 
 Standard git/GitHub workflow for all projects.
-Follow each step in order. Skip steps that don't apply.
+Follow each step in order. Skip a step only when its precondition is
+structurally absent (e.g., no PR exists yet). Never skip a phase
+because the diff seems small or the step feels disproportionate — run
+it as-is.
 
 Prerequisite: the `agynio/gh-pr-review` gh extension is installed
 (used by Phase 5 review-thread reactions).
@@ -17,6 +20,9 @@ Prerequisite: the `agynio/gh-pr-review` gh extension is installed
   who initiated the task. Do not pause between steps to ask for
   confirmation unless blocked by an error or ambiguity. Execute the
   full flow continuously and report results at the end.
+- Phase 2 code review and Phase 5 Monitor arming are pre-authorized —
+  run them without pausing for confirmation. The only user decision
+  point in the flow is flipping the PR from draft to ready for review.
 - Never create or edit files on the default branch. Always move into the
   worktree (or feature branch) first. Creating files before branching
   leads to redundant copy-and-delete work.
@@ -39,6 +45,12 @@ Note: `.worktrees/` is covered by the global gitignore.
 ## 2. Implement, commit, push
 
 The implementation work for this branch happens here.
+
+When the commit message or PR body will claim an exhaustive
+replacement or update ("replaced all X with Y"), run
+`git grep -n '<old pattern>'` before committing and confirm zero
+remaining matches — `replace_all` misses occurrences that differ in
+formatting or indentation.
 
 ## 3. Create a PR
 
