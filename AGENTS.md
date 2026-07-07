@@ -41,6 +41,11 @@ pre-commit run --all-files
 - Always create a branch before making changes (direct commits to main are prohibited)
 - Do NOT create git worktrees — branch only, no worktree
 - Clean up unused local branches (merged, squash-merged, or upstream gone) and stale worktree entries with `bin/git-cleanup-branches`. Plain `git branch -d` rejects squash-merged branches as "not fully merged"
+- The working tree may be shared by multiple concurrent Claude Code
+  sessions: claude/settings.json's model field commonly shows as a
+  spurious uncommitted diff from another session's /model command.
+  This is expected drift, not real work — stash-and-restore it
+  around branch switches instead of investigating or reconciling it
 
 ## Language
 

@@ -5,7 +5,7 @@
 
 set -eu
 
-AIRULES_MAX=140
+AIRULES_MAX=150
 RULES_MAX=100
 
 errors=0

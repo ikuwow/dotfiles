@@ -38,10 +38,12 @@ improvising the flow from this checklist alone.
 
 ## Commit
 
-- Append a blank line and a
-  `Co-authored-by: Claude <model name> <noreply@anthropic.com>`
-  trailer, naming the model actually in use. When the harness
-  prescribes its own trailer format, that format wins.
+- Append a blank line and exactly one Claude trailer block:
+  `Co-authored-by: Claude <model name> <noreply@anthropic.com>`,
+  naming the model actually in use. When the harness or project
+  rules prescribe a different trailer format, that format replaces
+  this one (harness wins over project rules) — never stack a second
+  trailer block.
 - Never modify commits that have already been pushed
 
 ## Push
