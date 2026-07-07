@@ -148,14 +148,34 @@ remarks. Just the list of problem-countermeasure pairs.
 If there are no significant problem behaviors in the session, say so in
 one line and stop.
 
-## Step 3: Record the Retrospective
+## Step 3: Route Findings by Scope
 
-Skip when there were no significant findings. Otherwise create one
-GitHub issue in ikuwow/dotfiles holding the problem/countermeasure
-list verbatim, via `--body-file` (never `--body`), title
-`Retrospective: <date> <one-line session summary>`, label
-`retrospective`. The label is provisioned once at setup; if
-`gh issue create` fails because it is missing, run
+Route each finding by the scope assigned in Step 2.
+
+### Global-scope findings
+
+ikuwow/dotfiles is a public repository. Before filing, sanitize the
+global-scope problem/countermeasure pairs: do not include the names
+of private repositories, their PR/issue numbers, their code, or
+quoted text from their rule files. Describe each problem by its
+behavior pattern (e.g., "a work project's Terraform PR review") so
+the countermeasure stays understandable without the private context.
+
+Create one GitHub issue in ikuwow/dotfiles holding the sanitized
+pairs via `--body-file` (never `--body`), title
+`Retrospective: <date> <one-line session summary>` (sanitized as
+above), label `retrospective`. The label is provisioned once at
+setup; if `gh issue create` fails because it is missing, run
 `gh label create retrospective --repo ikuwow/dotfiles --force` and retry.
+Skip issue creation when there are no global-scope findings.
+
 The weekly-improvement routine consumes these issues — do not
-implement the countermeasures in this session unless the user asks.
+implement global countermeasures in this session unless the user asks.
+
+### Project-scope findings
+
+Never file these as retrospective issues in ikuwow/dotfiles. Present
+them in the session and ask the user how to handle them
+(AskUserQuestion), offering these choices for each finding: apply to
+the project's rule files now / create an issue in the project's own
+repository / drop.
