@@ -70,6 +70,12 @@ This repository is a personal dotfiles repo. Scripts here may assume:
   short shell utilities even when reviewers recommend one. The user
   exercises these scripts on every commit; regressions surface
   immediately and can be fixed inline.
+- This repo's working tree may be shared by multiple concurrent
+  Claude Code sessions. claude/settings.json's model field commonly
+  shows as a spurious uncommitted diff from another session's /model
+  command — this is expected drift, not real work. Stash-and-restore
+  it around branch switches rather than treating it as something to
+  investigate or reconcile.
 
 Reviewer agents (silent-failure-hunter, pr-test-analyzer, etc.) are
 calibrated for production code and will recommend defensive handlers

@@ -129,6 +129,12 @@ once and applies to both perspectives.
      the PR body, or another verification mechanism. All verification
      items are scoped to this PR's diff alone; cross-component or E2E
      items belong in the parent issue.
+   - When the PR compresses an existing rule/instruction document
+     while claiming no meaning was lost, verify by building an
+     explicit line-by-line before/after correspondence for every
+     original bullet or sentence — not by freehand rewriting from
+     memory. State in the body how this was checked, not just
+     "confirmed no policy dropped."
 
 1. Conciseness (Essence-first)
    - The principles above (Why over what, DRY, Inverted pyramid,

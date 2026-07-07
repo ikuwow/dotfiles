@@ -42,6 +42,9 @@ improvising the flow from this checklist alone.
   `Co-authored-by: Claude <model name> <noreply@anthropic.com>`
   trailer, naming the model actually in use. When the harness
   prescribes its own trailer format, that format wins.
+- Emit exactly one Claude trailer block per commit. When project
+  rules prescribe a different Co-authored-by string, the winning
+  format replaces it — do not stack both.
 - Never modify commits that have already been pushed
 
 ## Push
