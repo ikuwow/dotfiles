@@ -54,20 +54,13 @@ formatting or indentation.
 
 ## 3. Create a PR
 
-1. Generate a unique temp file path:
-   `mktemp --suffix=.md`
-   Run this as a standalone Bash command (no command substitution).
-   Read the output to obtain the generated path.
-   Then call the Read tool on that path once — `mktemp` creates an empty
-   file, and the Write tool requires the file be Read first if it exists.
-   The Read returns a "shorter than offset" warning, which is expected;
-   the subsequent Write succeeds.
-1. Write the PR body to the generated path using the Write tool:
-   `Write(<path from mktemp>)`
+1. Write the PR body to a fresh file under the session scratchpad
+   directory using the Write tool (new filename per revision — a new
+   file needs no prior Read step)
    - Follow the repository's PR template if one exists
    - Follow the PR Body Checklist
 1. Create the PR as a draft:
-   `gh pr create --draft --body-file <path from mktemp>`
+   `gh pr create --draft --body-file <body file path>`
    - Never use `--body` for PR creation. The `#`-prefixed lines in the body
      trigger Claude Code's security pre-check, which cannot be bypassed by
      hooks. Always go through `--body-file`.
@@ -117,6 +110,10 @@ Once the review finishes, review the results:
 The code review is single-pass — do not re-run after fixes.
 `/pr-selfcheck` runs again in Phase 3 to catch inconsistencies
 introduced by review fix changes.
+
+When a fix is delegated to a subagent, arm a Monitor on the branch
+head (event-driven) instead of a fixed-delay wakeup, and tell the
+user what is being awaited before going idle.
 
 ### Phase 4: Finalize PR for review readiness
 
@@ -219,17 +216,12 @@ routine CI / comment events.
      (or `gh issue view <number> --json body --jq .body` for issues)
   1. Output a diff between the current body and the new body in the
      conversation (so what changed is visible and recoverable).
-  1. Generate a unique temp file path:
-     `mktemp --suffix=.md`
-     Run this as a standalone Bash command and read the output.
-     Then call the Read tool on that path once — `mktemp` creates an
-     empty file, and the Write tool requires the file be Read first if
-     it exists.
-  1. Write the new body to the generated path:
-     `Write(<path from mktemp>)`
+  1. Write the new body to a fresh file under the session scratchpad
+     directory using the Write tool (new filename per revision — no
+     temp-file generation, no Read of an empty file)
   1. Execute the edit:
-     `gh pr edit <number> --body-file <path from mktemp>`
-     (or `gh issue edit <number> --body-file <path from mktemp>`)
+     `gh pr edit <number> --body-file <body file path>`
+     (or `gh issue edit <number> --body-file <body file path>`)
   The goal is observability — always show the diff so the user can see
   what changed and recover manually-written content if accidentally
   overwritten.
