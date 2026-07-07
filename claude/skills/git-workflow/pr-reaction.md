@@ -10,13 +10,17 @@ when the author is a bot. Never touch anything with a human author
 autonomously — summarize to the user and wait for an explicit
 instruction.
 
-- Bot thread = every comment in it has `user.type == "Bot"`. Any single
-  human comment flips the thread to the human path.
-- Bot `NEW_TOP_COMMENT` / `NEW_REVIEW` = event line tag is `[BOT]`.
-- Known bot logins: `github-actions`, `dependabot`,
-  `copilot-pull-request-reviewer`, `renovate`.
-- `user.type == "User"` bots (`devin-ai-integration` etc.) go on the
-  human path.
+- Bot thread = every comment in it has REST `user.type == "Bot"`. Any
+  single `User`-type comment flips the thread to the human path — a
+  bot can open a thread that a human later joins.
+- Bot `NEW_TOP_COMMENT` / `NEW_REVIEW` = event line tag is `[BOT]`
+  (derived from GraphQL `author.__typename` in `bin/pr-monitor`; on
+  conflict with any other signal, the tag wins).
+- Author type is always taken from a live API response
+  (`user.type` / `__typename`), never assumed from a login name. The
+  same GitHub App can show a different login string per API — e.g.
+  GraphQL `author.login` omits the `[bot]` suffix that REST
+  `user.login` includes — so match on type, not on login text.
 
 ## Step 1: List and classify threads (read-only)
 
@@ -96,6 +100,8 @@ session. Switch to reply-only and notify the user.
   when later comments include a human.
 - Posting a top-level `gh pr comment` in place of a review-thread
   reply to bypass the bot-check.
+- Classifying an author from a remembered login string instead of a
+  live `user.type` / `__typename` lookup.
 
 ## References
 
