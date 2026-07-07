@@ -15,14 +15,9 @@ that behavior against primary sources before stating it.
   reliably under specific conditions
 - Stating how Claude Code itself behaves — skill auto-invocation
   triggers, `model:` frontmatter effects, subagent context
-  inheritance, hook execution, permission evaluation, and what the
-  user actually sees of a turn (tool inputs and Write file contents
-  are not rendered to the user) — is exactly as fact-checkable as
-  third-party tool behavior, and just as often wrong from unverified
-  recall. For which model actually served a turn, the session
-  jsonl's `.message.model` is the ground truth; the environment
-  identity string ("You are powered by …") is injected branding and
-  can disagree with the runtime.
+  inheritance, hook execution, permission evaluation, or what the
+  user actually sees of a turn (e.g., whether tool inputs or Write
+  file contents are rendered to the user)
 
 ## Verification sources, in priority order
 
@@ -30,6 +25,10 @@ that behavior against primary sources before stating it.
 2. Source code of the tool itself (`gh search code`, `gh api`,
    `deepwiki`, `context7`)
 3. Issues / discussions with reproducible reports
+
+For which model served a turn, prefer the session jsonl's
+`.message.model` over the environment identity string ("You are
+powered by …"); the two can disagree.
 
 If none of these can be verified, mark the claim as `要検証 / unverified`
 and either ask the user to verify with a clear "I have not confirmed
