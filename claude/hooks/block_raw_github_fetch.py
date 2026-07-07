@@ -49,7 +49,8 @@ def is_raw_github_fetch(command: str) -> bool:
 if __name__ == "__main__":
     try:
         data = json.load(sys.stdin)
-    except (json.JSONDecodeError, ValueError):
+    except (json.JSONDecodeError, ValueError) as e:
+        print(f"block_raw_github_fetch: stdin parse failed: {e}", file=sys.stderr)
         sys.exit(0)
 
     tool_name = data.get("tool_name", "")

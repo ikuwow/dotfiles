@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Ask before Write/Edit/NotebookEdit touches a tracked file on the default branch.
+"""Ask before Write/Edit/NotebookEdit touches a non-ignored path on the default branch.
 
 git-essentials.md ("Never create or edit files on the default branch")
 is a git-workflow precondition the model is expected to enforce on its
@@ -20,10 +20,14 @@ actually lands inside this repository's working tree.
 
 Every subprocess call is fail-open: a directory outside any git work
 tree, a detached HEAD, an unset ``origin/HEAD``, or a ``git`` binary
-that errors or times out all result in a silent ``exit(0)`` rather
-than a false "ask". The target path may not exist yet (Write creates
-new files), so git commands are anchored at the nearest existing
-ancestor directory instead of the path itself.
+that errors or times out all result in ``exit(0)`` rather than a false
+"ask". Expected fail-open cases (no work tree, detached HEAD, unset
+``origin/HEAD``) exit silently; anything unexpected (a bug in this
+hook, a git timeout) additionally prints a one-line stderr breadcrumb
+so hook logs can distinguish "rule not violated" from "hook broken".
+The target path may not exist yet (Write creates new files), so git
+commands are anchored at the nearest existing ancestor directory
+instead of the path itself.
 
 Spec: https://code.claude.com/docs/en/hooks
 """
@@ -79,7 +83,11 @@ def _run_git(args, cwd):
 def main():
     try:
         data = json.load(sys.stdin)
-    except (json.JSONDecodeError, ValueError):
+    except (json.JSONDecodeError, ValueError) as e:
+        print(
+            f"guard_default_branch_edits: stdin parse failed: {e}",
+            file=sys.stderr,
+        )
         sys.exit(0)
 
     tool_input = data.get("tool_input", {}) or {}
@@ -116,7 +124,8 @@ def main():
 
         result = _run_git(["rev-parse", "--show-toplevel"], start_dir)
         repo_root = result.stdout.strip() if result.returncode == 0 else start_dir
-    except Exception:
+    except Exception as e:
+        print(f"guard_default_branch_edits: check failed: {e!r}", file=sys.stderr)
         sys.exit(0)
 
     print(json.dumps({
@@ -124,11 +133,11 @@ def main():
             "hookEventName": "PreToolUse",
             "permissionDecision": "ask",
             "permissionDecisionReason": (
-                f"Write/Edit targets a tracked path on the default branch "
-                f"'{current}' of {repo_root}. git-essentials prohibits "
-                f"editing files on the default branch — branch first "
-                f"(invoke the git-workflow skill). Approve only if editing "
-                f"on the default branch is genuinely intended."
+                f"Write/Edit targets a non-ignored path on the default "
+                f"branch '{current}' of {repo_root}. git-essentials "
+                f"prohibits editing files on the default branch — branch "
+                f"first (invoke the git-workflow skill). Approve only if "
+                f"editing on the default branch is genuinely intended."
             ),
         },
     }))

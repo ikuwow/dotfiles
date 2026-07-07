@@ -157,11 +157,17 @@ def strip_code_spans(text):
 
 
 def collect_current_turn_assistant_text(events):
-    """Concatenate assistant text emitted since the last real user message.
+    """Collect assistant text blocks emitted since the last real user message.
 
     Walks events backward. Stops at a real user message. user events
     whose content is purely tool_result blocks are tool-call re-entries
     and are skipped, not treated as turn boundaries.
+
+    Returns a list of per-block strings (reverse-walk order) rather
+    than one joined string, so strip_code_spans can be applied per
+    block: joining first would let an unpaired fence in one block
+    silently swallow the prose — and any banned phrase — of every
+    other block.
 
     Single-turn capture:
 
@@ -172,7 +178,7 @@ def collect_current_turn_assistant_text(events):
     ...     ]}},
     ... ]
     >>> collect_current_turn_assistant_text(events)
-    '正直そう思う'
+    ['正直そう思う']
 
     Tool-call re-entry does not end the turn; both text blocks are
     captured (in reverse-walk order):
@@ -193,7 +199,7 @@ def collect_current_turn_assistant_text(events):
     ...     ]}},
     ... ]
     >>> collect_current_turn_assistant_text(events)
-    'second\\nfirst'
+    ['second', 'first']
 
     A real user message ends the scan; older turns are not captured:
 
@@ -207,12 +213,12 @@ def collect_current_turn_assistant_text(events):
     ...     ]}},
     ... ]
     >>> collect_current_turn_assistant_text(events)
-    'current'
+    ['current']
 
     Empty input:
 
     >>> collect_current_turn_assistant_text([])
-    ''
+    []
 
     Malformed events are skipped silently — system events, assistant
     messages with missing or null content, etc. — so the hook does not
@@ -230,7 +236,7 @@ def collect_current_turn_assistant_text(events):
     ...     ]}},
     ... ]
     >>> collect_current_turn_assistant_text(events)
-    '正直そう思う'
+    ['正直そう思う']
     """
     texts = []
     for event in reversed(events):
@@ -249,7 +255,7 @@ def collect_current_turn_assistant_text(events):
         for block in event.get("message", {}).get("content", []) or []:
             if isinstance(block, dict) and block.get("type") == "text":
                 texts.append(block.get("text", ""))
-    return "\n".join(texts)
+    return texts
 
 
 def main():
@@ -274,9 +280,9 @@ def main():
         print(f"block_excuse_phrases: transcript read failed: {e}", file=sys.stderr)
         sys.exit(0)
 
-    text = collect_current_turn_assistant_text(events)
+    blocks = collect_current_turn_assistant_text(events)
 
-    if not text:
+    if not blocks:
         poll_start = time.monotonic()
         last_err = None
         for _ in range(POLL_MAX_ITERATIONS):
@@ -287,11 +293,11 @@ def main():
             except (OSError, json.JSONDecodeError) as e:
                 last_err = e
                 continue
-            text = collect_current_turn_assistant_text(events)
-            if text:
+            blocks = collect_current_turn_assistant_text(events)
+            if blocks:
                 break
 
-        if not text:
+        if not blocks:
             elapsed_ms = int((time.monotonic() - poll_start) * 1000)
             err_suffix = f" last_err={last_err!r}" if last_err else ""
             print(
@@ -301,7 +307,7 @@ def main():
             )
             sys.exit(0)
 
-    if is_forbidden(strip_code_spans(text)):
+    if any(is_forbidden(strip_code_spans(block)) for block in blocks):
         print(json.dumps({"decision": "block", "reason": REASON}))
     sys.exit(0)
 
