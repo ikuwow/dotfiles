@@ -38,7 +38,7 @@ pre-commit run --all-files
 
 ## Git Workflow
 
-- Always create a branch before making changes (direct commits to main are prohibited)
+- Always create a branch before making changes. When the user explicitly requests direct work on main, proceed after the default-branch guard hook's first deny — its retry is sanctioned for the rest of the session
 - Do NOT create git worktrees — branch only, no worktree
 - Clean up unused local branches (merged, squash-merged, or upstream gone) and stale worktree entries with `bin/git-cleanup-branches`. Plain `git branch -d` rejects squash-merged branches as "not fully merged"
 - The working tree may be shared by multiple concurrent Claude Code

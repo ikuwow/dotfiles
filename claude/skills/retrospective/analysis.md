@@ -102,6 +102,9 @@ Choose the placement based on who benefits:
 - Personal habits or preferences → global `AIRULES.md` or `~/.claude/rules/` (tag: global)
 - Memory is for recording facts only. It must not be used as a mechanism
   for behavior change (see Prohibited Countermeasures below).
+- Choose placement by scope only. When the scope-correct file is at
+  its line budget, propose raising the budget or trimming that file —
+  never relocate the rule to a different tier to fit the budget
 
 ## Prohibited Countermeasures
 
