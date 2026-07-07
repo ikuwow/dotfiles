@@ -6,9 +6,14 @@ AIRULES.md (the 「正直」「本当のところ」「ぶっちゃけ」 ban un
 or qualifies an opinion).
 The model knows the rule but slips. A literal substring match cannot
 disambiguate legitimate uses (名詞 like 「正直者」), so this hook does
-not try. It blocks at most once per Stop chain: the second invocation
-arrives with stop_hook_active=true and is allowed through, preventing
-infinite loops.
+not try. It does exclude one legitimate case: text inside backtick
+code spans (inline `...` or fenced ``` blocks) is a *mention*, not a
+*use*, of the phrase (e.g. quoting it in a retrospective Problem
+line), so it is stripped before matching. Other legitimate uses
+remain accepted false positives, pinned below. It blocks at most once
+per Stop chain: the second invocation arrives with
+stop_hook_active=true and is allowed through, preventing infinite
+loops.
 
 I/O failures (stdin parse, missing transcript_path, transcript read,
 poll timeout) are swallowed and the hook exits 0 — a Stop hook that
@@ -48,7 +53,10 @@ REASON = (
     "The damage is retroactive (it taints prior statements) and "
     "prospective (it taints future ones), and it cannot be unplanted. "
     "「本当のところ」「ぶっちゃけ」 carry the same structural harm.\n\n"
-    "Judge your own usage and rewrite if it was 断り書き."
+    "Judge your own usage and rewrite if it was 断り書き.\n\n"
+    "When you need to mention (not use) a banned phrase — e.g. quoting "
+    "it in a retrospective Problem line — wrap it in backticks so this "
+    "hook can tell mention from use."
 )
 
 
@@ -79,6 +87,73 @@ def is_forbidden(text):
     False
     """
     return bool(FORBIDDEN_PATTERN.search(text))
+
+
+_FENCE_RE = re.compile(r"^(```|~~~)")
+_INLINE_CODE_RE = re.compile(r"`[^`]*`")
+
+
+def _strip_inline_code(line):
+    """Remove paired inline backtick spans from a single line.
+
+    A trailing unpaired backtick truncates the rest of the line —
+    there is no closing backtick to pair with, so everything after it
+    is inside an unterminated span and is dropped rather than risking
+    a false match on the fragment that follows.
+    """
+    line = _INLINE_CODE_RE.sub("", line)
+    if line.count("`") % 2 == 1:
+        line = line[: line.rfind("`")]
+    return line
+
+
+def strip_code_spans(text):
+    """Remove fenced code blocks and inline backtick spans from text.
+
+    Code spans are a *mention*, not a *use*, of a phrase — quoting a
+    banned phrase in backticks to talk about it (e.g. a retrospective
+    Problem line) should not trip the hook the way actually using it
+    as 断り書き would.
+
+    Banned phrase inside an inline backtick span is removed, the rest
+    of the line is kept:
+
+    >>> strip_code_spans("説明: `正直`は禁止らしい")
+    '説明: は禁止らしい'
+
+    Banned phrase inside a fenced code block is removed, fences
+    included:
+
+    >>> strip_code_spans("before\\n```\\n正直\\n```\\nafter")
+    'before\\nafter'
+
+    Banned phrase outside any code span is preserved:
+
+    >>> strip_code_spans("正直それは無理やと思う")
+    '正直それは無理やと思う'
+
+    An unpaired trailing fence is treated as an unterminated code
+    block: everything from the fence onward is dropped rather than
+    risking a false negative on unterminated content:
+
+    >>> strip_code_spans("before\\n```\\n正直")
+    'before'
+
+    An unpaired trailing backtick truncates the line at the backtick:
+
+    >>> strip_code_spans("正直 before ` after")
+    '正直 before '
+    """
+    out_lines = []
+    in_fence = False
+    for line in text.split("\n"):
+        if _FENCE_RE.match(line.strip()):
+            in_fence = not in_fence
+            continue
+        if in_fence:
+            continue
+        out_lines.append(_strip_inline_code(line))
+    return "\n".join(out_lines)
 
 
 def collect_current_turn_assistant_text(events):
@@ -226,7 +301,7 @@ def main():
             )
             sys.exit(0)
 
-    if is_forbidden(text):
+    if is_forbidden(strip_code_spans(text)):
         print(json.dumps({"decision": "block", "reason": REASON}))
     sys.exit(0)
 
