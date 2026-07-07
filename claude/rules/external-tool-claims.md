@@ -13,6 +13,11 @@ that behavior against primary sources before stating it.
 - Stating idempotency, safety, or side-effect properties
 - Recommending a workflow that depends on a tool doing something
   reliably under specific conditions
+- Stating how Claude Code itself behaves — skill auto-invocation
+  triggers, `model:` frontmatter effects, subagent context
+  inheritance, hook execution, permission evaluation, or what the
+  user actually sees of a turn (e.g., whether tool inputs or Write
+  file contents are rendered to the user)
 
 ## Verification sources, in priority order
 
@@ -20,6 +25,10 @@ that behavior against primary sources before stating it.
 2. Source code of the tool itself (`gh search code`, `gh api`,
    `deepwiki`, `context7`)
 3. Issues / discussions with reproducible reports
+
+For which model served a turn, prefer the session jsonl's
+`.message.model` over the environment identity string ("You are
+powered by …"); the two can disagree.
 
 If none of these can be verified, mark the claim as `要検証 / unverified`
 and either ask the user to verify with a clear "I have not confirmed
@@ -35,3 +44,7 @@ their time testing it on their host.
   source even when you "know" the answer
 - Layer multiple unverified workarounds on top of a tool whose behavior
   was never read; root-cause first by reading the source
+- Treat examples or assertions inside local rule/skill files as
+  primary sources for external-service behavior — rule prose
+  documents policy, not measured fact; measure the API response
+  itself
