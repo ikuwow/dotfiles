@@ -52,6 +52,7 @@
       "Bash(gh issue list *)",
       "Bash(gh issue create *)",
       "Bash(gh api *)",
+      "Bash(gh extension list)",
       "Bash(docker compose ps *)",
       "Bash(terraform validate *)",
       "Bash(terraform validate)",
