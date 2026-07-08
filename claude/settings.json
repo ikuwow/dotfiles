@@ -374,6 +374,17 @@
         ]
       }
     ],
+    "PostToolUse": [
+      {
+        "matcher": "ExitPlanMode",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PostToolUse\",\"additionalContext\":\"If this plan involves implementation beyond a trivial edit, dispatch the implementer subagent per the implementation-delegation rule.\"}}'"
+          }
+        ]
+      }
+    ],
     "PermissionRequest": [
       {
         "matcher": "Bash",
