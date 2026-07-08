@@ -335,6 +335,7 @@
       "Bash(copilot update *)"
     ]
   },
+  "model": "claude-fable-5[1m]",
   "hooks": {
     "UserPromptSubmit": [
       {
@@ -370,6 +371,17 @@
           {
             "type": "command",
             "command": "f=~/.claude/hooks/guard_default_branch_edits.py; if [ -f \"$f\" ] && command -v python3 >/dev/null; then python3 \"$f\"; fi"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "ExitPlanMode",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PostToolUse\",\"additionalContext\":\"Plan approved: if the plan involves implementation beyond a trivial edit, dispatch the implementer subagent per the implementation-delegation rule.\"}}'"
           }
         ]
       }
@@ -476,7 +488,6 @@
   },
   "effortLevel": "high",
   "advisorModel": "fable",
-  "model": "claude-opus-4-7[1m]",
   "autoUpdatesChannel": "stable",
   "tui": "default",
   "autoMemoryEnabled": false,
