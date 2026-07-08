@@ -335,7 +335,7 @@
       "Bash(copilot update *)"
     ]
   },
-  "model": "claude-fable-5[1m]",
+  "model": "claude-opus-4-7[1m]",
   "hooks": {
     "UserPromptSubmit": [
       {
