@@ -380,7 +380,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PostToolUse\",\"additionalContext\":\"Plan approved: if the plan involves implementation beyond a trivial edit, dispatch the implementer subagent per the implementation-delegation rule.\"}}'"
+            "command": "echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PostToolUse\",\"additionalContext\":\"If this plan involves implementation beyond a trivial edit, dispatch the implementer subagent per the implementation-delegation rule.\"}}'"
           }
         ]
       }

@@ -21,8 +21,9 @@ of implementing in the main session.
 
 ## Ordering
 
-- Complete branch setup (git workflow Step 1) before dispatching; the
-  subagent must not create branches or worktrees
+- Complete branch setup (pull the default branch, create the feature
+  branch) before dispatching; the subagent must not create branches or
+  worktrees
 
 ## Review of the subagent's work
 
