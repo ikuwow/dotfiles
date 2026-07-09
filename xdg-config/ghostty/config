@@ -25,7 +25,7 @@ font-size = 12
 font-feature = -calt, -liga, -dlig
 
 # Do not dim unfocused splits
-unfocused-split-opacity = 1
+unfocused-split-opacity = 0.85
 
 # Shift+Enter keybind for Claude Code
 # Ref: https://github.com/ghostty-org/ghostty/discussions/7419
