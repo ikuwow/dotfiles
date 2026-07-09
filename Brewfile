@@ -1,6 +1,6 @@
 # rubocop:disable all
 
-tap "homebrew/autoupdate"
+tap "homebrew/autoupdate", trusted: true
 tap "ikuwow/ikuwow-sshrc", trusted: true
 tap "Songmu/tap", trusted: true
 tap "fujiwara/tap", trusted: true
