@@ -145,8 +145,11 @@ for the user to remind you. Use the section 5 procedure
 
 ### Phase 5: Watch PR activity until merge
 
-After Phase 4 completes, arm a persistent `Monitor` running
-`pr-monitor <PR number>`. It polls every 60s and emits one stdout line
+Arm the persistent `Monitor` running `pr-monitor <PR number>` in the
+same turn you surface Phase 4 completion — before handing control back
+to the user and before they flip the PR to ready. `READY_FOR_REVIEW`
+is itself a monitored event, so an arm deferred until after the ready
+flip can never observe it. It polls every 60s and emits one stdout line
 per actionable change; quiet periods stay silent.
 
 1. Event lines:
