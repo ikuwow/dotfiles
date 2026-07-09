@@ -111,9 +111,12 @@ The code review is single-pass — do not re-run after fixes.
 `/pr-selfcheck` runs again in Phase 3 to catch inconsistencies
 introduced by review fix changes.
 
-When a fix is delegated to a subagent, arm a Monitor on the branch
-head (event-driven) instead of a fixed-delay wakeup, and tell the
-user what is being awaited before going idle.
+Never end a turn that claims ongoing waiting (delegated fix push,
+CI run, CI rerun, external state change) without an armed event
+source — a Monitor on the branch head, or `gh pr checks --watch`
+with `run_in_background: true`. After every `gh run rerun` or other
+re-kick, re-arm the watch before yielding. State what is being
+awaited in the final message before going idle.
 
 ### Phase 4: Finalize PR for review readiness
 

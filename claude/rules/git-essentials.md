@@ -12,16 +12,13 @@ correct. (Truly trivial fixes that don't warrant Plan Mode at all
 are a separate judgment call — see EnterPlanMode's own criteria.)
 
 The full procedure (worktree setup, PR body rules, CI phases,
-monitoring, cleanup) lives in the git-workflow skill, which Claude
-loads automatically based on its own description when the task
-matches — this rule does not control that; it only names where the
-detail lives. Plans MUST NOT restate the detailed procedures from
-the skill. If the skill doesn't trigger on its own, invoke it
-explicitly (`Skill(git-workflow)` or `/git-workflow`) rather than
-improvising the flow from this checklist alone.
+monitoring, cleanup) lives in the git-workflow skill. Plans MUST
+NOT restate the detailed procedures from the skill.
 
 ## Workflow checklist
 
+- Step 0: invoke `Skill(git-workflow)` (or `/git-workflow`) before
+  Step 1 — do not improvise the flow from this checklist alone
 - Step 1: pull default branch, create branch
   (`git-worktree-create <branch>`, or `git checkout -b` where
   project rules prohibit worktrees)
