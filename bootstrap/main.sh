@@ -67,6 +67,7 @@ brew bundle
 echo
 
 gh extension install agynio/gh-pr-review
+gh extension install dlvhdr/gh-dash
 echo
 
 scripts/configure_brew.sh
