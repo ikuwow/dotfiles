@@ -31,6 +31,10 @@ gh pr-review review view -R <owner>/<repo> <number> \
   --unresolved --not_outdated --include-comment-node-id
 ```
 
+`gh api` is required here: the `gh pr-review` extension does not
+expose `user.type` on review comments (no equivalent flag), and no
+high-level `gh pr` subcommand returns per-line review comments.
+
 ```bash
 gh api /repos/<owner>/<repo>/pulls/<number>/comments \
   --jq '.[] | {node_id, user_login: .user.login, user_type: .user.type}'
