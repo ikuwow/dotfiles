@@ -29,7 +29,7 @@ Compute the current session's transcript path. The Session ID is
 already substituted below when this SKILL.md loads:
 
 - Session ID: `${CLAUDE_SESSION_ID}`
-- Munged cwd: run `pwd | sed 's|/|-|g'` (every `/` becomes `-`, so a
+- Munged cwd: run `pwd | tr '/' '-'` (every `/` becomes `-`, so a
   leading `/` becomes a leading `-`)
 - Full path: `$HOME/.claude/projects/<munged-cwd>/<session-id>.jsonl`
 
