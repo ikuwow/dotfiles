@@ -7,8 +7,10 @@ in-memory session context during the first pass, and a Fable
 subagent, which applies it to spot-checked transcript slices during
 review.
 
-Analyze the provided session transcript and past retrospective issues,
-then produce a list of problem behaviors with structural countermeasures.
+Analyze the session's interaction record — in-memory session context
+for the main first pass, sampled transcript slices for the Fable
+review — and past retrospective issues, then produce a list of
+problem behaviors with structural countermeasures.
 
 Focus on the interaction process, not on the task content itself.
 
@@ -155,15 +157,16 @@ This section applies to Fable during Step 2; the main session does
 not read the transcript in Step 1.
 
 The jsonl is one JSON object per line and can be large (hundreds of
-KB) with verbose noise — full tool outputs, injected CLAUDE.md /
-system-reminder blocks, permission prompts. Do not let the noise bury
-the reasoning.
+KB to several MB) with verbose noise — full tool outputs, injected
+CLAUDE.md / system-reminder blocks, permission prompts. Do not read
+the whole file, regardless of size — always slice-sample.
 
-- For a small file, read it directly
-- For a large file, use Bash (`wc -l`, `jq`, `tail`) to extract the
-  signal: user turns, the assistant's own text and reasoning, tool
-  calls and their key results. Skip or skim bulk tool output and
-  repeated system reminders
+- Use Bash (`wc -l`, `jq`, `grep`, `tail`) to extract targeted slices
+  covering user turns, the assistant's own text and reasoning, tool
+  calls and their key results, and hook / Stop events
+- Skip or skim bulk tool output and repeated system reminders
 - The transcript may not include the currently-in-progress turn (the
-  one that triggered this retrospective). If so, note it in your
-  output; do not fabricate content for it.
+  one that triggered this retrospective); when the digest describes
+  behavior from that turn but the sampled slices do not confirm it,
+  return `unverifiable` for that finding rather than `reject` — see
+  the verdict schema in SKILL.md's Step 2

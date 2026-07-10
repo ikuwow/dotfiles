@@ -97,11 +97,12 @@ For each initial finding, return one of these verdicts:
 - confirm — the finding and the digest line up with the sampled transcript; keep as-is
 - adjust — the finding is directionally right but severity, scope, destination, or countermeasure needs a change; state the change
 - reject — the finding is not supported by the sampled transcript or the digest misrepresents what happened; state why
+- unverifiable — the digest attributes the finding to the currently-in-progress turn (the one that triggered this retrospective), which is not yet in the transcript; withhold judgment rather than reject on missing evidence
 
 Format each verdict as:
 
 ## <finding number/title>
-Verdict: confirm / adjust / reject
+Verdict: confirm / adjust / reject / unverifiable
 Reason: <one line>
 Adjusted finding: <only when Verdict is adjust — state the corrected fields>
 
@@ -128,6 +129,7 @@ Apply each Step 2 verdict to its finding:
 - confirm — keep the finding as-is
 - reject — drop the finding
 - adjust — replace the finding with Fable's adjusted version
+- unverifiable — keep the finding as-is and tag it as unverifiable so Step 4 can note the caveat in AskUserQuestion; do not treat this as dissent
 
 When main disagrees with a reject or adjust and keeps a version
 closer to its own Step 1 finding, record Fable's dissent (its verdict
