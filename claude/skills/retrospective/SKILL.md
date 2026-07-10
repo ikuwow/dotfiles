@@ -93,7 +93,20 @@ For each finding, ask via AskUserQuestion using the choices below.
 - Global finding: `create issue` / `skip` / `Other` — no `apply now`,
   because the weekly-improvement routine consumes global issues, and
   editing dotfiles-managed files from a project session would bypass
-  the dotfiles branch/PR workflow
+  the dotfiles branch/PR workflow; when the session cwd is the
+  dotfiles repo itself the bypass rationale does not hold, but keep
+  the ban for consistency and use `Other` for a manual dotfiles-side edit
+
+`apply now` branch gate (project-specific only):
+
+- Refuse when HEAD is on the default branch of the current repo
+  (detect via `git symbolic-ref refs/remotes/origin/HEAD` and compare
+  to `git rev-parse --abbrev-ref HEAD`), and tell the user to
+  `create issue` or `skip` instead
+- On a feature branch, write files but do NOT commit, then print
+  the exact paths written and warn that the changes land in the
+  current branch's working tree — commit or discard per the branch's
+  PR intent
 
 `apply now` (project-specific only), by destination:
 
@@ -108,6 +121,11 @@ For each finding, ask via AskUserQuestion using the choices below.
 
 `create issue`:
 
+- Batch by scope: all approved global findings become one issue in
+  `ikuwow/dotfiles`, and all approved project findings become one
+  issue in the current cwd's repo — never one issue per finding,
+  since the weekly-improvement routine and project maintainers
+  consume session-level issues
 - Global → `ikuwow/dotfiles`, label `retrospective`, via
   `--body-file` (never `--body`), title
   `Retrospective: <date> <one-line session summary>` (sanitized as
@@ -117,10 +135,10 @@ For each finding, ask via AskUserQuestion using the choices below.
   retry
 - Project-specific → the current cwd's repository, via
   `--body-file`, no label
-- Either way, the issue body includes the finding's `Destination:`
-  tag and the concrete countermeasure content so the
+- The issue body lists each included finding with its `Destination:`
+  tag and the concrete countermeasure content, so the
   weekly-improvement routine (or the project's own maintainers) can
-  act on it directly
+  act on each item directly
 
 `skip`: drop the finding, no record.
 
