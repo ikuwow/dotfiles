@@ -90,19 +90,27 @@ context.
 For each finding, ask via AskUserQuestion using the choices below.
 
 - Project-specific finding: `apply now` / `create issue` / `skip` / `Other`
-- Global finding: `create issue` / `skip` / `Other` — no `apply now`,
-  because the weekly-improvement routine consumes global issues, and
-  editing dotfiles-managed files from a project session would bypass
-  the dotfiles branch/PR workflow; when the session cwd is the
-  dotfiles repo itself the bypass rationale does not hold, but keep
-  the ban for consistency and use `Other` for a manual dotfiles-side edit
+- Global finding: `create issue` / `skip` / `Other` — no `apply now`
+  - The weekly-improvement routine consumes global issues, so
+    silently applying them here would skip that queue
+  - Editing dotfiles-managed files from an arbitrary project
+    session would bypass the dotfiles branch/PR workflow
+  - When the session cwd is the dotfiles repo itself, the bypass
+    rationale does not hold; keep the ban for consistency and use
+    `Other` for a manual dotfiles-side edit
 
 `apply now` branch gate (project-specific only):
 
-- Refuse when HEAD is on the default branch of the current repo
-  (detect via `git symbolic-ref refs/remotes/origin/HEAD` and compare
-  to `git rev-parse --abbrev-ref HEAD`), and tell the user to
+- Refuse when HEAD is on the default branch of the current repo,
+  detected with the two commands below (both emit the short branch
+  name, so a direct string equality holds), and tell the user to
   `create issue` or `skip` instead
+
+```
+current=$(git rev-parse --abbrev-ref HEAD)
+default=$(git symbolic-ref --short refs/remotes/origin/HEAD | sed 's|^origin/||')
+[ "$current" = "$default" ] && refuse
+```
 - On a feature branch, write files but do NOT commit, then print
   the exact paths written and warn that the changes land in the
   current branch's working tree — commit or discard per the branch's
@@ -140,9 +148,9 @@ For each finding, ask via AskUserQuestion using the choices below.
   weekly-improvement routine (or the project's own maintainers) can
   act on each item directly
 
-`skip`: drop the finding, no record.
+`skip` — drop the finding with no record.
 
-`Other`: follow the user's free-text instruction.
+`Other` — follow the user's free-text instruction.
 
 ### Prompt fatigue mitigation
 
