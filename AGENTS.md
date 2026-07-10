@@ -79,6 +79,7 @@ This repository is a personal dotfiles repo. Scripts here may assume:
 Reviewer agents (silent-failure-hunter, pr-test-analyzer, etc.) are
 calibrated for production code and will recommend defensive handlers
 and test coverage that are over-engineering for personal-dotfiles
-scope. Weigh those recommendations against this section before
-accepting them — and when in doubt, prefer the simpler version and
-let the user push back if it's wrong.
+scope. This governs how you weigh their findings (decline
+recommendations you judge over-engineered), never whether to run the
+review phases themselves — the git-workflow skill's phase pre-
+authorization is not overridable by this section.
