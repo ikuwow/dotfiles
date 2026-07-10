@@ -23,6 +23,13 @@ Prerequisite: the `agynio/gh-pr-review` gh extension is installed
 - Phase 2 code review and Phase 5 Monitor arming are pre-authorized —
   run them without pausing for confirmation. The only user decision
   point in the flow is flipping the PR from draft to ready for review.
+- Do not decide whether to run or skip any phase yourself. Signals like
+  a light interaction pattern, brevity of user messages, a small diff,
+  or personal-project scope are not permission to skip — they only
+  affect how you weigh findings within a phase. The only override to
+  the pre-authorization above is an explicit user instruction that
+  names a stopping point ("stop after creating the draft PR", "skip
+  Phase 2 for this PR", "no Monitor"). Absent that, run every phase.
 - Never create or edit files on the default branch. Always move into the
   worktree (or feature branch) first. Creating files before branching
   leads to redundant copy-and-delete work.
