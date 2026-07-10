@@ -1,5 +1,12 @@
 # Retrospective analysis instructions
 
+## Reader context
+
+This file has two consumers: the main session, which applies it to
+in-memory session context during the first pass, and a Fable
+subagent, which applies it to spot-checked transcript slices during
+review.
+
 Analyze the provided session transcript and past retrospective issues,
 then produce a list of problem behaviors with structural countermeasures.
 
@@ -143,6 +150,9 @@ If there are no significant problem behaviors in the session, say so in
 one line and stop.
 
 ## Reading the transcript
+
+This section applies to Fable during Step 2; the main session does
+not read the transcript in Step 1.
 
 The jsonl is one JSON object per line and can be large (hundreds of
 KB) with verbose noise — full tool outputs, injected CLAUDE.md /
