@@ -168,11 +168,14 @@ additions, each carrying dissent where present) move to Step 4.
 
 ## Step 4: Route findings by scope
 
-Take the subagent's output verbatim. Each finding carries a `Scope`
-(`global` / `project-specific`) tag and a `Destination`
+Take the finalized findings from Step 3. Each finding carries a
+`Scope` (`global` / `project-specific`) tag and a `Destination`
 (`existing-rule-edit` / `existing-skill-update` / `mechanize` /
-`new-rule` / `new-skill`) tag from Step 1. Ask the user how to route
-each finding — do not auto-file or auto-apply anything.
+`new-rule` / `new-skill`) tag — originally set in Step 1 and possibly
+adjusted in Steps 2-3. Ask the user how to route each finding — do
+not auto-file or auto-apply anything. Where a finding carries recorded
+Fable dissent (main kept a version Fable rejected or adjusted), show
+both versions in the AskUserQuestion so the user arbitrates.
 
 ### Sanitize global findings before filing as an issue
 
