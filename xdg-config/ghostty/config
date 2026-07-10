@@ -19,6 +19,7 @@ quick-terminal-position = center
 quick-terminal-size = 1080px, 50%
 
 font-family = "Monaco"
+font-family = "BIZ UDGothic Bold"
 font-style = Regular
 font-size = 12
 # Disable ligatures
