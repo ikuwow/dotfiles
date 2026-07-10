@@ -175,9 +175,15 @@ Take the finalized findings from Step 3. Each finding carries a
 (`existing-rule-edit` / `existing-skill-update` / `mechanize` /
 `new-rule` / `new-skill`) tag — originally set in Step 1 and possibly
 adjusted in Steps 2-3. Ask the user how to route each finding — do
-not auto-file or auto-apply anything. Where a finding carries recorded
-Fable dissent (main kept a version Fable rejected or adjusted), show
-both versions in the AskUserQuestion so the user arbitrates.
+not auto-file or auto-apply anything.
+
+Every AskUserQuestion prompt for a finding must include a compact
+Fable summary line — verdict plus the one-line reason from Step 2 —
+regardless of whether main accepted or overrode the verdict, so the
+user sees the outside review before choosing the route. When main
+kept a version Fable rejected or adjusted (recorded dissent), also
+show Fable's proposed version alongside main's kept version so the
+user arbitrates between the two.
 
 ### Sanitize global findings before filing as an issue
 
