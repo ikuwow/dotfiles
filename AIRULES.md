@@ -79,7 +79,7 @@
 - 通常のWebサイトよりもプレーンテキスト・Markdownファイルの取得を優先する
 - GitHubの操作はコーディングタスクの場合 `gh` コマンドを使う。ghが使えない環境やghで実現できない操作の場合のみ `raw.githubusercontent.com` 等を使ってよい
 - `gh` の中では高レベルサブコマンド（`gh pr view` / `gh pr diff` / `gh pr checks` / `gh issue view` / `gh run view` 等）を優先する。特にPRレビュー・レビューコメント・レビュースレッドの取得や操作は `gh pr-review` 拡張（`agynio/gh-pr-review`）を使う
-- 他リポのファイル本文取得は `gh api repos/OWNER/REPO/contents/PATH -H "Accept: application/vnd.github.raw"` を使う（`?ref=<branch>` でref指定可）。これは `gh` の高レベルサブコマンドで表現できない代表例で、他の `gh api` 用途（`gh api graphql -f query=...` 等）はこれらで実現できない操作に限定する
+- 他リポのファイル本文取得は `gh api repos/OWNER/REPO/contents/PATH -H "Accept: application/vnd.github.raw"` を使う（`?ref=<branch>` でref指定可）。これは `gh` の高レベルサブコマンドで表現できない代表例で、他の `gh api` 用途（`gh api graphql -f query=...` 等）は高レベルサブコマンド・`gh pr-review`・この contents shape のいずれでも表現できない操作に限定する
 - IDE連携のMCPサーバー（コードインデックス・シンボル解決・静的解析等）が接続されている時は、コード検索・ナビゲーション・解析にその読み取り系ツールを優先する（ユーザーの明示は不要）
 - OSS・ライブラリ・ツール等を提案・採用する前にGitHubリポジトリ等で最終コミット・リリース・archive有無・issue/PR対応を確認する（README・履歴レベルで止める）。3年以上更新なし / archive済みは積極採用せず、確認結果を採用可否の根拠とし未確認なら「未確認」とする。用途が単純なら自前実装・forkも選択肢に含める
 

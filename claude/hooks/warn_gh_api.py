@@ -15,9 +15,10 @@ whitespace collapsed to a single space).
 Session state is tracked in ``~/.claude/state/gh_api_warned_<session_id>.json``.
 Set ``ENABLE_GH_API_WARNING=0`` to disable.
 
-Commands where every ``gh api`` segment is a read of the contents endpoint
-(``gh api repos/OWNER/REPO/contents/PATH``, no write flags) are allowlisted
-and pass through without a deny on the first occurrence.
+Commands where every ``gh api`` segment is either a read of the contents
+endpoint (``gh api repos/OWNER/REPO/contents/PATH``, no write flags) or a
+help query (``gh api --help`` / ``gh api -h``) are allowlisted and skip the
+warning entirely.
 
 Spec: https://docs.anthropic.com/en/docs/claude-code/hooks
 """
@@ -165,7 +166,95 @@ def detect_gh_api(command: str) -> bool:
 
 
 _CONTENTS_RE = re.compile(r"repos/[^/\s]+/[^/\s]+/contents/[^\s]+")
-_WRITE_FLAGS = {"-X", "--method", "-f", "--field", "-F", "--raw-field", "--input"}
+_WRITE_SHORT = ("-X", "-f", "-F")
+_WRITE_LONG = ("--method", "--field", "--raw-field", "--input")
+_HELP_FLAGS = {"-h", "--help"}
+
+
+def _is_write_flag(tok: str) -> bool:
+    """Return True if ``tok`` is a ``gh api`` write flag in any form pflag accepts.
+
+    Handles space-separated (``-X PUT``, ``--method PUT``), attached short
+    (``-XPUT``, ``-fkey=val``), and ``=``-suffixed long (``--method=PUT``,
+    ``--field=key=val``) forms.
+
+    >>> _is_write_flag("-X")
+    True
+    >>> _is_write_flag("-XPUT")
+    True
+    >>> _is_write_flag("-fmessage=abc")
+    True
+    >>> _is_write_flag("-Fcontent=@file")
+    True
+    >>> _is_write_flag("--method")
+    True
+    >>> _is_write_flag("--method=PUT")
+    True
+    >>> _is_write_flag("--field=key=val")
+    True
+    >>> _is_write_flag("--raw-field=k=v")
+    True
+    >>> _is_write_flag("--input=-")
+    True
+    >>> _is_write_flag("-H")
+    False
+    >>> _is_write_flag("repos/foo/bar/contents/x")
+    False
+    """
+    for sf in _WRITE_SHORT:
+        if tok == sf or (tok.startswith(sf) and len(tok) > len(sf)):
+            return True
+    for lf in _WRITE_LONG:
+        if tok == lf or tok.startswith(lf + "="):
+            return True
+    return False
+
+
+def _iter_gh_api_rest(command: str):
+    """Yield the token list after ``api`` for each ``gh api`` segment in ``command``.
+
+    Yields ``None`` on a shlex parse failure to signal the caller should
+    bail. Segments that are not ``gh api`` invocations are skipped
+    silently. Mirrors ``detect_gh_api``'s walker semantics (first token
+    ``gh``, then skipping ``-``-prefixed flag tokens until the first
+    non-flag token equals ``api``).
+
+    >>> list(_iter_gh_api_rest("gh api repos/foo/bar"))
+    [['repos/foo/bar']]
+    >>> list(_iter_gh_api_rest('gh api -H "Accept: x" repos/foo/bar'))
+    [['-H', 'Accept: x', 'repos/foo/bar']]
+    >>> list(_iter_gh_api_rest("gh pr view 1"))
+    []
+    >>> list(_iter_gh_api_rest("mkdir d && gh api repos/foo/bar"))
+    [['repos/foo/bar']]
+    >>> list(_iter_gh_api_rest("gh api 'unterminated"))
+    [None]
+    """
+    for seg in _split_outside_quotes(command):
+        seg = seg.strip()
+        if not seg:
+            continue
+        if not re.match(r"gh(\s|$)", seg):
+            continue
+        try:
+            tokens = shlex.split(seg)
+        except ValueError:
+            yield None
+            return
+        if len(tokens) < 2:
+            continue
+
+        api_index = None
+        for idx, token in enumerate(tokens[1:], start=1):
+            if token.startswith("-"):
+                continue
+            if token == "api":
+                api_index = idx
+            break
+        if api_index is None:
+            continue
+
+        yield tokens[api_index + 1:]
 
 
 def is_contents_read(command: str) -> bool:
@@ -185,16 +274,30 @@ def is_contents_read(command: str) -> bool:
     NOT detected — non-contents endpoint, or graphql:
     >>> is_contents_read("gh api repos/foo/bar/pulls/123")
     False
-    >>> is_contents_read("gh api graphql -f query='...'")
+    >>> is_contents_read("gh api graphql")
     False
 
-    NOT detected — write flags present:
+    NOT detected — write flags present (space-separated forms):
     >>> is_contents_read(
     ...     "gh api repos/foo/bar/contents/x.md -X PUT "
     ...     "-f message=... -f content=..."
     ... )
     False
     >>> is_contents_read("gh api repos/foo/bar/contents/x.md -f sha=abc")
+    False
+    >>> is_contents_read("gh api repos/foo/bar/contents/x.md --method PUT")
+    False
+
+    NOT detected — write flags present (attached-value / ``=`` forms):
+    >>> is_contents_read("gh api repos/foo/bar/contents/x.md -XDELETE")
+    False
+    >>> is_contents_read("gh api repos/foo/bar/contents/x.md -fmessage=y")
+    False
+    >>> is_contents_read("gh api repos/foo/bar/contents/x.md -Fcontent=@file")
+    False
+    >>> is_contents_read("gh api repos/foo/bar/contents/x.md --method=PUT")
+    False
+    >>> is_contents_read("gh api repos/foo/bar/contents/x.md --field=key=val")
     False
 
     NOT detected — not a gh api command at all, or empty:
@@ -212,38 +315,51 @@ def is_contents_read(command: str) -> bool:
     ... )
     False
     """
-    found_gh_api = False
-    for seg in _split_outside_quotes(command):
-        seg = seg.strip()
-        if not seg:
-            continue
-        if not re.match(r"gh(\s|$)", seg):
-            continue
-        try:
-            tokens = shlex.split(seg)
-        except ValueError:
+    found = False
+    for rest in _iter_gh_api_rest(command):
+        if rest is None:
             return False
-        if len(tokens) < 2:
-            continue
-
-        api_index = None
-        for idx, token in enumerate(tokens[1:], start=1):
-            if token.startswith("-"):
-                continue
-            if token == "api":
-                api_index = idx
-            break
-        if api_index is None:
-            continue
-
-        found_gh_api = True
-        rest = tokens[api_index + 1:]
-        if any(tok in _WRITE_FLAGS for tok in rest):
+        found = True
+        if any(_is_write_flag(tok) for tok in rest):
             return False
         if not any(_CONTENTS_RE.fullmatch(tok) for tok in rest):
             return False
+    return found
 
-    return found_gh_api
+
+def is_help_query(command: str) -> bool:
+    """Return True if every ``gh api`` segment is a help query.
+
+    Detected:
+    >>> is_help_query("gh api --help")
+    True
+    >>> is_help_query("gh api -h")
+    True
+    >>> is_help_query("gh api graphql --help")
+    True
+
+    NOT detected — no help flag, not a gh api call, or empty:
+    >>> is_help_query("gh api repos/foo/bar/contents/x")
+    False
+    >>> is_help_query("gh pr view --help")
+    False
+    >>> is_help_query("")
+    False
+
+    Compound — every gh api segment must carry help:
+    >>> is_help_query("gh api --help && gh api -h")
+    True
+    >>> is_help_query("gh api --help && gh api repos/foo/bar")
+    False
+    """
+    found = False
+    for rest in _iter_gh_api_rest(command):
+        if rest is None:
+            return False
+        found = True
+        if not any(tok in _HELP_FLAGS for tok in rest):
+            return False
+    return found
 
 
 def _state_path(session_id: str) -> str:
@@ -321,7 +437,7 @@ def main() -> None:
     if not detect_gh_api(command):
         sys.exit(0)
 
-    if is_contents_read(command):
+    if is_contents_read(command) or is_help_query(command):
         sys.exit(0)
 
     session_id = data.get("session_id", "default")
