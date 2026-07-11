@@ -78,6 +78,17 @@ mkdir -p "$HOME/.claude/rules"
 find "$HOME/.claude/rules/" -maxdepth 1 -type l ! -exec test -e {} \; -print
 find "$DOTPATH/claude/rules" -maxdepth 1 -mindepth 1 -type f -name '*.md' -exec ln -fvns {} "$HOME/.claude/rules/" \;
 
+# GitHub CLI extensions (register via gh so `gh extension list` shows them)
+if command -v gh >/dev/null; then
+  for ext_src in "$DOTPATH/gh-extensions"/gh-*; do
+    [ -d "$ext_src" ] || continue
+    ext_name=$(basename "$ext_src")
+    if [ ! -e "$HOME/.local/share/gh/extensions/$ext_name" ]; then
+      gh extension install "$ext_src"
+    fi
+  done
+fi
+
 # Codex CLI
 link AIRULES.md  "$HOME/.codex/AGENTS.md"
 mkdir -p "$HOME/.codex/rules"
