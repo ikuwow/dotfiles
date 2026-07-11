@@ -6,7 +6,9 @@ built-in subcommand for.
 
 ## Installation
 
-Register with `gh` once by running the following from within this directory:
+Registered by `bootstrap/main.sh` on a fresh host. To install manually
+(e.g., on a host that has never run bootstrap), run from within this
+directory:
 
 ```sh
 gh extension install .
