@@ -6,16 +6,16 @@ built-in subcommand for.
 
 ## Installation
 
-Registered by `bootstrap/main.sh` on a fresh host. To install manually
-(e.g., on a host that has never run bootstrap), run from within this
-directory:
+From within this directory:
 
 ```sh
 gh extension install .
 ```
 
 `gh extension install` only accepts a local repo via the literal `.`
-argument, run from inside the extension directory.
+argument, run from inside the extension directory (verified against
+cli/cli's `pkg/cmd/extension/command.go`, where the install handler
+exact-matches `args[0] == "."`).
 
 ## Usage
 
