@@ -1,21 +1,26 @@
 #!/usr/bin/env python3
-"""Warn on Bash invocations of ``gh api`` in favor of high-level ``gh`` subcommands.
+"""Warn on gh api permission requests.
 
-Detects ``gh api ...`` (including ``gh api graphql ...``) in Bash commands.
-On the first occurrence per session per distinct command, denies the tool
-call with a suggestion to prefer high-level ``gh`` subcommands (``gh pr
-view``, ``gh pr diff``, ``gh pr checks``, ``gh issue view --comments``,
-``gh run view``, the ``gh pr-review`` extension for PR review threads).
-Re-issuing the exact same command in the same session is allowed through
-so the assistant can proceed after confirming ``gh api`` is actually
-needed. Two commands are considered the same when they match after
+Fires on ``PermissionRequest`` events (when a permission dialog would
+appear for a ``gh api`` call). On the first occurrence of each distinct
+command per session, denies the permission with a "prefer high-level gh
+subcommands" message so the assistant reconsiders before the user is
+prompted. Re-issuing the same command in the same session lets the hook
+fall through (``exit 0``) so the dialog reaches the user and they can
+approve. Two commands are considered the same when they match after
 whitespace normalization (leading/trailing trim, internal runs of
 whitespace collapsed to a single space).
+
+Registered under ``PermissionRequest`` with ``matcher: "Bash"`` and
+``if: "Bash(gh api *)"``. The ``if`` filter narrows to gh api commands,
+and the ``PermissionRequest`` lifecycle already excludes commands that
+permission ``allow`` rules would run without a dialog — so this hook
+only fires when the user was about to see a prompt anyway.
 
 Session state is tracked in ``~/.claude/state/gh_api_warned_<session_id>.json``.
 Set ``ENABLE_GH_API_WARNING=0`` to disable.
 
-Spec: https://docs.anthropic.com/en/docs/claude-code/hooks
+Spec: https://code.claude.com/docs/en/hooks#permissionrequest
 """
 import hashlib
 import json
@@ -25,14 +30,10 @@ import re
 import sys
 from datetime import datetime
 
-# Split on &&, ||, ;, newline, or single | (pipe) outside quotes.
-# `\|\|` is tried before `\|` so `||` is not consumed as two `|`.
-_SEPARATOR_RE = re.compile(r"&&|\|\||;|\n|\|")
-
 _STATE_DIR = os.path.expanduser("~/.claude/state")
 _STATE_PREFIX = "gh_api_warned_"
 
-REASON = (
+MESSAGE = (
     "Detected 'gh api'. Prefer high-level gh subcommands first:\n"
     "  gh pr view / gh pr diff / gh pr checks\n"
     "  gh issue view (with --comments)\n"
@@ -44,119 +45,6 @@ REASON = (
     "on the second and later occurrences of the same command (matched "
     "with whitespace normalized)."
 )
-
-
-def _split_outside_quotes(command: str) -> list[str]:
-    """Split command by shell separators, ignoring separators inside quotes.
-
-    >>> _split_outside_quotes("cat file | gh api foo")
-    ['cat file ', ' gh api foo']
-    >>> _split_outside_quotes("echo 'gh api hi | more'")
-    ["echo 'gh api hi | more'"]
-    >>> _split_outside_quotes("a && b || c ; d")
-    ['a ', ' b ', ' c ', ' d']
-    >>> _split_outside_quotes("a\\ngh api x")
-    ['a', 'gh api x']
-    >>> _split_outside_quotes('echo "pipe | inside double"')
-    ['echo "pipe | inside double"']
-    """
-    segments = []
-    current = []
-    in_single = False
-    in_double = False
-    i = 0
-    while i < len(command):
-        ch = command[i]
-
-        if ch == "\\" and in_double and i + 1 < len(command):
-            current.append(ch)
-            current.append(command[i + 1])
-            i += 2
-            continue
-
-        if ch == "'" and not in_double:
-            in_single = not in_single
-            current.append(ch)
-            i += 1
-            continue
-        if ch == '"' and not in_single:
-            in_double = not in_double
-            current.append(ch)
-            i += 1
-            continue
-
-        if not in_single and not in_double:
-            match = _SEPARATOR_RE.match(command, i)
-            if match:
-                segments.append("".join(current))
-                current = []
-                i = match.end()
-                continue
-
-        current.append(ch)
-        i += 1
-
-    segments.append("".join(current))
-    return segments
-
-
-def detect_gh_api(command: str) -> bool:
-    """Return True if a shell segment invokes ``gh api`` (or ``gh api graphql``).
-
-    Detected — plain ``gh api``:
-    >>> detect_gh_api("gh api repos/foo/bar/pulls/123")
-    True
-    >>> detect_gh_api("gh api graphql -f query='...'")
-    True
-    >>> detect_gh_api('gh api -H "Accept: application/vnd.github.raw" repos/foo/bar')
-    True
-
-    Detected — after a pipe, ``&&``, ``;``, or newline:
-    >>> detect_gh_api("something | gh api foo")
-    True
-    >>> detect_gh_api("mkdir d && gh api foo")
-    True
-    >>> detect_gh_api("ls ; gh api foo")
-    True
-    >>> detect_gh_api("mkdir d\\ngh api foo")
-    True
-
-    NOT detected — high-level gh subcommands:
-    >>> detect_gh_api("gh pr view 123")
-    False
-    >>> detect_gh_api("gh issue view 5 --comments")
-    False
-
-    NOT detected — inside quotes, or as a substring/argument:
-    >>> detect_gh_api('echo "gh api hello"')
-    False
-    >>> detect_gh_api("git commit -m 'switch from gh api to gh pr view'")
-    False
-    >>> detect_gh_api("github-api something")
-    False
-    >>> detect_gh_api("gh api-helper foo")
-    False
-
-    NOT detected — empty string:
-    >>> detect_gh_api("")
-    False
-    """
-    for seg in _split_outside_quotes(command):
-        seg = seg.strip()
-        if not seg:
-            continue
-        if not re.match(r"gh(\s|$)", seg):
-            continue
-        tokens = seg.split()
-        if len(tokens) < 2:
-            continue
-        for token in tokens[1:]:
-            if token.startswith("-"):
-                continue
-            if token == "api":
-                return True
-            break
-    return False
 
 
 def _state_path(session_id: str) -> str:
@@ -171,13 +59,14 @@ def _load_state(session_id: str) -> set:
         return set()
 
 
-def _save_state(session_id: str, shown: set) -> None:
+def _save_state(session_id: str, shown: set) -> bool:
     try:
         os.makedirs(_STATE_DIR, exist_ok=True)
         with open(_state_path(session_id), "w") as f:
             json.dump(sorted(shown), f)
     except OSError:
-        pass
+        return False
+    return True
 
 
 def _cleanup_old_state() -> None:
@@ -227,11 +116,13 @@ def main() -> None:
     if data.get("tool_name", "") != "Bash":
         sys.exit(0)
 
-    command = data.get("tool_input", {}).get("command", "")
+    command = (data.get("tool_input") or {}).get("command", "")
     if not command:
         sys.exit(0)
 
-    if not detect_gh_api(command):
+    # Belt-and-suspenders against the settings.json `if` filter failing open
+    # on parse errors or matching subshell-only occurrences.
+    if "gh api" not in command:
         sys.exit(0)
 
     session_id = data.get("session_id", "default")
@@ -240,12 +131,17 @@ def main() -> None:
 
     if key not in shown:
         shown.add(key)
-        _save_state(session_id, shown)
+        if not _save_state(session_id, shown):
+            # State didn't persist; skip the deny so the retry isn't
+            # infinite. Permission dialog reaches the user this time.
+            sys.exit(0)
         print(json.dumps({
             "hookSpecificOutput": {
-                "hookEventName": "PreToolUse",
-                "permissionDecision": "deny",
-                "permissionDecisionReason": REASON,
+                "hookEventName": "PermissionRequest",
+                "decision": {
+                    "behavior": "deny",
+                    "message": MESSAGE,
+                },
             },
         }))
         sys.exit(0)
