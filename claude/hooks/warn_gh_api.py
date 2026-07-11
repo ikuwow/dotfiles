@@ -15,6 +15,10 @@ whitespace collapsed to a single space).
 Session state is tracked in ``~/.claude/state/gh_api_warned_<session_id>.json``.
 Set ``ENABLE_GH_API_WARNING=0`` to disable.
 
+Commands where every ``gh api`` segment is a read of the contents endpoint
+(``gh api repos/OWNER/REPO/contents/PATH``, no write flags) are allowlisted
+and pass through without a deny on the first occurrence.
+
 Spec: https://docs.anthropic.com/en/docs/claude-code/hooks
 """
 import hashlib
@@ -22,6 +26,7 @@ import json
 import os
 import random
 import re
+import shlex
 import sys
 from datetime import datetime
 
@@ -159,6 +164,88 @@ def detect_gh_api(command: str) -> bool:
     return False
 
 
+_CONTENTS_RE = re.compile(r"repos/[^/\s]+/[^/\s]+/contents/[^\s]+")
+_WRITE_FLAGS = {"-X", "--method", "-f", "--field", "-F", "--raw-field", "--input"}
+
+
+def is_contents_read(command: str) -> bool:
+    """Return True if every ``gh api`` segment is a read of the contents endpoint.
+
+    Detected — plain contents read:
+    >>> is_contents_read("gh api repos/foo/bar/contents/README.md")
+    True
+    >>> is_contents_read(
+    ...     'gh api repos/foo/bar/contents/path/to/file.py -H '
+    ...     '"Accept: application/vnd.github.raw"'
+    ... )
+    True
+    >>> is_contents_read("gh api repos/foo/bar/contents/README.md?ref=trunk")
+    True
+
+    NOT detected — non-contents endpoint, or graphql:
+    >>> is_contents_read("gh api repos/foo/bar/pulls/123")
+    False
+    >>> is_contents_read("gh api graphql -f query='...'")
+    False
+
+    NOT detected — write flags present:
+    >>> is_contents_read(
+    ...     "gh api repos/foo/bar/contents/x.md -X PUT "
+    ...     "-f message=... -f content=..."
+    ... )
+    False
+    >>> is_contents_read("gh api repos/foo/bar/contents/x.md -f sha=abc")
+    False
+
+    NOT detected — not a gh api command at all, or empty:
+    >>> is_contents_read("gh pr view 123")
+    False
+    >>> is_contents_read("")
+    False
+
+    Compound commands — every gh api segment must qualify:
+    >>> is_contents_read("mkdir d && gh api repos/foo/bar/contents/README.md")
+    True
+    >>> is_contents_read(
+    ...     "gh api repos/foo/bar/contents/README.md && "
+    ...     "gh api repos/foo/bar/pulls/1"
+    ... )
+    False
+    """
+    found_gh_api = False
+    for seg in _split_outside_quotes(command):
+        seg = seg.strip()
+        if not seg:
+            continue
+        if not re.match(r"gh(\s|$)", seg):
+            continue
+        try:
+            tokens = shlex.split(seg)
+        except ValueError:
+            return False
+        if len(tokens) < 2:
+            continue
+
+        api_index = None
+        for idx, token in enumerate(tokens[1:], start=1):
+            if token.startswith("-"):
+                continue
+            if token == "api":
+                api_index = idx
+            break
+        if api_index is None:
+            continue
+
+        found_gh_api = True
+        rest = tokens[api_index + 1:]
+        if any(tok in _WRITE_FLAGS for tok in rest):
+            return False
+        if not any(_CONTENTS_RE.fullmatch(tok) for tok in rest):
+            return False
+
+    return found_gh_api
+
+
 def _state_path(session_id: str) -> str:
     return os.path.join(_STATE_DIR, f"{_STATE_PREFIX}{session_id}.json")
 
@@ -232,6 +319,9 @@ def main() -> None:
         sys.exit(0)
 
     if not detect_gh_api(command):
+        sys.exit(0)
+
+    if is_contents_read(command):
         sys.exit(0)
 
     session_id = data.get("session_id", "default")
