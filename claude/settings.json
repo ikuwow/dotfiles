@@ -363,10 +363,6 @@
           {
             "type": "command",
             "command": "f=~/.claude/hooks/block_raw_github_fetch.py; if [ -f \"$f\" ] && command -v python3 >/dev/null; then python3 \"$f\"; fi"
-          },
-          {
-            "type": "command",
-            "command": "f=~/.claude/hooks/warn_gh_api.py; if [ -f \"$f\" ] && command -v python3 >/dev/null; then python3 \"$f\"; fi"
           }
         ]
       },
@@ -395,6 +391,11 @@
       {
         "matcher": "Bash",
         "hooks": [
+          {
+            "type": "command",
+            "if": "Bash(gh api *)",
+            "command": "f=~/.claude/hooks/warn_gh_api.py; if [ -f \"$f\" ] && command -v python3 >/dev/null; then python3 \"$f\"; fi"
+          },
           {
             "type": "command",
             "command": "f=~/.claude/hooks/approve_git_gh_commands.py; if [ -f \"$f\" ] && command -v python3 >/dev/null; then python3 \"$f\"; fi"
