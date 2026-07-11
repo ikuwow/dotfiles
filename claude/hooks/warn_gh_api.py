@@ -59,13 +59,14 @@ def _load_state(session_id: str) -> set:
         return set()
 
 
-def _save_state(session_id: str, shown: set) -> None:
+def _save_state(session_id: str, shown: set) -> bool:
     try:
         os.makedirs(_STATE_DIR, exist_ok=True)
         with open(_state_path(session_id), "w") as f:
             json.dump(sorted(shown), f)
     except OSError:
-        pass
+        return False
+    return True
 
 
 def _cleanup_old_state() -> None:
@@ -115,8 +116,13 @@ def main() -> None:
     if data.get("tool_name", "") != "Bash":
         sys.exit(0)
 
-    command = data.get("tool_input", {}).get("command", "")
+    command = (data.get("tool_input") or {}).get("command", "")
     if not command:
+        sys.exit(0)
+
+    # Belt-and-suspenders against the settings.json `if` filter failing open
+    # on parse errors or matching subshell-only occurrences.
+    if "gh api" not in command:
         sys.exit(0)
 
     session_id = data.get("session_id", "default")
@@ -125,7 +131,10 @@ def main() -> None:
 
     if key not in shown:
         shown.add(key)
-        _save_state(session_id, shown)
+        if not _save_state(session_id, shown):
+            # State didn't persist; skip the deny so the retry isn't
+            # infinite. Permission dialog reaches the user this time.
+            sys.exit(0)
         print(json.dumps({
             "hookSpecificOutput": {
                 "hookEventName": "PermissionRequest",
