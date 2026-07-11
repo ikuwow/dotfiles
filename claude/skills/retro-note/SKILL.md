@@ -5,12 +5,6 @@ description: Use for a lightweight, shallow log of AI-mistake analysis appended 
 
 # Retro Note
 
-Do not rely on this SKILL.md's own frontmatter `model:` field to switch
-models — this skill has none, and the analysis runs on the current
-session's own model (no Fable subagent, no delegation). This keeps the
-per-session cost low; batch analysis across accumulated notes is a
-separate, later skill.
-
 ## Purpose
 
 This writes a shallow AI-mistake analysis of the current session to a
@@ -116,7 +110,7 @@ Build one JSON record for the whole session (not one per finding):
       "root": "「後段のバッチが何を必要とするか」から逆算せず、hook API の payload と実装容易性という道具側の制約から思考を始めた。goal（バッチ分析が意味を持つ最小情報単位）を最初に定義するステップを飛ばしている",
       "transcript_ref": {"turns": [8, 10]},
       "severity": "medium",
-      "feedback_target": "AIRULES.md 応答の姿勢と判断 / ソフトウェア開発における考慮"
+      "feedback_target": "AIRULES.md 応答の姿勢と判断"
     }
   ]
 }
@@ -130,13 +124,20 @@ Field notes:
 - `pr_number`: `null` unless a PR is obviously in context for this session
 - `task_summary`: one short sentence
 
-Serialize with `jq -c '.'` to produce a single line, then append:
+Write the record (pretty-printed) to a temp file with the Write tool, then
+compact and append it to the log with a single Bash command. Substitute
+`<project-slug>` (from Step 3) and `<YYYY-MM>` (the current year-month,
+readable from the datetime injected at each turn or via `date +%Y-%m`)
+textually before running:
 
 ```
-printf '%s\n' "$json" >> ~/.claude/retrospective/notes/<project-slug>/YYYY-MM.jsonl
+jq -c '.' /tmp/retro-note-record.json >> ~/.claude/retrospective/notes/<project-slug>/<YYYY-MM>.jsonl
 ```
 
-(`YYYY-MM` is the current year-month.)
+Going through a temp file avoids the shell-quoting hazards of embedding
+the JSON directly, and keeps this to a single append command with no
+inter-command variable state (Claude Code's Bash tool does not persist
+shell variables between calls).
 
 ## Step 5: Report
 
