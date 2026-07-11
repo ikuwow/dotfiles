@@ -84,7 +84,9 @@ if command -v gh >/dev/null; then
     [ -d "$ext_src" ] || continue
     ext_name=$(basename "$ext_src")
     if [ ! -e "$HOME/.local/share/gh/extensions/$ext_name" ]; then
-      gh extension install "$ext_src"
+      # `gh extension install` only accepts a local repo via literal "."
+      # run from within it; it rejects an absolute path directly.
+      (cd "$ext_src" && gh extension install .)
     fi
   done
 fi
