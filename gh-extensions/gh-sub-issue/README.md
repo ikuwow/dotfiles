@@ -6,9 +6,14 @@ built-in subcommand for.
 
 ## Installation
 
-Installed automatically by this repo's `scripts/deploy.sh`, which registers
-every directory under `gh-extensions/` with `gh extension install`. No manual
-step is needed once the dotfiles are deployed.
+Register with `gh` once by running the following from within this directory:
+
+```sh
+gh extension install .
+```
+
+`gh extension install` only accepts a local repo via the literal `.`
+argument, run from inside the extension directory.
 
 ## Usage
 
