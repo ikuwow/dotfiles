@@ -242,16 +242,4 @@ After the PR is merged (or the task is fully done):
 
 1. Move back to the repository root:
    `cd <repository root>`
-1. Run `git cleanup-branches` once. That completes this step.
-   - Use the space form (`git cleanup-branches`); it is already covered
-     by the `Bash(git *)` allow rule, so no extra permission is needed.
-   - It sweeps local branches that are merged, squash-merged, or
-     upstream-gone, removes their worktrees, and prunes stale worktree
-     entries. Plain `git branch -d` rejects squash-merged branches as
-     "not fully merged", which is why this custom sweep exists.
-   - Branches the sweep leaves behind (uncommitted work in the
-     worktree, PR closed without merge, etc.) stay behind. Do not
-     follow up with `git branch -d` / `git branch -D` /
-     `git push origin --delete` / `git worktree remove --force` or
-     similar to force them out. Only act on an explicit user request
-     to delete a specific branch.
+1. Run `git cleanup-branches` once.
