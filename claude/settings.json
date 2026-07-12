@@ -9,6 +9,7 @@
       "Read(~/.local/share/sre-knowledge-base/**)",
       "Read(~/.claude/rules/*)",
       "Read(~/.claude/skills/**)",
+      "Read(~/dotfiles/claude/**)",
       "Bash(ls *)",
       "Bash(cd .worktrees/*)",
       "Bash(echo *)",
