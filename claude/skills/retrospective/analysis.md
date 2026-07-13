@@ -24,25 +24,21 @@ Keep each entry to 1-2 lines. Skip behaviors that had no real impact.
 ## Step 2: Propose structural countermeasures
 
 For each problem, identify the governing rule first, then pick the
-highest applicable countermeasure in this order:
+highest applicable destination in this order:
 
-1. Fix the existing rule that failed to prevent the behavior.
-   Diagnose why it failed — wording too vague, wrong loading tier
-   (not in context when needed), or no enforcement — and propose
-   editing, splitting, relocating, or mechanizing that rule.
-   Never add a parallel rule next to a failed one.
-1. Delete or merge rules when overlap, contradiction, or sheer
-   volume contributed to the failure.
-1. Mechanize (hook, CI check, pre-commit, script, permission
-   setting, template) when the behavior is mechanically checkable.
-   A mechanized check may replace the prose rule it enforces.
-1. Add a new rule only when no existing rule covers the problem.
-   State the net context cost: lines added, target loading tier
-   (always-loaded rule vs on-demand skill), and what compensating
-   trim keeps the tier within budget.
+1. `existing-rule-edit` — an existing rule failed to prevent the behavior (vague wording, wrong loading tier, or no enforcement); edit, split, relocate, or mechanize it, never add a parallel rule next to a failed one
+1. `existing-skill-update` — an existing skill file (`SKILL.md`, `analysis.md`, etc.) failed to guide the behavior; edit it directly
+1. `mechanize` — the behavior is mechanically checkable; add a hook, CI check, pre-commit, script, permission setting, or template, which may replace the prose rule it enforces
+1. `new-rule` — no existing rule covers the problem; state the net context cost (lines added, target loading tier, compensating trim)
+1. `new-skill` — no existing skill covers the problem and it needs a new on-demand workflow; scaffold a new skill
 
-Format as a numbered list of pairs. Include a severity rating and a
-scope tag (global / project-specific) for each:
+A countermeasure that deletes or merges existing rules or skills is an
+orthogonal edit operation, not a destination of its own — apply it
+alongside whichever destination above the finding routes to, when
+overlap, contradiction, or sheer volume contributed to the failure.
+
+Format as a numbered list of pairs. Include a severity rating, a
+scope tag (global / project-specific), and a destination tag for each:
 
 ```
 ## 1. <short title>
@@ -50,6 +46,7 @@ scope tag (global / project-specific) for each:
 Problem: <what happened>
 Severity: high / medium / low (with brief justification)
 Scope: global / project-specific
+Destination: existing-rule-edit / existing-skill-update / mechanize / new-rule / new-skill
 Countermeasure: <structural fix>
 ```
 

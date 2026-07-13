@@ -71,14 +71,15 @@
 
 ## セッション終了時
 
-- ユーザーがタスク完了・セッション終了を宣言したら（「終わり」「done」「これで完了」等）、確認せず自動的に `/retrospective` を実行する
+- ユーザーがタスク完了・セッション終了を宣言したら（「終わり」「done」「これで完了」等）、確認せず自動的に `/retro-note` skill を invoke する
+  - 深い分析が必要な時のみ明示的に `/retrospective` を呼ぶ
 
 ## AIツール・外部サービス利用における考慮
 
 - Web検索よりMCPサーバー等の外部情報ツールを優先する
 - 通常のWebサイトよりもプレーンテキスト・Markdownファイルの取得を優先する
 - GitHubの操作はコーディングタスクの場合 `gh` コマンドを使う。ghが使えない環境やghで実現できない操作の場合のみ `raw.githubusercontent.com` 等を使ってよい
-- `gh` の中では高レベルサブコマンド（`gh pr view` / `gh pr diff` / `gh pr checks` / `gh issue view` / `gh run view` 等）を優先する。特にPRレビュー・レビューコメント・レビュースレッドの取得や操作は `gh pr-review` 拡張（`agynio/gh-pr-review`）を使う。`gh api`（特に `gh api graphql -f query=...`）はこれらで実現できない操作に限定する
+- `gh` の中では高レベルサブコマンド（`gh pr view` / `gh pr diff` / `gh pr checks` / `gh issue view` / `gh run view` 等）を優先する。特にPRレビュー・レビューコメント・レビュースレッドの取得や操作は `gh pr-review` 拡張（`agynio/gh-pr-review`）を使う。sub-issue の list/add/remove は `gh sub-issue` 拡張を使う。`gh api`（特に `gh api graphql -f query=...`）はこれらで実現できない操作に限定する
 - IDE連携のMCPサーバー（コードインデックス・シンボル解決・静的解析等）が接続されている時は、コード検索・ナビゲーション・解析にその読み取り系ツールを優先する（ユーザーの明示は不要）
 - OSS・ライブラリ・ツール等を提案・採用する前にGitHubリポジトリ等で最終コミット・リリース・archive有無・issue/PR対応を確認する（README・履歴レベルで止める）。3年以上更新なし / archive済みは積極採用せず、確認結果を採用可否の根拠とし未確認なら「未確認」とする。用途が単純なら自前実装・forkも選択肢に含める
 

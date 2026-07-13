@@ -249,11 +249,4 @@ After the PR is merged (or the task is fully done):
 
 1. Move back to the repository root:
    `cd <repository root>`
-1. Delete unused local branches (merged, squash-merged, or upstream
-   gone) along with their worktrees, and prune stale worktree entries:
-   `git cleanup-branches`
-   - Use the space form (`git cleanup-branches`); it is already covered
-     by the `Bash(git *)` allow rule, so no extra permission is needed.
-   - Plain `git branch -d` rejects squash-merged branches as "not fully
-     merged", so a custom sweep is needed for repos that squash on
-     merge.
+1. Run `git cleanup-branches` once.
