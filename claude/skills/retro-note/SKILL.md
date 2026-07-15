@@ -13,6 +13,13 @@ for later batch review across sessions. It does not do deep analysis or
 interactive routing — for that, `/retrospective` remains available and
 should be invoked explicitly when a deep dive is warranted.
 
+The write path assumes `XDG_DATA_HOME` is unset or equal to `$HOME/.local/share`;
+the matching `Write`/`Edit`/`Read` permission rules in `~/.claude/settings.json`
+are hard-coded to `~/.local/share/claude/retrospective/notes/**` because Claude
+Code permission patterns follow the gitignore spec and do not expand shell
+variables (only `~/` is recognized). On a host that points `XDG_DATA_HOME`
+elsewhere, either fix the environment or update those rules.
+
 ## Scope of findings
 
 In scope — AI-side judgment failures only:
