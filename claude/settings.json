@@ -4,6 +4,7 @@
     "DISABLE_AUTOUPDATER": "1"
   },
   "permissions": {
+    "defaultMode": "auto",
     "allow": [
       "Read(~/bin/**)",
       "Read(~/.local/share/sre-knowledge-base/**)",
