@@ -25,7 +25,7 @@ NOT restate the detailed procedures from the skill.
 - Step 2: implement, commit, push
 - Step 3: create a draft PR (`gh pr create --draft --body-file`)
 - Step 4: CI wait and review (Phases 1-5)
-- Step 6: cleanup after merge (`git cleanup-branches`)
+- Step 6: cleanup after merge (`git cleanup`)
 
 ## Branch
 

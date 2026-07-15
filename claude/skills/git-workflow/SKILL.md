@@ -249,4 +249,4 @@ After the PR is merged (or the task is fully done):
 
 1. Move back to the repository root:
    `cd <repository root>`
-1. Run `git cleanup-branches` once.
+1. Run `git cleanup` once.
