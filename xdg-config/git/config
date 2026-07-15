@@ -45,7 +45,7 @@
     required = true
 	process = git-lfs filter-process
 [include]
-    path = ~/.gitconfig.secrets
+    path = ~/.gitconfig.local
 [push]
 	default = current
 [pull]

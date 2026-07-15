@@ -60,6 +60,13 @@ pre-commit run --all-files
 - All scripts must pass shellcheck validation
 - Use `set -eu` for error handling in critical scripts
 
+## Machine-local Git Config
+
+Machine-specific git settings (host-only URL rewrites, per-repo
+credentials, work-account overrides) go in `~/.gitconfig.local`,
+which `xdg-config/git/config` includes. Do not add these to the
+tracked config.
+
 ## Personal Tool Defaults
 
 This repository is a personal dotfiles repo. Scripts here may assume:
