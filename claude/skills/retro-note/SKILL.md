@@ -8,7 +8,7 @@ description: Use for a lightweight, shallow log of AI-mistake analysis appended 
 ## Purpose
 
 This writes a shallow AI-mistake analysis of the current session to a
-project-scoped jsonl file (`~/.claude/retrospective/notes/<project-slug>/YYYY-MM.jsonl`)
+project-scoped jsonl file (`${XDG_DATA_HOME:-$HOME/.local/share}/claude/retrospective/notes/<project-slug>/YYYY-MM.jsonl`)
 for later batch review across sessions. It does not do deep analysis or
 interactive routing — for that, `/retrospective` remains available and
 should be invoked explicitly when a deep dive is warranted.
@@ -87,7 +87,7 @@ identify findings that satisfy both the scope and depth rules above.
 Create the directory:
 
 ```
-mkdir -p ~/.claude/retrospective/notes/<project-slug>
+mkdir -p "${XDG_DATA_HOME:-$HOME/.local/share}/claude/retrospective/notes/<project-slug>"
 ```
 
 ## Step 4: Build and append the record
@@ -131,7 +131,7 @@ readable from the datetime injected at each turn or via `date +%Y-%m`)
 textually before running:
 
 ```
-jq -c '.' /tmp/retro-note-record.json >> ~/.claude/retrospective/notes/<project-slug>/<YYYY-MM>.jsonl
+jq -c '.' /tmp/retro-note-record.json >> "${XDG_DATA_HOME:-$HOME/.local/share}/claude/retrospective/notes/<project-slug>/<YYYY-MM>.jsonl"
 ```
 
 Going through a temp file avoids the shell-quoting hazards of embedding
