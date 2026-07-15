@@ -12,12 +12,11 @@ are symlinks pointing to files in this repository.
 - Files under `claude/` are symlinked into `~/.claude/` — always look at `claude/` in this repo first for Claude Code configuration (settings, hooks, MCP, skills, etc.)
 - `AIRULES.md` is also symlinked to `~/.codex/AGENTS.md` (Codex CLI) and `~/.junie/AGENTS.md` (Junie CLI) for their global instructions
 - When investigating, reading, or editing files managed by this repository,
-  always start from the path within this repo (e.g., `bin/foo` not
-  `~/bin/foo`, `claude/settings.json` not `~/.claude/settings.json`). This
-  applies to discovery too — list `claude/hooks/` rather than
-  `~/.claude/hooks/`, cat `AIRULES.md` rather than `~/.claude/CLAUDE.md`.
-  Deploy targets under `$HOME` (`~/.claude/`, `~/.codex/`, etc.) generally
-  require a permission prompt and add nothing over the source in this repo
+  always start from the path within this repo. Examples: `bin/foo` not
+  `~/bin/foo`, `claude/settings.json` not `~/.claude/settings.json`,
+  `ls claude/hooks/` not `ls ~/.claude/hooks/`, `cat AIRULES.md` not
+  `cat ~/.claude/CLAUDE.md`. Deploy targets under `$HOME` (`~/.claude/`,
+  `~/.codex/`, etc.) generally require a permission prompt
 - Check `scripts/deploy.sh` for the full list of symlink mappings
 
 ## Key Commands
