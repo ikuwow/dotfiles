@@ -24,3 +24,8 @@ repos:
         language: script
         pass_filenames: false
         files: ^(AIRULES\.md|claude/rules/.*\.md)$
+      - id: check-userscript-version
+        name: Check userscript version bump
+        entry: scripts/check_userscript_version.sh
+        language: script
+        files: ^userscripts/.*\.user\.js$

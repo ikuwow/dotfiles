@@ -1,5 +1,9 @@
 // ==UserScript==
 // @name         YouTube Shorts Normalizer
+// @namespace    https://github.com/ikuwow/dotfiles
+// @version      0.1.0
+// @downloadURL  https://raw.githubusercontent.com/ikuwow/dotfiles/main/userscripts/youtube-shorts-normalizer.user.js
+// @updateURL    https://raw.githubusercontent.com/ikuwow/dotfiles/main/userscripts/youtube-shorts-normalizer.user.js
 // @description  Treat YouTube Shorts as normal videos: hide the sidebar Shorts entry and redirect the swipeable Shorts player to the normal /watch player
 // @run-at       document-start
 // @include      *://*.youtube.com/*
