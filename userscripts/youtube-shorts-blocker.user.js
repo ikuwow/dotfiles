@@ -6,8 +6,11 @@
 // ==/UserScript==
 // document.head may not exist yet at document-start, so the style is appended
 // to documentElement, which is always available.
-// Sidebar Shorts entries are matched by href (`/shorts`), not by `title="Shorts"`,
-// because the title is localized ("ショート" in Japanese, etc.).
+// The sidebar Shorts entry has no `href` on its <a> (YouTube handles the
+// navigation via an internal SPA endpoint) and its title is localized, so
+// neither an href nor a title match works. Match by the Shorts icon's SVG
+// `path d` prefix instead — it is stable across locales and is unique to
+// the Shorts button in the guide.
 // YouTube is a SPA: same-tab navigations don't reload the document. In-page
 // clicks on Shorts links are caught in the capture phase before YouTube's own
 // router runs, so the Shorts UI never renders. URL-bar navigations and any
@@ -19,8 +22,8 @@ var HIDE_SHELVES_CLASS = 'shorts-blocker-hide-shelves';
 
 var style = document.createElement('style');
 style.textContent = [
-    'ytd-guide-entry-renderer:has(a[href^="/shorts"]) { display: none !important; }',
-    'ytd-mini-guide-entry-renderer:has(a[href^="/shorts"]) { display: none !important; }',
+    'ytd-guide-entry-renderer:has(svg path[d^="m13.467 1.19"]) { display: none !important; }',
+    'ytd-mini-guide-entry-renderer:has(svg path[d^="m13.467 1.19"]) { display: none !important; }',
     'ytd-rich-shelf-renderer[is-shorts] { display: none !important; }',
     'html.' + HIDE_SHELVES_CLASS + ' ytd-reel-shelf-renderer { display: none !important; }',
     'html.' + HIDE_SHELVES_CLASS + ' ytd-video-renderer:has(a[href^="/shorts/"]) { display: none !important; }',
