@@ -29,7 +29,8 @@ function redirectIfShort() {
         location.replace('/');
         return;
     }
-    location.replace('/watch?v=' + id + location.search);
+    var extra = location.search ? '&' + location.search.slice(1) : '';
+    location.replace('/watch?v=' + id + extra);
 }
 
 redirectIfShort();
