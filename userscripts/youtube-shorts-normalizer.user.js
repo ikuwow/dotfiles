@@ -1,6 +1,6 @@
 // ==UserScript==
-// @name         YouTube Shorts Blocker
-// @description  Hide the sidebar Shorts entry and redirect the swipeable Shorts player to the normal /watch player
+// @name         YouTube Shorts Normalizer
+// @description  Treat YouTube Shorts as normal videos: hide the sidebar Shorts entry and redirect the swipeable Shorts player to the normal /watch player
 // @run-at       document-start
 // @include      *://*.youtube.com/*
 // ==/UserScript==
