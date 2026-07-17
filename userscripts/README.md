@@ -36,4 +36,4 @@ The Userscripts extension keeps its Save Location as a macOS security-scoped boo
 
 1. Edit the file
 1. Bump `// @version` (semver patch increment is enough); the `check-userscript-version` pre-commit hook rejects commits that modify a userscript without bumping this field
-1. Commit and push; Safari picks changes up from the Save Location automatically, and Chrome refreshes via Violentmonkey's periodic update check (or the "Check for userscript updates" button in the dashboard for immediate pickup)
+1. Commit and push; Safari picks changes up from the Save Location automatically, and Chrome refreshes via Violentmonkey's periodic update check (or the "Check all for updates" button in the dashboard for immediate pickup)
