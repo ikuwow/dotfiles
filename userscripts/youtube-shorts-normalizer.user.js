@@ -55,7 +55,7 @@ document.addEventListener('click', function(event) {
     if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
         return;
     }
-    var anchor = event.target.closest && event.target.closest('a[href^="/shorts/"]');
+    var anchor = event.target.closest('a[href^="/shorts/"]');
     if (!anchor) {
         return;
     }
