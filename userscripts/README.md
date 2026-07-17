@@ -15,7 +15,7 @@ The Userscripts extension keeps its Save Location as a macOS security-scoped boo
 ## Scripts
 
 - `ime-enter-fixer.user.js` — stops the IME confirmation Enter from triggering a site's submit handler in Safari, applied to all sites (`@include *://*/*`)
-- `youtube-shorts-blocker.user.js` — hides the Shorts tab/shelf/thumbnails on YouTube and redirects `/shorts/<id>` URLs to the normal `/watch?v=<id>` player, scoped to `*://*.youtube.com/*`
+- `youtube-shorts-blocker.user.js` — hides the sidebar Shorts entry on YouTube and redirects `/shorts/<id>` URLs to the normal `/watch?v=<id>` player so Shorts play in the standard video view instead of the swipeable feed, scoped to `*://*.youtube.com/*`
 
 ## Adding a new script
 
