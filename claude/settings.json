@@ -395,8 +395,8 @@
         "hooks": [
           {
             "type": "command",
-            "if": "Bash(gh api *)",
-            "command": "f=~/.claude/hooks/warn_gh_api.py; if [ -f \"$f\" ] && command -v python3 >/dev/null; then python3 \"$f\"; fi"
+            "command": "f=~/.claude/hooks/warn_gh_api.py; if [ -f \"$f\" ] && command -v python3 >/dev/null; then python3 \"$f\"; fi",
+            "if": "Bash(gh api *)"
           },
           {
             "type": "command",
