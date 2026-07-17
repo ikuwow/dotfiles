@@ -2,7 +2,7 @@
 // @name         IME Enter Fixer
 // @description  Prevent Safari from sending the IME confirmation Enter as a submit keystroke
 // @run-at       document-start
-// @include      *://*/*
+// @include      *://claude.ai/*
 // ==/UserScript==
 // Safari clears `isComposing` before keydown for the IME confirmation Enter,
 // so cover both signals: the modern `isComposing` flag and the legacy
