@@ -22,8 +22,28 @@ of implementing in the main session.
 ## Ordering
 
 - Complete branch setup (pull the default branch, create the feature
-  branch) before dispatching; the subagent must not create branches or
-  worktrees
+  branch — one worktree+branch per implementer when running parallel
+  dispatch) before dispatching; the subagent must not create branches
+  or worktrees
+
+## Parallel dispatch for multi-PR plans
+
+- When an approved plan decomposes into multiple PRs with no
+  interdependencies (no merge-order dependency, no file/section
+  overlap that would conflict when the sibling merges first), run
+  the git-workflow skill once per PR in parallel, each dispatching
+  its own implementer
+- Send the parallel implementer Agent calls in a single message so
+  they execute concurrently
+- Parallel implementers require worktree isolation per the implementer
+  agent's Concurrency rule; in projects that prohibit worktrees, fall
+  back to sequential single-implementer dispatch
+- Dependent PR chains (B rebases on A's merge, C reviews A's design
+  decision) stay sequential
+- The parent still owns push, PR creation, review, and monitor for
+  each PR; the implementer's role is unchanged (implement + local
+  commits in its assigned worktree)
+- Apply the section below once per dispatched implementer
 
 ## Review of the subagent's work
 
