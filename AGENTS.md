@@ -2,7 +2,7 @@
 
 Instructions for AI agents working in this repository.
 
-Read README.md for the project overview, repository structure, and how it works.
+Read @README.md for the project overview, repository structure, and how it works.
 
 ## CRITICAL: Symlink Architecture
 
