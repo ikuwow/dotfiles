@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+
+# Show which model each Claude Code subagent (Agent tool task) actually ran
+# on for a given session, since Claude Code itself does not surface this.
+# Ground truth lives in the session transcript directory's subagents/:
+# agent-<id>.jsonl (assistant messages carry .message.model and
+# .message.usage.output_tokens) and agent-<id>.meta.json (agentType,
+# description).
+#
+# Usage: claude-subagent-models [session-id]
+
+set -eu
+
+usage() {
+  echo "Usage: claude-subagent-models [session-id]" >&2
+}
+
+if [ "${1:-}" = "-h" ] || [ "${1:-}" = "--help" ]; then
+  usage
+  exit 0
+fi
+
+if [ $# -gt 1 ]; then
+  usage
+  exit 1
+fi
+
+project_slug="$(echo "$PWD" | tr '/.' '-')"
+project_dir="$HOME/.claude/projects/$project_slug"
+
+if [ ! -d "$project_dir" ]; then
+  echo "claude-subagent-models: no project directory found at $project_dir" >&2
+  exit 1
+fi
+
+if [ $# -eq 1 ]; then
+  session_id="$1"
+else
+  session_id=""
+  latest_mtime=0
+  for dir in "$project_dir"/*/; do
+    [ -d "${dir}subagents" ] || continue
+    mtime="$(stat -c '%Y' "${dir}subagents")"
+    if [ "$mtime" -gt "$latest_mtime" ]; then
+      latest_mtime="$mtime"
+      session_id="$(basename "$dir")"
+    fi
+  done
+  if [ -z "$session_id" ]; then
+    echo "no sessions with subagents found"
+    exit 0
+  fi
+fi
+
+subagents_dir="$project_dir/$session_id/subagents"
+
+if [ ! -d "$subagents_dir" ]; then
+  echo "claude-subagent-models: no subagents directory found at $subagents_dir" >&2
+  exit 1
+fi
+
+echo "$session_id"
+
+{
+  printf 'AGENT_ID\tTYPE\tMODEL\tOUT_TOKENS\tDESCRIPTION\n'
+  for jsonl in "$subagents_dir"/agent-*.jsonl; do
+    [ -e "$jsonl" ] || continue
+    base="$(basename "$jsonl" .jsonl)"
+    agent_id="${base#agent-}"
+    meta="$subagents_dir/$base.meta.json"
+
+    agent_type="-"
+    description="-"
+    if [ -f "$meta" ]; then
+      agent_type="$(jq -r '.agentType // "-"' "$meta")"
+      description="$(jq -r '.description // "-"' "$meta")"
+    fi
+
+    models="$(jq -rs '[.[] | select(.type=="assistant") | .message.model] | unique | if length == 0 then "-" else join(",") end' "$jsonl")"
+    out_tokens="$(jq -rs '[.[] | select(.type=="assistant") | (.message.usage.output_tokens // 0)] | add // 0' "$jsonl")"
+
+    printf '%s\t%s\t%s\t%s\t%s\n' "$agent_id" "$agent_type" "$models" "$out_tokens" "$description"
+  done
+} | column -t -s "$(printf '\t')"
