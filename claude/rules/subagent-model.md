@@ -14,8 +14,9 @@ For general-purpose subagents:
 | Writing code for well-defined, straightforward tasks | `"sonnet"` |
 | Multi-file implementation, non-trivial investigation, deep debugging, adversarial review | `"opus"` |
 
-Run a subagent on `"fable"` — including by omitting `model` under a
-Fable session — only on explicit user instruction; agents and skills
+Omitting `model` inherits the session model, whatever it currently
+is. Run a subagent on `"fable"` — whether by explicit `model` or by
+inheritance — only on explicit user instruction; agents and skills
 that pin `fable` in their own definition (e.g. fable-advisor) are
 exempt.
 
