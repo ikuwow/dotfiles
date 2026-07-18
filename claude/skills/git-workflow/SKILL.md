@@ -7,9 +7,7 @@ description: Standard git/GitHub workflow - branch setup, implementation, draft 
 
 Standard git/GitHub workflow for all projects.
 Follow each step in order. Skip a step only when its precondition is
-structurally absent (e.g., no PR exists yet). Never skip a phase
-because the diff seems small or the step feels disproportionate — run
-it as-is.
+structurally absent (e.g., no PR exists yet).
 
 Prerequisite: the `agynio/gh-pr-review` gh extension is installed
 (used by Phase 5 review-thread reactions).
@@ -23,13 +21,12 @@ Prerequisite: the `agynio/gh-pr-review` gh extension is installed
 - Phase 2 code review and Phase 5 Monitor arming are pre-authorized —
   run them without pausing for confirmation. The only user decision
   point in the flow is flipping the PR from draft to ready for review.
-- Do not decide whether to run or skip any phase yourself. Signals like
-  a light interaction pattern, brevity of user messages, a small diff,
-  or personal-project scope are not permission to skip — they only
-  affect how you weigh findings within a phase. The only override to
-  the pre-authorization above is an explicit user instruction that
-  names a stopping point ("stop after creating the draft PR", "skip
-  Phase 2 for this PR", "no Monitor"). Absent that, run every phase.
+- Signals like a small diff or personal-project scope affect how you
+  weigh findings within a phase, never whether to run it. The only
+  override to the pre-authorization above is an explicit user
+  instruction that names a stopping point ("stop after creating the
+  draft PR", "skip Phase 2 for this PR", "no Monitor"). Absent that,
+  run every phase.
 - Never create or edit files on the default branch. Always move into the
   worktree (or feature branch) first. Creating files before branching
   leads to redundant copy-and-delete work.
@@ -146,12 +143,10 @@ covers three things:
 
 Update incrementally as conditions are confirmed (e.g., after Phase 1
 CI passes, after apply / deploy succeeds, after post-deploy
-verification with `curl`, `aws logs tail`, etc.) — do not wait until
-the very end to do all of it at once.
+verification with `curl`, `aws logs tail`, etc.).
 
-This step is not optional. Execute it autonomously instead of waiting
-for the user to remind you. Use the section 5 procedure
-(`gh pr edit --body-file`) for body edits.
+Use the section 5 procedure (`gh pr edit --body-file`) for body
+edits.
 
 ### Phase 5: Watch PR activity until merge
 
