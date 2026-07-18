@@ -4,12 +4,10 @@ Core git/GitHub rules for all projects.
 
 Every plan produced by EnterPlanMode's Phase 4 (Final Plan) MUST
 include the workflow checklist below as an explicit section, from
-branch setup through cleanup — regardless of whether the task looks
-like "just docs" or otherwise low-ceremony. State scope-specific
-deviations explicitly (e.g., "stop after Step 3, skip CI wait").
-Omitting the checklist section from a Plan Mode plan is never
-correct. (Truly trivial fixes that don't warrant Plan Mode at all
-are a separate judgment call — see EnterPlanMode's own criteria.)
+branch setup through cleanup. State scope-specific deviations
+explicitly (e.g., "stop after Step 3, skip CI wait"). (Truly
+trivial fixes that don't warrant Plan Mode at all are a separate
+judgment call — see EnterPlanMode's own criteria.)
 
 The full procedure (worktree setup, PR body rules, CI phases,
 monitoring, cleanup) lives in the git-workflow skill. Plans MUST
