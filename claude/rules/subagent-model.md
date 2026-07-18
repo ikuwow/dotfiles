@@ -13,18 +13,18 @@ For general-purpose subagents:
 | Search, file reading, data gathering, formatting | `"sonnet"` |
 | Writing code for well-defined, straightforward tasks | `"sonnet"` |
 | Multi-file implementation, non-trivial investigation | `"opus"` |
-| Architecture decisions, deep debugging, final review | omit (inherit the session model) |
+| Hardest delegated reasoning (deep debugging, adversarial review) | omit (inherit the session model) |
 
-Inheriting the session model is a deliberate spend decision — the
-session model is typically the most expensive tier. Reserve it for
-work where lower tiers demonstrably fall short.
+Omit the model parameter only when lower tiers demonstrably fall
+short (inheriting spends the session model, typically the most
+expensive tier).
 
 ## Delegation economy
 
-- Delegate independent, fan-out-able subtasks (multi-file reads,
-  parallel investigations, independent implementations) to subagents
-  instead of running them inline; keep the main session for
-  orchestration, design decisions, and final review
+- Delegate independent, fan-out-able subtasks to subagents instead of
+  running them inline
+- Keep the main session for orchestration, design decisions, and
+  final review
 - Write delegation briefs goal-first: state the outcome and
   constraints, not step-by-step procedures
 
