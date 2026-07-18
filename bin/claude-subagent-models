@@ -25,7 +25,9 @@ if [ $# -gt 1 ]; then
   exit 1
 fi
 
-project_slug="$(echo "$PWD" | tr '/.' '-')"
+# Claude Code names project dirs by replacing every non-alphanumeric
+# character with "-" (verified against the claude binary, v2.1.212).
+project_slug="${PWD//[^a-zA-Z0-9]/-}"
 project_dir="$HOME/.claude/projects/$project_slug"
 
 if [ ! -d "$project_dir" ]; then
@@ -40,11 +42,16 @@ else
   latest_mtime=0
   for dir in "$project_dir"/*/; do
     [ -d "${dir}subagents" ] || continue
-    mtime="$(stat -c '%Y' "${dir}subagents")"
-    if [ "$mtime" -gt "$latest_mtime" ]; then
-      latest_mtime="$mtime"
-      session_id="$(basename "$dir")"
-    fi
+    # Directory mtime only tracks file creation; appends to existing
+    # jsonl files don't bump it, so key on the newest jsonl instead.
+    for jsonl in "${dir}subagents"/agent-*.jsonl; do
+      [ -e "$jsonl" ] || continue
+      mtime="$(stat -c '%Y' "$jsonl")"
+      if [ "$mtime" -gt "$latest_mtime" ]; then
+        latest_mtime="$mtime"
+        session_id="$(basename "$dir")"
+      fi
+    done
   done
   if [ -z "$session_id" ]; then
     echo "no sessions with subagents found"
@@ -76,8 +83,12 @@ echo "$session_id"
       description="$(jq -r '.description // "-"' "$meta")"
     fi
 
-    models="$(jq -rs '[.[] | select(.type=="assistant") | .message.model] | unique | if length == 0 then "-" else join(",") end' "$jsonl")"
-    out_tokens="$(jq -rs '[.[] | select(.type=="assistant") | (.message.usage.output_tokens // 0)] | add // 0' "$jsonl")"
+    models="$(jq -rs '[.[] | select(.type=="assistant") | (.message.model // empty)] | unique | if length == 0 then "-" else join(",") end' "$jsonl")"
+    # One API message spans multiple jsonl lines (one per content block),
+    # each carrying an in-progress usage snapshot that resets per message
+    # — dedupe by message id and take the final (max) snapshot so partial
+    # snapshots aren't double-counted.
+    out_tokens="$(jq -rs '[.[] | select(.type=="assistant")] | group_by(.message.id) | map([.[].message.usage.output_tokens // 0] | max) | add // 0' "$jsonl")"
 
     printf '%s\t%s\t%s\t%s\t%s\n' "$agent_id" "$agent_type" "$models" "$out_tokens" "$description"
   done
