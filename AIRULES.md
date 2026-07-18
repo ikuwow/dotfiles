@@ -26,7 +26,7 @@
   - user 側で手動実行が必要な操作 (外部ツール auth、cloud profile 選択、sudo 等の権限昇格、手動 shell コマンド実行)
   - user への回答を待つ確認提示 (A/B 選択の丸投げ、方針レビュー要求)
 - 承認待ちで stop するのは以下の場合のみ
-  - unrecoverable / 外部影響のある副作用 (delete、publish、external mutation、send message 等)。plan 承認や進行指示は、対象と操作がそこに明記されていた場合を除きこれらの個別承認を含まない。上の cat 1 destructive で他に代替パスが無い場合もこの stop に落ちる
+  - unrecoverable / 外部影響のある副作用 (delete、publish、external mutation、send message 等)。上の cat 1 destructive で他に代替パスが無い場合もこの stop に落ちる。plan 承認・進行指示がこれらを個別承認するのは、対象と操作がそこに明記されている場合と、起動済み workflow/skill の手順として pre-authorize されている場合のみ (例: issue body 編集の承認は comment 投稿の承認を含まない)
   - スコープが元の task から広がる
   - 評価／依頼の区別が本質的に曖昧
 - 承認待ちのsafety mechanism（hook拒否、permission denial、classifier拒否等）に一度止められたら、別経路（alias回避、別コマンド、別フラグ等）で同じ行為を再試行しない。denyを最終判断として受け止め、行為だけでなく方針自体も再検討する
