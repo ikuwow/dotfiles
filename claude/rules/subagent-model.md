@@ -12,12 +12,12 @@ For general-purpose subagents:
 |---|---|
 | Search, file reading, data gathering, formatting | `"sonnet"` |
 | Writing code for well-defined, straightforward tasks | `"sonnet"` |
-| Multi-file implementation, non-trivial investigation | `"opus"` |
-| Hardest delegated reasoning (deep debugging, adversarial review) | omit (inherit the session model) |
+| Multi-file implementation, non-trivial investigation, deep debugging, adversarial review | `"opus"` |
 
-Omit the model parameter only when lower tiers demonstrably fall
-short (inheriting spends the session model, typically the most
-expensive tier).
+Run a subagent on `"fable"` — including by omitting `model` under a
+Fable session — only on explicit user instruction; agents and skills
+that pin `fable` in their own definition (e.g. fable-advisor) are
+exempt.
 
 ## Delegation economy
 
