@@ -59,11 +59,16 @@ elif [ "${archname}" = "arm64" ]; then
 fi
 
 if [ -n "${CI+x}" ]; then
-  echo "Warning: You are on CI. Skip some setup lke 'brew bundle'."
+  echo "Warning: You are on CI. Skip some setup like 'brew bundle'."
   exit 0
 fi
 
 brew bundle
+echo
+
+gh extension install agynio/gh-pr-review
+gh extension install dlvhdr/gh-dash
+(cd gh-extensions/gh-sub-issue && gh extension install .)
 echo
 
 scripts/configure_brew.sh

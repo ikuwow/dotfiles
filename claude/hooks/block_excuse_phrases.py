@@ -6,9 +6,14 @@ AIRULES.md (the 「正直」「本当のところ」「ぶっちゃけ」 ban un
 or qualifies an opinion).
 The model knows the rule but slips. A literal substring match cannot
 disambiguate legitimate uses (名詞 like 「正直者」), so this hook does
-not try. It blocks at most once per Stop chain: the second invocation
-arrives with stop_hook_active=true and is allowed through, preventing
-infinite loops.
+not try. It does exclude one legitimate case: text inside backtick
+code spans (inline `...` or fenced ``` blocks) is a *mention*, not a
+*use*, of the phrase (e.g. quoting it in a retrospective Problem
+line), so it is stripped before matching. Other legitimate uses
+remain accepted false positives, pinned below. It blocks at most once
+per Stop chain: the second invocation arrives with
+stop_hook_active=true and is allowed through, preventing infinite
+loops.
 
 I/O failures (stdin parse, missing transcript_path, transcript read,
 poll timeout) are swallowed and the hook exits 0 — a Stop hook that
@@ -48,7 +53,10 @@ REASON = (
     "The damage is retroactive (it taints prior statements) and "
     "prospective (it taints future ones), and it cannot be unplanted. "
     "「本当のところ」「ぶっちゃけ」 carry the same structural harm.\n\n"
-    "Judge your own usage and rewrite if it was 断り書き."
+    "Judge your own usage and rewrite if it was 断り書き.\n\n"
+    "When you need to mention (not use) a banned phrase — e.g. quoting "
+    "it in a retrospective Problem line — wrap it in backticks so this "
+    "hook can tell mention from use."
 )
 
 
@@ -81,12 +89,85 @@ def is_forbidden(text):
     return bool(FORBIDDEN_PATTERN.search(text))
 
 
+_FENCE_RE = re.compile(r"^(```|~~~)")
+_INLINE_CODE_RE = re.compile(r"`[^`]*`")
+
+
+def _strip_inline_code(line):
+    """Remove paired inline backtick spans from a single line.
+
+    A trailing unpaired backtick truncates the rest of the line —
+    there is no closing backtick to pair with, so everything after it
+    is inside an unterminated span and is dropped rather than risking
+    a false match on the fragment that follows.
+    """
+    line = _INLINE_CODE_RE.sub("", line)
+    if line.count("`") % 2 == 1:
+        line = line[: line.rfind("`")]
+    return line
+
+
+def strip_code_spans(text):
+    """Remove fenced code blocks and inline backtick spans from text.
+
+    Code spans are a *mention*, not a *use*, of a phrase — quoting a
+    banned phrase in backticks to talk about it (e.g. a retrospective
+    Problem line) should not trip the hook the way actually using it
+    as 断り書き would.
+
+    Banned phrase inside an inline backtick span is removed, the rest
+    of the line is kept:
+
+    >>> strip_code_spans("説明: `正直`は禁止らしい")
+    '説明: は禁止らしい'
+
+    Banned phrase inside a fenced code block is removed, fences
+    included:
+
+    >>> strip_code_spans("before\\n```\\n正直\\n```\\nafter")
+    'before\\nafter'
+
+    Banned phrase outside any code span is preserved:
+
+    >>> strip_code_spans("正直それは無理やと思う")
+    '正直それは無理やと思う'
+
+    An unpaired trailing fence is treated as an unterminated code
+    block: everything from the fence onward is dropped rather than
+    risking a false negative on unterminated content:
+
+    >>> strip_code_spans("before\\n```\\n正直")
+    'before'
+
+    An unpaired trailing backtick truncates the line at the backtick:
+
+    >>> strip_code_spans("正直 before ` after")
+    '正直 before '
+    """
+    out_lines = []
+    in_fence = False
+    for line in text.split("\n"):
+        if _FENCE_RE.match(line.strip()):
+            in_fence = not in_fence
+            continue
+        if in_fence:
+            continue
+        out_lines.append(_strip_inline_code(line))
+    return "\n".join(out_lines)
+
+
 def collect_current_turn_assistant_text(events):
-    """Concatenate assistant text emitted since the last real user message.
+    """Collect assistant text blocks emitted since the last real user message.
 
     Walks events backward. Stops at a real user message. user events
     whose content is purely tool_result blocks are tool-call re-entries
     and are skipped, not treated as turn boundaries.
+
+    Returns a list of per-block strings (reverse-walk order) rather
+    than one joined string, so strip_code_spans can be applied per
+    block: joining first would let an unpaired fence in one block
+    silently swallow the prose — and any banned phrase — of every
+    other block.
 
     Single-turn capture:
 
@@ -97,7 +178,7 @@ def collect_current_turn_assistant_text(events):
     ...     ]}},
     ... ]
     >>> collect_current_turn_assistant_text(events)
-    '正直そう思う'
+    ['正直そう思う']
 
     Tool-call re-entry does not end the turn; both text blocks are
     captured (in reverse-walk order):
@@ -118,7 +199,7 @@ def collect_current_turn_assistant_text(events):
     ...     ]}},
     ... ]
     >>> collect_current_turn_assistant_text(events)
-    'second\\nfirst'
+    ['second', 'first']
 
     A real user message ends the scan; older turns are not captured:
 
@@ -132,12 +213,12 @@ def collect_current_turn_assistant_text(events):
     ...     ]}},
     ... ]
     >>> collect_current_turn_assistant_text(events)
-    'current'
+    ['current']
 
     Empty input:
 
     >>> collect_current_turn_assistant_text([])
-    ''
+    []
 
     Malformed events are skipped silently — system events, assistant
     messages with missing or null content, etc. — so the hook does not
@@ -155,7 +236,7 @@ def collect_current_turn_assistant_text(events):
     ...     ]}},
     ... ]
     >>> collect_current_turn_assistant_text(events)
-    '正直そう思う'
+    ['正直そう思う']
     """
     texts = []
     for event in reversed(events):
@@ -174,7 +255,7 @@ def collect_current_turn_assistant_text(events):
         for block in event.get("message", {}).get("content", []) or []:
             if isinstance(block, dict) and block.get("type") == "text":
                 texts.append(block.get("text", ""))
-    return "\n".join(texts)
+    return texts
 
 
 def main():
@@ -199,9 +280,9 @@ def main():
         print(f"block_excuse_phrases: transcript read failed: {e}", file=sys.stderr)
         sys.exit(0)
 
-    text = collect_current_turn_assistant_text(events)
+    blocks = collect_current_turn_assistant_text(events)
 
-    if not text:
+    if not blocks:
         poll_start = time.monotonic()
         last_err = None
         for _ in range(POLL_MAX_ITERATIONS):
@@ -212,11 +293,11 @@ def main():
             except (OSError, json.JSONDecodeError) as e:
                 last_err = e
                 continue
-            text = collect_current_turn_assistant_text(events)
-            if text:
+            blocks = collect_current_turn_assistant_text(events)
+            if blocks:
                 break
 
-        if not text:
+        if not blocks:
             elapsed_ms = int((time.monotonic() - poll_start) * 1000)
             err_suffix = f" last_err={last_err!r}" if last_err else ""
             print(
@@ -226,7 +307,7 @@ def main():
             )
             sys.exit(0)
 
-    if is_forbidden(text):
+    if any(is_forbidden(strip_code_spans(block)) for block in blocks):
         print(json.dumps({"decision": "block", "reason": REASON}))
     sys.exit(0)
 

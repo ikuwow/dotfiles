@@ -4,9 +4,13 @@
     "DISABLE_AUTOUPDATER": "1"
   },
   "permissions": {
+    "defaultMode": "auto",
     "allow": [
+      "Read(~/bin/**)",
       "Read(~/.local/share/sre-knowledge-base/**)",
       "Read(~/.claude/rules/*)",
+      "Read(~/.claude/skills/**)",
+      "Read(~/dotfiles/claude/**)",
       "Bash(ls *)",
       "Bash(cd .worktrees/*)",
       "Bash(echo *)",
@@ -16,6 +20,7 @@
       "Bash(mkdir *)",
       "Bash(tree *)",
       "Bash(git *)",
+      "Bash(git merge *)",
       "Bash(git-worktree-create *)",
       "Bash(jq *)",
       "Bash(yq *)",
@@ -26,6 +31,12 @@
       "Bash(actionlint *)",
       "Bash(yamllint *)",
       "Bash(brew info *)",
+      "Bash(gh --help)",
+      "Bash(gh --help *)",
+      "Bash(gh auth status)",
+      "Bash(gh auth status *)",
+      "Bash(gh * --help)",
+      "Bash(gh * --help *)",
       "Bash(gh * list *)",
       "Bash(gh * view *)",
       "Bash(gh search *)",
@@ -36,13 +47,26 @@
       "Bash(gh pr create *)",
       "Bash(gh pr edit *)",
       "Bash(gh pr checkout *)",
+      "Bash(gh pr-review review view *)",
+      "Bash(gh pr-review threads list *)",
+      "Bash(gh pr-review threads resolve *)",
+      "Bash(gh pr-review comments reply *)",
       "Bash(gh pr update-branch)",
       "Bash(gh pr update-branch *)",
       "Bash(gh issue list)",
       "Bash(gh issue list *)",
       "Bash(gh issue create *)",
-      "Bash(gh api *)",
+      "Bash(gh api repos/*/contents/*)",
+      "Bash(gh sub-issue list *)",
+      "Bash(gh extension list)",
       "Bash(docker compose ps *)",
+      "Bash(docker network ls)",
+      "Bash(docker network ls *)",
+      "Bash(container version)",
+      "Bash(container --help)",
+      "Bash(container * --help)",
+      "Bash(container-compose --help)",
+      "Bash(container-compose * --help)",
       "Bash(terraform validate *)",
       "Bash(terraform validate)",
       "Bash(terraform fmt *)",
@@ -85,10 +109,25 @@
       "Bash(colima status *)",
       "Bash(npx textlint)",
       "Bash(npx textlint *)",
-      "Bash(gcloud auth list)",
-      "Bash(gcloud auth list *)",
-      "Bash(gcloud services list)",
-      "Bash(gcloud services list *)",
+      "Bash(gcloud * list *)",
+      "Bash(gcloud * list-* *)",
+      "Bash(gcloud * describe *)",
+      "Bash(gcloud * get-* *)",
+      "Bash(gcloud * print-* *)",
+      "Bash(gcloud logging read *)",
+      "Bash(gcloud info *)",
+      "Bash(gcloud version)",
+      "Bash(gcloud version *)",
+      "Bash(gcloud --version)",
+      "Bash(gcloud --help)",
+      "Bash(gcloud --help *)",
+      "Bash(gcloud * --help)",
+      "Bash(gcloud * --help *)",
+      "Bash(gcloud help)",
+      "Bash(gcloud help *)",
+      "Bash(bq ls *)",
+      "Bash(bq show *)",
+      "Bash(bq head *)",
       "Bash(brew services list)",
       "Bash(brew services list *)",
       "WebFetch",
@@ -100,6 +139,7 @@
       "mcp__jetbrains",
       "mcp__Context7",
       "mcp__claude_ai_Context7",
+      "mcp__textlint",
       "mcp__notion__notion-search",
       "mcp__mcp-obsidian__obsidian_list_files_in_vault",
       "mcp__mcp-obsidian__obsidian_list_files_in_dir",
@@ -110,17 +150,24 @@
       "mcp__mcp-obsidian__obsidian_get_periodic_note",
       "mcp__mcp-obsidian__obsidian_get_recent_periodic_notes",
       "mcp__mcp-obsidian__obsidian_get_recent_changes",
+      "mcp__idea__get_*",
+      "mcp__idea__list_*",
+      "mcp__idea__search_*",
+      "mcp__idea__find_*",
+      "mcp__idea__generate_*",
+      "mcp__idea__read_file",
+      "mcp__idea__preview_table_data",
+      "mcp__idea__test_database_connection",
       "WebSearch",
-      "Write(//tmp/**)",
       "Edit(//tmp/**)",
       "Read(//tmp/**)",
       "Read(//private/tmp/**)",
-      "Write(//var/folders/**)",
       "Edit(//var/folders/**)",
       "Read(//var/folders/**)",
-      "Write(//private/var/folders/**)",
       "Edit(//private/var/folders/**)",
       "Read(//private/var/folders/**)",
+      "Edit(~/.local/share/claude/retrospective/**)",
+      "Read(~/.local/share/claude/retrospective/**)",
       "Bash(mdfind:*)",
       "Bash(mise list *)",
       "Bash(mise list)",
@@ -196,7 +243,8 @@
       "Skill(codex:setup)",
       "Skill(codex:setup *)",
       "Skill(pr-review-toolkit:review-pr)",
-      "Skill(pr-review-toolkit:review-pr *)"
+      "Skill(pr-review-toolkit:review-pr *)",
+      "Bash(pr-monitor *)"
     ],
     "deny": [
       "Bash(git push --force *)",
@@ -204,6 +252,10 @@
       "Bash(git push * --force *)",
       "Bash(git push * -f *)",
       "Bash(git push *--force*)",
+      "Bash(git push --force-with-lease)",
+      "Bash(git push --force-with-lease *)",
+      "Bash(git push * --force-with-lease)",
+      "Bash(git push * --force-with-lease *)",
       "Bash(git worktree remove --force *)",
       "Bash(git worktree remove * --force *)",
       "Bash(git worktree remove -f *)",
@@ -218,6 +270,8 @@
       "Bash(git add -A *)",
       "Bash(git checkout .)",
       "Bash(git restore .)",
+      "Bash(gcloud * get-credentials *)",
+      "Bash(gcloud * get-mount-command *)",
       "WebFetch(domain:localhost)",
       "WebFetch(domain:127.0.0.1)",
       "WebFetch(domain:0.0.0.0)",
@@ -244,7 +298,6 @@
       "Read(**/serviceAccount.json)"
     ],
     "ask": [
-      "Bash(git merge *)",
       "Bash(git rebase *)",
       "Bash(git commit --amend)",
       "Bash(git commit --amend *)",
@@ -261,14 +314,13 @@
       "Bash(git worktree move *)",
       "Bash(git worktree lock *)",
       "Bash(git worktree unlock *)",
-      "Bash(gh issue edit *)",
-      "Bash(gh api * --method *)",
-      "Bash(gh api * -X *)",
-      "Bash(gh api * --input *)",
-      "Bash(gh api * -f *)",
-      "Bash(gh api * --field *)",
-      "Bash(gh api * -F *)",
-      "Bash(gh api * --raw-field *)",
+      "Bash(gh api * --method*)",
+      "Bash(gh api * -X*)",
+      "Bash(gh api * --input*)",
+      "Bash(gh api * -f*)",
+      "Bash(gh api * --field*)",
+      "Bash(gh api * -F*)",
+      "Bash(gh api * --raw-field*)",
       "mcp__jetbrains__run_configuration",
       "mcp__jetbrains__execute_terminal_command",
       "mcp__jetbrains__replace_file_text_by_path",
@@ -306,6 +358,43 @@
           {
             "type": "command",
             "command": "f=~/.claude/hooks/block_cd_chaining.py; if [ -f \"$f\" ] && command -v python3 >/dev/null; then python3 \"$f\"; fi"
+          },
+          {
+            "type": "command",
+            "command": "f=~/.claude/hooks/warn_scripting_oneliners.py; if [ -f \"$f\" ] && command -v python3 >/dev/null; then python3 \"$f\"; fi"
+          },
+          {
+            "type": "command",
+            "command": "f=~/.claude/hooks/block_raw_github_fetch.py; if [ -f \"$f\" ] && command -v python3 >/dev/null; then python3 \"$f\"; fi"
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "f=~/.claude/hooks/guard_default_branch_edits.py; if [ -f \"$f\" ] && command -v python3 >/dev/null; then python3 \"$f\"; fi"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "ExitPlanMode",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PostToolUse\",\"additionalContext\":\"If this plan involves implementation beyond a trivial edit, dispatch the implementer subagent per the implementation-delegation rule.\"}}'"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "f=~/.claude/hooks/remind_show_edit_diff.py; if [ -f \"$f\" ] && command -v python3 >/dev/null; then python3 \"$f\"; fi"
           }
         ]
       }
@@ -316,11 +405,21 @@
         "hooks": [
           {
             "type": "command",
-            "command": "f=~/.claude/hooks/approve_git_gh_commands.py; if [ -f \"$f\" ] && command -v python3 >/dev/null; then python3 \"$f\"; fi"
+            "command": "f=~/.claude/hooks/warn_gh_api.py; if [ -f \"$f\" ] && command -v python3 >/dev/null; then python3 \"$f\"; fi",
+            "if": "Bash(gh api *)"
           },
           {
             "type": "command",
-            "command": "f=~/.claude/hooks/approve_gh_graphql_readonly.py; if [ -f \"$f\" ] && command -v python3 >/dev/null; then python3 \"$f\"; fi"
+            "command": "f=~/.claude/hooks/approve_git_gh_commands.py; if [ -f \"$f\" ] && command -v python3 >/dev/null; then python3 \"$f\"; fi"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash|Edit|Write|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "f=~/.claude/hooks/soft_deny_first.py; if [ -f \"$f\" ] && command -v python3 >/dev/null; then python3 \"$f\"; fi"
           }
         ]
       }
@@ -415,7 +514,11 @@
     }
   },
   "effortLevel": "high",
+  "advisorModel": "fable",
+  "model": "claude-opus-4-7[1m]",
   "autoUpdatesChannel": "stable",
+  "tui": "default",
+  "autoMemoryEnabled": false,
   "theme": "auto",
   "remoteControlAtStartup": true,
   "inputNeededNotifEnabled": true,
