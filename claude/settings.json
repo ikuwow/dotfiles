@@ -165,7 +165,6 @@
       "Read(//var/folders/**)",
       "Edit(//private/var/folders/**)",
       "Read(//private/var/folders/**)",
-      "Write(~/.local/share/claude/retrospective/**)",
       "Edit(~/.local/share/claude/retrospective/**)",
       "Read(~/.local/share/claude/retrospective/**)",
       "Bash(mdfind:*)",
