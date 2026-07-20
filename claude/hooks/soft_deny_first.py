@@ -3,12 +3,16 @@
 
 Fires on ``PermissionRequest`` events (when a permission dialog would
 appear for a ``Bash``, ``Edit``, ``Write``, or ``NotebookEdit`` call). On
-the first occurrence of each distinct call per session, denies the
-permission with a message that steers the agent toward a route that
-does not need permission, or asks it to retry the exact same call with
-its reason stated. Re-issuing the same call within the TTL lets the
-hook fall through (``exit 0``) so the dialog reaches the user and they
-can approve.
+the first occurrence of each distinct call within a 10-minute window
+per session, denies the permission with a message that steers the
+agent toward a route that does not need permission, or asks it to
+retry the exact same call with its reason stated. Re-issuing the same
+call within the TTL lets the hook fall through (``exit 0``) so the
+dialog reaches the user and they can approve.
+
+Inert in manual mode (``permission_mode`` absent or ``"default"``):
+manual mode is chosen deliberately, so its prompts must appear without
+an extra agent round-trip.
 
 Registered under ``PermissionRequest`` with
 ``matcher: "Bash|Edit|Write|NotebookEdit"``. Defers to
@@ -45,7 +49,9 @@ MESSAGE = (
     "Permission would be required for this call. First consider a route "
     "that does not need permission. If no such route exists, retry the "
     "exact same call with your reason stated; the retry will reach the "
-    "user for confirmation."
+    "user for confirmation. (Bash commands match with whitespace "
+    "normalized; other tools require identical input; the exemption "
+    "lasts 10 minutes.)"
 )
 
 
@@ -90,7 +96,7 @@ def _load_state(session_id: str, now: float) -> dict:
     return {
         key: ts
         for key, ts in data.items()
-        if now - ts <= _TTL_SECONDS
+        if isinstance(ts, (int, float)) and now - ts <= _TTL_SECONDS
     }
 
 
@@ -136,9 +142,16 @@ def main() -> None:
         data = json.load(sys.stdin)
     except (json.JSONDecodeError, ValueError):
         sys.exit(0)
+    if not isinstance(data, dict):
+        sys.exit(0)
 
     permission_mode = data.get("permission_mode")
-    if not permission_mode or permission_mode == "default":
+    if not permission_mode:
+        # The spec sends this field on PermissionRequest; its absence is
+        # unexpected, and skipping here silently disables the hook.
+        print("soft_deny_first: permission_mode missing", file=sys.stderr)
+        sys.exit(0)
+    if permission_mode == "default":
         sys.exit(0)
 
     tool_name = data.get("tool_name", "")
@@ -154,13 +167,16 @@ def main() -> None:
         # Owned by warn_gh_api.py; keep the two hooks' boundaries aligned.
         sys.exit(0)
 
-    if should_approve is None:
-        print("soft_deny_first: approve_git_gh_commands unavailable", file=sys.stderr)
-        sys.exit(0)
-    if tool_name == "Bash" and should_approve("Bash", command):
-        # approve_git_gh_commands will emit allow in parallel; never deny
-        # what it would allow (the allow+deny combination is undocumented).
-        sys.exit(0)
+    if tool_name == "Bash":
+        # should_approve only ever matters for Bash, so a broken sibling
+        # must not disable the hook for the other tools.
+        if should_approve is None:
+            print("soft_deny_first: approve_git_gh_commands unavailable", file=sys.stderr)
+            sys.exit(0)
+        if should_approve("Bash", command):
+            # approve_git_gh_commands will emit allow in parallel; never deny
+            # what it would allow (the allow+deny combination is undocumented).
+            sys.exit(0)
 
     session_id = data.get("session_id", "default")
     now = datetime.now().timestamp()
@@ -176,6 +192,7 @@ def main() -> None:
     if not _save_state(session_id, entries):
         # State didn't persist; skip the deny so the retry isn't
         # infinite. Permission dialog reaches the user this time.
+        print("soft_deny_first: could not persist state", file=sys.stderr)
         sys.exit(0)
 
     print(json.dumps({
