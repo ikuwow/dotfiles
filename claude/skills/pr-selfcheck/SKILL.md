@@ -20,9 +20,8 @@ Perform a self-review of the specified PR to catch issues before a human reviewe
 1. When verifying a body claim needs file contents at the PR head,
    run `git fetch origin pull/<number>/head` once and read via
    `git show FETCH_HEAD:<path>`. Do not create local branches and do
-   not run `git branch -D`/`-d` — branch deletion hits a blocking
-   permission prompt in this environment, and skipping the cleanup
-   leaves stray branches behind
+   not run `git branch -D`/`-d` (branch deletion blocks on a
+   permission prompt)
 1. Read `~/.claude/skills/git-workflow/pr-guidelines.md` to load the PR Body Checklist
 1. For each URL found in the PR body, verify accessibility with WebFetch
    If a URL is unreachable (network error, 403, etc.), report it as "unverifiable" rather than a must-fix.
@@ -31,7 +30,7 @@ Perform a self-review of the specified PR to catch issues before a human reviewe
 
 ## Review Criteria
 
-Evaluate the PR against the PR Body Checklist loaded in Step 3 (`~/.claude/skills/git-workflow/pr-guidelines.md`).
+Evaluate the PR against the PR Body Checklist loaded in Step 4 (`~/.claude/skills/git-workflow/pr-guidelines.md`).
 
 In addition to the high-level checklist, apply the following concrete
 signals so detection does not rely on subagent interpretation alone.
