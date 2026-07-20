@@ -84,6 +84,7 @@
 - `gh` の中では高レベルサブコマンド（`gh pr view` / `gh pr diff` / `gh pr checks` / `gh issue view` / `gh run view` 等）を優先する。特にPRレビュー・レビューコメント・レビュースレッドの取得や操作は `gh pr-review` 拡張（`agynio/gh-pr-review`）を使う。sub-issue の list/add/remove は `gh sub-issue` 拡張を使う。`gh api`（特に `gh api graphql -f query=...`）はこれらで実現できない操作に限定する
 - IDE連携のMCPサーバー（コードインデックス・シンボル解決・静的解析等）が接続されている時は、コード検索・ナビゲーション・解析にその読み取り系ツールを優先する（ユーザーの明示は不要）
 - OSS・ライブラリ・ツール等を提案・採用する前にGitHubリポジトリ等で最終コミット・リリース・archive有無・issue/PR対応を確認する（README・履歴レベルで止める）。3年以上更新なし / archive済みは積極採用せず、確認結果を採用可否の根拠とし未確認なら「未確認」とする。用途が単純なら自前実装・forkも選択肢に含める
+- GitHub repositoryの内部詳細（source code・formula・configファイル等）を確認する時は個別ファイルから入らず上位から順に見る: README → 直近release tagとmain差分（`gh api repos/.../releases`）→ 既知issue/PR検索（`gh search issues/prs`）→ source code。CLIの使い方・挙動を `--help`・man page・実機実行で確認する段階では適用不要
 
 ---
 
