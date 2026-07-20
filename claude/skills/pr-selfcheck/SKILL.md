@@ -17,6 +17,12 @@ Perform a self-review of the specified PR to catch issues before a human reviewe
    `gh pr view <number> --json title,body,url,additions,deletions,files`
 1. Retrieve the diff:
    `gh pr diff <number>`
+1. When verifying a body claim needs file contents at the PR head,
+   run `git fetch origin pull/<number>/head` once and read via
+   `git show FETCH_HEAD:<path>`. Do not create local branches and do
+   not run `git branch -D`/`-d` — branch deletion hits a blocking
+   permission prompt in this environment, and skipping the cleanup
+   leaves stray branches behind
 1. Read `~/.claude/skills/git-workflow/pr-guidelines.md` to load the PR Body Checklist
 1. For each URL found in the PR body, verify accessibility with WebFetch
    If a URL is unreachable (network error, 403, etc.), report it as "unverifiable" rather than a must-fix.
