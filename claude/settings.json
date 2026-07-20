@@ -57,6 +57,8 @@
       "Bash(gh issue list *)",
       "Bash(gh issue create *)",
       "Bash(gh api repos/*/contents/*)",
+      "Bash(gh api /notifications*)",
+      "Bash(gh api '/notifications*)",
       "Bash(gh sub-issue list *)",
       "Bash(gh extension list)",
       "Bash(docker compose ps *)",

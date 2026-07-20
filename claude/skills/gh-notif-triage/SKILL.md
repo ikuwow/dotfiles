@@ -24,10 +24,15 @@ action-relevant items visible.
 1. Fetch notifications:
 
    ```
-   gh api '/notifications?all=false&per_page=50'
+   gh api /notifications --paginate
    ```
 
-   When the `all` argument is present, switch to `all=true`.
+   Unread-only is the API default. When the `all` argument is present,
+   use `gh api '/notifications?all=true' --paginate` instead.
+
+   The first `gh api` call in a session may be soft-denied once by the
+   warn_gh_api hook; retrying the identical command is the sanctioned
+   path (no high-level `gh` subcommand exists for notifications).
 
 2. Classify each thread per the rule table below.
 
@@ -45,8 +50,13 @@ action-relevant items visible.
 5. For each approved `done` candidate, mark it done:
 
    ```
-   gh api -X DELETE /notifications/threads/<thread_id>
+   gh api /notifications/threads/<thread_id> -X DELETE
    ```
+
+   Write the path before `-X` so the command matches the settings.json
+   ask rule for `gh api * -X*` — each delete goes through a permission
+   prompt even in `auto` mode (which only skips this skill's own
+   approval step).
 
 6. Print the list of done threads in-conversation. Do not write a log
    file — the kept categories (`review_requested` / `mention` /
