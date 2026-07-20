@@ -403,6 +403,15 @@
             "command": "f=~/.claude/hooks/approve_git_gh_commands.py; if [ -f \"$f\" ] && command -v python3 >/dev/null; then python3 \"$f\"; fi"
           }
         ]
+      },
+      {
+        "matcher": "Bash|Edit|Write|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "f=~/.claude/hooks/soft_deny_first.py; if [ -f \"$f\" ] && command -v python3 >/dev/null; then python3 \"$f\"; fi"
+          }
+        ]
       }
     ],
     "Notification": [
