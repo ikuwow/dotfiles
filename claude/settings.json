@@ -312,7 +312,6 @@
       "Bash(git worktree move *)",
       "Bash(git worktree lock *)",
       "Bash(git worktree unlock *)",
-      "Bash(gh issue edit *)",
       "Bash(gh api * --method*)",
       "Bash(gh api * -X*)",
       "Bash(gh api * --input*)",
@@ -385,6 +384,15 @@
           {
             "type": "command",
             "command": "echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PostToolUse\",\"additionalContext\":\"If this plan involves implementation beyond a trivial edit, dispatch the implementer subagent per the implementation-delegation rule.\"}}'"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "f=~/.claude/hooks/remind_show_edit_diff.py; if [ -f \"$f\" ] && command -v python3 >/dev/null; then python3 \"$f\"; fi"
           }
         ]
       }

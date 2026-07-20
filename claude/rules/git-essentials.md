@@ -50,3 +50,11 @@ NOT restate the detailed procedures from the skill.
   --hard` on a published branch, back out to a merge-based path:
   `gh pr update-branch <N>`, merge the default branch into the
   feature branch, or a fresh commit on top.
+
+## PR / issue body edits
+
+- Before running `gh pr edit` / `gh issue edit` with `--body`,
+  `--body-file`, or `--title`, present the diff between the current
+  and the new value in the conversation so the user can review and
+  recover overwritten content. Procedure lives in the git-workflow
+  skill Section 5.
