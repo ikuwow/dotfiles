@@ -50,6 +50,8 @@ record per finding:
 - `ts` is part of the id: session_id alone collides when one session
   appends multiple records
 - `row` is the 1-based line number in this cycle's findings.jsonl
+- `task` comes from the record's `task_summary`; `project` comes from
+  the note directory slug (it is not a record field)
 
 Then write `scope.json`: `[{"project": ..., "file": ..., "lines_covered": N}]`
 where `lines_covered` is each note file's total line count as of this
@@ -57,8 +59,9 @@ flatten (previously covered plus newly covered).
 
 ## Step 3: Normalize targets (subagent)
 
-Dispatch one sonnet subagent to map each finding's free-text
-`feedback_target` to one or two canonical IDs:
+Dispatch one sonnet subagent to read the workdir's `findings.jsonl`
+and map each finding's free-text `feedback_target` to one or two
+canonical IDs:
 
 - `AIRULES.md#<section name>`
 - `rules/<filename>`
@@ -74,9 +77,9 @@ report a frequency table plus any mappings it was unsure about.
 ## Step 4: Cluster (subagent)
 
 Dispatch one sonnet subagent (two independent ones plus a reconcile
-pass when findings exceed ~60) to cluster all findings by the mechanism
-similarity of their `root` fields, explicitly ignoring
-`feedback_target`. Give it `${CLAUDE_SKILL_DIR}/clusters.md` as the
+pass when findings exceed ~60) to read the workdir's `findings.jsonl`
+and cluster all findings by the mechanism similarity of their `root`
+fields, explicitly ignoring `feedback_target`. Give it `${CLAUDE_SKILL_DIR}/clusters.md` as the
 starting taxonomy; proposing new clusters or splits is allowed.
 
 Output: `assignment.jsonl` in the workdir
@@ -93,13 +96,16 @@ session context and cross-rule judgment.
 1. Effect measurement: read previous cycles' `actions.jsonl`. For each
    prior rule-edit and watch action, report whether its cluster
    recurred in this cycle's data (count and severity). This output is
-   mandatory — without it the feedback loop does not close.
+   mandatory — without it the feedback loop does not close. On a
+   machine's first cycle there are no prior actions; record that and
+   continue.
 1. Diagnose each cluster: rule-absent / rule-weak / rule-not-followed.
 1. Decide a disposition per cluster: rule-edit / skill-step / hook /
-   watch / accept / planned. Weigh cost of failure: cheap
-   self-correcting failures lean accept; failures that reach persisted
-   artifacts, infrastructure, or user-facing claims lean structural
-   fixes.
+   watch / accept / planned. Consult `target-map.jsonl` to identify
+   the concrete target asset (rule file, section, or skill) for each
+   cluster's action. Weigh cost of failure: cheap self-correcting
+   failures lean accept; failures that reach persisted artifacts,
+   infrastructure, or user-facing claims lean structural fixes.
 1. Write `report.md` to the workdir: cluster table (counts, severity
    mix, diagnosis, disposition), effect-measurement results, key
    observations, and proposed actions in priority order.
