@@ -35,6 +35,7 @@ link .gemrc                   "$HOME/.gemrc"
 link .default-gems            "$HOME/.default-gems"
 link .default-npm-packages    "$HOME/.default-npm-packages"
 link .default-python-packages "$HOME/.default-python-packages"
+link .textlintrc.json         "$HOME/.textlintrc.json"
 
 # XDG config: all subdirs in xdg-config/ auto-discovered
 mkdir -p "$XDG_CONFIG_HOME"
@@ -65,12 +66,16 @@ link claude/settings.json          "$HOME/.claude/settings.json"
 link claude/statusline-command.sh  "$HOME/.claude/statusline-command.sh"
 link AIRULES.md           "$HOME/.claude/CLAUDE.md"
 mkdir -p "$HOME/.claude/skills"
+find "$HOME/.claude/skills/" -maxdepth 1 -type l ! -exec test -e {} \; -print
 find "$DOTPATH/claude/skills" -maxdepth 1 -mindepth 1 -type d -exec ln -fvns {} "$HOME/.claude/skills/" \;
 mkdir -p "$HOME/.claude/hooks"
+find "$HOME/.claude/hooks/" -maxdepth 1 -type l ! -exec test -e {} \; -print
 find "$DOTPATH/claude/hooks" -maxdepth 1 -mindepth 1 -type f ! -name 'test_*' -exec ln -fvns {} "$HOME/.claude/hooks/" \;
 mkdir -p "$HOME/.claude/agents"
+find "$HOME/.claude/agents/" -maxdepth 1 -type l ! -exec test -e {} \; -print
 find "$DOTPATH/claude/agents" -maxdepth 1 -mindepth 1 -type f -name '*.md' -exec ln -fvns {} "$HOME/.claude/agents/" \;
 mkdir -p "$HOME/.claude/rules"
+find "$HOME/.claude/rules/" -maxdepth 1 -type l ! -exec test -e {} \; -print
 find "$DOTPATH/claude/rules" -maxdepth 1 -mindepth 1 -type f -name '*.md' -exec ln -fvns {} "$HOME/.claude/rules/" \;
 
 # Codex CLI
@@ -81,4 +86,5 @@ find "$DOTPATH/codex/rules" -maxdepth 1 -mindepth 1 -type f -name '*.rules' -exe
 # Junie CLI (JetBrains)
 link AIRULES.md  "$HOME/.junie/AGENTS.md"
 mkdir -p "$HOME/.junie/skills"
+find "$HOME/.junie/skills/" -maxdepth 1 -type l ! -exec test -e {} \; -print
 find "$DOTPATH/claude/skills" -maxdepth 1 -mindepth 1 -type d -exec ln -fvns {} "$HOME/.junie/skills/" \;

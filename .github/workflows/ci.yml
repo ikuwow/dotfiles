@@ -14,6 +14,7 @@ jobs:
           shellcheck -- **/*.sh
           find bin/ -type f ! -name '*.md' -exec shellcheck {} +
           find xdg-config/git/hooks/ -type f -exec shellcheck {} +
+          find gh-extensions/ -type f ! -name '*.md' ! -name 'LICENSE' -exec shellcheck {} +
           shellcheck --exclude SC2148 .bash_profile .bashrc
   python-doctest:
     runs-on: ubuntu-latest

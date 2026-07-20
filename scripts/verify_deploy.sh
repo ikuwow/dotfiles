@@ -1,11 +1,14 @@
 #!/bin/bash
 
 # Verify that deploy.sh created expected symlinks and directories.
-# Exit with non-zero if any check fails.
+# Exits non-zero only on a repo-driven check failure (missing symlink,
+# missing directory). Host-drift checks (dangling symlinks, untracked
+# real files) print WARN and never fail the exit code.
 
 set -eu
 
 errors=0
+warnings=0
 
 check_symlink() {
   local path="$1"
@@ -24,6 +27,39 @@ check_dir() {
   else
     echo "FAIL: $path does not exist"
     errors=$((errors + 1))
+  fi
+}
+
+# Drift checks below are warnings, not failures: the live host's symlink
+# state is ambient, human-owned state (a stray dangling symlink might be
+# something intentionally left for manual review), not a repo-consistency
+# fact this script can safely gate a commit on. deploy.sh never
+# auto-deletes for the same reason. See check_symlink/check_dir above for
+# the deterministic, repo-driven checks that DO fail the build.
+
+check_no_dangling_symlinks() {
+  local dir="$1"
+  local dangling
+  dangling=$(find "$dir" -maxdepth 1 -type l ! -exec test -e {} \; -print)
+  if [ -z "$dangling" ]; then
+    echo "OK: $dir has no dangling symlinks"
+  else
+    echo "WARN: $dir has dangling symlinks (review and remove manually if stale):"
+    echo "$dangling"
+    warnings=$((warnings + 1))
+  fi
+}
+
+check_no_untracked_real_files() {
+  local dir="$1"
+  local real_files
+  real_files=$(find "$dir" -maxdepth 1 -type f -print)
+  if [ -z "$real_files" ]; then
+    echo "OK: $dir has no untracked real files"
+  else
+    echo "WARN: $dir has real files not managed by deploy.sh (should be symlinks):"
+    echo "$real_files"
+    warnings=$((warnings + 1))
   fi
 }
 
@@ -65,19 +101,26 @@ check_symlink "$HOME/.claude/settings.json"
 check_symlink "$HOME/.claude/CLAUDE.md"
 check_dir "$HOME/.claude/skills"
 check_dir "$HOME/.claude/hooks"
+check_dir "$HOME/.claude/agents"
 check_dir "$HOME/.claude/rules"
-# Auto-discovered skills, hooks, and rules
+# Auto-discovered skills, hooks, agents, and rules
 check_symlink "$HOME/.claude/skills/retrospective"
 check_symlink "$HOME/.claude/hooks/approve_git_gh_commands.py"
-check_symlink "$HOME/.claude/hooks/approve_gh_graphql_readonly.py"
 check_symlink "$HOME/.claude/hooks/hook_utils.py"
-check_symlink "$HOME/.claude/rules/git-workflow.md"
-check_symlink "$HOME/.claude/rules/gh-graphql.md"
+check_symlink "$HOME/.claude/agents/investigator.md"
+check_symlink "$HOME/.claude/skills/git-workflow"
+check_no_dangling_symlinks "$HOME/.claude/skills"
+check_no_dangling_symlinks "$HOME/.claude/hooks"
+check_no_dangling_symlinks "$HOME/.claude/agents"
+check_no_dangling_symlinks "$HOME/.claude/rules"
+check_no_untracked_real_files "$HOME/.claude/rules"
 
 echo ""
 if [ "$errors" -gt 0 ]; then
   echo "FAILED: $errors check(s) failed"
   exit 1
+elif [ "$warnings" -gt 0 ]; then
+  echo "PASSED with $warnings warning(s) — see WARN lines above"
 else
   echo "All checks passed"
 fi

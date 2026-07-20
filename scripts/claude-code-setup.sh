@@ -33,6 +33,8 @@ mcp_add Context7 '{"command":"npx","args":["-y","@upstash/context7-mcp"]}'
 # they're not secret and Claude Code's diagnostics warn about missing env vars.
 # shellcheck disable=SC2016
 mcp_add mcp-obsidian '{"command":"uvx","args":["mcp-obsidian"],"env":{"OBSIDIAN_API_KEY":"${OBSIDIAN_API_KEY}","OBSIDIAN_HOST":"127.0.0.1","OBSIDIAN_PORT":"27123"}}'
+# textlint resolves presets via Node sibling lookup, so each preset needs its own -p.
+mcp_add textlint "{\"command\":\"npx\",\"args\":[\"-y\",\"-p\",\"textlint\",\"-p\",\"textlint-rule-preset-jtf-style\",\"-p\",\"textlint-rule-preset-ja-technical-writing\",\"-p\",\"textlint-rule-preset-ai-writing\",\"textlint\",\"--mcp\",\"--config\",\"$HOME/.textlintrc.json\"]}"
 
 # --- Plugins ---
 # Ensure marketplaces exist (required on fresh environments like Claude Code web).
