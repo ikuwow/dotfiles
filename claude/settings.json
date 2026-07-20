@@ -20,6 +20,7 @@
       "Bash(mkdir *)",
       "Bash(tree *)",
       "Bash(git *)",
+      "Bash(git merge *)",
       "Bash(git-worktree-create *)",
       "Bash(jq *)",
       "Bash(yq *)",
@@ -295,7 +296,6 @@
       "Read(**/serviceAccount.json)"
     ],
     "ask": [
-      "Bash(git merge *)",
       "Bash(git rebase *)",
       "Bash(git commit --amend)",
       "Bash(git commit --amend *)",
