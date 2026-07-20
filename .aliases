@@ -33,7 +33,7 @@ alias mysql='mysql --pager="less -S -n -i -F -X"'
 alias remotehost="cat ~/.ssh/config ~/.ssh/config.d/* | grep -e '^Host' | sed -e 's/^Host //g'"
 alias tf='terraform'
 alias today='date +%Y%m%d'
-alias now='date +%Y%m%d%H%I%S'
+alias now='date +%Y%m%d%H%M%S'
 alias kc='kubectl'
 alias bs='brew services'
 

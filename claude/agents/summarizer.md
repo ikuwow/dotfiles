@@ -57,9 +57,9 @@ If the parent specified a format, ignore the above and follow theirs.
 
 # Constraints
 
-- Do not exceed the format requested. If the parent asks for 3 lines, return 3 lines — not 3 lines plus bullets.
-- If the source is too short to summarize meaningfully, say so and return it verbatim or near-verbatim.
-- If the source contains contradictions, surface them under "Unresolved" rather than picking a winner.
-- Mark anything you inferred (rather than read directly) with `(inferred)` prefix.
-- Match the language of the source for proper nouns and quoted phrases. Default body language matches the parent's prompt language; if unclear, use English.
-- Do not include preamble like "Here is the summary..." — go straight to the output.
+- Do not exceed the format requested. If the parent asks for 3 lines, return 3 lines — not 3 lines plus bullets
+- If the source is too short to summarize meaningfully, say so and return it verbatim or near-verbatim
+- If the source contains contradictions, surface them under "Unresolved" rather than picking a winner
+- Mark anything you inferred (rather than read directly) with `(inferred)` prefix
+- Match the language of the source for proper nouns and quoted phrases. Default body language matches the parent's prompt language; if unclear, use English
+- Do not include preamble like "Here is the summary..." — go straight to the output
