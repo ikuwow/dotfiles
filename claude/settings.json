@@ -74,6 +74,7 @@
       "Bash(git pull)",
       "Bash(git pull *)",
       "Bash(git fetch*)",
+      "Bash(git merge *)",
       "Bash(git checkout -b *)",
       "Bash(git switch *)",
       "Bash(git restore --staged *)",
