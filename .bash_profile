@@ -54,7 +54,6 @@ fi
 # Universal PATH
 PATH="$HOME/bin:$PATH"
 PATH="$HOME/.local/bin:$PATH"
-PATH="$HOME/.ticloud/bin:$PATH"
 export PATH
 
 # Universal environment
