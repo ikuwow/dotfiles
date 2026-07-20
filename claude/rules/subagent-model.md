@@ -1,27 +1,34 @@
 # Subagent Model Selection
 
-When spawning subagents via the Agent tool, select the model based on task
-complexity to balance cost and capability.
+When spawning subagents via the Agent tool, select the model based
+on task complexity to balance cost and capability.
 
-## Model Guidelines
+Built-in subagent types have their own defaults — do not override
+them.
 
-Built-in subagent types have their own defaults — do not override them:
-
-- Explore: defaults to Haiku (already optimized, no override needed)
-- Plan: inherits from the main session model (Opus — no override needed)
-
-For general-purpose subagents, apply these rules:
+For general-purpose subagents:
 
 | Task type | `model` parameter |
 |---|---|
 | Search, file reading, data gathering, formatting | `"sonnet"` |
 | Writing code for well-defined, straightforward tasks | `"sonnet"` |
-| Architecture decisions, complex reasoning, large-scale code generation | omit (inherits Opus) |
+| Multi-file implementation, non-trivial investigation, deep debugging, adversarial review | `"opus"` |
 
-## Rationale
+Omitting `model` inherits the session model, whatever it currently
+is. Run a subagent on `"fable"` — whether by explicit `model` or by
+inheritance — only on explicit user instruction; agents and skills
+that pin `fable` in their own definition (e.g. fable-advisor) are
+exempt.
 
-- Opus is reserved for tasks that genuinely require deep reasoning
-- `CLAUDE_CODE_SUBAGENT_MODEL` env var is NOT used because it overrides
-  per-invocation model parameters and would weaken Plan agents
-- Skills define their own model in frontmatter and are not affected by
-  this guideline
+## Delegation economy
+
+- Delegate independent, fan-out-able subtasks to subagents instead of
+  running them inline
+- Keep the main session for orchestration, design decisions, and
+  final review
+- Write delegation briefs goal-first: state the outcome and
+  constraints, not step-by-step procedures
+
+Do not set the `CLAUDE_CODE_SUBAGENT_MODEL` env var (it overrides
+per-invocation model parameters). Skills define their own model in
+frontmatter and are not affected by this guideline.
