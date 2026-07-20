@@ -1,0 +1,5 @@
+# Map any github.com repo to its ghq clone so `c` (checkout) resolves
+# without enumerating owners. gh-dash treats ":owner/:repo" as a literal
+# template key (see dlvhdr/gh-dash internal/tui/common/repopath.go).
+repoPaths:
+  ":owner/:repo": ~/ghq/github.com/:owner/:repo

@@ -1,15 +1,16 @@
 # rubocop:disable all
 
-tap "homebrew/autoupdate"
-tap "ikuwow/ikuwow-sshrc"
-tap "Songmu/tap"
-tap "fujiwara/tap"
-tap "kayac/tap"
-tap "keidarcy/tap"
-tap "oven-sh/bun"
-tap "configcat/tap"
-tap "pipe-cd/homebrew-tap"
-tap "jetbrains/junie"
+tap "homebrew/autoupdate", trusted: true
+tap "ikuwow/ikuwow-sshrc", trusted: true
+tap "Songmu/tap", trusted: true
+tap "fujiwara/tap", trusted: true
+tap "kayac/tap", trusted: true
+tap "keidarcy/tap", trusted: true
+tap "oven-sh/bun", trusted: true
+tap "configcat/tap", trusted: true
+tap "pipe-cd/tap", trusted: true
+tap "datadog-labs/pack", trusted: true
+tap "jetbrains/junie", trusted: true
 
 brew "mas"
 
@@ -46,7 +47,7 @@ brew "grep"
 
 # AI tools
 cask "codex"
-cask "claude-code"
+cask "claude-code@latest"
 brew "gemini-cli"
 brew "junie"
 
@@ -59,12 +60,16 @@ brew "uv"
 brew "node"
 brew "bun"
 
-# For AWS
+# AWS
 brew "awscli"
 brew "awslogs"
 brew "cfn-lint"
 cask "session-manager-plugin"
 brew "lambroll"
+
+# GCP
+cask "gcloud-cli"
+brew "cloud-sql-proxy"
 
 brew "zlib"
 brew "mise"
@@ -129,7 +134,6 @@ brew "datadog-labs/pack/pup"
 # Databases
 # brew "mysql" # Do not install mysql (server)
 brew "mysql-client"
-cask "mysqlworkbench"
 brew "postgresql"
 brew "tbls"
 brew "sqlparse"
@@ -158,31 +162,31 @@ brew "virt-manager"
 brew "docker"
 brew "docker-compose"
 brew "docker-buildx"
-brew "colima", restart_service: true
+brew "colima"
 brew "lima-additional-guestagents" # https://github.com/abiosoft/colima/issues/1333
+
+brew "container" # Do not use brew services: container manages its own LaunchAgent. apple/container#158
+brew "socktainer", start_service: true, restart_service: :changed
+brew "container-compose"
 brew "kubie"
 brew "k9s"
 brew "kind"
 brew "helm"
 brew "helmfile"
-cask "copilot-cli"
 brew "ecspresso"
 brew "ecschedule"
 brew "e1s"
 # kubectl and kustomize should be managed by mise
-brew "pipe-cd/homebrew-tap/pipectl"
-cask "container"
+brew "pipe-cd/tap/pipectl"
 
 # Browsers
 cask "google-chrome"
 cask "firefox"
 
-cask "deepl"
 cask "1password-cli"
 cask "neovide-app"
 cask "vimr"
 cask "xquartz"
-cask "gcloud-cli"
 cask "vagrant"
 cask "vlc"
 cask "zoom"
@@ -191,12 +195,12 @@ cask "onyx"
 cask "claude"
 cask "utm"
 cask "wireshark-app"
-cask "gitify"
 cask "zotero"
 
 # Work related
 
 mas "Dark Reader for Safari", id: 1438243180
+mas "Userscripts", id: 1463298887
 mas "The Unarchiver", id: 425424353
 mas "Numbers", id: 409203825
 mas "Keynote", id: 409183694

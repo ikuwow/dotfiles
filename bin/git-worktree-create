@@ -1,12 +1,17 @@
 #!/bin/bash
 
 # Create a git worktree with a sanitized directory name under .worktrees/
-# Usage: git-worktree-create <branch-name>
+# Usage: git-worktree-create <branch-name> [base]
+#
+# If <base> is omitted, the worktree branches from origin's default branch
+# (e.g. origin/main). The remote tip is fetched first so the new branch
+# reflects the latest upstream state regardless of which branch you're
+# currently on. If <base> is given, it is used verbatim (no fetch).
 
 set -eu
 
-if [ $# -ne 1 ]; then
-  echo "Usage: git-worktree-create <branch-name>" >&2
+if [ $# -lt 1 ] || [ $# -gt 2 ]; then
+  echo "Usage: git-worktree-create <branch-name> [base]" >&2
   exit 1
 fi
 
@@ -16,11 +21,25 @@ if [ "$(pwd)" != "$(git rev-parse --show-toplevel)" ]; then
 fi
 
 branch="$1"
+
+if [ $# -eq 2 ]; then
+  base="$2"
+else
+  if ! head_ref="$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null)"; then
+    echo "Error: origin/HEAD is not set; cannot resolve default branch" >&2
+    echo "Hint: run 'git remote set-head origin -a' first" >&2
+    exit 1
+  fi
+  default_branch="${head_ref#refs/remotes/origin/}"
+  git fetch origin "$default_branch"
+  base="origin/${default_branch}"
+fi
+
 sanitized="$(echo "$branch" | tr '/' '-')"
 date_str="$(date +%Y%m%d)"
 dir=".worktrees/${date_str}-${sanitized}"
 
-git worktree add -b "$branch" "$dir"
+git worktree add -b "$branch" "$dir" "$base"
 echo ""
 echo "Run this to start working in the worktree:"
 echo "  cd $dir"

@@ -1,0 +1,138 @@
+#!/usr/bin/env bash
+#
+# gh-sub-issue: manage GitHub sub-issues (list/add/remove) via the REST
+# endpoints under /issues/{number}/sub_issues, which gh has no built-in
+# subcommand for. Independent implementation; nothing vendored.
+
+set -eu
+
+usage() {
+  cat <<'EOF'
+Usage:
+  gh sub-issue list <parent-issue-number>
+  gh sub-issue add <parent-issue-number> --sub-issue-number <child-issue-number> [--replace-parent]
+  gh sub-issue remove <parent-issue-number> --sub-issue-number <child-issue-number>
+EOF
+}
+
+die() {
+  echo "gh sub-issue: $1" >&2
+  exit 1
+}
+
+require_number() {
+  local label="$1" value="$2"
+  [[ "$value" =~ ^[0-9]+$ ]] || die "$label must be a positive integer, got: $value"
+}
+
+# The sub_issues API addresses children by their numeric database id, not
+# their repo-local issue number, so resolve that first.
+child_issue_id() {
+  local number="$1" id
+  id=$(gh api "/repos/{owner}/{repo}/issues/$number" --jq '.id // empty')
+  [ -n "$id" ] || die "could not resolve issue #$number to an id (does it exist?)"
+  echo "$id"
+}
+
+cmd_list() {
+  [ $# -eq 1 ] || { usage >&2; exit 1; }
+  local parent="$1"
+  require_number "parent issue number" "$parent"
+  gh api "/repos/{owner}/{repo}/issues/$parent/sub_issues" --template \
+    '{{range .}}{{tablerow (printf "#%v" .number) .title (join ", " (pluck "name" .labels)) (timeago .updated_at)}}{{end}}{{tablerender}}'
+}
+
+cmd_add() {
+  [ $# -ge 1 ] || { usage >&2; exit 1; }
+  local parent="$1"
+  shift
+  require_number "parent issue number" "$parent"
+
+  local sub_number="" replace_parent=0
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --sub-issue-number)
+        [ $# -ge 2 ] || die "--sub-issue-number requires a value"
+        sub_number="$2"
+        shift 2
+        ;;
+      --replace-parent)
+        replace_parent=1
+        shift
+        ;;
+      *)
+        die "unknown flag: $1"
+        ;;
+    esac
+  done
+  [ -n "$sub_number" ] || die "--sub-issue-number is required"
+  require_number "sub-issue number" "$sub_number"
+
+  local sub_id
+  sub_id=$(child_issue_id "$sub_number")
+
+  if [ "$replace_parent" -eq 1 ]; then
+    gh api "/repos/{owner}/{repo}/issues/$parent/sub_issues" \
+      -F sub_issue_id="$sub_id" -F replace_parent=true
+  else
+    gh api "/repos/{owner}/{repo}/issues/$parent/sub_issues" \
+      -F sub_issue_id="$sub_id"
+  fi
+}
+
+cmd_remove() {
+  [ $# -ge 1 ] || { usage >&2; exit 1; }
+  local parent="$1"
+  shift
+  require_number "parent issue number" "$parent"
+
+  local sub_number=""
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --sub-issue-number)
+        [ $# -ge 2 ] || die "--sub-issue-number requires a value"
+        sub_number="$2"
+        shift 2
+        ;;
+      *)
+        die "unknown flag: $1"
+        ;;
+    esac
+  done
+  [ -n "$sub_number" ] || die "--sub-issue-number is required"
+  require_number "sub-issue number" "$sub_number"
+
+  local sub_id
+  sub_id=$(child_issue_id "$sub_number")
+
+  gh api -X DELETE "/repos/{owner}/{repo}/issues/$parent/sub_issue" \
+    -F sub_issue_id="$sub_id"
+}
+
+if [ $# -eq 0 ]; then
+  usage >&2
+  exit 1
+fi
+
+case "$1" in
+  -h | --help)
+    usage
+    exit 0
+    ;;
+  list)
+    shift
+    cmd_list "$@"
+    ;;
+  add)
+    shift
+    cmd_add "$@"
+    ;;
+  remove)
+    shift
+    cmd_remove "$@"
+    ;;
+  *)
+    usage >&2
+    exit 1
+    ;;
+esac
