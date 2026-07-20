@@ -29,7 +29,7 @@ Compute the current session's transcript path. The Session ID is
 already substituted below when this SKILL.md loads:
 
 - Session ID: `${CLAUDE_SESSION_ID}`
-- Munged cwd: run `pwd | sed 's|/|-|g'` (every `/` becomes `-`, so a
+- Munged cwd: run `pwd | tr '/' '-'` (every `/` becomes `-`, so a
   leading `/` becomes a leading `-`)
 - Full path: `$HOME/.claude/projects/<munged-cwd>/<session-id>.jsonl`
 
@@ -60,40 +60,104 @@ Inputs:
 
 Output: return the analysis findings in the format specified in
 analysis.md. For each finding, include a `Scope:` tag with value
-`global` or `project-specific`. Do not create GitHub issues and do
+`global` or `project-specific`, and a `Destination:` tag with one of
+`existing-rule-edit` / `existing-skill-update` / `mechanize` /
+`new-rule` / `new-skill`. Do not create GitHub issues and do
 not invoke AskUserQuestion — the orchestrator handles routing after
 you return. Do not add preamble or closing remarks.
 ```
 
 ## Step 2: Route findings by scope
 
-Take the subagent's output verbatim and act on each finding based on
-its Scope tag.
+Take the subagent's output verbatim. Each finding carries a `Scope`
+(`global` / `project-specific`) tag and a `Destination`
+(`existing-rule-edit` / `existing-skill-update` / `mechanize` /
+`new-rule` / `new-skill`) tag from Step 1. Ask the user how to route
+each finding — do not auto-file or auto-apply anything.
 
-### Global-scope findings
+### Sanitize global findings before filing as an issue
 
-ikuwow/dotfiles is a public repository. Before filing, sanitize the
-global-scope problem/countermeasure pairs: do not include the names
-of private repositories, their PR/issue numbers, their code, or
-quoted text from their rule files. Describe each problem by its
-behavior pattern (e.g., "a work project's Terraform PR review") so
-the countermeasure stays understandable without the private context.
+This applies only when a global-scope finding is being filed as an
+issue below. ikuwow/dotfiles is a public repository: do not include
+the names of private repositories, their PR/issue numbers, their
+code, or quoted text from their rule files. Describe each problem by
+its behavior pattern (e.g., "a work project's Terraform PR review")
+so the countermeasure stays understandable without the private
+context.
 
-Create one GitHub issue in ikuwow/dotfiles holding the sanitized
-pairs via `--body-file` (never `--body`), title
-`Retrospective: <date> <one-line session summary>` (sanitized as
-above), label `retrospective`. The label is provisioned once at
-setup; if `gh issue create` fails because it is missing, run
-`gh label create retrospective --repo ikuwow/dotfiles --force` and retry.
-Skip issue creation when there are no global-scope findings.
+### Ask the user how to route each finding
 
-The weekly-improvement routine consumes these issues — do not
-implement global countermeasures in this session unless the user asks.
+For each finding, ask via AskUserQuestion using the choices below.
 
-### Project-scope findings
+- Project-specific finding: `apply now` / `create issue` / `skip` / `Other`
+- Global finding: `create issue` / `skip` / `Other` — no `apply now`
+  - The weekly-improvement routine consumes global issues, so
+    silently applying them here would skip that queue
+  - Editing dotfiles-managed files from an arbitrary project
+    session would bypass the dotfiles branch/PR workflow
+  - When the session cwd is the dotfiles repo itself, the bypass
+    rationale does not hold; keep the ban for consistency and use
+    `Other` for a manual dotfiles-side edit
 
-Never file these as retrospective issues in ikuwow/dotfiles. Present
-them in the session and ask the user how to handle them
-(AskUserQuestion), offering these choices for each finding: apply to
-the project's rule files now / create an issue in the project's own
-repository / drop.
+`apply now` branch gate (project-specific only):
+
+- Refuse when HEAD is on the default branch of the current repo,
+  detected with the two commands below (both emit the short branch
+  name, so a direct string equality holds), and tell the user to
+  `create issue` or `skip` instead
+
+```
+current=$(git rev-parse --abbrev-ref HEAD)
+default=$(git symbolic-ref --short refs/remotes/origin/HEAD | sed 's|^origin/||')
+[ "$current" = "$default" ] && refuse
+```
+- On a feature branch, write files but do NOT commit, then print
+  the exact paths written and warn that the changes land in the
+  current branch's working tree — commit or discard per the branch's
+  PR intent
+
+`apply now` (project-specific only), by destination:
+
+- `existing-rule-edit` / `existing-skill-update` → Edit the target file
+- `mechanize` → Write the hook script or CI config; extend
+  `.claude/settings.json`'s hooks section if the countermeasure needs
+  a new hook entry
+- `new-rule` → Write the new rule file; add a 1-line pointer in the
+  parent rule if applicable
+- `new-skill` → Create the skill directory with a `SKILL.md` skeleton
+  and frontmatter; the content is fleshed out in a later session
+
+`create issue`:
+
+- Batch by scope: all approved global findings become one issue in
+  `ikuwow/dotfiles`, and all approved project findings become one
+  issue in the current cwd's repo — never one issue per finding,
+  since the weekly-improvement routine and project maintainers
+  consume session-level issues
+- Global → `ikuwow/dotfiles`, label `retrospective`, via
+  `--body-file` (never `--body`), title
+  `Retrospective: <date> <one-line session summary>` (sanitized as
+  above). The label is provisioned once at setup; if
+  `gh issue create` fails because it is missing, run
+  `gh label create retrospective --repo ikuwow/dotfiles --force` and
+  retry
+- Project-specific → the current cwd's repository, via
+  `--body-file`, no label
+- The issue body lists each included finding with its `Destination:`
+  tag and the concrete countermeasure content, so the
+  weekly-improvement routine (or the project's own maintainers) can
+  act on each item directly
+
+`skip` — drop the finding with no record.
+
+`Other` — follow the user's free-text instruction.
+
+### Prompt fatigue mitigation
+
+- 4 or fewer findings: ask about all of them in a single
+  AskUserQuestion call (max 4 questions per call)
+- 5 or more findings: keep only `medium` and `high` severity findings
+  for AskUserQuestion; auto-`skip` `low` severity findings and
+  announce it in one line ("auto-skipped N low-severity findings")
+- If the remaining `medium`+`high` findings still exceed 4, split
+  them across multiple AskUserQuestion calls of up to 4 questions each

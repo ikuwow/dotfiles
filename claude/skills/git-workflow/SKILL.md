@@ -7,9 +7,7 @@ description: Standard git/GitHub workflow - branch setup, implementation, draft 
 
 Standard git/GitHub workflow for all projects.
 Follow each step in order. Skip a step only when its precondition is
-structurally absent (e.g., no PR exists yet). Never skip a phase
-because the diff seems small or the step feels disproportionate — run
-it as-is.
+structurally absent (e.g., no PR exists yet).
 
 Prerequisite: the `agynio/gh-pr-review` gh extension is installed
 (used by Phase 5 review-thread reactions).
@@ -23,6 +21,12 @@ Prerequisite: the `agynio/gh-pr-review` gh extension is installed
 - Phase 2 code review and Phase 5 Monitor arming are pre-authorized —
   run them without pausing for confirmation. The only user decision
   point in the flow is flipping the PR from draft to ready for review.
+- Signals like a small diff or personal-project scope affect how you
+  weigh findings within a phase, never whether to run it. The only
+  override to the pre-authorization above is an explicit user
+  instruction that names a stopping point ("stop after creating the
+  draft PR", "skip Phase 2 for this PR", "no Monitor"). Absent that,
+  run every phase.
 - Never create or edit files on the default branch. Always move into the
   worktree (or feature branch) first. Creating files before branching
   leads to redundant copy-and-delete work.
@@ -111,9 +115,12 @@ The code review is single-pass — do not re-run after fixes.
 `/pr-selfcheck` runs again in Phase 3 to catch inconsistencies
 introduced by review fix changes.
 
-When a fix is delegated to a subagent, arm a Monitor on the branch
-head (event-driven) instead of a fixed-delay wakeup, and tell the
-user what is being awaited before going idle.
+Never end a turn that claims ongoing waiting (delegated fix push,
+CI run, CI rerun, external state change) without an armed event
+source — a Monitor on the branch head, or `gh pr checks --watch`
+with `run_in_background: true`. After every `gh run rerun` or other
+re-kick, re-arm the watch before yielding. State what is being
+awaited in the final message before going idle.
 
 ### Phase 4: Finalize PR for review readiness
 
@@ -136,17 +143,18 @@ covers three things:
 
 Update incrementally as conditions are confirmed (e.g., after Phase 1
 CI passes, after apply / deploy succeeds, after post-deploy
-verification with `curl`, `aws logs tail`, etc.) — do not wait until
-the very end to do all of it at once.
+verification with `curl`, `aws logs tail`, etc.).
 
-This step is not optional. Execute it autonomously instead of waiting
-for the user to remind you. Use the section 5 procedure
-(`gh pr edit --body-file`) for body edits.
+Use the section 5 procedure (`gh pr edit --body-file`) for body
+edits.
 
 ### Phase 5: Watch PR activity until merge
 
-After Phase 4 completes, arm a persistent `Monitor` running
-`pr-monitor <PR number>`. It polls every 60s and emits one stdout line
+Arm the persistent `Monitor` running `pr-monitor <PR number>` in the
+same turn you surface Phase 4 completion — before handing control back
+to the user and before they flip the PR to ready. `READY_FOR_REVIEW`
+is itself a monitored event, so an arm deferred until after the ready
+flip can never observe it. It polls every 60s and emits one stdout line
 per actionable change; quiet periods stay silent.
 
 1. Event lines:
@@ -236,11 +244,4 @@ After the PR is merged (or the task is fully done):
 
 1. Move back to the repository root:
    `cd <repository root>`
-1. Delete unused local branches (merged, squash-merged, or upstream
-   gone) along with their worktrees, and prune stale worktree entries:
-   `git cleanup-branches`
-   - Use the space form (`git cleanup-branches`); it is already covered
-     by the `Bash(git *)` allow rule, so no extra permission is needed.
-   - Plain `git branch -d` rejects squash-merged branches as "not fully
-     merged", so a custom sweep is needed for repos that squash on
-     merge.
+1. Run `git cleanup` once.

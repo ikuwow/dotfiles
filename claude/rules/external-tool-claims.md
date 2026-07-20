@@ -30,10 +30,16 @@ For which model served a turn, prefer the session jsonl's
 `.message.model` over the environment identity string ("You are
 powered by …"); the two can disagree.
 
-If none of these can be verified, mark the claim as `要検証 / unverified`
-and either ask the user to verify with a clear "I have not confirmed
-this" caveat, or investigate yourself before asking the user to spend
-their time testing it on their host.
+When a primary source could exist but you have not read it, investigate
+first (docs / man page / `--help` / source via `gh api ... -H "Accept:
+application/vnd.github.raw"` / `deepwiki` / `context7`) before writing
+the claim, recommending the tool or service, or asking the user to
+test it on their host. Marking the claim `要検証 / unverified` is not
+a substitute for that investigation — it is reserved for cases where
+the primary source is genuinely unreachable (offline, host-local
+state, non-public code) or has been read and remains inconclusive.
+Only in those cases may you ask the user to verify, and only with a
+clear "I have not confirmed this" caveat.
 
 ## Don't
 
