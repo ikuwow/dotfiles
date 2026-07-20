@@ -55,6 +55,5 @@ NOT restate the detailed procedures from the skill.
 
 - Before running `gh pr edit` / `gh issue edit` with `--body`,
   `--body-file`, or `--title`, present the diff between the current
-  and the new value in the conversation so the user can review and
-  recover overwritten content. Procedure lives in the git-workflow
-  skill Section 5.
+  and the new value in the conversation. Procedure lives in the
+  `Update a PR / issue` section of the git-workflow skill.
