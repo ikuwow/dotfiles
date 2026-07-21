@@ -515,7 +515,7 @@
   "advisorModel": "fable",
   "model": "claude-opus-4-7[1m]",
   "autoUpdatesChannel": "stable",
-  "tui": "default",
+  "tui": "fullscreen",
   "autoMemoryEnabled": false,
   "theme": "auto",
   "remoteControlAtStartup": true,
