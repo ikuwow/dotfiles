@@ -516,6 +516,7 @@
   "model": "claude-opus-4-7[1m]",
   "autoUpdatesChannel": "stable",
   "tui": "fullscreen",
+  "copyOnSelect": false,
   "autoMemoryEnabled": false,
   "theme": "auto",
   "remoteControlAtStartup": true,
