@@ -117,6 +117,8 @@ def _is_mutation(command: str) -> bool:
     False
     >>> _is_mutation("gh api /repos/owner/repo/pulls/1 --method=GET")
     False
+    >>> _is_mutation("gh api /repos/owner/repo/pulls/1 --method=POST")
+    True
     >>> _is_mutation("gh api graphql -f query='{ viewer { login } }'")
     True
     >>> _is_mutation("gh api /repos/owner/repo/pulls/1 -X POST")
@@ -124,6 +126,22 @@ def _is_mutation(command: str) -> bool:
     >>> _is_mutation("gh api /repos/owner/repo -X get")
     False
     >>> _is_mutation("gh api /repos/owner/repo --raw-field body=@-")
+    True
+    >>> _is_mutation("gh api /repos/owner/repo --field name=value")
+    True
+    >>> _is_mutation("gh api /repos/owner/repo --input payload.json")
+    True
+    >>> _is_mutation("gh api /repos/owner/repo -XPATCH")
+    True
+    >>> _is_mutation("gh api /repos/owner/repo -XGET")
+    False
+    >>> _is_mutation("gh api /repos/owner/repo -Xpost")
+    True
+    >>> _is_mutation("gh api /repos/owner/repo -fkey=value")
+    True
+    >>> _is_mutation("gh api /repos/owner/repo -Fkey=@file")
+    True
+    >>> _is_mutation("gh api /repos/owner/repo --method")
     True
     >>> _is_mutation("gh api 'unterminated quote")
     True
@@ -142,6 +160,16 @@ def _is_mutation(command: str) -> bool:
     i = 0
     while i < len(args):
         arg = args[i]
+
+        # Glued short forms (pflag accepts -XPOST, -fkey=value, -Fkey=value).
+        if len(arg) > 2 and arg.startswith("-X") and arg[2] != "=":
+            if arg[2:].upper() != "GET":
+                return True
+            i += 1
+            continue
+        if len(arg) > 2 and (arg.startswith("-f") or arg.startswith("-F")) and arg[2] != "=":
+            return True
+
         if arg in _BODY_FLAGS:
             return True
         if "=" in arg:
