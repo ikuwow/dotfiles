@@ -222,20 +222,15 @@ routine CI / comment events.
   1. Fetch the current body:
      `gh pr view <number> --json body --jq .body`
      (or `gh issue view <number> --json body --jq .body` for issues)
-  1. Emit a diff between the current body and the new body as text
-     in the assistant message body (a fenced ```diff block), not as
-     a Bash / tool-call output. Tool-call output is not reliably
-     visible to the user; the diff must appear in the assistant's
-     own message so it is visible and recoverable.
+  1. Emit a diff between the current body and the new body as
+     text in the assistant message body (a fenced ```diff block).
+     Do not substitute a Bash / tool-call diff.
   1. Write the new body to a fresh file under the session scratchpad
      directory using the Write tool (new filename per revision — no
      temp-file generation, no Read of an empty file)
   1. Execute the edit:
      `gh pr edit <number> --body-file <body file path>`
      (or `gh issue edit <number> --body-file <body file path>`)
-  The goal is observability — always show the diff so the user can see
-  what changed and recover manually-written content if accidentally
-  overwritten.
 
 Note: Always use `--body-file` for any body update. The `#`-prefixed lines
 in PR/issue bodies trigger Claude Code's security pre-check when passed
