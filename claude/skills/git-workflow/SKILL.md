@@ -223,8 +223,8 @@ routine CI / comment events.
      `gh pr view <number> --json body --jq .body`
      (or `gh issue view <number> --json body --jq .body` for issues)
   1. Emit a diff between the current body and the new body as
-     text in the assistant message body (a fenced ```diff block).
-     Do not substitute a Bash / tool-call diff.
+     text in the assistant message body — a fenced ```diff block,
+     not a Bash / tool-call output
   1. Write the new body to a fresh file under the session scratchpad
      directory using the Write tool (new filename per revision — no
      temp-file generation, no Read of an empty file)

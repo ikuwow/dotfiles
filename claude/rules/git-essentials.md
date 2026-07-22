@@ -55,7 +55,6 @@ NOT restate the detailed procedures from the skill.
 
 - Before running `gh pr edit` / `gh issue edit` with `--body`,
   `--body-file`, or `--title`, emit the diff between the current
-  and the new value as text in the assistant message body (a
-  fenced ```diff block). Do not substitute a Bash / tool-call
-  diff. Procedure lives in the `Update a PR / issue` section of
-  the git-workflow skill.
+  and new value as text in the assistant message body — a fenced
+  ```diff block, not a Bash / tool-call output (procedure: the
+  `Update a PR / issue` section of the git-workflow skill)
