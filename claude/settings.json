@@ -275,6 +275,8 @@
       "Bash(git restore .)",
       "Bash(gcloud * get-credentials *)",
       "Bash(gcloud * get-mount-command *)",
+      "Bash(aws logs start-query *)",
+      "Bash(* aws logs start-query *)",
       "WebFetch(domain:localhost)",
       "WebFetch(domain:127.0.0.1)",
       "WebFetch(domain:0.0.0.0)",
