@@ -54,6 +54,9 @@ NOT restate the detailed procedures from the skill.
 ## PR / issue body edits
 
 - Before running `gh pr edit` / `gh issue edit` with `--body`,
-  `--body-file`, or `--title`, present the diff between the current
-  and the new value in the conversation. Procedure lives in the
-  `Update a PR / issue` section of the git-workflow skill.
+  `--body-file`, or `--title`, emit the diff between the current and
+  the new value as text in the assistant message body (a fenced
+  ```diff block), not as a Bash / tool-call output. Tool-call output
+  is not reliably visible to the user, so a tool-call-only diff does
+  not satisfy this rule. Procedure lives in the `Update a PR /
+  issue` section of the git-workflow skill.
