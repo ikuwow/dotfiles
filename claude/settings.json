@@ -275,8 +275,6 @@
       "Bash(git restore .)",
       "Bash(gcloud * get-credentials *)",
       "Bash(gcloud * get-mount-command *)",
-      "Bash(aws logs start-query *)",
-      "Bash(* aws logs start-query *)",
       "WebFetch(domain:localhost)",
       "WebFetch(domain:127.0.0.1)",
       "WebFetch(domain:0.0.0.0)",
@@ -375,6 +373,10 @@
           {
             "type": "command",
             "command": "f=~/.claude/hooks/block_raw_github_fetch.py; if [ -f \"$f\" ] && command -v python3 >/dev/null; then python3 \"$f\"; fi"
+          },
+          {
+            "type": "command",
+            "command": "f=~/.claude/hooks/block_aws_logs_start_query.py; if [ -f \"$f\" ] && command -v python3 >/dev/null; then python3 \"$f\"; fi"
           }
         ]
       },
