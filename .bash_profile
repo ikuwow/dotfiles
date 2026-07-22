@@ -83,7 +83,7 @@ export TF_PLUGIN_CACHE_DIR="$HOME/.terraform.d/plugin-cache"
 export CHECKPOINT_DISABLE=1
 
 # Claude Code: fullscreen renderer ignores copyOnSelect (anthropics/claude-code#77259).
-# Disable mouse click capture so terminal-native select+copy works while wheel scroll stays.
+# Disable in-app click handling so Shift/Option-drag selects natively (no auto-copy); wheel scroll stays.
 export CLAUDE_CODE_DISABLE_MOUSE_CLICKS=1
 
 # AWS Profile Switcher
