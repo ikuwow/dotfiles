@@ -82,6 +82,10 @@ export SHELLCHECK_OPTS='--exclude=SC1090,SC1091,SC2039,SC3010,SC3060,SC3028'
 export TF_PLUGIN_CACHE_DIR="$HOME/.terraform.d/plugin-cache"
 export CHECKPOINT_DISABLE=1
 
+# Claude Code: fullscreen renderer ignores copyOnSelect (anthropics/claude-code#77259).
+# Disable mouse click capture so terminal-native select+copy works while wheel scroll stays.
+export CLAUDE_CODE_DISABLE_MOUSE_CLICKS=1
+
 # AWS Profile Switcher
 if [ -f ~/.aws/current_profile ]; then
   AWS_PROFILE="$(cat ~/.aws/current_profile)"
