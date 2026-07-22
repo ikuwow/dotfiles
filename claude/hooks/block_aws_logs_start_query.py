@@ -7,11 +7,14 @@ data. Block it at the permission layer so no allow rule (e.g. the
 it, and so the block is not bypassed by option-position tricks that a
 glob-based ``permissions.deny`` entry would miss.
 
-The hook splits the command into shell segments (respecting quotes),
-strips leading environment-variable assignments and an optional
-``env ...`` wrapper from each segment, and denies the segment when the
-resolved command is ``aws`` (or a path ending in ``/aws``) with
-service ``logs`` and subcommand ``start-query``.
+The hook splits the command into shell segments (respecting quotes and
+collapsing ``\\`` + newline line continuations), strips leading
+environment-variable assignments and an optional ``env ...`` wrapper
+from each segment, walks past aws global options — including known
+value-taking flags like ``--profile`` in either ``--profile stg-ro`` or
+``--profile=stg-ro`` form — and denies the segment when the resolved
+command is ``aws`` (or a path ending in ``/aws``) with service ``logs``
+and subcommand ``start-query``.
 
 Spec: https://code.claude.com/docs/en/hooks
 """
@@ -50,12 +53,18 @@ REASON = (
 def _split_outside_quotes(command: str) -> list[str]:
     """Split by shell separators, ignoring separators inside quotes.
 
+    Bash line continuation ``\\`` + newline outside quotes is collapsed
+    before splitting so a multi-line ``aws logs start-query \\<NL> ...``
+    still lands in one segment.
+
     >>> _split_outside_quotes("aws logs start-query | jq .")
     ['aws logs start-query ', ' jq .']
     >>> _split_outside_quotes("echo 'aws logs start-query | jq .'")
     ["echo 'aws logs start-query | jq .'"]
     >>> _split_outside_quotes("foo && aws logs start-query")
     ['foo ', ' aws logs start-query']
+    >>> _split_outside_quotes("aws logs start-query \\\\\\n  --foo bar")
+    ['aws logs start-query   --foo bar']
     """
     segments: list[str] = []
     current: list[str] = []
@@ -63,6 +72,9 @@ def _split_outside_quotes(command: str) -> list[str]:
     i = 0
     while i < len(command):
         ch = command[i]
+        if ch == "\\" and not in_single and i + 1 < len(command) and command[i + 1] == "\n":
+            i += 2
+            continue
         if ch == "\\" and in_double and i + 1 < len(command):
             current.append(ch)
             current.append(command[i + 1])
@@ -166,6 +178,16 @@ def blocks(command: str) -> bool:
     True
     >>> blocks("aws --profile stg-ro --region us-east-1 logs start-query")
     True
+    >>> blocks("aws --debug logs start-query")
+    True
+    >>> blocks("aws --output text logs start-query")
+    True
+
+    Blocked (backslash + newline line continuation):
+    >>> blocks("aws logs start-query \\\\\\n  --log-group-name /aws/lambda/foo")
+    True
+    >>> blocks("AWS_PROFILE=stg-ro aws logs start-query \\\\\\n  --query-string 'fields @timestamp'")
+    True
 
     Blocked (absolute path):
     >>> blocks("/opt/homebrew/bin/aws logs start-query")
@@ -197,6 +219,8 @@ def blocks(command: str) -> bool:
 
     Not blocked (option value happens to be ``logs`` / ``start-query``):
     >>> blocks("aws --profile logs s3 ls")
+    False
+    >>> blocks("aws --output start-query logs describe-log-groups")
     False
 
     Not blocked (help lookup with ``help`` before subcommand):
