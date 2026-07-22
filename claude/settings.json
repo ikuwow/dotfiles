@@ -4,7 +4,6 @@
     "DISABLE_AUTOUPDATER": "1"
   },
   "permissions": {
-    "defaultMode": "auto",
     "allow": [
       "Read(~/bin/**)",
       "Read(~/.local/share/sre-knowledge-base/**)",
@@ -336,8 +335,10 @@
       "Bash(copilot -p *)",
       "Bash(copilot update)",
       "Bash(copilot update *)"
-    ]
+    ],
+    "defaultMode": "auto"
   },
+  "model": "claude-opus-4-7[1m]",
   "hooks": {
     "UserPromptSubmit": [
       {
@@ -513,10 +514,8 @@
   },
   "effortLevel": "high",
   "advisorModel": "fable",
-  "model": "claude-opus-4-7[1m]",
   "autoUpdatesChannel": "stable",
   "tui": "fullscreen",
-  "copyOnSelect": false,
   "autoMemoryEnabled": false,
   "theme": "auto",
   "remoteControlAtStartup": true,
@@ -524,6 +523,7 @@
   "agentPushNotifEnabled": true,
   "skipAutoPermissionPrompt": true,
   "voiceEnabled": true,
+  "copyOnSelect": false,
   "feedbackSurveyState": {
     "lastShownTime": 1754272823676
   }
