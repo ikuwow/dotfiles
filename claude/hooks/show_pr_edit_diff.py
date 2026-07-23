@@ -6,7 +6,8 @@ with ``gh pr edit`` or ``gh issue edit`` (first three tokens) and carries a
 title/body-overwriting flag (``--title``/``-t``, ``--body``/``-b``,
 ``--body-file``/``-F``, including the ``=``-joined long-option forms), this
 fetches the current server-side title/body via ``gh {pr,issue} view``,
-computes a unified diff against the new value, and returns it via the hook
+computes a diff against the new value (unified diff for the body,
+one-line before/after for the title), and returns it via the hook
 ``systemMessage`` field so Claude Code renders it directly to the user —
 without waiting on the agent to generate reply text.
 
@@ -208,7 +209,12 @@ def main():
                 lines.append("[body unchanged]")
 
         message = "\n".join(lines)
-    except Exception:
+    except (
+        OSError,
+        UnicodeDecodeError,
+        subprocess.TimeoutExpired,
+        json.JSONDecodeError,
+    ):
         sys.exit(0)
 
     print(json.dumps({"systemMessage": message}))
