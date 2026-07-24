@@ -19,10 +19,10 @@ prSections:
     filters: is:open -is:draft author:@me review:approved
   - title: Returned to you
     filters: is:open author:@me review:changes_requested
-  - title: Waiting on review
-    filters: is:open -is:draft author:@me review:required
   - title: Draft
     filters: is:open author:@me is:draft
+  - title: Waiting on review
+    filters: is:open -is:draft author:@me review:required
   - title: Assigned
     filters: is:open assignee:@me
   - title: Mentioned
