@@ -33,3 +33,12 @@ issuesSections:
     filters: is:open assignee:@me
   - title: Mentioned
     filters: is:open mentions:@me
+
+keybindings:
+  prs:
+    # Review the PR diff in hunk (https://hunk.dev/). Fetches the diff
+    # via API so it works without a local clone. `d` stays the built-in
+    # plain-text diff.
+    - key: D
+      name: hunk diff
+      command: gh pr diff --repo {{.RepoName}} {{.PrNumber}} | hunk patch -
