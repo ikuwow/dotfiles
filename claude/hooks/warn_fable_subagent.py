@@ -1,19 +1,21 @@
 #!/usr/bin/env python3
 """Soft-deny subagent invocations that would run on Fable.
 
-Fires on ``PreToolUse`` events matched to the ``Agent`` tool (the Agent
-tool bypasses the permission dialog and is invoked directly from the
-main loop, so ``PermissionRequest`` cannot intercept it — ``PreToolUse``
-is the only lifecycle point available). Denies the call when the
-subagent would run on Fable, either via an explicit
+Fires on ``PreToolUse`` events matched to the ``Agent`` tool. Denies
+the call when the subagent would run on Fable, either via an explicit
 ``tool_input.model`` of ``"fable"``/``"claude-fable-5"``, or via
 inheritance when ``model`` is unset and the session's
 ``ANTHROPIC_MODEL`` env var is a Fable alias.
 
+``PreToolUse`` with matcher ``Agent`` was chosen over
+``PermissionRequest``: the Agent tool was not observed to route
+through the permission dialog in this session's harness (empirical,
+not documented on the linked spec page), so ``PermissionRequest``
+would not fire for it.
+
 Exempt: subagent types whose ``~/.claude/agents/<subagent_type>.md``
-frontmatter pins ``model: fable`` (currently only ``fable-advisor``) —
-this mechanizes the "agents that pin fable are exempt" clause of
-``claude/rules/subagent-model.md``.
+frontmatter pins ``model: fable`` — mechanizes the "agents that pin
+fable are exempt" clause of ``claude/rules/subagent-model.md``.
 
 On the first denied occurrence of a given (subagent_type, effective
 model) pair per session, the call is denied with a message steering
@@ -96,27 +98,60 @@ def _cleanup_old_state() -> None:
         pass
 
 
-def _agent_pins_fable(subagent_type: str) -> bool:
+def _agent_pins_fable(subagent_type: str, agents_dir: str = _AGENTS_DIR) -> bool:
     """Return True if the agent's frontmatter pins model: fable.
 
-    Reads ``~/.claude/agents/<subagent_type>.md`` and checks whether the
-    frontmatter block (delimited by ``---`` lines, starting at line 1)
-    contains a ``model: fable`` (or ``claude-fable-5``) line.
+    Reads ``<agents_dir>/<subagent_type>.md`` (defaults to
+    ``~/.claude/agents/``) and checks whether the frontmatter block
+    (delimited by ``---`` lines, starting at line 1) contains a
+    ``model: fable`` (or ``claude-fable-5``) line. ``agents_dir`` is
+    a doctest hook — production callers omit it.
 
-    Rejects path-traversal-ish subagent_type values:
+    Rejects subagent_type values with path-traversal characters
+    (``/`` or ``..``) before touching the filesystem:
     >>> _agent_pins_fable("../etc/passwd")
+    False
+    >>> _agent_pins_fable("nested/dir/name")
+    False
+    >>> _agent_pins_fable("")
+    False
+
+    Names without ``/`` or ``..`` fall through to file lookup and
+    return False via the OSError branch when no matching file exists
+    (e.g. missing agent, colon-qualified plugin names when
+    ``~/.claude/agents/plugin:name.md`` isn't present):
+    >>> _agent_pins_fable("does-not-exist-agent")
     False
     >>> _agent_pins_fable("plugin:name")
     False
 
-    Missing file:
-    >>> _agent_pins_fable("does-not-exist-agent")
+    Agent frontmatter pins fable → exempt. Uses a tmpdir-injected
+    ``agents_dir`` because CI never runs ``scripts/deploy.sh``, so
+    ``~/.claude/agents/`` doesn't exist under the doctest job:
+    >>> import tempfile
+    >>> _tmpdir = tempfile.mkdtemp()
+    >>> _ = open(os.path.join(_tmpdir, "fable-pinned.md"), "w").write(
+    ...     "---\\nname: x\\nmodel: fable\\n---\\n")
+    >>> _agent_pins_fable("fable-pinned", agents_dir=_tmpdir)
+    True
+
+    Same tmpdir, agent pins a non-fable model → not exempt (proves
+    the loop inspects the value, not just the presence of ``model:``):
+    >>> _ = open(os.path.join(_tmpdir, "opus-pinned.md"), "w").write(
+    ...     "---\\nmodel: opus\\n---\\n")
+    >>> _agent_pins_fable("opus-pinned", agents_dir=_tmpdir)
     False
+
+    Alias ``claude-fable-5`` also counts as fable-pinned:
+    >>> _ = open(os.path.join(_tmpdir, "cf5-pinned.md"), "w").write(
+    ...     "---\\nmodel: claude-fable-5\\n---\\n")
+    >>> _agent_pins_fable("cf5-pinned", agents_dir=_tmpdir)
+    True
     """
     if not subagent_type or "/" in subagent_type or ".." in subagent_type:
         return False
 
-    path = os.path.join(_AGENTS_DIR, f"{subagent_type}.md")
+    path = os.path.join(agents_dir, f"{subagent_type}.md")
     try:
         with open(path) as f:
             lines = f.readlines()
@@ -142,6 +177,10 @@ def _effective_model_is_fable(tool_input: dict) -> bool:
     >>> _effective_model_is_fable({"model": "fable"})
     True
 
+    Alias ``claude-fable-5`` also counts as Fable:
+    >>> _effective_model_is_fable({"model": "claude-fable-5"})
+    True
+
     Explicit non-fable model, regardless of session inheritance:
     >>> os.environ["ANTHROPIC_MODEL"] = "fable"
     >>> _effective_model_is_fable({"model": "sonnet"})
@@ -155,8 +194,7 @@ def _effective_model_is_fable(tool_input: dict) -> bool:
     >>> del os.environ["ANTHROPIC_MODEL"]
 
     Unset model, session is not fable:
-    >>> os.environ.pop("ANTHROPIC_MODEL", None) is None or True
-    True
+    >>> _ = os.environ.pop("ANTHROPIC_MODEL", None)
     >>> _effective_model_is_fable({})
     False
     """
@@ -213,7 +251,10 @@ def main() -> None:
         shown.add(key)
         if not _save_state(session_id, shown):
             # State didn't persist; skip the deny so the retry isn't
-            # infinite. The subagent runs on Fable this time.
+            # infinite. If the failure is persistent (unwritable state
+            # dir, disk full), this branch fires on every Fable Agent
+            # call — the hook silently no-ops until the I/O issue is
+            # fixed.
             sys.exit(0)
         print(json.dumps({
             "hookSpecificOutput": {
