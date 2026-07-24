@@ -30,7 +30,7 @@ defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
 defaults write com.apple.menuextra.battery ShowPercent -string "YES"
 defaults write com.apple.Siri HotkeyTag -int 3 # Hold Option Space
 defaults -currentHost write com.apple.Spotlight MenuItemHidden -int 1
-defaults write com.apple.Spotlight PasteboardHistoryTimeout -int 604800  # Clipboard history retention: 7 days (default 8h = 28800)
+defaults write com.apple.Spotlight PasteboardHistoryTimeout -int 604800  # 7 days
 
 echo "Configuring with sudo..."
 sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate on
