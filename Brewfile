@@ -49,6 +49,7 @@ cask "codex"
 cask "claude-code@latest"
 brew "gemini-cli"
 brew "junie"
+brew "hunk"
 
 # required by vim
 brew "python"
