@@ -3,3 +3,7 @@
 # template key (see dlvhdr/gh-dash internal/tui/common/repopath.go).
 repoPaths:
   ":owner/:repo": ~/ghq/github.com/:owner/:repo
+
+# Show cross-repo results by default (e.g. review-requested across all
+# repos). Toggle per-section scoping to the current repo with `t`.
+smartFilteringAtLaunch: false
