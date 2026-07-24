@@ -5,9 +5,10 @@ description: Use when the user wants to reflect on AI communication quality and 
 
 # Session Retrospective
 
-Delegate the transcript analysis to a Fable subagent (stronger
-reasoning, session-independent perspective), then route the findings
-from the main session.
+Main session produces first-pass findings from in-memory context, a
+Fable subagent (stronger reasoning, session-independent perspective)
+reviews them against spot-checked transcript slices, then main routes
+the finalized findings.
 
 The Fable subagent runs via the Agent tool's `model:` override, which
 works in Claude Code v2.1.202. Do not rely on this SKILL.md's own
@@ -23,7 +24,32 @@ gh issue list --repo ikuwow/dotfiles --label retrospective --state all --limit 1
 
 Keep the JSON output for Step 1.
 
-## Step 1: Delegate analysis to a Fable subagent
+## Step 1: Main first-pass analysis
+
+Read `${CLAUDE_SKILL_DIR}/analysis.md` and follow it to produce
+initial findings from the current session's in-memory context — do
+not read the transcript file for this step. Substitute the Step 0
+JSON output for `<PAST_RETROSPECTIVES>` where analysis.md's
+cross-session recurrence check needs it (or the literal string `[]`
+if Step 0 returned no issues).
+
+Alongside the findings, produce a factual digest of what the analysis
+drew on:
+
+- User-turn references: a paraphrase (not a verbatim quote) of each
+  user turn that informed a finding
+- Hook / Stop events: any hook rejection, permission denial, or
+  Stop-hook trigger observed in the session
+- Decisions consulted: plan approvals, explicit user confirmations, or
+  routing choices referenced by a finding
+- Tool calls: any tool call whose result produced signal for a
+  finding, named by command, not full output
+
+The digest is what Fable uses in Step 2 to spot-check coverage — keep
+each item specific enough that Fable can verify it against a
+transcript slice.
+
+## Step 2: Fable review
 
 Compute the current session's transcript path. The Session ID is
 already substituted below when this SKILL.md loads:
@@ -37,43 +63,127 @@ Confirm the file exists with `ls -la <full-path>` before spawning.
 If it does not exist (rare, e.g. the transcript is still buffered),
 fall back to the newest `*.jsonl` in `$HOME/.claude/projects/<munged-cwd>/`.
 
-Then invoke the Agent tool with:
+Invoke the Agent tool with:
 
 - `subagent_type`: `general-purpose`
 - `model`: `fable`
-- `description`: `retrospective analysis`
+- `description`: `retrospective review`
 - `prompt`: paste the template below, substituting `<TRANSCRIPT_PATH>`
-  with the resolved absolute path and `<PAST_RETROSPECTIVES>` with the
-  JSON output from Step 0 (or the literal string `[]` if empty).
+  with the resolved absolute path, `<FINDINGS>` with Step 1's
+  findings, and `<DIGEST>` with Step 1's factual digest
 
 Prompt template:
 
 ```
-You are performing a session retrospective on the outside.
+You are reviewing a session retrospective's first-pass findings from
+the outside.
 
 Instructions: Read the analysis instructions at
-${CLAUDE_SKILL_DIR}/analysis.md and follow them exactly.
+${CLAUDE_SKILL_DIR}/analysis.md — they define the severity, taxonomy,
+and output format for both the first pass and this review.
 
 Inputs:
+- Initial findings (produced by the main session from in-memory context): <FINDINGS>
+- Factual digest (what the main session drew on to produce the findings): <DIGEST>
 - Session transcript (jsonl, one JSON object per line): <TRANSCRIPT_PATH>
-- Past retrospectives on this project (for cross-session recurrence detection): <PAST_RETROSPECTIVES>
 
-Output: return the analysis findings in the format specified in
-analysis.md. For each finding, include a `Scope:` tag with value
-`global` or `project-specific`, and a `Destination:` tag with one of
-`existing-rule-edit` / `existing-skill-update` / `mechanize` /
-`new-rule` / `new-skill`. Do not create GitHub issues and do
-not invoke AskUserQuestion — the orchestrator handles routing after
-you return. Do not add preamble or closing remarks.
+Mandatory: before returning verdicts, sample the transcript with `jq`
+/ `grep` regardless of digest quality — around 5-10 slices, under
+~20 KB total. Pick slices that let you check digest coverage: a few
+user turns, a few tool-call sequences, one or two hook/stop events. Do
+not read the whole transcript.
+
+For each initial finding, return one of these verdicts:
+- confirm — the finding and the digest line up with the sampled transcript; keep as-is
+- adjust — the finding is directionally right but severity, scope, destination, or countermeasure needs a change; state the change
+- reject — the finding is not supported by the sampled transcript or the digest misrepresents what happened; state why
+- unverifiable — the digest attributes the finding to the currently-in-progress turn (the one that triggered this retrospective), which is not yet in the transcript; withhold judgment rather than reject on missing evidence
+
+Format each verdict as:
+
+## <finding number/title>
+Verdict: confirm / adjust / reject / unverifiable
+Reason: <one line>
+Adjusted finding: <only when Verdict is adjust — state the corrected fields>
+
+If the mandatory slice sample reveals a behavior the digest omitted,
+list it separately as a proposed addition, using analysis.md's finding
+format plus a Reason line citing the transcript evidence:
+
+## Add missing: <short title>
+Problem: <what happened>
+Severity: high / medium / low
+Scope: global / project-specific
+Destination: existing-rule-edit / existing-skill-update / mechanize / new-rule / new-skill
+Countermeasure: <structural fix>
+Reason: <transcript evidence for this addition>
+
+Do not read the whole transcript. Do not invoke AskUserQuestion or gh
+— the orchestrator handles both. Do not add preamble or closing
+remarks.
 ```
 
-## Step 2: Route findings by scope
+## Step 3: Apply verdicts + delta round 2
 
-Take the subagent's output verbatim. Each finding carries a `Scope`
-(`global` / `project-specific`) tag and a `Destination`
+Apply each Step 2 verdict to its finding:
+- confirm — keep the finding as-is
+- reject — drop the finding
+- adjust — replace the finding with Fable's adjusted version
+- unverifiable — keep the finding as-is and tag it as unverifiable so Step 4 can note the caveat in AskUserQuestion; do not treat this as dissent
+
+When main disagrees with a reject or adjust and keeps a version
+closer to its own Step 1 finding, record Fable's dissent (its verdict
+and reason) alongside the kept finding — Step 4's AskUserQuestion
+surfaces both versions so the user arbitrates.
+
+If Step 2 returned any "Add missing" proposals, send a delta-only
+round 2 to the same Fable subagent via SendMessage, asking it to
+defend each addition with concrete transcript evidence. Do not re-run
+the Step 1 findings in round 2 — only the delta.
+
+Round 2 prompt template:
+
+```
+Defend the "Add missing" findings from your previous review with
+concrete transcript evidence.
+
+Additions to defend: <ADD_MISSING_FINDINGS>
+
+For each addition, cite the specific evidence that supports it — a
+line range, the jq/grep query used, or a short quoted snippet. If you
+cannot produce concrete evidence for an addition, withdraw it.
+
+Format each response as:
+
+## <addition title>
+Evidence: <line range / query / quoted snippet, or "withdrawn">
+```
+
+Accept or reject each defended addition based on the evidence
+quality. Surface dissent the same way as above when main rejects a
+defended addition it disagrees with.
+
+This round is the last one — 2 total Fable rounds is the hard cap.
+
+The finalized findings (Step 1 confirmed/adjusted, plus any accepted
+additions, each carrying dissent where present) move to Step 4.
+
+## Step 4: Route findings by scope
+
+Take the finalized findings from Step 3. Each finding carries a
+`Scope` (`global` / `project-specific`) tag and a `Destination`
 (`existing-rule-edit` / `existing-skill-update` / `mechanize` /
-`new-rule` / `new-skill`) tag from Step 1. Ask the user how to route
-each finding — do not auto-file or auto-apply anything.
+`new-rule` / `new-skill`) tag — originally set in Step 1 and possibly
+adjusted in Steps 2-3. Ask the user how to route each finding — do
+not auto-file or auto-apply anything.
+
+Every AskUserQuestion prompt for a finding must include a compact
+Fable summary line — verdict plus the one-line reason from Step 2 —
+regardless of whether main accepted or overrode the verdict, so the
+user sees the outside review before choosing the route. When main
+kept a version Fable rejected or adjusted (recorded dissent), also
+show Fable's proposed version alongside main's kept version so the
+user arbitrates between the two.
 
 ### Sanitize global findings before filing as an issue
 
