@@ -11,13 +11,9 @@ one-line before/after for the title), and returns it via the hook
 ``systemMessage`` field so Claude Code renders it directly to the user —
 without waiting on the agent to generate reply text.
 
-This complements the existing ``PostToolUse`` reminder
-(``remind_show_edit_diff.py``), which nudges the agent to paste a diff into
-its own reply after the edit already ran. That reminder still depends on an
-LLM turn and can be skipped; this hook computes and displays the diff itself,
-before the edit executes, and is a fallback-safe no-op on any failure (parse
-failure, gh error, unreadable ``--body-file``, PR not found, timeout, etc.)
-so it never blocks the underlying command.
+Fallback-safe on any failure (parse failure, gh error, unreadable
+``--body-file``, PR not found, timeout, etc.): the hook exits 0 without a
+systemMessage so it never blocks the underlying command.
 
 Registered under ``PreToolUse`` with ``matcher: "Bash"``. Set
 ``ENABLE_SHOW_PR_EDIT_DIFF=0`` to disable.

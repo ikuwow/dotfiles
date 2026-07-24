@@ -403,15 +403,6 @@
             "command": "echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PostToolUse\",\"additionalContext\":\"If this plan involves implementation beyond a trivial edit, dispatch the implementer subagent per the implementation-delegation rule.\"}}'"
           }
         ]
-      },
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "f=~/.claude/hooks/remind_show_edit_diff.py; if [ -f \"$f\" ] && command -v python3 >/dev/null; then python3 \"$f\"; fi"
-          }
-        ]
       }
     ],
     "PermissionRequest": [
