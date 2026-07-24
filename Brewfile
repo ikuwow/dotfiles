@@ -23,7 +23,6 @@ mas "WiFi Signal", id: 525912054
 cask "karabiner-elements"
 cask "ghostty"
 cask "font-noto-sans-mono-cjk-jp"
-cask "pastebot"
 cask "istat-menus"
 cask "rambox"
 mas "Barbee", id: 1548711022
