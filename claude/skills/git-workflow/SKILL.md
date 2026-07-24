@@ -22,11 +22,12 @@ Prerequisite: the `agynio/gh-pr-review` gh extension is installed
   run them without pausing for confirmation. The only user decision
   point in the flow is flipping the PR from draft to ready for review.
 - Signals like a small diff or personal-project scope affect how you
-  weigh findings within a phase, never whether to run it. The only
-  override to the pre-authorization above is an explicit user
-  instruction that names a stopping point ("stop after creating the
-  draft PR", "skip Phase 2 for this PR", "no Monitor"). Absent that,
-  run every phase.
+  weigh findings within a phase, never whether to run it. You MUST
+  NOT skip a phase for these reasons, and offering the user a skip
+  ("diff is small, skip Phase X?") is itself a prohibited pause — a
+  phase is skipped only on the user's unprompted instruction that
+  names a stopping point ("stop after creating the draft PR", "skip
+  Phase 2 for this PR", "no Monitor"). Absent that, run every phase.
 - Never create or edit files on the default branch. Always move into the
   worktree (or feature branch) first. Creating files before branching
   leads to redundant copy-and-delete work.
@@ -70,7 +71,15 @@ formatting or indentation.
      hooks. Always go through `--body-file`.
 1. After creating the PR, display the PR URL to the user:
    `gh pr view --json url --jq '.url'`
-1. Proceed to CI wait (step 4)
+1. Before ending the turn, create tracked tasks (`TaskCreate`) for
+   each remaining stage: Phase 1 (selfcheck + CI), Phase 2 (code
+   review), Phase 3 (consolidate), Phase 4 (finalize), Phase 5
+   (Monitor arm), Step 6 (cleanup). Mark a phase task completed only
+   after its command has actually run in this session. Ad-hoc task
+   lists for the feature work are not the workflow's completion
+   signal — the workflow is done only when these phase tasks are
+   done.
+1. Launch Phase 1 in the same turn as PR creation (see section 4)
 
 ## 4. CI Wait & Review
 
