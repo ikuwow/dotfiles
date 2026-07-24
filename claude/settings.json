@@ -316,7 +316,6 @@
       "Bash(gh pr merge *)",
       "Bash(gh pr close *)",
       "Bash(gh pr reopen *)",
-      "Bash(gh pr ready *)",
       "Bash(gh issue close *)",
       "Bash(gh issue reopen *)",
       "Bash(gh api * --method*)",
