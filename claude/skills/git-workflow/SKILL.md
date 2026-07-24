@@ -222,8 +222,9 @@ routine CI / comment events.
   1. Fetch the current body:
      `gh pr view <number> --json body --jq .body`
      (or `gh issue view <number> --json body --jq .body` for issues)
-  1. Emit a diff between the current body and the new body as a
-     fenced `diff` code block in the assistant message body
+  1. Summarize the change in the assistant message body — a short
+     list of what is being added, removed, or reworded, not the full
+     before/after diff
   1. Write the new body to a fresh file under the session scratchpad
      directory using the Write tool (new filename per revision — no
      temp-file generation, no Read of an empty file)
