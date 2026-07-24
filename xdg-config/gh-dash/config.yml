@@ -31,7 +31,5 @@ prSections:
 issuesSections:
   - title: Assigned
     filters: is:open assignee:@me
-  - title: Created
-    filters: is:open author:@me
   - title: Mentioned
     filters: is:open mentions:@me
