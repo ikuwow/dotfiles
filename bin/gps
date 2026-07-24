@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+
+# Google Cloud Profile Switcher: pick / list / clear gcloud
+# configurations via fzf.
+#
+# This script only activates the gcloud configuration and prints
+# feedback. Exporting GC_ACTIVE_CONFIG into the parent shell is the
+# wrapper function's responsibility — see gps() in .functions.
+
+set -eu
+
+if ! command -v fzf >/dev/null 2>&1; then
+  echo "Error: gps requires fzf executable." >&2
+  exit 1
+fi
+
+query="${1:-}"
+
+if [ "$query" = "--help" ] || [ "$query" = "-h" ]; then
+  cat << 'EOF'
+Usage: gps [OPTIONS] [QUERY]
+
+Google Cloud Profile Switcher - Switch between gcloud configurations interactively
+
+OPTIONS:
+  --help, -h     Show this help message
+  --clear        Clear the current gcloud configuration (set to "none")
+  --list         List all configurations (current one marked with *)
+
+ARGUMENTS:
+  QUERY          Filter configurations by query string (optional)
+
+EXAMPLES:
+  gps                  # Interactive configuration selection with fzf
+  gps prod             # Filter configurations containing "prod"
+  gps --list           # List all available configurations
+  gps --clear          # Clear current configuration
+EOF
+  exit 0
+fi
+
+DUMMY_CONFIG_NAME="none"
+if ! gcloud config configurations list --format='value(name)' | grep -q "^${DUMMY_CONFIG_NAME}$"; then
+  gcloud config configurations create "$DUMMY_CONFIG_NAME"
+fi
+
+if [ "$query" = "--clear" ]; then
+  gcloud config configurations activate "$DUMMY_CONFIG_NAME"
+  echo "Google Cloud configuration cleared."
+  exit 0
+fi
+
+if [ "$query" = "--list" ]; then
+  current_config="${GC_ACTIVE_CONFIG:-$(cat "${CLOUDSDK_CONFIG:-${XDG_CONFIG_HOME:-$HOME/.config}/gcloud}/active_config" 2>/dev/null || echo "")}"
+  gcloud config configurations list --format='value(name)' | while read -r config; do
+    if [ "$config" = "$current_config" ]; then
+      echo "* $config"
+    else
+      echo "  $config"
+    fi
+  done
+  exit 0
+fi
+
+if [ -n "$query" ]; then
+  config="$(gcloud config configurations list --format='value(name)' | grep -v "^${DUMMY_CONFIG_NAME}$" | fzf --filter "$query" | head -n 1)"
+else
+  config="$(gcloud config configurations list --format='value(name)' | grep -v "^${DUMMY_CONFIG_NAME}$" | fzf)"
+fi
+
+if [ -z "$config" ]; then
+  echo "No profiles are selected."
+  exit 0
+fi
+
+gcloud config configurations activate "$config"
+echo "Google Cloud config set: $config"
