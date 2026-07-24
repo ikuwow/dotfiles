@@ -68,6 +68,10 @@ content that doesn't fit on one line — including issue references
   at the end of the body (e.g., in a "Follow-up" / "Notes" section).
   Do not surface them in the opening sections (purpose, scope,
   summary), where they compete with the approve/reject decision.
+- Organize sections by what a reviewer or operator needs (purpose,
+  key changes, prerequisites, verification). Do not create
+  property-themed sections ("safety valves", "performance notes");
+  fold each such point into the bullet for the change it qualifies.
 - Inside GitHub PR / issue bodies and PR / issue comments only — that
   is, Markdown posted through the GitHub web UI — do not hard-wrap
   paragraphs or list items. Write each paragraph as a single line and
@@ -101,6 +105,13 @@ once and applies to both perspectives.
      version selections. Especially important for dotfiles /
      infrastructure changes where "why this value" matters.
    - All URLs and anchor links must resolve to the expected content
+   - Operational sections (verification, rollout, rollback,
+     monitoring) may name an external tool or service only after
+     confirming the project actually uses it (repo dependencies /
+     config via git grep, project docs, or an explicit user
+     statement). Rationale attributed to a linked issue / PR must
+     match what that source actually says. Unverified vendor
+     mentions or misattributed rationale are Must Fix.
 
 1. Issue linking
    - Do NOT use auto-close keywords (`Closes`, `Fixes`, `Resolves`)
