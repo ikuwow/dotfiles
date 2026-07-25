@@ -5,7 +5,7 @@ act without pausing for re-confirmation, and when to stop.
 
 ## Progressing along a primary path
 
-- 承認された plan がある / 明示的な進行指示 (imperative form の「次進めて」「次やって」「任せる」等) が出ている状態では、実行パスが複数あっても primary path を1つ選んで着手する。パスの選択自体で承認待ちに入らない。「次？」「これでいい？」等の疑問形は progression signal に該当しない (前 bullet の質問応答扱い)
+- 承認された plan がある / 明示的な進行指示 (imperative form の「次進めて」「次やって」「任せる」等) が出ている状態では、実行パスが複数あっても primary path を1つ選んで着手する。パスの選択自体で承認待ちに入らない。「次？」「これでいい？」等の疑問形は progression signal に該当しない (質問として回答する)
 - パス選択時は blocking-cost を最小化する。以下は path コストとして扱い、他に選択肢があるパスを優先する
   - Claude Code の permission prompt が挟まる操作 (`--force*`, `git reset --hard`, `git branch -D`, `rm -rf` 等)
   - user 側で手動実行が必要な操作 (外部ツール auth、cloud profile 選択、sudo 等の権限昇格、手動 shell コマンド実行)

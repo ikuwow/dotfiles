@@ -1,9 +1,6 @@
 # Rule Authoring
 
-Guidance for editing AI-facing rule and convention documents (`AIRULES.md`,
-`CLAUDE.md`, `claude/rules/*.md`, skills, etc.).
-
-## Editing AI rule and convention documents
+Guidance for editing AI-facing rule and convention documents.
 
 - bulletを追加・温存するのは、削除するとAIの挙動が変わる場合のみ。セクション名・隣接bulletから導ける内容は書かない
 - 既存指示の適用を変える要件（例外・前処理等）は、隣に段落を追記せず影響を受ける指示文自体を書き換えて統合する（矛盾した指示の併存を防ぐ）
