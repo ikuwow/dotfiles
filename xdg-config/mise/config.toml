@@ -1,0 +1,10 @@
+# Global mise config.
+#
+# These npm CLIs replace the retired ~/.default-npm-packages file. mise
+# deprecated default package files (warning from 2026.11.0, removal in
+# 2027.11.0); the npm: backend is the official replacement for CLI tools.
+# "npm:yarn" is Yarn Classic (1.x), matching what the old file installed.
+[tools]
+"npm:yarn" = "latest"
+"npm:pnpm" = "latest"
+"npm:typescript" = "latest"
