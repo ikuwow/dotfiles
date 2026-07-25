@@ -13,10 +13,7 @@ import config
 REPLIES_FILE = "replies.jsonl"
 JUDGEMENTS_FILE = "judgements.jsonl"
 
-# Surface markers for the energy axis. The instruction it stands for is
-# under-specified, so this is reported alongside the judge's call rather than
-# used to decide anything.
-ENERGY_MARKERS = re.compile(r"[!！]|^(?:お|あ|わ|へえ|ほんま|なるほど|やば)", re.MULTILINE)
+ENERGY_MARKERS = re.compile(config.ENERGY_MARKER_PATTERN, re.MULTILINE)
 
 
 def load(path):
@@ -40,18 +37,26 @@ def main():
         else:
             cross[key(row)] = row
 
+    # Keys judged fewer times than planned are excluded outright rather than
+    # contributing a majority drawn from a smaller vote than everything else.
+    under_judged = [i for i, rows in primary.items() if len(rows) != config.JUDGE_PASSES]
+    for identifier in under_judged:
+        del primary[identifier]
+
     # 1. Judge reliability, before any result that depends on it.
-    unanimous = 0
-    measured = 0
-    for identifier, rows in primary.items():
-        if len(rows) < config.JUDGE_PASSES:
-            continue
-        measured += 1
-        if len({r["register"] for r in rows}) == 1:
-            unanimous += 1
+    unanimous = sum(
+        1 for rows in primary.values() if len({r["register"] for r in rows}) == 1
+    )
+    measured = len(primary)
     print("judge reliability")
     print(f"  repeat agreement on register: {unanimous}/{measured} texts unanimous "
           f"across {config.JUDGE_PASSES} passes")
+    if measured and unanimous / measured < config.AGREEMENT_THRESHOLD:
+        print(f"  BELOW the {config.AGREEMENT_THRESHOLD:.0%} threshold — "
+              f"treat every figure below as unreliable")
+    if under_judged:
+        print(f"  excluded from every figure below: {len(under_judged)} texts "
+              f"without {config.JUDGE_PASSES} successful passes")
 
     cross_agree = sum(
         1
@@ -135,9 +140,10 @@ def main():
             parts.append(f"{hits}/{len(values)}" if values else "-")
         print((f"  {cell:<20} " + " ".join(f"{p:<4}" for p in parts)).rstrip())
 
-    # 5. First person: violations, not occurrences.
+    # 5. First person. Substring occurrences only — whether a match outside the
+    # specified set is a violation is a judgement made by reading it.
     print()
-    print("first person (occurrences of the specified set vs anything else)")
+    print("first person (raw substring occurrences; matches need reading)")
     for cell in sorted({c for c, _, _ in replies if not c.startswith("control-")}):
         texts = [r["text"] for k, r in replies.items() if k[0] == cell]
         joined = "\n".join(texts)

@@ -23,30 +23,10 @@ CONTROLS_FILE = "controls.jsonl"
 JUDGEMENTS_FILE = "judgements.jsonl"
 MAX_WORKERS = 8
 
-RUBRIC = """あなたは日本語の文体を判定する評価器です。与えられたテキストを3つの軸で判定してください。
-
-1. register: 地の文の文末表現の種別
-   - "kansai": 関西弁の話し言葉。「〜やん」「〜やで」「〜ねん」「〜へん」「〜ちゃう」だけでなく、
-     動詞＋「で」「わ」の文末、「〜ん」の否定形（せん、あらへん、分からん等）、
-     「〜とる」の進行形、「〜やろ」「〜やと思う」も関西弁に含める
-   - "desumasu": 標準語のですます調
-   - "dearu": 標準語のだ・である調（常体）
-   - "plain": 上記のいずれとも判定できない
-   混在している場合は、地の文の大半を占める方を選ぶ。
-2. tameguchi: 敬語を使っていない（ため口である）か
-3. high_energy: テンションが高く明るいと言えるか。落ち着いた説明口調なら false
-
-見出し・コードブロック・箇条書きの記号は無視し、地の文で判定してください。
-内容の正しさは評価対象外です。
-
-JSON のみを出力してください。前後に説明を付けないでください。
-{"register": "...", "tameguchi": true/false, "high_energy": true/false}"""
-
-
 def claude(model, prompt):
     result = subprocess.run(
         ["claude", "-p", "--safe-mode", "--tools", "", "--model", model,
-         "--output-format", "json", "--system-prompt", RUBRIC, prompt],
+         "--output-format", "json", "--system-prompt", config.JUDGE_RUBRIC, prompt],
         capture_output=True,
         text=True,
         timeout=300,
@@ -84,16 +64,20 @@ def judge_one(record, model, pass_index):
 
 
 def main():
-    records = []
+    # Keyed rather than appended: a restarted run can leave a second copy of a
+    # conversation in replies.jsonl, and judging both would put two different
+    # texts under one identifier in the analysis. Last one wins.
+    by_key = {}
     for path in (REPLIES_FILE, CONTROLS_FILE):
         try:
             with open(path, encoding="utf-8") as f:
                 for line in f:
                     record = json.loads(line)
                     if "error" not in record:
-                        records.append(record)
+                        by_key[(record["cell"], record["rep"], record["turn"])] = record
         except FileNotFoundError:
             sys.exit(f"{path} not found; run run.py first")
+    records = list(by_key.values())
 
     jobs = []
     for record in records:
