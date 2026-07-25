@@ -52,7 +52,7 @@ pre-commit run --all-files
 ## Language
 
 - Write all text in English: commit messages, PR descriptions, issue comments, code comments, etc
-- Exception: `AIRULES.md` is written in Japanese; references to its content may also be in Japanese
+- Exception: `AIRULES.md` and the `claude/rules/` files carrying rules split out of it are written in Japanese; references to their content may also be in Japanese. When editing an existing rule file, match the language it already uses
 
 ## Script Requirements
 

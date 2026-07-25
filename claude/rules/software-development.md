@@ -1,9 +1,8 @@
-# Software Development
+# ソフトウェア開発
 
-Rules for implementation work in an environment with filesystem, shell, and
-git/gh access.
+filesystem・shell・git/gh が使える環境での実装作業に適用する。
 
-## General
+## 全般
 
 1. Unix哲学に従い、スクリプトやモジュールは小さく保ち、1つのことだけをうまくやらせる
 1. README.mdがあれば読む
@@ -23,28 +22,28 @@ git/gh access.
 1. 編集 / 簡素化 / 整理タスクで、依頼されたスコープに含まれない既存の行・コメント・順序・命名・wordingは基本的に触らない。明らかなtypo修正等で「ついで」が許容される場面もあるが、原則は別PRで提案する
 1. リポジトリへ永続化する出力（コミットメッセージ・PR本文・コード内コメント・docs等）の言語は、OSSはデフォルト英語、それ以外はプロジェクトのルール（`CLAUDE.md` / `AGENTS.md` 等）と既存資産（PR / commit history / docs）の言語に合わせる
 
-## Tool selection
+## ツール選択
 
 - GitHubの操作はコーディングタスクの場合 `gh` コマンドを使う。ghが使えない環境やghで実現できない操作の場合のみ `raw.githubusercontent.com` 等を使ってよい
 - `gh` の中では高レベルサブコマンド（`gh pr view` / `gh pr diff` / `gh pr checks` / `gh issue view` / `gh run view` 等）を優先する。特にPRレビュー・レビューコメント・レビュースレッドの取得や操作は `gh pr-review` 拡張（`agynio/gh-pr-review`）を使う。sub-issue の list/add/remove は `gh sub-issue` 拡張を使う。`gh api`（特に `gh api graphql -f query=...`）はこれらで実現できない操作に限定する
 - IDE連携のMCPサーバー（コードインデックス・シンボル解決・静的解析等）が接続されている時は、コード検索・ナビゲーション・解析にその読み取り系ツールを優先する（ユーザーの明示は不要）
 - GitHub repositoryの内部詳細（source code・formula・configファイル等）を確認する時は個別ファイルから入らず上位から順に見る: README → 直近release tagとmain差分（`gh api repos/.../releases`）→ 既知issue/PR検索（`gh search issues/prs`）→ source code。CLIの使い方・挙動を `--help`・man page・実機実行で確認する段階では適用不要
 
-## Shell scripts
+## シェルスクリプト作成
 
 1. `[[ condition ]] && command` の形式は避け、明示的な `if` 文を使用する（`set -e` との非互換のため）。ただし `continue` / `break` との組み合わせは例外
 1. 重要なスクリプトでは `set -eu` を使用する
 1. すべてのスクリプトはshellcheckの警告をクリアする（`.shellcheckrc` に従う）
 1. shellは小規模なユーティリティに限定し、100行を目安にする。超える場合は分割またはPython等を検討する
 
-## Confidential information handling
+## セキュリティと機密情報の取り扱い
 
 1. 個人情報・APIキー・パスワード・DB接続文字列等の機密情報を絶対にコミットしない
 1. 機密情報は環境変数や `.env.local` 等に分離する。サンプルファイルにはダミー値のみ使用する
 1. コミット前に機密情報が含まれていないか確認する。`.gitignore` を適切に設定する
 1. ログ・デバッグ出力に機密情報を含めない
 
-## Agent permission policy
+## AI Agent の権限管理方針
 
 - read-onlyかつ副作用のないコマンドは原則allowとする
 - 外部への書き込み（コメント投稿、issue操作等）や任意コード実行が可能なコマンド（python3, node, docker run等）はallowにしない
