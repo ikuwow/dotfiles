@@ -1,0 +1,51 @@
+# Software Development
+
+Rules for implementation work in an environment with filesystem, shell, and
+git/gh access.
+
+## General
+
+1. Unix哲学に従い、スクリプトやモジュールは小さく保ち、1つのことだけをうまくやらせる
+1. README.mdがあれば読む
+1. 全体を少しずつ作り、1コミットごとにレスポンスを返す形で進める
+1. コメントはコードから読み取れない意図の説明のみに限定する
+1. シェルコマンドは `&&` や `;` で連結せず、1コマンドずつ個別に実行する。特に `cd` は他のコマンドと絶対に連結しない（bare repository attack防止チェックに該当するため）
+1. シェルコマンド内でコマンド置換（`$()`、バッククォート）を使わない。複数行テキストはシングルクォートで渡し、本文にシングルクォートが含まれる場合のみheredocにフォールバック
+1. AWS CLIを実行する際は必ず `AWS_PROFILE=<profile> aws ...` の形式で環境変数をコマンドの先頭に付与する。使用するprofileは必ずユーザーに確認してから実行すること。GCPの権限切り替えは `gps` コマンドを使用する
+1. プロジェクトと無関係のファイルは、現在のプロジェクトroot直下の `ikuwowfiles/` 以下に置く（グローバルgitignore対象）
+1. コード・ファイル内の検索は `git grep` を第一選択とする。Bashの `find` コマンドではなくGlob/Grep/Readツールを優先し、`find` は専用ツールでは実現できない場合（パーミッション・タイムスタンプ条件等）に限定する
+1. ユーザー提示のドキュメント・URLは正確に読んでから実装する。コード例はそのまま適用する
+1. エラー対処は最も影響の小さい解決策から試す。セキュリティを弱める設定は最終手段
+1. 新ツール・サービスの設定時は公式サンプル実装を先に確認する
+1. バージョンを更新する際は最新版を確認し、現在との差分を把握した上で指定すること
+1. GitHubのissue/PRを `#123` 形式で参照する際、現在のリポジトリと異なるリポジトリのものは `orgname/reponame#123` 形式で記述する
+1. GitHub issueを読む際は親issueがある場合はその内容も読むこと。またsub issueの有無を確認し、存在する場合はタイトルとステータスを把握する（詳細まで読む必要はない）。さらにコメントも全件取得すること（`gh issue view <number> --comments`）
+1. 編集 / 簡素化 / 整理タスクで、依頼されたスコープに含まれない既存の行・コメント・順序・命名・wordingは基本的に触らない。明らかなtypo修正等で「ついで」が許容される場面もあるが、原則は別PRで提案する
+1. リポジトリへ永続化する出力（コミットメッセージ・PR本文・コード内コメント・docs等）の言語は、OSSはデフォルト英語、それ以外はプロジェクトのルール（`CLAUDE.md` / `AGENTS.md` 等）と既存資産（PR / commit history / docs）の言語に合わせる
+
+## Tool selection
+
+- GitHubの操作はコーディングタスクの場合 `gh` コマンドを使う。ghが使えない環境やghで実現できない操作の場合のみ `raw.githubusercontent.com` 等を使ってよい
+- `gh` の中では高レベルサブコマンド（`gh pr view` / `gh pr diff` / `gh pr checks` / `gh issue view` / `gh run view` 等）を優先する。特にPRレビュー・レビューコメント・レビュースレッドの取得や操作は `gh pr-review` 拡張（`agynio/gh-pr-review`）を使う。sub-issue の list/add/remove は `gh sub-issue` 拡張を使う。`gh api`（特に `gh api graphql -f query=...`）はこれらで実現できない操作に限定する
+- IDE連携のMCPサーバー（コードインデックス・シンボル解決・静的解析等）が接続されている時は、コード検索・ナビゲーション・解析にその読み取り系ツールを優先する（ユーザーの明示は不要）
+- GitHub repositoryの内部詳細（source code・formula・configファイル等）を確認する時は個別ファイルから入らず上位から順に見る: README → 直近release tagとmain差分（`gh api repos/.../releases`）→ 既知issue/PR検索（`gh search issues/prs`）→ source code。CLIの使い方・挙動を `--help`・man page・実機実行で確認する段階では適用不要
+
+## Shell scripts
+
+1. `[[ condition ]] && command` の形式は避け、明示的な `if` 文を使用する（`set -e` との非互換のため）。ただし `continue` / `break` との組み合わせは例外
+1. 重要なスクリプトでは `set -eu` を使用する
+1. すべてのスクリプトはshellcheckの警告をクリアする（`.shellcheckrc` に従う）
+1. shellは小規模なユーティリティに限定し、100行を目安にする。超える場合は分割またはPython等を検討する
+
+## Confidential information handling
+
+1. 個人情報・APIキー・パスワード・DB接続文字列等の機密情報を絶対にコミットしない
+1. 機密情報は環境変数や `.env.local` 等に分離する。サンプルファイルにはダミー値のみ使用する
+1. コミット前に機密情報が含まれていないか確認する。`.gitignore` を適切に設定する
+1. ログ・デバッグ出力に機密情報を含めない
+
+## Agent permission policy
+
+- read-onlyかつ副作用のないコマンドは原則allowとする
+- 外部への書き込み（コメント投稿、issue操作等）や任意コード実行が可能なコマンド（python3, node, docker run等）はallowにしない
+- allowルールを提案する際はこの方針に従い、副作用の有無を必ず確認する
