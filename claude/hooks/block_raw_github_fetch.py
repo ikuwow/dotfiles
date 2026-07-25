@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Deny curl/wget fetches of raw.githubusercontent.com in favor of ``gh``.
 
-AIRULES.md ("GitHubの操作は...`gh` コマンドを使う。ghが使えない環境や
+The rule ("GitHubの操作は...`gh` コマンドを使う。ghが使えない環境や
 ghで実現できない操作の場合のみ...`raw.githubusercontent.com` 等を使って
 よい") only permits fetching raw.githubusercontent.com directly when
 ``gh`` itself is unavailable. This PreToolUse hook mechanizes the
