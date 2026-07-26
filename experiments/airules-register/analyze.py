@@ -1,17 +1,23 @@
-"""Aggregate judgements.jsonl and replies.jsonl into the reported figures.
+"""Aggregate the recorded judgements into the reported figures.
 
 Reports, in order: whether the judge is trustworthy on this run, then the
-register results it is being trusted for, then the descriptive axes.
+register results it is being trusted for, then energy and the empathy flag.
+
+`--controls-only` reads `judgements-controls.jsonl` and stops after the
+reliability section, which is the gate run before any replies are generated.
 """
 
 import json
+import os
 import re
+import sys
 from collections import Counter, defaultdict
 
 import config
 
-REPLIES_FILE = "replies.jsonl"
-JUDGEMENTS_FILE = "judgements.jsonl"
+REPLIES_FILE = os.path.join(config.DATA_DIR, "replies.jsonl")
+JUDGEMENTS_FILE = os.path.join(config.DATA_DIR, "judgements.jsonl")
+CONTROL_JUDGEMENTS_FILE = os.path.join(config.DATA_DIR, "judgements-controls.jsonl")
 
 ENERGY_MARKERS = re.compile(config.ENERGY_MARKER_PATTERN, re.MULTILINE)
 
@@ -25,9 +31,98 @@ def key(row):
     return (row["cell"], row["rep"], row["turn"])
 
 
+def is_high(row):
+    """The judge's ordinal collapsed to the boolean the cells are compared on."""
+    level = row.get("energy_level")
+    return isinstance(level, int) and level >= config.ENERGY_HIGH_THRESHOLD
+
+
+def majority(rows, predicate):
+    return sum(1 for r in rows if predicate(r)) > len(rows) / 2
+
+
+def report_reliability(primary, cross):
+    """Everything that has to hold before a figure below it means anything."""
+    measured = len(primary)
+    unanimous = sum(
+        1 for rows in primary.values() if len({r["register"] for r in rows}) == 1
+    )
+    energy_unanimous = sum(
+        1 for rows in primary.values() if len({is_high(r) for r in rows}) == 1
+    )
+    print("judge reliability")
+    print(f"  repeat agreement on register: {unanimous}/{measured} texts unanimous "
+          f"across {config.JUDGE_PASSES} passes")
+    if measured and unanimous / measured < config.AGREEMENT_THRESHOLD:
+        print(f"  BELOW the {config.AGREEMENT_THRESHOLD:.0%} threshold — "
+              f"treat every register figure below as unreliable")
+    print(f"  repeat agreement on energy (level >= {config.ENERGY_HIGH_THRESHOLD}): "
+          f"{energy_unanimous}/{measured} texts unanimous")
+    if measured and energy_unanimous / measured < config.ENERGY_AGREEMENT_THRESHOLD:
+        print(f"  BELOW the {config.ENERGY_AGREEMENT_THRESHOLD:.0%} threshold — "
+              f"treat every energy figure below as unreliable")
+
+    for axis, extract in (("register", lambda rows: Counter(
+            r["register"] for r in rows).most_common(1)[0][0]),
+            ("energy", lambda rows: majority(rows, is_high))):
+        agree = sum(
+            1
+            for identifier, rows in primary.items()
+            if identifier in cross
+            and extract(rows) == extract([cross[identifier]])
+        )
+        print(f"  agreement with {config.CROSS_JUDGE_MODEL} on {axis}: "
+              f"{agree}/{len(cross)}")
+
+
+def report_controls(primary):
+    """The hand-written texts, one line each, against the labels they carry.
+
+    Energy is what decides between wordings in this round, so the controls that
+    matter most are the ones built to break a judge that counts surface
+    markers: a report voice with an exclamation mark on every sentence, and a
+    reply full of empathy written flat.
+    """
+    controls = sorted(
+        (identifier, rows)
+        for identifier, rows in primary.items()
+        if identifier[0].startswith("control-")
+    )
+    correct = Counter()
+    total = Counter()
+    print()
+    print("controls (hand-written, known labels)")
+    for identifier, rows in controls:
+        got = {
+            "register": Counter(r["register"] for r in rows).most_common(1)[0][0],
+            "energy_high": majority(rows, is_high),
+            "empathy": majority(rows, lambda r: r.get("empathy_padding")),
+        }
+        expected = {
+            "register": rows[0].get("expected"),
+            "energy_high": rows[0].get("expected_energy_high"),
+            "empathy": rows[0].get("expected_empathy"),
+        }
+        levels = [r.get("energy_level") for r in rows]
+        marks = []
+        for axis in ("register", "energy_high", "empathy"):
+            if expected[axis] is None:
+                continue
+            total[axis] += 1
+            hit = got[axis] == expected[axis]
+            correct[axis] += hit
+            marks.append(f"{axis}={got[axis]}{'' if hit else f' MISS(want {expected[axis]})'}")
+        print(f"  {identifier[0]:<26} levels={levels}  " + "  ".join(marks))
+    print("  correct: " + "  ".join(
+        f"{axis} {correct[axis]}/{total[axis]}" for axis in sorted(total)))
+
+
 def main():
-    replies = {key(r): r for r in load(REPLIES_FILE) if "error" not in r}
-    judgements = [j for j in load(JUDGEMENTS_FILE) if "error" not in j]
+    controls_only = "--controls-only" in sys.argv
+    judgements = [
+        j for j in load(CONTROL_JUDGEMENTS_FILE if controls_only else JUDGEMENTS_FILE)
+        if "error" not in j
+    ]
 
     primary = defaultdict(list)
     cross = {}
@@ -43,79 +138,52 @@ def main():
     for identifier in under_judged:
         del primary[identifier]
 
-    # 1. Judge reliability, before any result that depends on it.
-    unanimous = sum(
-        1 for rows in primary.values() if len({r["register"] for r in rows}) == 1
-    )
-    measured = len(primary)
-    print("judge reliability")
-    print(f"  repeat agreement on register: {unanimous}/{measured} texts unanimous "
-          f"across {config.JUDGE_PASSES} passes")
-    if measured and unanimous / measured < config.AGREEMENT_THRESHOLD:
-        print(f"  BELOW the {config.AGREEMENT_THRESHOLD:.0%} threshold — "
-              f"treat every figure below as unreliable")
+    report_reliability(primary, cross)
     if under_judged:
         print(f"  excluded from every figure below: {len(under_judged)} texts "
               f"without {config.JUDGE_PASSES} successful passes")
+    report_controls(primary)
+    if controls_only:
+        return
 
-    cross_agree = sum(
-        1
-        for identifier, rows in primary.items()
-        if identifier in cross
-        and Counter(r["register"] for r in rows).most_common(1)[0][0]
-        == cross[identifier]["register"]
-    )
-    print(f"  agreement with {config.CROSS_JUDGE_MODEL}: {cross_agree}/{len(cross)}")
+    replies = {key(r): r for r in load(REPLIES_FILE) if "error" not in r}
 
-    controls = [
-        (identifier, rows)
-        for identifier, rows in primary.items()
-        if identifier[0].startswith("control-")
-    ]
-    correct = 0
-    for identifier, rows in controls:
-        expected = rows[0].get("expected")
-        majority = Counter(r["register"] for r in rows).most_common(1)[0][0]
-        mark = "ok" if majority == expected else "MISS"
-        if majority == expected:
-            correct += 1
-        print(f"  {identifier[0]:<28} expected={expected:<9} got={majority:<9} {mark}")
-    print(f"  controls correct: {correct}/{len(controls)}")
-
-    # 2. Register by cell, using the majority judgement.
     by_cell = defaultdict(list)
     by_cell_style = defaultdict(list)
     by_cell_turn = defaultdict(dict)
     for identifier, rows in primary.items():
         if identifier[0].startswith("control-"):
             continue
-        cell, rep, turn = identifier
-        majority = Counter(r["register"] for r in rows).most_common(1)[0][0]
-        tameguchi = sum(1 for r in rows if r.get("tameguchi")) > len(rows) / 2
-        energy = sum(1 for r in rows if r.get("high_energy")) > len(rows) / 2
-        style = replies[identifier].get("style")
-        entry = {"register": majority, "tameguchi": tameguchi, "energy": energy}
+        cell, _, _ = identifier
+        levels = [r["energy_level"] for r in rows if isinstance(r.get("energy_level"), int)]
+        entry = {
+            "register": Counter(r["register"] for r in rows).most_common(1)[0][0],
+            "tameguchi": majority(rows, lambda r: r.get("tameguchi")),
+            "energy_high": majority(rows, is_high),
+            "energy_level": sum(levels) / len(levels) if levels else None,
+            "empathy": majority(rows, lambda r: r.get("empathy_padding")),
+        }
         by_cell[cell].append(entry)
-        by_cell_style[(cell, style)].append(entry)
-        by_cell_turn[cell][(rep, turn)] = majority
+        by_cell_style[(cell, replies[identifier].get("style"))].append(entry)
+        by_cell_turn[cell][(identifier[1], identifier[2])] = entry["register"]
 
     print()
     print("register by cell")
     for cell in sorted(by_cell):
         rows = by_cell[cell]
-        n = len(rows)
         kansai = sum(1 for r in rows if r["register"] == "kansai")
         tame = sum(1 for r in rows if r["tameguchi"])
         breakdown = " ".join(
             f"{k}={v}" for k, v in sorted(Counter(r["register"] for r in rows).items())
         )
-        print(f"  {cell:<20} kansai {kansai:>3}/{n:<3} tameguchi {tame:>3}/{n:<3}  {breakdown}")
+        print(f"  {cell:<22} kansai {kansai:>3}/{len(rows):<3} "
+              f"tameguchi {tame:>3}/{len(rows):<3}  {breakdown}")
 
-    # 3. Mirroring: does the user's own register change the result?
+    # Mirroring: does the user's own register change the result?
     print()
     print("register by the style of the user's turn")
     styles = ["plain", "desumasu", "casual"]
-    print(f"  {'cell':<20} " + " ".join(f"{s:>10}" for s in styles))
+    print(f"  {'cell':<22} " + " ".join(f"{s:>10}" for s in styles))
     for cell in sorted(by_cell):
         parts = []
         for style in styles:
@@ -125,43 +193,55 @@ def main():
                 continue
             kansai = sum(1 for r in rows if r["register"] == "kansai")
             parts.append(f"{kansai:>6}/{len(rows):<3}")
-        print((f"  {cell:<20} " + " ".join(parts)).rstrip())
+        print((f"  {cell:<22} " + " ".join(parts)).rstrip())
 
-    # 4. Decay: register per turn index, averaged over repetitions.
+    # Decay: register per turn index, averaged over repetitions.
     print()
     print("kansai rate by turn index")
     turns = sorted({t for cell in by_cell_turn.values() for _, t in cell})
-    print((f"  {'cell':<20} " + " ".join(f"t{t:<3}" for t in turns)).rstrip())
+    print((f"  {'cell':<22} " + " ".join(f"t{t:<3}" for t in turns)).rstrip())
     for cell in sorted(by_cell_turn):
         parts = []
         for turn in turns:
             values = [v for (_, t), v in by_cell_turn[cell].items() if t == turn]
             hits = sum(1 for v in values if v == "kansai")
             parts.append(f"{hits}/{len(values)}" if values else "-")
-        print((f"  {cell:<20} " + " ".join(f"{p:<4}" for p in parts)).rstrip())
+        print((f"  {cell:<22} " + " ".join(f"{p:<4}" for p in parts)).rstrip())
 
-    # 5. First person. Substring occurrences only — whether a match outside the
+    # First person. Substring occurrences only — whether a match outside the
     # specified set is a violation is a judgement made by reading it.
     print()
     print("first person (raw substring occurrences; matches need reading)")
-    for cell in sorted({c for c, _, _ in replies if not c.startswith("control-")}):
-        texts = [r["text"] for k, r in replies.items() if k[0] == cell]
-        joined = "\n".join(texts)
-        specified = {p: joined.count(p) for p in config.SPECIFIED_PRONOUNS}
+    for cell in sorted(by_cell):
+        joined = "\n".join(r["text"] for k, r in replies.items() if k[0] == cell)
+        specified = sum(joined.count(p) for p in config.SPECIFIED_PRONOUNS)
         other = {p: joined.count(p) for p in config.OTHER_PRONOUNS if joined.count(p)}
-        total = sum(specified.values())
-        print(f"  {cell:<20} specified={total:<4} " +
+        print(f"  {cell:<22} specified={specified:<4} " +
               (f"other={other}" if other else "other=none"))
 
-    # 6. Energy, descriptive only.
+    # Energy. The axis this round is decided on, so the judge's call, the mean
+    # of the ordinal behind it and the independent marker count are printed
+    # together rather than any one of them standing alone.
     print()
-    print("energy (judge call, and surface markers per reply — descriptive only)")
+    print("energy")
+    print(f"  {'cell':<22} {'high':>9} {'mean level':>11} {'markers/reply':>14}")
     for cell in sorted(by_cell):
         rows = by_cell[cell]
-        judged = sum(1 for r in rows if r["energy"])
+        high = sum(1 for r in rows if r["energy_high"])
+        levels = [r["energy_level"] for r in rows if r["energy_level"] is not None]
+        mean = sum(levels) / len(levels) if levels else float("nan")
         texts = [r["text"] for k, r in replies.items() if k[0] == cell]
         markers = sum(len(ENERGY_MARKERS.findall(t)) for t in texts) / max(len(texts), 1)
-        print(f"  {cell:<20} judge {judged:>3}/{len(rows):<3}  markers/reply {markers:.1f}")
+        print(f"  {cell:<22} {high:>5}/{len(rows):<3} {mean:>11.2f} {markers:>14.1f}")
+
+    # Empathy padding. Not a target — printed to show whether a wording bought
+    # its brightness by inventing shared feeling or experience, which the rules
+    # forbid on accuracy grounds regardless of how it scores here.
+    print()
+    print("empathy padding (lower is better; not a target, a side effect to watch)")
+    for cell in sorted(by_cell):
+        rows = by_cell[cell]
+        print(f"  {cell:<22} {sum(1 for r in rows if r['empathy']):>3}/{len(rows)}")
 
     cost = sum(r.get("cost_usd") or 0 for r in replies.values())
     print()

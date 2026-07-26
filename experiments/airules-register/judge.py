@@ -8,9 +8,16 @@ instead of hidden inside a single call.
 Hand-written controls with known labels are judged in the same pass, including
 borderline cases, so the judge's discrimination is measured on this run rather
 than assumed from a previous one.
+
+`--controls-only` judges nothing but those hand-written texts. The energy axis
+decides which wording ships in round 2, so the rubric has to be shown to
+separate bright delivery from a loud report and from warm-but-flat prose before
+any replies are generated -- and the controls cost cents where the generation
+costs tens of dollars.
 """
 
 import json
+import os
 import re
 import subprocess
 import sys
@@ -18,9 +25,10 @@ from concurrent.futures import ThreadPoolExecutor
 
 import config
 
-REPLIES_FILE = "replies.jsonl"
+REPLIES_FILE = os.path.join(config.DATA_DIR, "replies.jsonl")
 CONTROLS_FILE = "controls.jsonl"
-JUDGEMENTS_FILE = "judgements.jsonl"
+JUDGEMENTS_FILE = os.path.join(config.DATA_DIR, "judgements.jsonl")
+CONTROL_JUDGEMENTS_FILE = os.path.join(config.DATA_DIR, "judgements-controls.jsonl")
 MAX_WORKERS = 8
 
 def claude(model, prompt):
@@ -53,6 +61,8 @@ def judge_one(record, model, pass_index):
         "turn": record["turn"],
         "style": record.get("style"),
         "expected": record.get("expected"),
+        "expected_energy_high": record.get("expected_energy_high"),
+        "expected_empathy": record.get("expected_empathy"),
         "judge_model": model,
         "pass": pass_index,
     }
@@ -64,11 +74,15 @@ def judge_one(record, model, pass_index):
 
 
 def main():
+    controls_only = "--controls-only" in sys.argv
+    output_file = CONTROL_JUDGEMENTS_FILE if controls_only else JUDGEMENTS_FILE
+    sources = (CONTROLS_FILE,) if controls_only else (REPLIES_FILE, CONTROLS_FILE)
+
     # Keyed rather than appended: a restarted run can leave a second copy of a
     # conversation in replies.jsonl, and judging both would put two different
     # texts under one identifier in the analysis. Last one wins.
     by_key = {}
-    for path in (REPLIES_FILE, CONTROLS_FILE):
+    for path in sources:
         try:
             with open(path, encoding="utf-8") as f:
                 for line in f:
@@ -89,12 +103,13 @@ def main():
     with ThreadPoolExecutor(max_workers=MAX_WORKERS) as pool:
         rows = list(pool.map(lambda job: judge_one(*job), jobs))
 
-    with open(JUDGEMENTS_FILE, "w", encoding="utf-8") as f:
+    os.makedirs(config.DATA_DIR, exist_ok=True)
+    with open(output_file, "w", encoding="utf-8") as f:
         for row in rows:
             f.write(json.dumps(row, ensure_ascii=False) + "\n")
 
     errors = sum(1 for row in rows if "error" in row)
-    print(f"wrote {JUDGEMENTS_FILE}: {len(rows)} rows, {errors} errors")
+    print(f"wrote {output_file}: {len(rows)} rows, {errors} errors")
 
 
 if __name__ == "__main__":

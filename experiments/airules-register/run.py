@@ -28,7 +28,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 import config
 
-REPLIES_FILE = "replies.jsonl"
+REPLIES_FILE = os.path.join(config.DATA_DIR, "replies.jsonl")
 MAX_WORKERS = 5
 
 _write_lock = threading.Lock()
@@ -144,6 +144,7 @@ def run_conversation(cell, rep, system_path):
 
 
 def main():
+    os.makedirs(config.DATA_DIR, exist_ok=True)
     with open(config.BASE_SYSTEM_FILE, encoding="utf-8") as f:
         base = f.read().strip()
     with open(config.AIRULES_FILE, encoding="utf-8") as f:
