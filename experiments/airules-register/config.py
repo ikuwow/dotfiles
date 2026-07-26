@@ -61,6 +61,15 @@ DELIVERY_BULLETS = [
     "- 感嘆詞と感嘆符を地の文に自然に混ぜる（「お」「あー」「せやな」「よっしゃ」等）",
 ]
 
+# The guard, added after round 2. The cell carrying both candidates was the only
+# one to move brightness, and it also raised praise and claimed experience on
+# the technical turns, from 0-1 of 12 to 5 of 12. `過度な称賛・テンプレ的な感謝や
+# 謝罪は避ける` was already in every cell and did not hold, so this states the
+# boundary next to the instruction that provokes crossing it rather than a
+# section away. What the cell measures is whether saying so costs the
+# brightness -- a guard that flattens the delivery is not worth having.
+GUARD_BULLET = "- 明るさは話し方で出す。相手への称賛や自分の体験談で出さない"
+
 # Candidate B. The single example replaced by three, each of them a plain
 # factual answer delivered brightly. No empathy, no anecdote, nothing the
 # assistant would have to invent to imitate them.
@@ -105,6 +114,9 @@ def wordings(airules_text):
         ("4-examples", tone_variant(airules_text, bright_examples=True)),
         ("5-delivery-examples",
          tone_variant(airules_text, added=DELIVERY_BULLETS, bright_examples=True)),
+        ("6-delivery-examples-guard",
+         tone_variant(airules_text, added=DELIVERY_BULLETS + [GUARD_BULLET],
+                      bright_examples=True)),
     ]
 
 

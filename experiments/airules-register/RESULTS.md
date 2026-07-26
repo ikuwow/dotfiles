@@ -1,11 +1,144 @@
-# Results — 2026-07-25
+# Results
+
+## Round 2 — 2026-07-26: which brightness wording reaches the reply
+
+Seven cells, 21 conversations, 210 replies, no errors, $38.95 at list price.
+Model `claude-sonnet-5`. Every cell carries the whole of `AIRULES.md` with the
+wording edited into its tone section. Raw output in `round2/results-output.txt`.
+
+### The judge, before anything that rests on it
+
+| check | result |
+| --- | --- |
+| repeat agreement on register across 3 passes | 214/220 texts unanimous |
+| repeat agreement on energy across 3 passes | 208/220 texts unanimous |
+| agreement with `claude-haiku-4-5` on register | 202/220 |
+| agreement with `claude-haiku-4-5` on energy | 190/220 |
+| hand-written controls classified correctly | 10/10 register, 10/10 energy, 10/10 empathy |
+
+Both repeat-agreement figures clear the thresholds in `config`. Cross-model
+agreement is looser on energy (86%) than on register (92%), which is the axis
+this round decides on, so differences of one or two replies between cells are
+not differences.
+
+The rubric was revised twice, both times against the control gate and both
+times before a single reply existed. The first version scored the
+exclamation-mark report at 3 of 3 despite the rubric already saying it should
+cap at 1, so the cap was rewritten to key on spoken-versus-written vocabulary.
+The second scored a 相槌 opener as empathy, overlapping the delivery axis it is
+supposed to be independent of, so the two were separated explicitly. Nothing
+was changed after the replies were generated.
+
+### Neither candidate works alone
+
+| cell | energy high | mean level | markers/reply |
+| --- | --- | --- | --- |
+| no block (control) | 2/30 | 1.00 | 0.2 |
+| current `AIRULES.md` | 1/30 | 1.01 | 0.2 |
+| + `テンション高めで明るく、サバサバしている` | 1/30 | 1.03 | 0.2 |
+| + delivery bullets | 4/30 | 1.13 | 0.3 |
+| + three bright examples | 2/30 | 1.07 | 0.3 |
+| + both | 14/30 | 1.50 | 1.2 |
+| + both + the guard | 12/30 | 1.44 | 0.9 |
+
+Stating brightness as delivery scores 4 of 30 on its own. Replacing the single
+example with three bright ones scores 2 of 30. The no-instruction control
+scores 2 of 30. Put the two together and the figure is 14 of 30, on the judge's
+call and on the marker count alike — 1.2 markers per reply against 0.2 to 0.3
+everywhere else.
+
+The adjective wording that was removed in e53a3d8 scores 1 of 30, which is the
+control's figure. It is the cell that connects this round to round 1's 6 of 30,
+measured there on a coarser rubric.
+
+So brightness is not a matter of finding the right sentence. A description of
+the delivery and an example of it each fail on their own and work together,
+which is the one result here that a differently-worded single bullet would not
+have produced.
+
+### Brightness lands on the conversational turns only
+
+| cell | plain | desumasu | casual |
+| --- | --- | --- | --- |
+| current `AIRULES.md` | 0/12 | 0/9 | 1/9 |
+| + delivery bullets | 1/12 | 0/9 | 3/9 |
+| + three bright examples | 0/12 | 0/9 | 2/9 |
+| + both | 5/12 | 3/9 | 6/9 |
+| + both + the guard | 2/12 | 3/9 | 7/9 |
+
+Seven of the ten turns ask a technical question, and in every cell the answers
+to them stay flat after the first sentence: a bright opener, then workmanlike
+Kansai prose. Nothing moved that, and nothing was meant to — an explanation of
+what squash merge costs has no cheerful version. The aggregate above is
+therefore diluted by seven turns no wording is trying to move, and the casual
+column is where the instruction is doing its work.
+
+### The winning cell buys some of it with praise and invented experience
+
+| cell | empathy padding, all | plain turns |
+| --- | --- | --- |
+| current `AIRULES.md` | 5/30 | 0/12 |
+| + delivery bullets | 7/30 | 1/12 |
+| + three bright examples | 8/30 | 0/12 |
+| + both | 14/30 | 5/12 |
+| + both + the guard | 8/30 | 2/12 |
+
+Empathy on the casual turns is not padding: two of those three turns ask the
+assistant how it feels, so answering is the task. The plain column is where an
+invented rapport shows, and the cell carrying both candidates goes from 0-1 of
+12 to 5 of 12 there. Reading them: `ウチの経験則だと` on a question about
+rebase, `お、ええとこ突いてきたな!`, `良い着眼点やで`. The first is a claim to
+experience the assistant does not have; the other two are the praise
+`過度な称賛・テンプレ的な感謝や謝罪は避ける` already forbids, in a file that
+was carrying that bullet in every one of these cells.
+
+Adding one line to the tone section — `明るさは話し方で出す。相手への称賛や自分
+の体験談で出さない` — roughly halves it, 14 of 30 to 8 of 30 and 5 of 12 to 2 of
+12, while brightness on the casual turns holds at 7 of 9 against 6 of 9. The
+aggregate energy falls from 14 to 12, and all of that fall is on the technical
+turns where brightness was not wanted.
+
+At three conversations per cell, 14 against 12 is not a difference; re-judging
+the identical texts moved several cells by one. What the run supports is that
+the guard did not cost the brightness where it was wanted, and that it cut the
+padding roughly in half.
+
+### What shipped
+
+The tone section of `AIRULES.md` gains the two delivery bullets, the guard, and
+the three examples in place of the one, verbatim as the cell that was measured.
+
+### Register and first person, unchanged
+
+Every cell carrying an instruction is 30/30 on Kansai and on ため口, at every
+turn index and under every user-turn style; the control is 0/30. Adding four
+lines about tone moved neither.
+
+First person: no violations. One match outside the specified set, `俺` in
+`3-delivery`, is quoted hypothetical speech attributed to a code reviewer
+(`「俺ならこう書く」レベルの指摘`) on the turn that asks about nitpicking review
+comments — the same construction round 1 found.
+
+The three bright examples do not contain `ウチ`, where the example they replaced
+did. The first-person bullet is unchanged and compliance did not move, so this
+is recorded rather than acted on.
+
+### Limits
+
+Three conversations per cell, which is enough for the gap between 1 of 30 and
+14 of 30 and not enough for the gap between 14 and 12. Sonnet 5 against the
+Opus 5 section of the published prompt, and a reconstructed placement, as in
+round 1 — so this ranks wordings against each other and does not predict what
+claude.ai will do with any of them.
+
+## Round 1 — 2026-07-25: does the register survive
 
 Run of the procedure in `README.md` against `AIRULES.md` as of b06a83a, the
 post-#335 file of 59 lines. Model `claude-sonnet-5`. 15 conversations, 10 turns
-each, 150 replies, no errors. Reproduce with `python3 analyze.py`; the raw
-output is in `results-output.txt`.
+each, 150 replies, no errors. Raw output in `round1/results-output.txt`; the
+cell definitions are in `config.py` as of that commit.
 
-## The judge, before anything that rests on it
+### The judge, before anything that rests on it
 
 | check | result |
 | --- | --- |
@@ -18,7 +151,7 @@ first person, and a mostly-standard reply carrying a single Kansai marker. Both
 were classified correctly, so the judge is not keying on surface markers alone.
 Agreement clears the threshold in `config.AGREEMENT_THRESHOLD`.
 
-## The register holds everywhere
+### The register holds everywhere
 
 | cell | kansai | tameguchi | registers observed |
 | --- | --- | --- | --- |
@@ -37,7 +170,7 @@ The failure reported from claude.ai — replies arriving in ですます or だ�
 therefore still does not reproduce here, under the closest condition this
 harness can construct.
 
-## An earlier version of this run said the opposite
+### An earlier version of this run said the opposite
 
 A previous run of this harness found the register breaking at turn 3, the first
 user turn written in ですます, in three of fifteen conversations. That result was
@@ -61,7 +194,7 @@ The restart path has since been exercised — a run that lost one cell to a stal
 error row skipped the 12 recorded conversations and regenerated only the 3
 missing ones.
 
-## Energy
+### Energy
 
 The one axis where the cells differ.
 
@@ -83,7 +216,7 @@ are recorded rather than acted on. What survives that caveat is the gap between
 6/30 and 28/30, which is larger than the axis's vagueness can account for and
 appears in the marker count as well.
 
-## First person
+### First person
 
 Zero violations across 150 replies. Occurrences of the specified set: 83, all
 `うち`; `ウチ`, `あたし` and `あーし` do not appear. The count is a raw substring
@@ -94,7 +227,7 @@ attributed to a code reviewer (`「私ならこう書く」`, `「俺やった�
 `「僕やったらこう書くけど」`), all on turn 7, which asks how it feels to receive
 nitpicking review comments. None is the assistant referring to itself.
 
-## Limits
+### Limits
 
 Sonnet 5, given the Opus 5 section of the published prompt, which is what
 claude.ai serves — the model and the system prompt come from different tiers.
