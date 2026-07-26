@@ -23,12 +23,12 @@ import json
 import os
 import subprocess
 import threading
-from collections import Counter
+from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor
 
 import config
 
-REPLIES_FILE = "replies.jsonl"
+REPLIES_FILE = os.path.join(config.DATA_DIR, "replies.jsonl")
 MAX_WORKERS = 5
 
 _write_lock = threading.Lock()
@@ -55,7 +55,10 @@ def claude(system_path):
          "--input-format", "stream-json", "--output-format", "stream-json", "--verbose"],
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
+        # Discarded rather than piped: nothing reads it, and an unread pipe that
+        # fills stops the child mid-turn with no error and no output. The result
+        # event carries what a failure needs to say.
+        stderr=subprocess.DEVNULL,
         text=True,
         bufsize=1,
     )
@@ -89,7 +92,12 @@ def claude(system_path):
             replies.append(reply)
     finally:
         process.stdin.close()
-        process.wait(timeout=120)
+        try:
+            process.wait(timeout=120)
+        except subprocess.TimeoutExpired:
+            process.kill()
+            process.wait()
+            raise
 
     return replies, cost
 
@@ -102,29 +110,28 @@ def append(records):
 
 
 def complete_conversations():
-    """(cell, rep) pairs with every turn recorded and no error row.
+    """(cell, rep) pairs holding every turn index.
 
-    A conversation that failed is not complete, so a restart retries it. The
-    retry appends a second set of rows; judge.py keys on (cell, rep, turn) and
-    keeps the last, so the successful attempt is the one analysed.
+    Completeness is the set of turn indices, not a row count: two torn writes of
+    six turns each sum to twelve and would pass a count test while turns 7-10
+    were missing for good.
+
+    A conversation that failed is retried, and its error row stays in the file.
+    The retry appends a second set of rows; judge.py keys on (cell, rep, turn)
+    and keeps the last, so the successful attempt is the one analysed -- and the
+    stale error row must not keep the pair out of `done`, or every later run
+    regenerates a conversation that already succeeded.
     """
     if not os.path.exists(REPLIES_FILE):
         return set()
-    turns = Counter()
-    failed = set()
+    wanted = set(range(1, len(config.PROBE_TURNS) + 1))
+    turns = defaultdict(set)
     with open(REPLIES_FILE, encoding="utf-8") as f:
         for line in f:
             record = json.loads(line)
-            pair = (record["cell"], record["rep"])
-            if "error" in record:
-                failed.add(pair)
-            else:
-                turns[pair] += 1
-    return {
-        pair
-        for pair, count in turns.items()
-        if count >= len(config.PROBE_TURNS) and pair not in failed
-    }
+            if "error" not in record:
+                turns[(record["cell"], record["rep"])].add(record["turn"])
+    return {pair for pair, indices in turns.items() if indices >= wanted}
 
 
 def run_conversation(cell, rep, system_path):
@@ -136,7 +143,8 @@ def run_conversation(cell, rep, system_path):
         return
 
     records = []
-    for index, ((style, _), text) in enumerate(zip(config.PROBE_TURNS, replies), start=1):
+    for index, ((style, _), text) in enumerate(
+            zip(config.PROBE_TURNS, replies, strict=True), start=1):
         records.append({"cell": cell, "rep": rep, "turn": index, "style": style,
                         "cost_usd": cost if index == 1 else None, "text": text})
     append(records)
@@ -144,6 +152,7 @@ def run_conversation(cell, rep, system_path):
 
 
 def main():
+    os.makedirs(config.DATA_DIR, exist_ok=True)
     with open(config.BASE_SYSTEM_FILE, encoding="utf-8") as f:
         base = f.read().strip()
     with open(config.AIRULES_FILE, encoding="utf-8") as f:
