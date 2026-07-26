@@ -234,14 +234,44 @@ def main():
         markers = sum(len(ENERGY_MARKERS.findall(t)) for t in texts) / max(len(texts), 1)
         print(f"  {cell:<22} {high:>5}/{len(rows):<3} {mean:>11.2f} {markers:>14.1f}")
 
+    # Energy by the style of the user's turn. The seven technical turns are not
+    # where brightness is wanted -- an explanation of what squash merge costs
+    # has no cheerful version -- so the aggregate above dilutes the three casual
+    # turns with seven that no wording is trying to move.
+    print()
+    print("energy (level >= 2) by the style of the user's turn")
+    print(f"  {'cell':<22} " + " ".join(f"{s:>10}" for s in styles))
+    for cell in sorted(by_cell):
+        parts = []
+        for style in styles:
+            rows = by_cell_style.get((cell, style), [])
+            if not rows:
+                parts.append(f"{'-':>10}")
+                continue
+            high = sum(1 for r in rows if r["energy_high"])
+            parts.append(f"{high:>6}/{len(rows):<3}")
+        print((f"  {cell:<22} " + " ".join(parts)).rstrip())
+
     # Empathy padding. Not a target — printed to show whether a wording bought
     # its brightness by inventing shared feeling or experience, which the rules
     # forbid on accuracy grounds regardless of how it scores here.
+    # Split by style for the same reason as energy, and one more: two of the
+    # three casual turns ask the assistant how it feels. Empathy there is
+    # answering the question, not padding, so the plain and desumasu columns
+    # are where an invented rapport would show.
     print()
-    print("empathy padding (lower is better; not a target, a side effect to watch)")
+    print("empathy padding (not a target; a side effect to watch)")
+    print(f"  {'cell':<22} {'all':>10} " + " ".join(f"{s:>10}" for s in styles))
     for cell in sorted(by_cell):
         rows = by_cell[cell]
-        print(f"  {cell:<22} {sum(1 for r in rows if r['empathy']):>3}/{len(rows)}")
+        parts = [f"{sum(1 for r in rows if r['empathy']):>6}/{len(rows):<3}"]
+        for style in styles:
+            subset = by_cell_style.get((cell, style), [])
+            if not subset:
+                parts.append(f"{'-':>10}")
+                continue
+            parts.append(f"{sum(1 for r in subset if r['empathy']):>6}/{len(subset):<3}")
+        print((f"  {cell:<22} " + " ".join(parts)).rstrip())
 
     cost = sum(r.get("cost_usd") or 0 for r in replies.values())
     print()
