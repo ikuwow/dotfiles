@@ -1,3 +1,7 @@
+sample
+  texts in the judgements file: 220
+  with 3 successful primary passes: 220
+
 judge reliability
   repeat agreement on register: 214/220 texts unanimous across 3 passes
   repeat agreement on energy (level >= 2): 208/220 texts unanimous
@@ -15,74 +19,75 @@ controls (hand-written, known labels)
   control-kansai-mixed       levels=[0, 0, 0]  register=kansai  energy_high=False  empathy=False
   control-loud-hollow        levels=[1, 1, 1]  register=dearu  energy_high=False  empathy=False
   control-plain-one-marker   levels=[1, 0, 0]  register=dearu  energy_high=False  empathy=False
-  correct: empathy 10/10  energy_high 10/10  register 10/10
+  correct: register 10/10  energy_high 10/10  empathy 10/10
+  gate passed
 
 register by cell
-  0-control              kansai   0/30  tameguchi  17/30   dearu=18 desumasu=12
-  1-airules-current      kansai  30/30  tameguchi  30/30   kansai=30
-  2-adjective            kansai  30/30  tameguchi  30/30   kansai=30
-  3-delivery             kansai  30/30  tameguchi  30/30   kansai=30
-  4-examples             kansai  30/30  tameguchi  30/30   kansai=30
-  5-delivery-examples    kansai  30/30  tameguchi  30/30   kansai=30
-  6-delivery-examples-guard kansai  30/30  tameguchi  30/30   kansai=30
+  0-control                  kansai   0/30  tameguchi  17/30   dearu=18 desumasu=12
+  1-airules-current          kansai  30/30  tameguchi  30/30   kansai=30
+  2-adjective                kansai  30/30  tameguchi  30/30   kansai=30
+  3-delivery                 kansai  30/30  tameguchi  30/30   kansai=30
+  4-examples                 kansai  30/30  tameguchi  30/30   kansai=30
+  5-delivery-examples        kansai  30/30  tameguchi  30/30   kansai=30
+  6-delivery-examples-guard  kansai  30/30  tameguchi  30/30   kansai=30
 
 register by the style of the user's turn
-  cell                        plain   desumasu     casual
-  0-control                   0/12       0/9        0/9
-  1-airules-current          12/12       9/9        9/9
-  2-adjective                12/12       9/9        9/9
-  3-delivery                 12/12       9/9        9/9
-  4-examples                 12/12       9/9        9/9
-  5-delivery-examples        12/12       9/9        9/9
-  6-delivery-examples-guard     12/12       9/9        9/9
+  cell                            plain   desumasu     casual
+  0-control                       0/12       0/9        0/9
+  1-airules-current              12/12       9/9        9/9
+  2-adjective                    12/12       9/9        9/9
+  3-delivery                     12/12       9/9        9/9
+  4-examples                     12/12       9/9        9/9
+  5-delivery-examples            12/12       9/9        9/9
+  6-delivery-examples-guard      12/12       9/9        9/9
 
 kansai rate by turn index
-  cell                   t1   t2   t3   t4   t5   t6   t7   t8   t9   t10
-  0-control              0/3  0/3  0/3  0/3  0/3  0/3  0/3  0/3  0/3  0/3
-  1-airules-current      3/3  3/3  3/3  3/3  3/3  3/3  3/3  3/3  3/3  3/3
-  2-adjective            3/3  3/3  3/3  3/3  3/3  3/3  3/3  3/3  3/3  3/3
-  3-delivery             3/3  3/3  3/3  3/3  3/3  3/3  3/3  3/3  3/3  3/3
-  4-examples             3/3  3/3  3/3  3/3  3/3  3/3  3/3  3/3  3/3  3/3
-  5-delivery-examples    3/3  3/3  3/3  3/3  3/3  3/3  3/3  3/3  3/3  3/3
-  6-delivery-examples-guard 3/3  3/3  3/3  3/3  3/3  3/3  3/3  3/3  3/3  3/3
+  cell                       t1   t2   t3   t4   t5   t6   t7   t8   t9   t10
+  0-control                  0/3  0/3  0/3  0/3  0/3  0/3  0/3  0/3  0/3  0/3
+  1-airules-current          3/3  3/3  3/3  3/3  3/3  3/3  3/3  3/3  3/3  3/3
+  2-adjective                3/3  3/3  3/3  3/3  3/3  3/3  3/3  3/3  3/3  3/3
+  3-delivery                 3/3  3/3  3/3  3/3  3/3  3/3  3/3  3/3  3/3  3/3
+  4-examples                 3/3  3/3  3/3  3/3  3/3  3/3  3/3  3/3  3/3  3/3
+  5-delivery-examples        3/3  3/3  3/3  3/3  3/3  3/3  3/3  3/3  3/3  3/3
+  6-delivery-examples-guard  3/3  3/3  3/3  3/3  3/3  3/3  3/3  3/3  3/3  3/3
 
 first person (raw substring occurrences; matches need reading)
-  0-control              specified=1    other={'僕': 2}
-  1-airules-current      specified=12   other=none
-  2-adjective            specified=5    other=none
-  3-delivery             specified=9    other={'俺': 1}
-  4-examples             specified=9    other=none
-  5-delivery-examples    specified=9    other=none
-  6-delivery-examples-guard specified=8    other=none
+  0-control                  specified=1    other={'僕': 2}
+  1-airules-current          specified=12   other=none
+  2-adjective                specified=5    other=none
+  3-delivery                 specified=9    other={'俺': 1}
+  4-examples                 specified=9    other=none
+  5-delivery-examples        specified=9    other=none
+  6-delivery-examples-guard  specified=8    other=none
 
 energy
-  cell                        high  mean level  markers/reply
-  0-control                  2/30         1.00            0.2
-  1-airules-current          1/30         1.01            0.2
-  2-adjective                1/30         1.03            0.2
-  3-delivery                 4/30         1.13            0.3
-  4-examples                 2/30         1.07            0.3
-  5-delivery-examples       14/30         1.50            1.2
-  6-delivery-examples-guard    12/30         1.44            0.9
+  cell                            high  mean level  markers/reply
+  0-control                      2/30         1.00            0.2
+  1-airules-current              1/30         1.01            0.2
+  2-adjective                    1/30         1.03            0.2
+  3-delivery                     4/30         1.13            0.3
+  4-examples                     2/30         1.07            0.3
+  5-delivery-examples           14/30         1.50            1.2
+  6-delivery-examples-guard     12/30         1.44            0.9
 
 energy (level >= 2) by the style of the user's turn
-  cell                        plain   desumasu     casual
-  0-control                   0/12       0/9        2/9
-  1-airules-current           0/12       0/9        1/9
-  2-adjective                 0/12       0/9        1/9
-  3-delivery                  1/12       0/9        3/9
-  4-examples                  0/12       0/9        2/9
-  5-delivery-examples         5/12       3/9        6/9
-  6-delivery-examples-guard      2/12       3/9        7/9
+  cell                            plain   desumasu     casual
+  0-control                       0/12       0/9        2/9
+  1-airules-current               0/12       0/9        1/9
+  2-adjective                     0/12       0/9        1/9
+  3-delivery                      1/12       0/9        3/9
+  4-examples                      0/12       0/9        2/9
+  5-delivery-examples             5/12       3/9        6/9
+  6-delivery-examples-guard       2/12       3/9        7/9
 
 empathy padding (not a target; a side effect to watch)
-  cell                          all      plain   desumasu     casual
-  0-control                   7/30       0/12       0/9        7/9
-  1-airules-current           5/30       0/12       0/9        5/9
-  2-adjective                 6/30       0/12       0/9        6/9
-  3-delivery                  7/30       1/12       0/9        6/9
-  4-examples                  8/30       0/12       0/9        8/9
-  5-delivery-examples        14/30       5/12       0/9        9/9
-  6-delivery-examples-guard      8/30       2/12       0/9        6/9
+  cell                              all      plain   desumasu     casual
+  0-control                       7/30       0/12       0/9        7/9
+  1-airules-current               5/30       0/12       0/9        5/9
+  2-adjective                     6/30       0/12       0/9        6/9
+  3-delivery                      7/30       1/12       0/9        6/9
+  4-examples                      8/30       0/12       0/9        8/9
+  5-delivery-examples            14/30       5/12       0/9        9/9
+  6-delivery-examples-guard       8/30       2/12       0/9        6/9
 
 generation cost reported at list price: $38.95

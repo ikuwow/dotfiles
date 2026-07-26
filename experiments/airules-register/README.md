@@ -39,7 +39,7 @@ turn up front does not work either: messages that arrive while the model is
 generating are merged into the turn in progress. `smoke_test.py` checks both
 properties with a system prompt demanding a fixed token in every reply.
 
-Varied: the brightness wording, six cells including a control that supplies no
+Varied: the brightness wording, seven cells including a control that supplies no
 block at all. The control is what makes the rest interpretable — if it does not
 come back in standard Japanese, the probe cannot detect the failure being
 investigated.
@@ -47,9 +47,9 @@ investigated.
 Every cell that carries an instruction carries the whole of `AIRULES.md` with
 the wording edited into its tone section, which is the condition the file is
 actually deployed under. Round 1 measured the tone bullets as a standalone
-block as well, and the energy axis saturated at 28-30 of 30 there while the
-same bullets scored 6 of 30 inside the file, so a standalone cell separates
-nothing.
+block as well, and the energy axis saturated there at 28 of 30 for those
+bullets and 30 of 30 for two variants of them, while the same bullets scored 6
+of 30 inside the file, so a standalone cell separates nothing.
 
 | cell | wording |
 | --- | --- |
@@ -59,11 +59,24 @@ nothing.
 | `3-delivery` | brightness stated as delivery — 語勢, テンポ, 感嘆詞, 感嘆符 |
 | `4-examples` | the single example replaced by three bright ones |
 | `5-delivery-examples` | both candidates together |
+| `6-delivery-examples-guard` | both, plus a line keeping brightness out of the content |
+
+Each round pins the `AIRULES.md` it varied as `<round>/airules-input.md` rather
+than reading the live file, because round 2's winning wording shipped into that
+file. A harness reading it live would build `1-airules-current` as a copy of the
+winning cell and `3-delivery` as the file plus a second copy of bullets it
+already carries — cells that differ in label and not in content. Round 3 begins
+by copying the then-current file to `round3/airules-input.md` and redefining the
+cells and `config.EXAMPLE_BULLET` against it.
 
 The candidates ask for nothing to be added to the content of a reply. A wording
 that produced brightness by inventing shared feeling or experience would be
 buying it with fabrication, which the rest of the file forbids, so the judge
 scores that separately as `empathy_padding`.
+
+The bright examples were written against the probe set, so two of them answer
+three of the ten turns. That is what an example is for, and it also means those
+three turns are closer to being handed an answer in the cells that carry them.
 
 Ten turns per conversation, three repetitions per cell. Each turn is tagged with
 how the user's own message is written:
@@ -161,5 +174,5 @@ credentials as an interactive session.
 | `analyze.py` | aggregates into the reported figures |
 | `controls.jsonl` | hand-written texts with known labels |
 | `claude-ai-system-prompt.txt` | the prompt the recorded runs used |
-| `round1/`, `round2/` | recorded output, one directory per round; `config.DATA_DIR` selects which one is written |
+| `round1/`, `round2/` | recorded output and the round's pinned `airules-input.md`; `config.DATA_DIR` selects which one is written |
 | `RESULTS.md` | what the recorded runs found |

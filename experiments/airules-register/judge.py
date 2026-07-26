@@ -1,19 +1,20 @@
 """Score every reply, repeatedly and with a second model. Writes judgements.jsonl.
 
-Round 1 of the investigation scored each reply once and treated the result as
-fact. Here each reply is judged config.JUDGE_PASSES times by the primary judge
-and once by a different model, so that disagreement is visible in the output
-instead of hidden inside a single call.
+An earlier run, before this harness existed, scored each reply once and treated
+the result as fact. Here each reply is judged config.JUDGE_PASSES times by the
+primary judge and once by a different model, so that disagreement is visible in
+the output instead of hidden inside a single call.
 
 Hand-written controls with known labels are judged in the same pass, including
 borderline cases, so the judge's discrimination is measured on this run rather
 than assumed from a previous one.
 
 `--controls-only` judges nothing but those hand-written texts. The energy axis
-decides which wording ships in round 2, so the rubric has to be shown to
+decides which wording ships in round 2, so the rubric should be shown to
 separate bright delivery from a loud report and from warm-but-flat prose before
-any replies are generated -- and the controls cost cents where the generation
-costs tens of dollars.
+any replies are generated -- the controls are a handful of calls where the
+generation is tens of dollars. Nothing enforces that order; it is the procedure
+in README.md, and `run.py` will generate replies whether the gate ran or not.
 """
 
 import json
@@ -30,6 +31,7 @@ CONTROLS_FILE = "controls.jsonl"
 JUDGEMENTS_FILE = os.path.join(config.DATA_DIR, "judgements.jsonl")
 CONTROL_JUDGEMENTS_FILE = os.path.join(config.DATA_DIR, "judgements-controls.jsonl")
 MAX_WORKERS = 8
+RUBRIC_KEYS = ("register", "tameguchi", "energy_level", "empathy_padding")
 
 def claude(model, prompt):
     result = subprocess.run(
@@ -67,7 +69,14 @@ def judge_one(record, model, pass_index):
         "pass": pass_index,
     }
     try:
-        row.update(parse(claude(model, "判定対象:\n\n" + record["text"])))
+        # Only the rubric's own keys are taken. `update()` with the raw object
+        # would let the judge overwrite the identity fields and, worse, the
+        # `expected_*` labels it is being graded against -- a reply echoing
+        # `"expected"` back would grade itself and the control gate would print
+        # a perfect score having checked nothing. A missing key raises here
+        # rather than reaching analyze.py as a silent False vote.
+        parsed = parse(claude(model, "判定対象:\n\n" + record["text"]))
+        row.update({k: parsed[k] for k in RUBRIC_KEYS})
     except Exception as exc:  # noqa: BLE001 - record the failure, keep going
         row["error"] = str(exc)[:300]
     return row
@@ -90,7 +99,8 @@ def main():
                     if "error" not in record:
                         by_key[(record["cell"], record["rep"], record["turn"])] = record
         except FileNotFoundError:
-            sys.exit(f"{path} not found; run run.py first")
+            hint = "run run.py first" if path == REPLIES_FILE else "it is committed"
+            sys.exit(f"{path} not found; {hint}")
     records = list(by_key.values())
 
     jobs = []

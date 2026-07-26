@@ -5,15 +5,18 @@ against one file rather than an edit scattered across the scripts.
 
 Round 2 asks a different question from round 1. Round 1 asked whether the
 register survives; it does, in every cell carrying an instruction. What did not
-survive was the brightness of the delivery: the same tone bullets scored 28-30
-of 30 on their own and 6 of 30 inside the whole of `AIRULES.md`. So round 2
-varies only the brightness wording, and every cell carries the whole file rather
-than the tone section alone -- measured in isolation the axis saturates and
-separates nothing.
+survive was the brightness of the delivery: the tone bullets scored 28 of 30 on
+their own, 30 of 30 for two variants of them, and 6 of 30 inside the whole of
+`AIRULES.md`, on round 1's coarser rubric. So round 2 varies only the
+brightness wording, and every cell carrying an instruction carries the whole
+file rather than the tone section alone -- measured in isolation the axis
+saturates and separates nothing.
 
-Round 1's cell definitions are in this file as of commit b06a83a; its recorded
-output is under `round1/`.
+Round 1's cell definitions are in this file as of commit a28e795, which added
+the harness; its recorded output is under `round1/`.
 """
+
+import os
 
 MODEL = "claude-sonnet-5"
 JUDGE_MODEL = "claude-sonnet-5"
@@ -23,7 +26,14 @@ REPETITIONS = 3
 
 DATA_DIR = "round2"
 BASE_SYSTEM_FILE = "claude-ai-system-prompt.txt"
-AIRULES_FILE = "../../AIRULES.md"
+# Each round pins the `AIRULES.md` it varied, rather than reading the live file.
+# Round 2's winning wording shipped into `AIRULES.md`, so a harness reading the
+# live file would build `1-airules-current` as a copy of the winning cell and
+# `3-delivery` as the file plus a second copy of bullets it already has --
+# seven cells, several of them silently identical, every figure internally
+# consistent and meaningless. Round 3 starts by copying the then-current file to
+# `round3/airules-input.md` and redefining the cells against it.
+AIRULES_FILE = os.path.join(DATA_DIR, "airules-input.md")
 
 # Ten turns in fixed order. `style` records how the user's own turn is written,
 # because mirroring the user's register is a competing explanation for any
@@ -44,14 +54,17 @@ PROBE_TURNS = [
     ("casual", "今日はこのへんにしとこ。付き合ってくれてありがとな"),
 ]
 
-# The line every variant is built around. `tone_variant` raises if it is absent,
-# so a reworded AIRULES.md fails the run instead of silently producing cells
-# that differ from the ones named here.
+# The line every variant is built around, in the round's pinned input. Each
+# round re-points this at whichever bullet it varies around; `tone_variant`
+# raises if it is absent, so a mismatched pair of file and constant fails the
+# run instead of silently producing cells that differ from the ones named here.
 EXAMPLE_BULLET = "- 例:「お、それ CI 落ちてるやん! 設定の方やと思うわ、ウチがちょっと見とくわ」"
 
-# The wording removed in e53a3d8, kept verbatim as the anchor. Round 1 measured
-# it inside the whole file at 6/30 on a coarser rubric, so it is the only cell
-# that connects round 2's figures to round 1's.
+# The wording removed in e53a3d8, kept verbatim. It is the closest cell to round
+# 1's full-file cell rather than an exact anchor: round 1's file also carried the
+# 感嘆・相槌 and persona bullets e53a3d8 removed and the four-way pronoun bullet
+# 9527dc8 narrowed, and scored it on a coarser rubric. It bounds the comparison
+# to round 1's 6/30 instead of making it.
 ADJECTIVE_BULLET = "- テンション高めで明るく、サバサバしている"
 
 # Candidate A. Brightness stated as delivery: 語勢, テンポ, 感嘆詞, 感嘆符.
@@ -61,10 +74,11 @@ DELIVERY_BULLETS = [
     "- 感嘆詞と感嘆符を地の文に自然に混ぜる（「お」「あー」「せやな」「よっしゃ」等）",
 ]
 
-# The guard, added after round 2. The cell carrying both candidates was the only
-# one to move brightness, and it also raised praise and claimed experience on
-# the technical turns, from 0-1 of 12 to 5 of 12. `過度な称賛・テンプレ的な感謝や
-# 謝罪は避ける` was already in every cell and did not hold, so this states the
+# The guard, added as cell 6 once the first six cells had been judged. The cell
+# carrying both candidates was the only one of those six to move brightness, and
+# it also raised praise and claimed experience on the plain-form turns, from 0-1
+# of 12 to 5 of 12. `過度な称賛・テンプレ的な感謝や謝罪は避ける` was already in
+# every cell carrying an instruction and did not hold, so this states the
 # boundary next to the instruction that provokes crossing it rather than a
 # section away. What the cell measures is whether saying so costs the
 # brightness -- a guard that flattens the delivery is not worth having.
@@ -73,6 +87,13 @@ GUARD_BULLET = "- 明るさは話し方で出す。相手への称賛や自分�
 # Candidate B. The single example replaced by three, each of them a plain
 # factual answer delivered brightly. No empathy, no anecdote, nothing the
 # assistant would have to invent to imitate them.
+#
+# Deliberate, and a limit on what cells 4-6 establish: the second and third
+# examples answer probe turns 1, 5 and 8 (rebase versus merge, squash merge's
+# drawbacks, bisect). The point of an example is to demonstrate the delivery on
+# the material at hand, and these were written against the probe set, so those
+# three turns are closer to being handed an answer than the other seven are.
+# Candidate B alone scoring 2 of 30 bounds how much that overlap can be worth.
 BRIGHT_EXAMPLES = [
     "- 例:「お、それ CI 落ちてるやん! 設定の方が怪しいわ、ちょっと見とくで」",
     "- 例:「そこは rebase より merge やな! 履歴壊さんで済むし、こっちのが安全やで」",
@@ -84,9 +105,9 @@ SPECIFIED_PRONOUNS = ["うち", "あたし", "ウチ", "あーし"]
 # (自分のブランチ, 自分専用) rather than referring to the speaker. Counting it
 # produced a violation in every cell including the control, which is the giveaway.
 # Both lists are matched as substrings, so every count needs reading before it
-# means anything: うち also appears inside もうちょい and 知らんうちに, and the
-# earlier run's two matches here were both quoted remarks attributed to a code
-# reviewer rather than the assistant's own first person.
+# means anything: うち also appears inside もうちょい and 知らんうちに, and in the
+# cells carrying an instruction every match here so far has been a quoted remark
+# attributed to a code reviewer rather than the assistant's own first person.
 OTHER_PRONOUNS = ["私", "僕", "俺", "わたし", "ぼく", "おれ"]
 
 
@@ -98,9 +119,14 @@ def tone_variant(airules_text, added=(), bright_examples=False):
     `## 会話応答の文体とトーン`, which is where the wording would go if it ships.
     """
     lines = airules_text.split("\n")
-    index = lines.index(EXAMPLE_BULLET)  # ValueError if AIRULES.md has drifted
+    index = lines.index(EXAMPLE_BULLET)  # ValueError if the input has drifted
     examples = BRIGHT_EXAMPLES if bright_examples else [EXAMPLE_BULLET]
     replacement = list(added) + list(examples)
+    # A bullet the input already carries would make this cell a copy of another
+    # one under a label saying otherwise, which no figure would reveal.
+    for bullet in added:
+        if bullet in lines:
+            raise ValueError(f"input already carries this bullet: {bullet}")
     return "\n".join(lines[:index] + replacement + lines[index + 1:])
 
 
@@ -123,7 +149,7 @@ def wordings(airules_text):
 def system_prompt(base, block):
     """Placement is fixed: a <user_preferences> section appended to `system`.
 
-    An earlier round of the investigation found no difference between four
+    An earlier run, before this harness existed, found no difference between four
     placements. The tag name comes from prose in the published prompt --
     "Personal tone, formatting, or feature preferences go in 'user
     preferences'" -- which names the product setting, not a section of the

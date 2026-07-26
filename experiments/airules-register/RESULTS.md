@@ -3,7 +3,8 @@
 ## Round 2 — 2026-07-26: which brightness wording reaches the reply
 
 Seven cells, 21 conversations, 210 replies, no errors, $38.95 at list price.
-Model `claude-sonnet-5`. Every cell carries the whole of `AIRULES.md` with the
+Model `claude-sonnet-5`. Every cell carrying an instruction carries the whole of
+`AIRULES.md`, as of 7830a08 and pinned as `round2/airules-input.md`, with the
 wording edited into its tone section. Raw output in `round2/results-output.txt`.
 
 ### The judge, before anything that rests on it
@@ -16,9 +17,9 @@ wording edited into its tone section. Raw output in `round2/results-output.txt`.
 | agreement with `claude-haiku-4-5` on energy | 190/220 |
 | hand-written controls classified correctly | 10/10 register, 10/10 energy, 10/10 empathy |
 
-Both repeat-agreement figures clear the thresholds in `config`. Cross-model
-agreement is looser on energy (86%) than on register (92%), which is the axis
-this round decides on, so differences of one or two replies between cells are
+Both repeat-agreement figures clear the thresholds in `config`. Energy is the
+axis this round decides on, and cross-model agreement is looser there (86%)
+than on register (92%), so differences of one or two replies between cells are
 not differences.
 
 The rubric was revised twice, both times against the control gate and both
@@ -45,11 +46,13 @@ Stating brightness as delivery scores 4 of 30 on its own. Replacing the single
 example with three bright ones scores 2 of 30. The no-instruction control
 scores 2 of 30. Put the two together and the figure is 14 of 30, on the judge's
 call and on the marker count alike — 1.2 markers per reply against 0.2 to 0.3
-everywhere else.
+in every cell that does not carry both.
 
-The adjective wording that was removed in e53a3d8 scores 1 of 30, which is the
-control's figure. It is the cell that connects this round to round 1's 6 of 30,
-measured there on a coarser rubric.
+The adjective wording that was removed in e53a3d8 scores 1 of 30, against the
+control's 2 of 30: indistinguishable from supplying no instruction at all. It is
+the closest cell to round 1's full-file cell and its 6 of 30, though not the
+same one — round 1's file also carried the 感嘆・相槌 and persona bullets
+e53a3d8 removed, and scored them on a coarser rubric.
 
 So brightness is not a matter of finding the right sentence. A description of
 the delivery and an example of it each fail on their own and work together,
@@ -60,11 +63,17 @@ have produced.
 
 | cell | plain | desumasu | casual |
 | --- | --- | --- | --- |
+| no block (control) | 0/12 | 0/9 | 2/9 |
 | current `AIRULES.md` | 0/12 | 0/9 | 1/9 |
+| + the adjective bullet | 0/12 | 0/9 | 1/9 |
 | + delivery bullets | 1/12 | 0/9 | 3/9 |
 | + three bright examples | 0/12 | 0/9 | 2/9 |
 | + both | 5/12 | 3/9 | 6/9 |
 | + both + the guard | 2/12 | 3/9 | 7/9 |
+
+The control row is the one to read the losing candidates against: 2 of 9 on the
+casual turns is what supplying no instruction produces, so the examples cell
+matches it exactly and the delivery cell is one reply above it.
 
 Seven of the ten turns ask a technical question, and in every cell the answers
 to them stay flat after the first sentence: a bright opener, then workmanlike
@@ -75,13 +84,15 @@ column is where the instruction is doing its work.
 
 ### The winning cell buys some of it with praise and invented experience
 
-| cell | empathy padding, all | plain turns |
-| --- | --- | --- |
-| current `AIRULES.md` | 5/30 | 0/12 |
-| + delivery bullets | 7/30 | 1/12 |
-| + three bright examples | 8/30 | 0/12 |
-| + both | 14/30 | 5/12 |
-| + both + the guard | 8/30 | 2/12 |
+| cell | empathy padding, all | plain turns | casual turns |
+| --- | --- | --- | --- |
+| no block (control) | 7/30 | 0/12 | 7/9 |
+| current `AIRULES.md` | 5/30 | 0/12 | 5/9 |
+| + the adjective bullet | 6/30 | 0/12 | 6/9 |
+| + delivery bullets | 7/30 | 1/12 | 6/9 |
+| + three bright examples | 8/30 | 0/12 | 8/9 |
+| + both | 14/30 | 5/12 | 9/9 |
+| + both + the guard | 8/30 | 2/12 | 6/9 |
 
 Empathy on the casual turns is not padding: two of those three turns ask the
 assistant how it feels, so answering is the task. The plain column is where an
@@ -111,13 +122,16 @@ the three examples in place of the one, verbatim as the cell that was measured.
 ### Register and first person, unchanged
 
 Every cell carrying an instruction is 30/30 on Kansai and on ため口, at every
-turn index and under every user-turn style; the control is 0/30. Adding four
+turn index and under every user-turn style; the control is 0/30. Adding five
 lines about tone moved neither.
 
-First person: no violations. One match outside the specified set, `俺` in
-`3-delivery`, is quoted hypothetical speech attributed to a code reviewer
-(`「俺ならこう書く」レベルの指摘`) on the turn that asks about nitpicking review
-comments — the same construction round 1 found.
+First person: no violations. In the cells carrying an instruction there is one
+match outside the specified set, `俺` in `3-delivery`, and it is quoted
+hypothetical speech attributed to a code reviewer (`「俺ならこう書く」レベルの指
+摘`) on the turn that asks about nitpicking review comments — the same
+construction round 1 found. The control's two occurrences of `僕` are genuine
+self-reference, which is what a cell carrying no first-person instruction is
+expected to produce.
 
 The three bright examples do not contain `ウチ`, where the example they replaced
 did. The first-person bullet is unchanged and compliance did not move, so this
@@ -131,12 +145,18 @@ Opus 5 section of the published prompt, and a reconstructed placement, as in
 round 1 — so this ranks wordings against each other and does not predict what
 claude.ai will do with any of them.
 
+The bright examples were written against the probe set: two of the three answer
+turns 1, 5 and 8. Demonstrating the delivery on the material at hand is what an
+example is for, but it also means those three turns are closer to being handed
+an answer in the three cells that carry them. Candidate B scoring 2 of 30 alone
+bounds what that overlap can be worth.
+
 ## Round 1 — 2026-07-25: does the register survive
 
 Run of the procedure in `README.md` against `AIRULES.md` as of b06a83a, the
 post-#335 file of 59 lines. Model `claude-sonnet-5`. 15 conversations, 10 turns
 each, 150 replies, no errors. Raw output in `round1/results-output.txt`; the
-cell definitions are in `config.py` as of that commit.
+cell definitions are in `config.py` as of a28e795, which added the harness.
 
 ### The judge, before anything that rests on it
 
