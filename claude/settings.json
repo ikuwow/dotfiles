@@ -464,17 +464,6 @@
           }
         ]
       }
-    ],
-    "SubagentStop": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "if command -v noti >/dev/null; then NOTI_NSUSER_SOUNDNAME=Pop noti --title 'Claude Code' --message 'Subagent done.'; fi"
-          }
-        ]
-      }
     ]
   },
   "statusLine": {
