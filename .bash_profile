@@ -93,10 +93,6 @@ if [ -f ~/.aws/current_profile ]; then
 fi
 
 export CLOUDSDK_CONFIG="$XDG_CONFIG_HOME/gcloud"
-if [ -f "$CLOUDSDK_CONFIG/active_config" ]; then
-  GC_ACTIVE_CONFIG="$(cat "$CLOUDSDK_CONFIG/active_config")"
-  export GC_ACTIVE_CONFIG
-fi
 
 export COLIMA_HOME="$XDG_CONFIG_HOME/colima"
 
