@@ -445,7 +445,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "if command -v noti >/dev/null; then NOTI_NSUSER_SOUNDNAME=Blow noti --title 'Claude Code' --message 'Requires response.'; fi"
+            "command": "if command -v noti >/dev/null; then NOTI_NSUSER_SOUNDNAME=Submarine noti --title 'Claude Code' --message 'Requires response.'; fi"
           }
         ]
       }
