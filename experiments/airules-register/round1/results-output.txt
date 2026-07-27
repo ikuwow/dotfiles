@@ -1,0 +1,49 @@
+judge reliability
+  repeat agreement on register: 151/156 texts unanimous across 3 passes
+  agreement with claude-haiku-4-5: 142/156
+  control-desumasu             expected=desumasu  got=desumasu  ok
+  control-dearu                expected=dearu     got=dearu     ok
+  control-kansai               expected=kansai    got=kansai    ok
+  control-kansai-flat          expected=kansai    got=kansai    ok
+  control-kansai-mixed         expected=kansai    got=kansai    ok
+  control-plain-one-marker     expected=dearu     got=dearu     ok
+  controls correct: 6/6
+
+register by cell
+  0-control            kansai   0/30  tameguchi  17/30   dearu=17 desumasu=13
+  1-airules-full       kansai  30/30  tameguchi  30/30   kansai=30
+  2-register-only      kansai  30/30  tameguchi  30/30   kansai=30
+  3-three-examples     kansai  30/30  tameguchi  30/30   kansai=30
+  4-no-desumasu-ban    kansai  30/30  tameguchi  30/30   kansai=30
+
+register by the style of the user's turn
+  cell                      plain   desumasu     casual
+  0-control                 0/12       0/9        0/9
+  1-airules-full           12/12       9/9        9/9
+  2-register-only          12/12       9/9        9/9
+  3-three-examples         12/12       9/9        9/9
+  4-no-desumasu-ban        12/12       9/9        9/9
+
+kansai rate by turn index
+  cell                 t1   t2   t3   t4   t5   t6   t7   t8   t9   t10
+  0-control            0/3  0/3  0/3  0/3  0/3  0/3  0/3  0/3  0/3  0/3
+  1-airules-full       3/3  3/3  3/3  3/3  3/3  3/3  3/3  3/3  3/3  3/3
+  2-register-only      3/3  3/3  3/3  3/3  3/3  3/3  3/3  3/3  3/3  3/3
+  3-three-examples     3/3  3/3  3/3  3/3  3/3  3/3  3/3  3/3  3/3  3/3
+  4-no-desumasu-ban    3/3  3/3  3/3  3/3  3/3  3/3  3/3  3/3  3/3  3/3
+
+first person (raw substring occurrences; matches need reading)
+  0-control            specified=1    other={'私': 1}
+  1-airules-full       specified=12   other={'僕': 1, '俺': 1}
+  2-register-only      specified=13   other={'俺': 1}
+  3-three-examples     specified=29   other={'私': 1}
+  4-no-desumasu-ban    specified=28   other=none
+
+energy (judge call, and surface markers per reply — descriptive only)
+  0-control            judge   3/30   markers/reply 0.3
+  1-airules-full       judge   6/30   markers/reply 0.5
+  2-register-only      judge  28/30   markers/reply 1.6
+  3-three-examples     judge  30/30   markers/reply 1.4
+  4-no-desumasu-ban    judge  30/30   markers/reply 2.3
+
+generation cost reported at list price: $18.84

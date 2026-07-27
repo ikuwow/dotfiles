@@ -32,9 +32,6 @@ link .sshrc         "$HOME/.sshrc"
 # Version / package managers
 link .tool-versions           "$HOME/.tool-versions"
 link .gemrc                   "$HOME/.gemrc"
-link .default-gems            "$HOME/.default-gems"
-link .default-npm-packages    "$HOME/.default-npm-packages"
-link .default-python-packages "$HOME/.default-python-packages"
 link .textlintrc.json         "$HOME/.textlintrc.json"
 
 # XDG config: all subdirs in xdg-config/ auto-discovered

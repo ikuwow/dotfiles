@@ -4,7 +4,6 @@
     "DISABLE_AUTOUPDATER": "1"
   },
   "permissions": {
-    "defaultMode": "auto",
     "allow": [
       "Read(~/bin/**)",
       "Read(~/.local/share/sre-knowledge-base/**)",
@@ -105,21 +104,27 @@
       "Bash(gh run watch *)",
       "Bash(gh pr checks *)",
       "Bash(gh pr diff *)",
-      "Bash(gh pr ready *)",
       "Bash(gh pr create *)",
       "Bash(gh pr edit *)",
       "Bash(gh pr checkout *)",
+      "Bash(gh pr comment *)",
       "Bash(gh pr-review review view *)",
       "Bash(gh pr-review threads list *)",
       "Bash(gh pr-review threads resolve *)",
       "Bash(gh pr-review comments reply *)",
+      "Bash(gh pr-review comments create *)",
+      "Bash(gh pr-review review create *)",
       "Bash(gh pr update-branch)",
       "Bash(gh pr update-branch *)",
       "Bash(gh issue list)",
       "Bash(gh issue list *)",
       "Bash(gh issue create *)",
+      "Bash(gh issue edit *)",
+      "Bash(gh issue comment *)",
       "Bash(gh api repos/*/contents/*)",
       "Bash(gh sub-issue list *)",
+      "Bash(gh sub-issue add *)",
+      "Bash(gh sub-issue remove *)",
       "Bash(gh extension list)",
       "Bash(docker compose ps *)",
       "Bash(docker network ls)",
@@ -365,6 +370,11 @@
       "Read(**/serviceAccount.json)"
     ],
     "ask": [
+      "Bash(gh pr merge *)",
+      "Bash(gh pr close *)",
+      "Bash(gh pr reopen *)",
+      "Bash(gh issue close *)",
+      "Bash(gh issue reopen *)",
       "Bash(gh api * --method*)",
       "Bash(gh api * -X*)",
       "Bash(gh api * --input*)",
@@ -389,7 +399,8 @@
       "Bash(copilot -p *)",
       "Bash(copilot update)",
       "Bash(copilot update *)"
-    ]
+    ],
+    "defaultMode": "auto"
   },
   "hooks": {
     "UserPromptSubmit": [
@@ -417,6 +428,14 @@
           {
             "type": "command",
             "command": "f=~/.claude/hooks/block_raw_github_fetch.py; if [ -f \"$f\" ] && command -v python3 >/dev/null; then python3 \"$f\"; fi"
+          },
+          {
+            "type": "command",
+            "command": "f=~/.claude/hooks/block_aws_logs_start_query.py; if [ -f \"$f\" ] && command -v python3 >/dev/null; then python3 \"$f\"; fi"
+          },
+          {
+            "type": "command",
+            "command": "f=~/.claude/hooks/show_pr_edit_diff.py; if [ -f \"$f\" ] && command -v python3 >/dev/null; then python3 \"$f\"; fi"
           }
         ]
       },
@@ -428,6 +447,15 @@
             "command": "f=~/.claude/hooks/guard_default_branch_edits.py; if [ -f \"$f\" ] && command -v python3 >/dev/null; then python3 \"$f\"; fi"
           }
         ]
+      },
+      {
+        "matcher": "Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "f=~/.claude/hooks/warn_fable_subagent.py; if [ -f \"$f\" ] && command -v python3 >/dev/null; then python3 \"$f\"; fi"
+          }
+        ]
       }
     ],
     "PostToolUse": [
@@ -437,15 +465,6 @@
           {
             "type": "command",
             "command": "echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PostToolUse\",\"additionalContext\":\"If this plan involves implementation beyond a trivial edit, dispatch the implementer subagent per the implementation-delegation rule.\"}}'"
-          }
-        ]
-      },
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "f=~/.claude/hooks/remind_show_edit_diff.py; if [ -f \"$f\" ] && command -v python3 >/dev/null; then python3 \"$f\"; fi"
           }
         ]
       }
@@ -566,9 +585,8 @@
   },
   "effortLevel": "high",
   "advisorModel": "fable",
-  "model": "claude-opus-4-7[1m]",
   "autoUpdatesChannel": "stable",
-  "tui": "default",
+  "tui": "fullscreen",
   "autoMemoryEnabled": false,
   "theme": "auto",
   "remoteControlAtStartup": true,
@@ -576,6 +594,7 @@
   "agentPushNotifEnabled": true,
   "skipAutoPermissionPrompt": true,
   "voiceEnabled": true,
+  "copyOnSelect": false,
   "feedbackSurveyState": {
     "lastShownTime": 1754272823676
   }
