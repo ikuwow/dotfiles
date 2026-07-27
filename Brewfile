@@ -11,6 +11,7 @@ tap "configcat/tap", trusted: true
 tap "pipe-cd/tap", trusted: true
 tap "datadog-labs/pack", trusted: true
 tap "jetbrains/junie", trusted: true
+tap "anthropics/tap", trusted: true
 
 brew "mas"
 
