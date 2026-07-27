@@ -44,8 +44,6 @@ clear "I have not confirmed this" caveat.
 ## Don't
 
 - Write "〜のはず" / "〜される" without a primary source check
-- Ask the user to test something on their host before reading the tool's
-  source for the relevant code path
 - Treat training-data recall as verification — re-confirm via a primary
   source even when you "know" the answer
 - Layer multiple unverified workarounds on top of a tool whose behavior
