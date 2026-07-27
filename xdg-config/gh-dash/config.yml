@@ -1,5 +1,44 @@
+# yaml-language-server: $schema=https://gh-dash.dev/schema.json
+
 # Map any github.com repo to its ghq clone so `c` (checkout) resolves
 # without enumerating owners. gh-dash treats ":owner/:repo" as a literal
 # template key (see dlvhdr/gh-dash internal/tui/common/repopath.go).
 repoPaths:
   ":owner/:repo": ~/ghq/github.com/:owner/:repo
+
+# Show cross-repo results by default (e.g. review-requested across all
+# repos). Toggle per-section scoping to the current repo with `t`.
+smartFilteringAtLaunch: false
+
+# PR sections mirror the categories on https://github.com/pulls/inbox
+# so incoming review requests and merge-ready PRs are visible at a glance.
+prSections:
+  - title: Needs your review
+    filters: is:open -is:draft review-requested:@me
+  - title: Ready to merge
+    filters: is:open -is:draft author:@me review:approved
+  - title: Returned to you
+    filters: is:open author:@me review:changes_requested
+  - title: Draft
+    filters: is:open author:@me is:draft
+  - title: Waiting on review
+    filters: is:open -is:draft author:@me review:required
+  - title: Assigned
+    filters: is:open assignee:@me
+  - title: Mentioned
+    filters: is:open mentions:@me
+
+issuesSections:
+  - title: Assigned
+    filters: is:open assignee:@me
+  - title: Mentioned
+    filters: is:open mentions:@me
+
+keybindings:
+  prs:
+    # Review the PR diff in hunk (https://hunk.dev/). Fetches the diff
+    # via API so it works without a local clone. `d` stays the built-in
+    # plain-text diff.
+    - key: D
+      name: hunk diff
+      command: gh pr diff --repo {{.RepoName}} {{.PrNumber}} | hunk patch -

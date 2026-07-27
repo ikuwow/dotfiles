@@ -89,6 +89,7 @@ dotfiles/
 ├── claude/         # Claude Code settings → ~/.claude/
 ├── codex/          # Codex CLI rules → ~/.codex/
 ├── userscripts/    # Safari userscripts loaded by the Userscripts extension
+├── experiments/    # Measurement harnesses for this repository's own rule files
 └── ... (dotfiles deployed to ~/, see Symlink Map)
 ```
 
