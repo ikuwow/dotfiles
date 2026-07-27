@@ -121,8 +121,9 @@ planned/accept entries in Step 8.
 
 One action = one PR. For each approved action, invoke the git-workflow
 skill (branch, edit, draft PR, CI and review phases). Rule edits follow
-the rule-editing section of AIRULES.md (integrate into the affected
-instruction, positive form, one sentence per bullet). Record which
+`rule-authoring.md` (integrate into the affected instruction) and the
+output-format rules in AIRULES.md (positive form, one sentence per
+bullet). Record which
 review findings were adopted or declined, and why, in `report.md`.
 
 ## Step 8: Persist lifecycle

@@ -11,6 +11,7 @@ tap "configcat/tap", trusted: true
 tap "pipe-cd/tap", trusted: true
 tap "datadog-labs/pack", trusted: true
 tap "jetbrains/junie", trusted: true
+tap "anthropics/tap", trusted: true
 
 brew "mas"
 
@@ -23,7 +24,6 @@ mas "WiFi Signal", id: 525912054
 cask "karabiner-elements"
 cask "ghostty"
 cask "font-noto-sans-mono-cjk-jp"
-cask "pastebot"
 cask "istat-menus"
 cask "rambox"
 mas "Barbee", id: 1548711022
@@ -50,6 +50,7 @@ cask "codex"
 cask "claude-code@latest"
 brew "gemini-cli"
 brew "junie"
+cask "anthropics/tap/ant"
 
 # required by vim
 brew "python"
@@ -83,6 +84,7 @@ brew "cmake"
 brew "ghostscript"
 brew "git"
 brew "git-secrets"
+brew "hunk"
 brew "highlight"
 brew "jq"
 brew "jd"
