@@ -1,0 +1,3 @@
+# Assembled by run.py from claude-ai-system-prompt.txt and the wordings in config.py
+system-*.txt
+__pycache__/

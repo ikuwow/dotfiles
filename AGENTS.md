@@ -9,7 +9,7 @@ Read @README.md for the project overview, repository structure, and how it works
 Files like `~/.bashrc`, `~/.bash_profile`, `~/.inputrc`, etc. in `$HOME`
 are symlinks pointing to files in this repository.
 
-- Files under `claude/` are symlinked into `~/.claude/` — always look at `claude/` in this repo first for Claude Code configuration (settings, hooks, MCP, skills, etc.)
+- Files under `claude/` are symlinked into `~/.claude/` — always look at `claude/` in this repo first for Claude Code configuration (settings, hooks, MCP, skills, etc.). See `claude/README.md` for the source-to-target map. MCP server registration and plugin installation are handled by `scripts/claude-code-setup.sh`, not by symlink
 - `AIRULES.md` is also symlinked to `~/.codex/AGENTS.md` (Codex CLI) and `~/.junie/AGENTS.md` (Junie CLI) for their global instructions
 - When investigating, reading, or editing files managed by this repository,
   always start from the path within this repo. Examples: `bin/foo` not
@@ -53,6 +53,7 @@ pre-commit run --all-files
 
 - Write all text in English: commit messages, PR descriptions, issue comments, code comments, etc
 - Exception: `AIRULES.md` is written in Japanese; references to its content may also be in Japanese
+- Rule files under `claude/rules/` are mixed: match the language of the file being edited, and write new ones in English
 
 ## Script Requirements
 

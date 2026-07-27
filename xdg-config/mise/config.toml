@@ -1,0 +1,7 @@
+# The npm: prefix is deliberate for all three. Bare "yarn" resolves to
+# Berry 4.x while "npm:yarn" is Classic 1.x, bare "pnpm" installs through
+# the aqua backend, and "typescript" has no registry short name at all.
+[tools]
+"npm:yarn" = "latest"
+"npm:pnpm" = "latest"
+"npm:typescript" = "latest"
