@@ -40,9 +40,9 @@ of implementing in the main session.
   back to sequential single-implementer dispatch
 - Dependent PR chains (B rebases on A's merge, C reviews A's design
   decision) stay sequential
-- The parent still owns push, PR creation, review, and monitor for
-  each PR; the implementer's role is unchanged (implement + local
-  commits in its assigned worktree)
+- Each implementer pushes its own branch and opens its own draft PR
+  with a placeholder title and body; the parent owns the real PR
+  title and body, review, and monitor for each PR
 - Apply the section below once per dispatched implementer
 
 ## Review of the subagent's work
@@ -54,3 +54,6 @@ of implementing in the main session.
   risky areas
 - Systematic review stays with the PR review pipeline (pr-selfcheck /
   pr-review-toolkit)
+- When the implementer opened the PR, rewrite its placeholder title
+  and body before running `/pr-selfcheck` — the stub is not a draft to
+  edit
