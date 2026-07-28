@@ -50,7 +50,7 @@ The parent prepares the branch; implement on it. Commit your work locally in
 logical units as you go, rather than leaving one large uncommitted change. Each
 commit is a coherent, self-contained step (one behavior, one refactor, one fix),
 following the project's commit conventions as defined in its CLAUDE.md or
-contributing docs. The parent reviews your commits and owns push and the PR.
+contributing docs. The parent reviews your commits.
 
 # Push, draft PR, and CI
 
