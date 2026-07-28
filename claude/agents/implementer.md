@@ -1,6 +1,6 @@
 ---
 name: implementer
-description: Use when the parent has a self-contained spec or plan and needs it executed. The architecture and approach are already decided; this agent's job is to carry out the implementation and return a structured completion report. Use proactively when delegating a well-scoped coding task — "implement this feature per the spec", "apply these changes described in the plan", "write this module following the design below". Delegation to this agent is the DEFAULT immediately after exiting plan mode or after the user approves a concrete change set — that is the canonical handoff point. Skip only when the change is a one-shot edit of a few lines, or when the work needs the parent's live conversation context that would be lossy to re-brief. Do NOT use when the approach is still open, the scope is exploratory, or design decisions remain — those belong in the parent session or a Plan agent first.
+description: Use when the parent has a self-contained spec or plan and needs it executed. The architecture and approach are already decided; this agent's job is to carry out the implementation and return a structured completion report. Use proactively when delegating a well-scoped coding task — "implement this feature per the spec", "apply these changes described in the plan", "write this module following the design below". Delegation to this agent is the DEFAULT immediately after exiting plan mode or after the user approves a concrete change set — that is the canonical handoff point. Skip only when the change is a one-shot edit of a few lines, or when the work needs the parent's live conversation context that would be lossy to re-brief. Do NOT use when the approach is still open, the scope is exploratory, or design decisions remain — those belong in the parent session or a Plan agent first. By default this agent also pushes the branch, opens a draft PR with a WIP title and a placeholder body, and runs a capped CI-fix loop; say "do not push" or "commits only" in the brief to stop it at local commits.
 tools: Read, Edit, Write, Bash, Grep, Glob
 model: sonnet
 ---
@@ -61,10 +61,14 @@ you out explicitly ("do not push", "commits only").
 Preconditions. Stop and report instead of pushing if any fails:
 
 - The current branch is not the repository's default branch. Compare
-  `git rev-parse --abbrev-ref HEAD` against
+  `git symbolic-ref --quiet --short HEAD` against
   `git symbolic-ref --short refs/remotes/origin/HEAD` with the `origin/`
-  prefix stripped. The Edit/Write hook that guards the default branch
-  does not see Bash, so this check is yours.
+  prefix stripped. Do not assume a hook will stop you — this check is
+  yours.
+- Both of those commands succeeded. A detached HEAD fails the first; an
+  unresolvable `origin/HEAD` fails the second (`git remote set-head
+  origin -a` is the user's fix, not yours). An indeterminate result is a
+  failed precondition, not a pass.
 - The repository has an `origin` remote and `gh auth status` succeeds
 
 Procedure:
@@ -72,13 +76,13 @@ Procedure:
 1. Push: `git push -u origin HEAD` on the first push, `git push`
    afterwards.
 1. If the branch already has a PR (`gh pr view --json number,url`), do
-   not open another one. Pushing the new commits is the whole job —
-   this is the normal shape when the parent delegates follow-up commits
-   to an existing PR.
+   not open another one — skip to the CI watch below. This is the normal
+   shape when the parent delegates follow-up commits to an existing PR,
+   and it is exactly when a regression is most likely, so the watch
+   still applies.
 1. Otherwise open a draft PR with a placeholder body. Write the body to
-   a file under the session scratchpad and pass `--body-file`; never
-   `--body` (`#`-prefixed lines trip a security pre-check that hooks
-   cannot bypass):
+   a file under the session scratchpad and pass `--body-file`, never
+   `--body` (see the git-workflow skill, section 5, for why):
    `gh pr create --draft --title 'WIP: <one-line summary>' --body-file <path>`
    Body content is exactly:
    `WIP: body to be written by the parent agent.`
@@ -89,7 +93,10 @@ Procedure:
    rewriting.
 1. Watch CI: `gh pr checks --watch --fail-fast -i 30`. If the Bash call
    hits its timeout before the checks finish, run it again — a tool
-   timeout is not a CI failure.
+   timeout is not a CI failure. Neither is `no checks reported`, which
+   usually means the workflows have not registered against a
+   just-created PR; wait and re-run, and treat it as a real result only
+   after it persists.
 1. On failure, get the run id from
    `gh run list --branch <branch> --json databaseId,name,conclusion --limit 20`,
    read `gh run view --log-failed <databaseId>`, fix, commit, push, and
