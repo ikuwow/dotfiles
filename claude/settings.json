@@ -20,7 +20,7 @@
       "Bash(tree *)",
       "Bash(git merge *)",
       "Bash(git push)",
-      "Bash(git push *)",
+      "Bash(git push -u origin HEAD)",
       "Bash(git-worktree-create *)",
       "Bash(jq *)",
       "Bash(yq *)",
