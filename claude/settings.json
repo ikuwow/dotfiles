@@ -19,6 +19,8 @@
       "Bash(mkdir *)",
       "Bash(tree *)",
       "Bash(git merge *)",
+      "Bash(git push)",
+      "Bash(git push *)",
       "Bash(git-worktree-create *)",
       "Bash(jq *)",
       "Bash(yq *)",
