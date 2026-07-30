@@ -25,6 +25,11 @@ of implementing in the main session.
   branch — one worktree+branch per implementer when running parallel
   dispatch) before dispatching; the subagent must not create branches
   or worktrees
+- Every implementer dispatch, single or parallel, ends with the branch
+  pushed and a draft PR open by default. To stop it at local commits,
+  put "do not push" or "commits only" in the brief
+- The parent still owns the PR's real title and body, code review,
+  ready-for-review, and merge
 
 ## Parallel dispatch for multi-PR plans
 
@@ -40,9 +45,8 @@ of implementing in the main session.
   back to sequential single-implementer dispatch
 - Dependent PR chains (B rebases on A's merge, C reviews A's design
   decision) stay sequential
-- The parent still owns push, PR creation, review, and monitor for
-  each PR; the implementer's role is unchanged (implement + local
-  commits in its assigned worktree)
+- Each implementer pushes its own branch and opens its own draft PR,
+  so the parent monitors one PR per dispatched implementer
 - Apply the section below once per dispatched implementer
 
 ## Review of the subagent's work
@@ -54,3 +58,7 @@ of implementing in the main session.
   risky areas
 - Systematic review stays with the PR review pipeline (pr-selfcheck /
   pr-review-toolkit)
+- When the implementer opened the PR, replace the placeholder body and
+  drop the `WIP:` prefix from the title before running `/pr-selfcheck`.
+  The body is a fixed stub carrying no content; the title is a real
+  one-line summary that only needs the prefix removed
