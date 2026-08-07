@@ -17,8 +17,7 @@ For general-purpose subagents:
 Omitting `model` inherits the session model, whatever it currently
 is. Run a subagent on `"fable"` — whether by explicit `model` or by
 inheritance — only on explicit user instruction; agents and skills
-that pin `fable` in their own definition (e.g. fable-advisor) are
-exempt.
+that pin `fable` in their own definition are exempt.
 
 ## Delegation economy
 
