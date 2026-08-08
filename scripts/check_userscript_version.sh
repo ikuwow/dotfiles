@@ -18,6 +18,9 @@ for file in "$@"; do
   fi
 
   if git cat-file -e "HEAD:$file" 2>/dev/null; then
+    if git diff --quiet HEAD -- "$file"; then
+      continue
+    fi
     head_version=$(git show "HEAD:$file" | grep -m1 '^// @version' || true)
     if [ "$head_version" = "$work_version" ]; then
       echo "$file: content changed but // @version was not bumped"
