@@ -91,7 +91,8 @@ Launch both in a single assistant message so they execute concurrently:
 
 If either fails:
 - Fix self-review "Must Fix" / "Should Fix" items
-- Fix CI failures (`gh run view --log-failed`)
+- Fix CI failures (`gh run view --log-failed`), or hand them back to
+  the implementer when one is dispatched
 - Push fixes, then re-run both until both pass
 
 Note: `/pr-selfcheck` is a mechanical check, not a code review.
