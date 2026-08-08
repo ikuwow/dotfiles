@@ -52,6 +52,16 @@ report the overrun itself as Should Fix (pr-guidelines: Length
 budget), and re-examine the body against the signals above to decide
 what to cut and whether to escalate.
 
+### Process-record signals
+
+Applies to the PR body only. Flag each as Should Fix; if multiple
+signals fire across the body, escalate to Must Fix.
+
+- Chronological narration of implementation attempts ("first tried X, it failed, so Y")
+- Records of direction changes made mid-implementation
+- References to the session, to plan-mode phases, or to individual commits within the branch
+- Rejected alternatives described at implementation-attempt granularity rather than as design alternatives weighed for the delivered design
+
 ### Hard-wrap detection (GitHub-posted markdown)
 
 For PR bodies, PR comments, issue bodies, and issue comments, GitHub

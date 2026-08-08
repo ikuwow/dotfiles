@@ -82,22 +82,28 @@ Five phases: pass all mechanical checks, run the code review,
 consolidate fixes, finalize the PR for review readiness, then watch
 PR activity until merge.
 
-### Phase 1: PR self-review + CI (parallel)
+### Phase 1: PR self-review + narrative sweep + CI (parallel)
 
-Launch both in a single assistant message so they execute concurrently:
+Launch all three in a single assistant message so they execute concurrently:
 
-- `/pr-selfcheck <PR number>` — PR presentation review
+- `/pr-selfcheck <PR number>` — PR body presentation review
+- the `narrative-sweep` agent — process-record narration in the comments
+  and Markdown prose the branch added. Pass it the branch name and
+  nothing else
 - `gh pr checks --watch` — CI monitoring. Run with `run_in_background: true`
 
-If either fails:
+If any of the three fails:
 - Fix self-review "Must Fix" / "Should Fix" items
+- Move anything the sweep escalated into the PR body
 - Fix CI failures (`gh run view --log-failed`), or hand them back to
   the implementer when one is dispatched
-- Push fixes, then re-run both until both pass
+- The sweep commits locally without pushing, so push its commits and the
+  self-review fixes together in one push, then re-run all three until
+  all pass
 
-Note: `/pr-selfcheck` is a mechanical check, not a code review.
-Re-running it after fixes is expected. The "single-pass" policy
-applies only to the code review in Phase 2.
+Note: `/pr-selfcheck` and the narrative sweep are mechanical checks, not
+a code review. Re-running them after fixes is expected. The
+"single-pass" policy applies only to the code review in Phase 2.
 
 ### Phase 2: Code review
 
@@ -112,13 +118,15 @@ Once Phase 1 passes, launch:
 Once the review finishes, review the results:
 
 1. Fix issues found by the code review
-1. Push fixes if any code was changed, then re-run
+1. Re-run the `narrative-sweep` agent so the comments and prose those
+   fixes introduced are covered
+1. Push the fixes and the sweep's commits in one push, then re-run
    `/pr-selfcheck` and `gh pr checks --watch` to confirm the PR
    is still consistent and CI passes.
 
 The code review is single-pass — do not re-run after fixes.
-`/pr-selfcheck` runs again in Phase 3 to catch inconsistencies
-introduced by review fix changes.
+`/pr-selfcheck` and the narrative sweep run again in Phase 3 to catch
+inconsistencies introduced by review fix changes.
 
 Never end a turn that claims ongoing waiting (delegated fix push,
 CI run, CI rerun, external state change) without an armed event
