@@ -29,15 +29,14 @@ of implementing in the main session.
   pushed, a draft PR open, and a time-bounded CI watch by default. To
   stop it at local commits, put "do not push" or "commits only" in the
   brief
-- When an implementer returns with CI still in flight, do not wait on
-  it: arm the git-workflow Phase 1 background watch and run
-  `/pr-selfcheck` alongside it
+- When an implementer returns with CI still in flight, replace the
+  placeholder PR body and title, then go straight to the git-workflow
+  Phase 1 checks instead of waiting on it
 - Hand a CI failure back to the same implementer, addressed by the name
   or agentId from its spawn result, instead of dispatching a fresh one
-  or taking the fix loop into the parent. Waiting is the parent's
-  because it needs no judgment; diagnosing and fixing a failed check
-  needs little, and belongs on the cheaper agent that already holds the
-  context
+  or taking the fix loop into the parent
+- Once the implementer reports its fix-round cap hit, the failure stops
+  being handback material and is the parent's call
 - The parent still owns the PR's real title and body, code review,
   ready-for-review, and merge
 
