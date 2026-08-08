@@ -97,9 +97,12 @@ If any of the three fails:
 - Move anything the sweep escalated into the PR body
 - Fix CI failures (`gh run view --log-failed`), or hand them back to
   the implementer when one is dispatched
-- The sweep commits locally without pushing, so push its commits and the
-  self-review fixes together in one push, then re-run all three until
-  all pass
+
+The sweep commits locally without pushing. Whenever it produced commits,
+push them together with any self-review and CI fixes in one push,
+regardless of whether the three checks passed, then re-run all three
+until all pass. After any push, re-arm `gh pr checks --watch` (the
+running watch is bound to the pre-push head).
 
 Note: `/pr-selfcheck` and the narrative sweep are mechanical checks, not
 a code review. Re-running them after fixes is expected. The
@@ -117,7 +120,8 @@ Once Phase 1 passes, launch:
 
 Once the review finishes, review the results:
 
-1. Fix issues found by the code review
+1. Fix issues found by the code review and commit the fixes (the sweep
+   reads committed content only)
 1. Re-run the `narrative-sweeper` agent when the review fixes changed any
    file, so the comments and prose those fixes introduced are covered.
    Skip it when the review produced no code changes — its previous pass
