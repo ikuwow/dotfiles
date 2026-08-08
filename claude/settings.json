@@ -343,6 +343,16 @@
     "defaultMode": "auto"
   },
   "hooks": {
+    "SubagentStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '{\"hookSpecificOutput\":{\"hookEventName\":\"SubagentStart\",\"additionalContext\":\"Advisor policy: do not call the advisor tool in this subagent unless your agent definition or task brief explicitly permits it. When blocked or genuinely uncertain, return early and report to the parent instead — the parent holds the advisor and the wider context needed to resolve it.\"}}'"
+          }
+        ]
+      }
+    ],
     "UserPromptSubmit": [
       {
         "hooks": [
