@@ -88,6 +88,9 @@ derivable from the code — goes in the report's escalated section instead
 of disappearing. The parent moves it into the PR body, an issue, or an
 ADR, the sanctioned homes for rejected-alternative rationale.
 
+The sequence of implementation attempts made along the way is removed,
+never escalated.
+
 # Constraints
 
 - Never modify executable lines
