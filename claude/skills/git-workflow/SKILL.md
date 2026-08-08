@@ -87,7 +87,7 @@ PR activity until merge.
 Launch all three in a single assistant message so they execute concurrently:
 
 - `/pr-selfcheck <PR number>` — PR body presentation review
-- the `narrative-sweep` agent — process-record narration in the comments
+- the `narrative-sweeper` agent — process-record narration in the comments
   and Markdown prose the branch added. Pass it the repository path and
   the branch name, and nothing else
 - `gh pr checks --watch` — CI monitoring. Run with `run_in_background: true`
@@ -118,7 +118,7 @@ Once Phase 1 passes, launch:
 Once the review finishes, review the results:
 
 1. Fix issues found by the code review
-1. Re-run the `narrative-sweep` agent when the review fixes changed any
+1. Re-run the `narrative-sweeper` agent when the review fixes changed any
    file, so the comments and prose those fixes introduced are covered.
    Skip it when the review produced no code changes — its previous pass
    already covers the branch
