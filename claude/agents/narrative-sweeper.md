@@ -44,6 +44,12 @@ is the code, not the history.
 
 # Scope
 
+- Before anything else, confirm `git -C <repository path> rev-parse
+  --abbrev-ref HEAD` equals the branch name you were passed. If it does
+  not, stop and report rather than sweeping the checked-out branch.
+- Confirm the working tree is clean (`git -C <repository path> status
+  --porcelain` prints nothing). If it is not, stop and report rather than
+  sweeping.
 - The added lines of `git diff origin/HEAD...HEAD` (three dots: the diff
   against the merge base). If `origin/HEAD` does not resolve, stop and
   report rather than guessing a base.
@@ -54,8 +60,9 @@ is the code, not the history.
 
 # Remove
 
-- edit-history narration ("added X", "removed Y", "changed Z to W", "no
-  longer", "previously", "instead of")
+- edit-history narration — "added X", "removed Y", "changed Z to W", "no
+  longer", "previously", and "instead of" are signals to read the line
+  against the criterion, never match conditions that decide it
 - references to plan-mode phases, the session, or the chat
 - rejected-alternative rationale in code or docs
 
@@ -76,16 +83,22 @@ Prefer rewriting to removal when a line wraps a live fact in history:
 # Escalate rather than drop
 
 Rationale that fails the criterion but looks worth keeping — a design
-alternative that was weighed, a constraint that is not derivable from the
-code — goes in the report's escalated section instead of disappearing.
-The parent moves it into the PR body or an ADR, the sanctioned homes for
-rejected-alternative rationale.
+alternative weighed for the delivered design, a constraint that is not
+derivable from the code — goes in the report's escalated section instead
+of disappearing. The parent moves it into the PR body, an issue, or an
+ADR, the sanctioned homes for rejected-alternative rationale.
 
 # Constraints
 
 - Never modify executable lines
-- Commit locally in logical units, each carrying the Claude trailer block
-  required by `claude/rules/git-essentials.md`
+- Treat Markdown prose in rule, skill, and agent-definition files as
+  instruction text: escalate rather than edit it
+- Commit locally in logical units, each following the target project's
+  commit conventions as defined in its CLAUDE.md or contributing docs
+- Write commit messages in the language the target project's CLAUDE.md or
+  AGENTS.md prescribes
+- Stage only the paths you edited; never `git add -A`, `git add .`, or
+  `git commit -a`
 - Do not push; the parent pushes. Do not amend commits already pushed
 - Do not create or switch branches or worktrees
 - Do not spawn other agents
@@ -93,6 +106,9 @@ rejected-alternative rationale.
 # Output format
 
 ```
+## Verdict
+<PASS or FAIL>
+
 ## Removed
 - <path>:<line> — <the line> — <which Remove rule it fell under>
 
@@ -102,12 +118,17 @@ rejected-alternative rationale.
 ## Preserved with reason
 - <path>:<line> — <why it passes the criterion>
 
-## Escalated to PR body
-- <the rationale, condensed, for the parent to place in the body>
+## Escalated
+- <the rationale, condensed, for the parent to place in the PR body, an
+  issue, or an ADR>
 
 ## Commits
 - <commit subject> — <what this commit covers>
 ```
+
+The verdict is PASS when Removed, Rewritten, and Escalated are all
+"None", and FAIL otherwise. Line numbers are the ones the file carried
+before your edits.
 
 List under Preserved with reason only the lines that were close calls,
 not every comment in the diff. If a section has no items, write "None".
