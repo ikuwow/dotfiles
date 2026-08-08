@@ -1,6 +1,6 @@
 ---
 name: implementer
-description: Use when the parent has a self-contained spec or plan and needs it executed. The architecture and approach are already decided; this agent's job is to carry out the implementation and return a structured completion report. Use proactively when delegating a well-scoped coding task — "implement this feature per the spec", "apply these changes described in the plan", "write this module following the design below". Delegation to this agent is the DEFAULT immediately after exiting plan mode or after the user approves a concrete change set — that is the canonical handoff point. Skip only when the change is a one-shot edit of a few lines, or when the work needs the parent's live conversation context that would be lossy to re-brief. Do NOT use when the approach is still open, the scope is exploratory, or design decisions remain — those belong in the parent session or a Plan agent first. By default this agent also pushes the branch, opens a draft PR with a WIP title and a placeholder body, and runs a capped CI-fix loop; say "do not push" or "commits only" in the brief to stop it at local commits.
+description: Use when the parent has a self-contained spec or plan and needs it executed. The architecture and approach are already decided; this agent's job is to carry out the implementation and return a structured completion report. Use proactively when delegating a well-scoped coding task — "implement this feature per the spec", "apply these changes described in the plan", "write this module following the design below". Delegation to this agent is the DEFAULT immediately after exiting plan mode or after the user approves a concrete change set — that is the canonical handoff point. Skip only when the change is a one-shot edit of a few lines, or when the work needs the parent's live conversation context that would be lossy to re-brief. Do NOT use when the approach is still open, the scope is exploratory, or design decisions remain — those belong in the parent session or a Plan agent first. By default this agent also pushes the branch, opens a draft PR with a WIP title and a placeholder body, and runs a capped CI-fix loop, though its CI watch is time-bounded: on slow CI it returns with the checks still in flight, and the parent watches from there and resumes it on failure. Say "do not push" or "commits only" in the brief to stop it at local commits.
 tools: Read, Edit, Write, Bash, Grep, Glob
 model: sonnet
 ---
@@ -91,23 +91,31 @@ Procedure:
    rewrites both title and body. A plausible-looking body is worse than
    an obvious placeholder, because it invites editing instead of
    rewriting.
-1. Watch CI: `gh pr checks --watch --fail-fast -i 30`. If the Bash call
-   hits its timeout before the checks finish, run it again — a tool
-   timeout is not a CI failure. Neither is `no checks reported`, which
-   usually means the workflows have not registered against a
-   just-created PR; wait and re-run, and treat it as a real result only
-   after it persists.
+1. Watch CI, bounded: `gh pr checks --watch --fail-fast -i 30` with an
+   explicit Bash `timeout` of 180000. Re-run it at most twice, and only
+   when it returned `no checks reported` — that means the workflows
+   have not registered against a just-created PR yet. Anything else
+   ends the watch: a green result and a failure are acted on below,
+   while checks still pending after the watch, or still unreported
+   after the re-runs, are reported as in flight. Waiting longer is not
+   yours — the parent watches from there and resumes you if a check
+   fails. A tool timeout is not a CI failure, and neither is an
+   unreported check.
 1. On failure, get the run id from
    `gh run list --branch <branch> --json databaseId,name,conclusion --limit 20`,
    read `gh run view --log-failed <databaseId>`, fix, commit, push, and
-   watch again.
+   watch again under the same bounded procedure. This is also how you
+   proceed when the parent resumes you with a failure after you
+   returned with CI in flight.
 
 Limits:
 
-- At most 3 fix-and-push rounds. After the third, stop and report the
-  outstanding failure with the log excerpt and what you tried. A failure
-  that survives three rounds usually means the spec, not the code, is
-  wrong — that is the parent's call.
+- At most 3 fix-and-push rounds per PR, counted across the whole
+  branch: rounds you run after the parent resumes you add to the ones
+  you already ran, they do not start a fresh count. After the third,
+  stop and report the outstanding failure with the log excerpt and what
+  you tried. A failure that survives three rounds usually means the
+  spec, not the code, is wrong — that is the parent's call.
 - Never make a check pass by weakening it. No deleting or skipping
   tests, no `continue-on-error`, no disabling a linter or a rule, no
   loosening an assertion, no widening an ignore list — unless the spec
@@ -165,7 +173,8 @@ default below.
 
 ## CI
 <final check status, how many fix rounds were needed, and the outstanding
-failure if the cap was hit — or "not run" plus the reason>
+failure if the cap was hit — or "in flight" plus which checks the parent
+still has to watch, or "not run" plus the reason>
 
 ## Incomplete / follow-ups
 <anything not done, blockers encountered — or "None">

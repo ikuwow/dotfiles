@@ -26,8 +26,18 @@ of implementing in the main session.
   dispatch) before dispatching; the subagent must not create branches
   or worktrees
 - Every implementer dispatch, single or parallel, ends with the branch
-  pushed and a draft PR open by default. To stop it at local commits,
-  put "do not push" or "commits only" in the brief
+  pushed, a draft PR open, and a time-bounded CI watch by default. To
+  stop it at local commits, put "do not push" or "commits only" in the
+  brief
+- When an implementer returns with CI still in flight, do not wait on
+  it: arm the git-workflow Phase 1 background watch and run
+  `/pr-selfcheck` alongside it
+- Hand a CI failure back to the same implementer, addressed by the name
+  or agentId from its spawn result, instead of dispatching a fresh one
+  or taking the fix loop into the parent. Waiting is the parent's
+  because it needs no judgment; diagnosing and fixing a failed check
+  needs little, and belongs on the cheaper agent that already holds the
+  context
 - The parent still owns the PR's real title and body, code review,
   ready-for-review, and merge
 
