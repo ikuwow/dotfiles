@@ -29,9 +29,12 @@ of implementing in the main session.
   pushed, a draft PR open, and a time-bounded CI watch by default. To
   stop it at local commits, put "do not push" or "commits only" in the
   brief
-- When an implementer returns with CI still in flight, replace the
-  placeholder PR body and title, then go straight to the git-workflow
-  Phase 1 checks instead of waiting on it
+- When the implementer opened the PR, replace the placeholder body and
+  drop the `WIP:` prefix from the title before running `/pr-selfcheck`.
+  The body is a fixed stub carrying no content; the title is a real
+  one-line summary that only needs the prefix removed
+- When an implementer returns with CI still in flight, go straight to
+  the git-workflow Phase 1 checks instead of waiting on it
 - Hand a CI failure back to the same implementer, addressed by the name
   or agentId from its spawn result, instead of dispatching a fresh one
   or taking the fix loop into the parent
@@ -67,7 +70,3 @@ of implementing in the main session.
   risky areas
 - Systematic review stays with the PR review pipeline (pr-selfcheck /
   pr-review-toolkit)
-- When the implementer opened the PR, replace the placeholder body and
-  drop the `WIP:` prefix from the title before running `/pr-selfcheck`.
-  The body is a fixed stub carrying no content; the title is a real
-  one-line summary that only needs the prefix removed
