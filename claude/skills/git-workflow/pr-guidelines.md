@@ -21,6 +21,9 @@ content that doesn't fit on one line — including issue references
   vs. approaches rejected, what was deliberately left out of scope,
   risks or things a reviewer should watch out for). Do not paraphrase
   the diff (file lists, "added X to Y", per-file summaries).
+  "Approaches rejected" covers design alternatives weighed for the
+  delivered design; the sequence of implementation attempts made
+  along the way stays out of the body.
 - Single source of truth (DRY) — If the rationale, background, or
   requirements live elsewhere (issue, design doc, ADR, prior PR,
   official spec), do not duplicate them. Replace with a one-line
