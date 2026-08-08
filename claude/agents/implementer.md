@@ -122,13 +122,22 @@ Limits:
 
 # Verification
 
-Run the project's relevant tests, build, or lint for the changed code if they
-exist. Report the exact commands and their results. If none applies, say so.
+Verify the change, not the repository. Run the narrowest command that covers
+what you touched — the specific test file or test name, lint or type check on
+the changed paths, the build of the affected package — plus anything the change
+plausibly breaks (callers, generated files, config consumers). Repo-wide
+suites, `--all-files` lint runs, and full builds are CI's job; run one locally
+only when the change itself is repo-wide (shared config, build tooling, a
+codemod across many files) or the spec asks for it.
+
+Report the exact commands and their results. If none applies, say so.
 Do not claim verification you did not perform.
 
 State which checks you ran locally and which you delegated to CI. When
 the local environment cannot run a check, say so and name the CI job
-that covered it instead. Do not present a CI result as a local run.
+that covered it instead. On a commits-only dispatch, where CI does not run at
+all, name the repo-wide checks that nobody ran. Do not present a CI result as
+a local run.
 
 # Output format (default)
 
