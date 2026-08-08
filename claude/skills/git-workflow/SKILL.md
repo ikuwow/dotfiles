@@ -118,8 +118,10 @@ Once Phase 1 passes, launch:
 Once the review finishes, review the results:
 
 1. Fix issues found by the code review
-1. Re-run the `narrative-sweep` agent so the comments and prose those
-   fixes introduced are covered
+1. Re-run the `narrative-sweep` agent when the review fixes changed any
+   file, so the comments and prose those fixes introduced are covered.
+   Skip it when the review produced no code changes — its previous pass
+   already covers the branch
 1. Push the fixes and the sweep's commits in one push, then re-run
    `/pr-selfcheck` and `gh pr checks --watch` to confirm the PR
    is still consistent and CI passes.

@@ -73,7 +73,7 @@ Prefer rewriting to removal when a line wraps a live fact in history:
 Rationale that fails the litmus but looks worth keeping — a design
 alternative that was weighed, a constraint that is not derivable from the
 code — goes in the report's escalated section instead of disappearing.
-The parent moves it into the PR body, the sanctioned home for
+The parent moves it into the PR body or an ADR, the sanctioned homes for
 rejected-alternative rationale.
 
 # Constraints
