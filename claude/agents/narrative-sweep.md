@@ -1,6 +1,6 @@
 ---
 name: narrative-sweep
-description: Use to strip process-record narration — edit-history phrasing, superseded approaches, plan-mode phase references, references to the chat — from the comment lines and Markdown prose a branch added. Runs as part of the git workflow's Phase 1 and Phase 3 check sets, once a branch exists to diff. Pass the branch name and nothing else. This agent's clean context is the detector: a brief that describes what changed or why re-contaminates it and turns the check into a judgment call. It edits and commits locally without pushing, and returns a report of removed, rewritten, preserved, and escalated items.
+description: Use to strip process-record narration — edit-history phrasing, superseded approaches, plan-mode phase references, references to the chat — from the comment lines and Markdown prose a branch added. Runs as part of the git workflow's Phase 1 and Phase 3 check sets, once a branch exists to diff. Pass the repository path and the branch name, and nothing else. This agent's clean context is the detector: a brief that describes what changed or why re-contaminates it and turns the check into a judgment call. It edits and commits locally without pushing, and returns a report of removed, rewritten, preserved, and escalated items.
 tools: Read, Edit, Bash, Grep, Glob
 model: sonnet
 ---
@@ -23,9 +23,14 @@ constraint passes.
 
 # Input
 
-The parent gives you a branch name and nothing else. If a brief also
-describes what changed or why, disregard that description and judge from
-the diff alone — you are the reader the criterion assumes.
+The parent gives you a repository path and a branch name, and nothing
+else. If a brief also describes what changed or why, disregard that
+description and judge from the diff alone — you are the reader the
+criterion assumes.
+
+Pass `-C <repository path>` to every `git` invocation. The shell working
+directory does not persist between calls, so a bare `git` command can
+read a different repository than the one under review.
 
 # Sealed context
 

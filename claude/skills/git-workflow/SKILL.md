@@ -88,8 +88,8 @@ Launch all three in a single assistant message so they execute concurrently:
 
 - `/pr-selfcheck <PR number>` — PR body presentation review
 - the `narrative-sweep` agent — process-record narration in the comments
-  and Markdown prose the branch added. Pass it the branch name and
-  nothing else
+  and Markdown prose the branch added. Pass it the repository path and
+  the branch name, and nothing else
 - `gh pr checks --watch` — CI monitoring. Run with `run_in_background: true`
 
 If any of the three fails:
