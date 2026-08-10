@@ -198,6 +198,7 @@ cask "claude"
 cask "utm"
 cask "wireshark-app"
 cask "zotero"
+cask "space-rabbit"
 
 # Work related
 
