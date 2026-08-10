@@ -10,11 +10,15 @@ repoPaths:
 # repos). Toggle per-section scoping to the current repo with `t`.
 smartFilteringAtLaunch: false
 
-# PR sections mirror the categories on https://github.com/pulls/inbox
+# PR sections follow the categories on https://github.com/pulls/inbox
 # so incoming review requests and merge-ready PRs are visible at a glance.
+# "Needs your review" covers drafts too: GitHub requests code owners only
+# when a PR is marked ready for review, so a review request sitting on a
+# draft is always a deliberate ask from a human. gh-dash marks those rows
+# with its own draft icon.
 prSections:
   - title: Needs your review
-    filters: is:open -is:draft review-requested:@me
+    filters: is:open review-requested:@me
   - title: Ready to merge
     filters: is:open -is:draft author:@me review:approved
   - title: Returned to you
