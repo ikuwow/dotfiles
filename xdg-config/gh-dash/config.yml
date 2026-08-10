@@ -13,8 +13,8 @@ smartFilteringAtLaunch: false
 # PR sections follow the categories on https://github.com/pulls/inbox
 # so incoming review requests and merge-ready PRs are visible at a glance.
 prSections:
-  # Drafts are included: GitHub auto-requests code owners only at
-  # ready-for-review, so a review request on a draft is a deliberate ask.
+  # Drafts are included: code owners are never auto-requested while a PR
+  # is a draft, so a request here is one someone added explicitly.
   - title: Needs your review
     filters: is:open review-requested:@me
   - title: Ready to merge
