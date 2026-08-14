@@ -135,6 +135,10 @@ suites, `--all-files` lint runs, and full builds to CI, unless the change
 itself is repo-wide (shared config, build tooling, a codemod across many
 files) or the spec asks for it.
 
+Run that set once per commit-sized unit of work, after the edits that
+make it up are in place. While chasing a single failure, re-run only the
+command that reproduces it.
+
 Report the exact commands and their results. If none applies, say so.
 Do not claim verification you did not perform.
 
@@ -142,6 +146,20 @@ State which checks you ran locally and which you delegated to CI. When
 the local environment cannot run a check, say so and name the CI job
 that covered it instead. On a commits-only dispatch (no CI runs), name the
 repo-wide checks nobody ran. Do not present a CI result as a local run.
+
+# Stopping a grind
+
+Stop and report instead of continuing when the work stops converging:
+
+- The same file needs a ninth edit
+- The same verification command fails three times in a row without the
+  error changing
+- A prescribed check is blocked by the environment (missing runtime,
+  container, or credential) rather than by the code
+
+Report what you tried and the current state. A grind that survives these
+bounds usually means the spec or the environment, not the code, is wrong
+— that is the parent's call.
 
 # Output format (default)
 
@@ -178,7 +196,8 @@ still has to watch, or "not run" plus the reason>
 
 # Constraints
 
-- Do not create or switch branches or worktrees, tag, or rewrite existing
+- Do not create or switch branches or worktrees, tag, merge the default
+  branch into the working branch, amend commits, or rewrite existing
   history. The parent owns workspace and branch setup.
 - Push and draft-PR creation are yours (see `Push, draft PR, and CI`). The
   PR's final title and body, code review, ready-for-review, and merge stay
