@@ -19,12 +19,23 @@ of implementing in the main session.
 - Exploratory scope or undecided design (belongs in the parent session
   or a Plan agent first)
 
+## Brief contents
+
+- Name the files the change touches and the entry points to start from
+- State the verification scope and cadence once as an outcome ("the
+  package's tests and lint pass before each commit"), not as per-step
+  instructions to run a command after individual edits
+- Prescribe a verification command only after confirming it runs on
+  this host; when a check only runs in CI, say so and name the job
+
 ## Ordering
 
 - Complete branch setup (pull the default branch, create the feature
   branch — one worktree+branch per implementer when running parallel
   dispatch) before dispatching; the subagent must not create branches
-  or worktrees
+  or worktrees, and must not merge the default branch mid-run — when
+  the branch needs newer default-branch commits, the parent merges and
+  re-dispatches
 - Every implementer dispatch, single or parallel, ends with the branch
   pushed, a draft PR open, and a time-bounded CI watch by default. To
   stop it at local commits, put "do not push" or "commits only" in the
