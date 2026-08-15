@@ -9,6 +9,23 @@
 # (claude/skills/git-workflow/SKILL.md) Phase 5 for the reaction protocol.
 #
 # Usage: pr-monitor <pr-number> [interval-seconds]
+#
+# Events, one per stdout line. Field values are GitHub's own and are
+# passed through rather than sorted into categories here, so a vocabulary
+# this script has never seen still reaches the reader intact:
+#
+#   STATE: <state>
+#   REVIEW: <reviewDecision>
+#   READY_FOR_REVIEW
+#   NEW_COMMENT: [BOT|USER] <author> <path>:<line>
+#   NEW_TOP_COMMENT: [BOT|USER] <author>
+#   NEW_REVIEW: [BOT|USER] <author> <state>
+#   CI_RUN: <workflow run name> (<conclusion>)
+#   POLL_ERROR: <call that failed>: <message>
+#
+# CI_RUN covers Actions runs whose conclusion is anything but success.
+# Checks that are not Actions runs never reach it; `gh pr checks` sees
+# those.
 
 set -eu
 
@@ -144,9 +161,7 @@ while true; do
 
   if [ "$state" != "$prev_state" ]; then
     if [ "$first_poll" -eq 0 ]; then
-      case "$state" in
-        MERGED|CLOSED) echo "STATE: $state" ;;
-      esac
+      echo "STATE: $state"
     fi
     prev_state="$state"
   fi
@@ -160,9 +175,7 @@ while true; do
 
   if [ -n "$decision" ] && [ "$decision" != "$prev_decision" ]; then
     if [ "$first_poll" -eq 0 ]; then
-      case "$decision" in
-        CHANGES_REQUESTED|APPROVED) echo "REVIEW: $decision" ;;
-      esac
+      echo "REVIEW: $decision"
     fi
     prev_decision="$decision"
   fi
@@ -171,16 +184,31 @@ while true; do
     seen_runs=()
     prev_ci_sha="$head_sha"
   fi
-  runs_json="$(gh run list --branch "$head_branch" --json databaseId,name,conclusion,headSha --limit 20 2>/dev/null || true)"
+  # `gh run list` answers `[]` for a branch with no runs, so an empty or
+  # unparseable result means the call itself failed. That gets its own
+  # event because silence here otherwise reads exactly like a clean run,
+  # while the GraphQL sections below keep emitting normally. A swallowed
+  # failure also leaves `seen_runs` unseeded, so the next poll would
+  # replay every run that was already settled at arm time.
+  runs_json="$(gh run list --branch "$head_branch" --json databaseId,name,conclusion,headSha,attempt --limit 20 2>/dev/null || true)"
+  if [ -z "$runs_json" ] || ! echo "$runs_json" | jq -e . >/dev/null 2>&1; then
+    echo "POLL_ERROR: gh run list"
+    runs_json=""
+  fi
   if [ -n "$runs_json" ]; then
-    while IFS=$'\t' read -r run_id run_name run_conclusion; do
-      [ -z "$run_id" ] && continue
-      if [ -z "${seen_runs[$run_id]:-}" ]; then
-        [ "$first_poll" -eq 0 ] && echo "CI_FAILURE: $run_name ($run_conclusion)"
-        seen_runs[$run_id]=1
+    # Keyed on the attempt, not the run: `gh run rerun` reuses the run's
+    # databaseId and bumps `attempt`, and a rerun leaves the head SHA
+    # alone, so a run-keyed map would swallow every result after the first.
+    while IFS=$'\t' read -r run_key run_name run_conclusion; do
+      [ -z "$run_key" ] && continue
+      if [ -z "${seen_runs[$run_key]:-}" ]; then
+        if [ "$first_poll" -eq 0 ]; then
+          echo "CI_RUN: $run_name ($run_conclusion)"
+        fi
+        seen_runs[$run_key]=1
       fi
     done < <(echo "$runs_json" | jq -r --arg sha "$head_sha" \
-      '.[] | select(.headSha == $sha and (.conclusion // "") != "" and .conclusion != "success") | "\(.databaseId)\t\(.name)\t\(.conclusion)"' \
+      '.[] | select(.headSha == $sha and (.conclusion // "") != "" and .conclusion != "success") | "\(.databaseId):\(.attempt)\t\(.name)\t\(.conclusion)"' \
       || true)
   fi
 
