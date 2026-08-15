@@ -192,9 +192,10 @@ per actionable change; quiet periods stay silent.
    - `NEW_REVIEW: [BOT|USER] <author> <state>` — new PR review
      (summary body). `state` ∈ `COMMENTED` / `APPROVED` /
      `CHANGES_REQUESTED` / `DISMISSED`. Empty-body reviews filtered.
-   - `CI_FAILURE: <workflow run name>` — new `FAILURE` Actions run on
-     the PR's head SHA. Checks that are not Actions runs never produce
-     this line; reach them through `gh pr checks`.
+   - `CI_FAILURE: <workflow run name> (<conclusion>)` — an Actions run on
+     the PR's head SHA settled on a conclusion other than `success`; the
+     conclusion is the line's own last field. Checks that are not Actions
+     runs never produce this line; reach them through `gh pr checks`.
 
 1. Re-fetch detail on each event with:
    - `gh pr view <number> --json state,isDraft,reviewDecision,latestReviews,statusCheckRollup,comments,updatedAt,mergedAt,headRefName`
