@@ -9,6 +9,21 @@
 # (claude/skills/git-workflow/SKILL.md) Phase 5 for the reaction protocol.
 #
 # Usage: pr-monitor <pr-number> [interval-seconds]
+#
+# Events, one per stdout line. Field values are GitHub's own, passed
+# through rather than classified here:
+#
+#   STATE: <state>
+#   REVIEW: <reviewDecision>
+#   READY_FOR_REVIEW
+#   NEW_COMMENT: [BOT|USER] <author> <path>:<line>
+#   NEW_TOP_COMMENT: [BOT|USER] <author>
+#   NEW_REVIEW: [BOT|USER] <author> <state>
+#   CHECK: <check name> (<conclusion or state>)
+#   POLL_ERROR: <call that failed>
+#
+# CHECK covers every check on the head commit, Actions or not, settling
+# on anything but success.
 
 set -eu
 
@@ -51,7 +66,8 @@ prev_state=""
 prev_decision=""
 prev_isdraft=""
 prev_ci_sha=""
-declare -A seen_runs=()
+declare -A prev_check=()
+declare -A poll_failed=()
 seen_comments="$(mktemp)"
 seen_top_comments="$(mktemp)"
 seen_reviews="$(mktemp)"
@@ -60,7 +76,23 @@ trap 'rm -f "$seen_comments" "$seen_top_comments" "$seen_reviews"' EXIT
 # First-poll seeding: do not emit events for state that already held at
 # arm time. Only transitions during this monitor's lifetime should wake
 # the operator. The flag is flipped after the first successful poll.
+# `CHECK` is the exception — a check already red when the monitor is
+# armed is the reader's problem now, so it reports rather than seeds.
 first_poll=1
+
+# One line per outage, not per poll: an unauthorized token or an outage
+# persists for many intervals, and a line each time would drown the
+# silence the rest of the script maintains.
+poll_error() {
+  if [ -z "${poll_failed[$1]:-}" ]; then
+    echo "POLL_ERROR: $1"
+    poll_failed[$1]=1
+  fi
+}
+
+poll_ok() {
+  unset "poll_failed[$1]"
+}
 
 # `__typename` on each author is the authoritative Bot/User signal per
 # `pr-reaction.md`. It flows into the event line as a `[BOT]` or
@@ -128,25 +160,24 @@ emit_new() {
 }
 
 while true; do
-  pr_json="$(gh pr view "$pr" --json state,isDraft,reviewDecision,statusCheckRollup,headRefName,headRefOid 2>/dev/null || true)"
-  # Skip the poll on an empty OR malformed fetch: a non-empty but truncated
-  # response would make the unguarded `jq -r` extractions below exit nonzero
-  # and, under `set -e`, kill the monitor silently.
-  if [ -z "$pr_json" ] || ! echo "$pr_json" | jq -e . >/dev/null 2>&1; then
+  pr_json="$(gh pr view "$pr" --json state,isDraft,reviewDecision,statusCheckRollup,headRefOid 2>/dev/null || true)"
+  # Requiring `.state` rather than mere parseability: `{}` parses, and an
+  # empty `state` reaches the comparison below while an empty `headRefOid`
+  # resets `prev_check` twice over, replaying every failing check.
+  if ! echo "$pr_json" | jq -e '.state? // empty' >/dev/null 2>&1; then
+    poll_error "gh pr view"
     sleep "$interval"
     continue
   fi
+  poll_ok "gh pr view"
   state="$(echo "$pr_json" | jq -r '.state // ""')"
   isdraft="$(echo "$pr_json" | jq -r '.isDraft // ""')"
   decision="$(echo "$pr_json" | jq -r '.reviewDecision // ""')"
-  head_branch="$(echo "$pr_json" | jq -r '.headRefName // ""')"
   head_sha="$(echo "$pr_json" | jq -r '.headRefOid // ""')"
 
   if [ "$state" != "$prev_state" ]; then
     if [ "$first_poll" -eq 0 ]; then
-      case "$state" in
-        MERGED|CLOSED) echo "STATE: $state" ;;
-      esac
+      echo "STATE: $state"
     fi
     prev_state="$state"
   fi
@@ -158,33 +189,62 @@ while true; do
     prev_isdraft="$isdraft"
   fi
 
-  if [ -n "$decision" ] && [ "$decision" != "$prev_decision" ]; then
-    if [ "$first_poll" -eq 0 ]; then
-      case "$decision" in
-        CHANGES_REQUESTED|APPROVED) echo "REVIEW: $decision" ;;
-      esac
+  # `prev_decision` tracks the empty value too: a dismissal clears
+  # `reviewDecision`, and holding the stale one here would then swallow
+  # the re-approval that follows.
+  if [ "$decision" != "$prev_decision" ]; then
+    if [ "$first_poll" -eq 0 ] && [ -n "$decision" ]; then
+      echo "REVIEW: $decision"
     fi
     prev_decision="$decision"
   fi
 
+  # A new head retires the old commit's checks, and a check that lands on
+  # the same value it held there would otherwise compare equal and stay
+  # silent.
   if [ "$head_sha" != "$prev_ci_sha" ]; then
-    seen_runs=()
+    prev_check=()
     prev_ci_sha="$head_sha"
   fi
-  runs_json="$(gh run list --branch "$head_branch" --json databaseId,name,conclusion,headSha --limit 20 2>/dev/null || true)"
-  if [ -n "$runs_json" ]; then
-    while IFS=$'\t' read -r run_id run_name run_conclusion; do
-      [ -z "$run_id" ] && continue
-      if [ -z "${seen_runs[$run_id]:-}" ]; then
-        [ "$first_poll" -eq 0 ] && echo "CI_FAILURE: $run_name ($run_conclusion)"
-        seen_runs[$run_id]=1
-      fi
-    done < <(echo "$runs_json" | jq -r --arg sha "$head_sha" \
-      '.[] | select(.headSha == $sha and (.conclusion // "") != "" and .conclusion != "success") | "\(.databaseId)\t\(.name)\t\(.conclusion)"' \
-      || true)
+  # The rollup rides along on the poll above and covers every check on the
+  # head commit, Actions or not. Every value it holds is tracked, settled
+  # or not, so a rerun passing back through a running state is a change
+  # again on the way out; the ones that never warrant waking anybody are
+  # the only names spelled here, so a value added later reports rather
+  # than vanishes.
+  if ! echo "$pr_json" | jq -e '.statusCheckRollup | type == "array"' >/dev/null 2>&1; then
+    poll_error "gh pr view (rollup)"
+  else
+    poll_ok "gh pr view (rollup)"
   fi
+  while IFS=$'\t' read -r check_name check_state; do
+    [ -z "$check_name" ] && continue
+    # `unseen` rather than an empty default: a check reporting COMPLETED
+    # with no conclusion holds the empty string, which would otherwise
+    # match a check never seen before and never report.
+    if [ "$check_state" != "${prev_check[$check_name]-unseen}" ]; then
+      case "$check_state" in
+        SUCCESS|NEUTRAL|SKIPPED|PENDING|EXPECTED|QUEUED|WAITING|REQUESTED|IN_PROGRESS) ;;
+        *) echo "CHECK: $check_name ($check_state)" ;;
+      esac
+      prev_check[$check_name]="$check_state"
+    fi
+  done < <(echo "$pr_json" | jq -r '
+    .statusCheckRollup[]?
+    | (.name // .context // "?") as $n
+    | (if (.status // "COMPLETED") == "COMPLETED"
+       then (.conclusion // .state // "") else .status end) as $c
+    | "\($n)\t\($c)"' || true)
 
   threads_json="$(gh api graphql -f owner="$owner" -f repo="$repo" -F num="$pr" -f query="$threads_query" 2>/dev/null || true)"
+  # Testing the field rather than the string: GraphQL answers an error
+  # with a parseable body on stdout, which a non-empty test would read as
+  # a healthy poll and, worse, clear a running outage's suppression.
+  if ! echo "$threads_json" | jq -e '.data.repository.pullRequest.reviewThreads' >/dev/null 2>&1; then
+    poll_error "gh api graphql (threads)"
+  else
+    poll_ok "gh api graphql (threads)"
+  fi
   fresh_comments="$(echo "$threads_json" | jq -r --arg me "$me" '
     .data.repository.pullRequest.reviewThreads.nodes[]
     | select(.isResolved == false and .isOutdated == false)
@@ -200,6 +260,11 @@ while true; do
   # by the `REVIEW:` decision event, and an empty COMMENTED has nothing
   # to read.
   reviews_json="$(gh api graphql -f owner="$owner" -f repo="$repo" -F num="$pr" -f query="$reviews_query" 2>/dev/null || true)"
+  if ! echo "$reviews_json" | jq -e '.data.repository.pullRequest.reviews' >/dev/null 2>&1; then
+    poll_error "gh api graphql (reviews)"
+  else
+    poll_ok "gh api graphql (reviews)"
+  fi
   fresh_top="$(echo "$reviews_json" | jq -r --arg me "$me" '
     .data.repository.pullRequest.comments.nodes[]
     | select(.author.login != $me)

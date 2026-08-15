@@ -177,25 +177,10 @@ is itself a monitored event, so an arm deferred until after the ready
 flip can never observe it. It polls every 60s and emits one stdout line
 per actionable change; quiet periods stay silent.
 
-1. Event lines:
-   - `STATE: MERGED` / `STATE: CLOSED` — top-level `state` changed.
-   - `REVIEW: CHANGES_REQUESTED` / `REVIEW: APPROVED` —
-     `reviewDecision` changed.
-   - `READY_FOR_REVIEW` — `isDraft` flipped to false.
-   - `NEW_COMMENT: [BOT|USER] <author> <path>:<line>` — new review-
-     thread comment, thread `isResolved == false` and
-     `isOutdated == false`. `[BOT|USER]` is a routing hint per
-     `pr-reaction.md`; the rule's full thread walk still governs
-     mutations.
-   - `NEW_TOP_COMMENT: [BOT|USER] <author>` — new top-level PR
-     comment.
-   - `NEW_REVIEW: [BOT|USER] <author> <state>` — new PR review
-     (summary body). `state` ∈ `COMMENTED` / `APPROVED` /
-     `CHANGES_REQUESTED` / `DISMISSED`. Empty-body reviews filtered.
-   - `CI_FAILURE: <workflow run name> (<conclusion>)` — an Actions run on
-     the PR's head SHA settled on a conclusion other than `success`; the
-     conclusion is the line's own last field. Checks that are not Actions
-     runs never produce this line; reach them through `gh pr checks`.
+1. Each event line is `<EVENT>` or `<EVENT>: <details>`, carrying
+   GitHub's own field values. The steps below cover the events with a
+   fixed procedure; read any other line and judge from what it says.
+   `pr-monitor`'s header documents the full set.
 
 1. Re-fetch detail on each event with:
    - `gh pr view <number> --json state,isDraft,reviewDecision,latestReviews,statusCheckRollup,comments,updatedAt,mergedAt,headRefName`
@@ -215,11 +200,14 @@ per actionable change; quiet periods stay silent.
      user.
 
 1. React per `pr-reaction.md` (bot check, reply-channel routing,
-   thread resolve, cap for autonomous fix pushes).
+   thread resolve, cap for autonomous fix pushes). A `[BOT|USER]` label
+   on an event line is a routing hint; the rule's thread walk still
+   governs mutations.
 
-1. `CI_FAILURE`: get the `databaseId` from `gh run list`, inspect with
-   `gh run view --log-failed <databaseId>`, then fix and push (same
-   pre-push checks).
+1. `CHECK`: `gh pr checks` links the failing check. For an Actions job,
+   `gh run view --log-failed <databaseId>` from `gh run list` reaches the
+   failed steps, which a conclusion like `cancelled` or `timed_out` does
+   not have. Fix and push under the same pre-push checks.
 
 1. Exit conditions:
    - `STATE: MERGED` → execute Step 6 (Cleanup).
