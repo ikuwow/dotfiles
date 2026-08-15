@@ -85,8 +85,8 @@ Report the exact commands and their results. If none applies, say so. Do not
 claim verification you did not perform. State which checks you ran locally and
 which you left to CI, naming the job for each. Any check that neither you nor
 CI ran goes in Incomplete / follow-ups, whatever dropped it — no covering job,
-a commits-only dispatch, an environment that cannot run it — so the parent
-reads what nobody covered. Do not present a CI result as a local run.
+a commits-only dispatch, an environment that cannot run it, a wider command
+you narrowed past — so the parent reads what nobody covered. Do not present a CI result as a local run.
 
 # Commits
 
@@ -162,9 +162,10 @@ Procedure:
    makes obvious — a lint or format violation, a typo, a missing import,
    a stale generated file. Commit, push, and watch again under the same
    bound. That is the one fix round this dispatch gets: if that watch is
-   not green, stop and report. Each failure the parent hands back carries
-   its own fix round, so keep no count across handbacks — the cumulative
-   budget is the parent's to spend. Failures your diff did not cause
+   not green, stop and report. A dispatch that arrives as a handed-back CI
+   failure spends its round on that fix and carries no count from the
+   dispatch before it — the cumulative budget is the parent's to spend.
+   Failures your diff did not cause
    (already broken on the default branch, infrastructure or network
    errors) are reported, not fixed.
 
@@ -175,7 +176,7 @@ Stop and report instead of continuing when the work stops converging:
 - The same file needs a ninth edit
 - The same verification command fails three times in a row without the
   error changing
-- The fix round left CI red, and the log does not make the cause obvious
+- The fix round's watch was not green
 - Going green would require weakening a check, or the path forward seems
   to require a force push
 
