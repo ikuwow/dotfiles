@@ -476,13 +476,13 @@
     "command": "bash ~/.claude/statusline-command.sh"
   },
   "enabledPlugins": {
-    "gopls-lsp@claude-plugins-official": false,
+    "gopls-lsp@claude-plugins-official": true,
     "codex@openai-codex": true,
     "pr-review-toolkit@claude-plugins-official": true,
-    "session-report@claude-plugins-official": false,
-    "claude-md-management@claude-plugins-official": false,
-    "skill-creator@claude-plugins-official": false,
-    "claude-code-setup@claude-plugins-official": false,
+    "session-report@claude-plugins-official": true,
+    "claude-md-management@claude-plugins-official": true,
+    "skill-creator@claude-plugins-official": true,
+    "claude-code-setup@claude-plugins-official": true,
     "hookify@claude-plugins-official": true,
     "security-guidance@claude-plugins-official": true
   },
