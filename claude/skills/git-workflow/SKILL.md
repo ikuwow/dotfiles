@@ -91,9 +91,7 @@ Launch all three in a single assistant message so they execute concurrently:
   and Markdown prose the branch added. Pass it the repository path and
   the branch name, and nothing else
 - `gh pr checks --watch --fail-fast` — CI monitoring. Run with
-  `run_in_background: true`. It returns as soon as one check fails, so a
-  fast job's failure is actionable while slower jobs are still running and
-  the checks it reports as failed are not the full set
+  `run_in_background: true`
 
 If any of the three fails:
 - Fix self-review "Must Fix" / "Should Fix" items
