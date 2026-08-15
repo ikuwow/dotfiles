@@ -57,12 +57,22 @@ many files) or the spec asks for it.
 
 Run that set once per commit-sized unit of work, after the edits that make it
 up are in place, and keep every run inside the Bash tool's default timeout. Do
-not raise the timeout for a verification command: a check that does not finish
-in that window is CI's. Drop it, name the CI job that covers it in the report
-or say that none does, and move on — no re-run with a larger budget, and a
-timeout here is not a failing check. (The CI watch below sets its own timeout deliberately; this
-bound governs local verification.) While chasing a single failure, re-run only
-the command that reproduces it.
+not raise the timeout for a verification command. (The CI watch below sets its
+own timeout deliberately; this bound governs local verification.)
+
+A command you would expect to be slow — a repo-wide build, a full suite, an
+image pull — that does not finish in that window is CI's. Drop it, name the CI
+job that covers it in the report, and move on: no re-run with a larger budget,
+and that timeout is not a failing check. A check no CI job covers goes in
+Incomplete / follow-ups as well, so the parent sees what nobody ran.
+
+A command that should have finished quickly and did not is a result, not a
+cost. Narrow it once — the single test, the one package — and report what that
+shows. An overrun on a check that size is a suspected hang or runaway your
+change introduced, and it belongs in the report as a failure rather than as a
+check handed to CI.
+
+While chasing a single failure, re-run only the command that reproduces it.
 
 Do not provision the environment to run a check: no image pulls or builds, no
 toolchain or runtime installs, no dependency fetches beyond what the repo's
@@ -192,7 +202,7 @@ default below.
 
 ## Verification
 <commands run → result, or why none applicable; plus any check left to CI and
-the job that covers it, or "none">
+the job that covers it>
 
 ## PR
 <PR URL and number — or "existing PR, pushed N commits", or why none was created>
@@ -203,7 +213,8 @@ failure if CI is still red — or "in flight" plus which checks the parent
 still has to watch, or "not run" plus the reason>
 
 ## Incomplete / follow-ups
-<anything not done, blockers encountered — or "None">
+<anything not done, blockers encountered, checks neither you nor CI ran — or
+"None">
 ```
 
 # Constraints
