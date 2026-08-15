@@ -476,7 +476,6 @@
     "command": "bash ~/.claude/statusline-command.sh"
   },
   "enabledPlugins": {
-    "gopls-lsp@claude-plugins-official": true,
     "codex@openai-codex": true,
     "pr-review-toolkit@claude-plugins-official": true,
     "session-report@claude-plugins-official": true,
@@ -538,6 +537,7 @@
   "autoUpdatesChannel": "stable",
   "tui": "fullscreen",
   "autoMemoryEnabled": false,
+  "skipWorkflowUsageWarning": true,
   "theme": "auto",
   "remoteControlAtStartup": true,
   "inputNeededNotifEnabled": true,
@@ -547,6 +547,5 @@
   "copyOnSelect": false,
   "feedbackSurveyState": {
     "lastShownTime": 1754272823676
-  },
-  "skipWorkflowUsageWarning": true
+  }
 }

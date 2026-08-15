@@ -42,7 +42,6 @@ claude plugin marketplace add anthropics/claude-plugins-official
 claude plugin marketplace add openai/codex-plugin-cc
 claude plugin install codex@openai-codex
 claude plugin install pr-review-toolkit@claude-plugins-official
-claude plugin install gopls-lsp@claude-plugins-official
 claude plugin install session-report@claude-plugins-official
 claude plugin install claude-md-management@claude-plugins-official
 claude plugin install skill-creator@claude-plugins-official
