@@ -173,14 +173,14 @@ while true; do
   fi
   runs_json="$(gh run list --branch "$head_branch" --json databaseId,name,conclusion,headSha --limit 20 2>/dev/null || true)"
   if [ -n "$runs_json" ]; then
-    while IFS=$'\t' read -r run_id run_name; do
+    while IFS=$'\t' read -r run_id run_name run_conclusion; do
       [ -z "$run_id" ] && continue
       if [ -z "${seen_runs[$run_id]:-}" ]; then
-        [ "$first_poll" -eq 0 ] && echo "CI_FAILURE: $run_name"
+        [ "$first_poll" -eq 0 ] && echo "CI_FAILURE: $run_name ($run_conclusion)"
         seen_runs[$run_id]=1
       fi
     done < <(echo "$runs_json" | jq -r --arg sha "$head_sha" \
-      '.[] | select(.headSha == $sha and .conclusion == "FAILURE") | "\(.databaseId)\t\(.name)"' \
+      '.[] | select(.headSha == $sha and (.conclusion // "") != "" and .conclusion != "success") | "\(.databaseId)\t\(.name)\t\(.conclusion)"' \
       || true)
   fi
 
