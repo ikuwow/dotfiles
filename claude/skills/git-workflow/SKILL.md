@@ -102,8 +102,9 @@ If any of the three fails:
 The sweep commits locally without pushing. Whenever it produced commits,
 push them together with any self-review and CI fixes in one push,
 regardless of whether the three checks passed, then re-run all three
-until all pass. After any push, re-arm `gh pr checks --watch --fail-fast`
-(the running watch is bound to the pre-push head).
+until all pass. After any push, and after a watch exits with checks still
+pending, re-arm `gh pr checks --watch --fail-fast` (the running watch is
+bound to the pre-push head).
 
 Note: `/pr-selfcheck` and the narrative sweep are mechanical checks, not
 a code review. Re-running them after fixes is expected. The
