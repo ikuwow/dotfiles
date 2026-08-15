@@ -145,7 +145,7 @@ Procedure:
    rewrites both title and body. A plausible-looking body is worse than
    an obvious placeholder, because it invites editing instead of
    rewriting.
-1. Watch CI, bounded: `gh pr checks --watch --fail-fast` with the
+1. Watch CI, bounded: `gh pr checks --watch --fail-fast -i 30` with the
    Bash tool's `timeout` parameter set to 180000 (milliseconds). Re-run
    it at most twice, and only when it returned `no checks reported`
    (workflows not yet registered against a just-created PR or a
