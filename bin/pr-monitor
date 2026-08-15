@@ -66,7 +66,7 @@ prev_state=""
 prev_decision=""
 prev_isdraft=""
 prev_ci_sha=""
-declare -A seen_checks=()
+declare -A prev_check=()
 declare -A poll_failed=()
 seen_comments="$(mktemp)"
 seen_top_comments="$(mktemp)"
@@ -163,7 +163,7 @@ while true; do
   pr_json="$(gh pr view "$pr" --json state,isDraft,reviewDecision,statusCheckRollup,headRefOid 2>/dev/null || true)"
   # Requiring `.state` rather than mere parseability: `{}` parses, and an
   # empty `state` reaches the comparison below while an empty `headRefOid`
-  # resets `seen_checks` twice over, replaying every failing check.
+  # resets `prev_check` twice over, replaying every failing check.
   if ! echo "$pr_json" | jq -e '.state? // empty' >/dev/null 2>&1; then
     poll_error "gh pr view"
     sleep "$interval"
@@ -199,35 +199,42 @@ while true; do
     prev_decision="$decision"
   fi
 
+  # A new head retires the old commit's checks, and a check that lands on
+  # the same value it held there would otherwise compare equal and stay
+  # silent.
   if [ "$head_sha" != "$prev_ci_sha" ]; then
-    seen_checks=()
+    prev_check=()
     prev_ci_sha="$head_sha"
   fi
   # The rollup rides along on the poll above and covers every check on the
-  # head commit, Actions or not. Its timestamp moves with each rerun or
-  # re-post, keying attempts of one check apart; a status context carries
-  # `startedAt` alone. Excluded are the values GitHub itself counts as
-  # passing or not yet settled; the rest travel as they came, so a value
-  # added later reports rather than vanishes.
+  # head commit, Actions or not. Every value it holds is tracked, settled
+  # or not, so a rerun passing back through a running state is a change
+  # again on the way out; the ones that never warrant waking anybody are
+  # the only names spelled here, so a value added later reports rather
+  # than vanishes.
   if ! echo "$pr_json" | jq -e '.statusCheckRollup | type == "array"' >/dev/null 2>&1; then
     poll_error "gh pr view (rollup)"
   else
     poll_ok "gh pr view (rollup)"
   fi
-  while IFS=$'\t' read -r check_key check_name check_conclusion; do
-    [ -z "$check_key" ] && continue
-    if [ -z "${seen_checks[$check_key]:-}" ]; then
-      echo "CHECK: $check_name ($check_conclusion)"
-      seen_checks[$check_key]=1
+  while IFS=$'\t' read -r check_name check_state; do
+    [ -z "$check_name" ] && continue
+    # `unseen` rather than an empty default: a check reporting COMPLETED
+    # with no conclusion holds the empty string, which would otherwise
+    # match a check never seen before and never report.
+    if [ "$check_state" != "${prev_check[$check_name]-unseen}" ]; then
+      case "$check_state" in
+        SUCCESS|NEUTRAL|SKIPPED|PENDING|EXPECTED|QUEUED|WAITING|REQUESTED|IN_PROGRESS) ;;
+        *) echo "CHECK: $check_name ($check_state)" ;;
+      esac
+      prev_check[$check_name]="$check_state"
     fi
   done < <(echo "$pr_json" | jq -r '
     .statusCheckRollup[]?
-    | {n: (.name // .context // "?"), c: (.conclusion // .state // ""),
-       done: (.status // "COMPLETED"), at: (.completedAt // .startedAt // "")}
-    | select(.done == "COMPLETED" and .c != "" and .c != "SUCCESS"
-             and .c != "NEUTRAL" and .c != "SKIPPED"
-             and .c != "PENDING" and .c != "EXPECTED")
-    | "\(.n):\(.at)\t\(.n)\t\(.c)"' || true)
+    | (.name // .context // "?") as $n
+    | (if (.status // "COMPLETED") == "COMPLETED"
+       then (.conclusion // .state // "") else .status end) as $c
+    | "\($n)\t\($c)"' || true)
 
   threads_json="$(gh api graphql -f owner="$owner" -f repo="$repo" -F num="$pr" -f query="$threads_query" 2>/dev/null || true)"
   # Testing the field rather than the string: GraphQL answers an error
