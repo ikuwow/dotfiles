@@ -34,8 +34,8 @@ Prerequisite: the `agynio/gh-pr-review` gh extension is installed
 
 ## 1. Start Work
 
-1. Switch to the default branch and pull:
-   `git home`
+1. From the main clone, not a worktree, switch to the default branch and
+   pull: `git home`
 1. Create a worktree and branch (defaults to branching from origin's default branch):
    `git-worktree-create <branch-name>`
    - To branch from somewhere other than origin's default:
@@ -221,8 +221,7 @@ per actionable change; quiet periods stay silent.
    pre-push checks).
 
 1. Exit conditions:
-   - `STATE: MERGED` → execute Step 6 (Cleanup). `pr-monitor` exits on
-     its own at `MERGED` and at `CLOSED`, so neither needs a `TaskStop`.
+   - `STATE: MERGED` → execute Step 6 (Cleanup).
    - `STATE: CLOSED` without merge → skip cleanup.
    - Session ends → Monitor terminates with the session (best-effort).
 
