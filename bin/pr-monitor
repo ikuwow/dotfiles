@@ -67,6 +67,7 @@ prev_decision=""
 prev_isdraft=""
 prev_ci_sha=""
 declare -A seen_runs=()
+declare -A poll_failed=()
 seen_comments="$(mktemp)"
 seen_top_comments="$(mktemp)"
 seen_reviews="$(mktemp)"
@@ -76,6 +77,20 @@ trap 'rm -f "$seen_comments" "$seen_top_comments" "$seen_reviews"' EXIT
 # arm time. Only transitions during this monitor's lifetime should wake
 # the operator. The flag is flipped after the first successful poll.
 first_poll=1
+
+# One line per outage, not per poll: an unauthorized token or an outage
+# persists for many intervals, and a line each time would drown the
+# silence the rest of the script maintains.
+poll_error() {
+  if [ -z "${poll_failed[$1]:-}" ]; then
+    echo "POLL_ERROR: $1"
+    poll_failed[$1]=1
+  fi
+}
+
+poll_ok() {
+  unset "poll_failed[$1]"
+}
 
 # `__typename` on each author is the authoritative Bot/User signal per
 # `pr-reaction.md`. It flows into the event line as a `[BOT]` or
@@ -144,13 +159,15 @@ emit_new() {
 
 while true; do
   pr_json="$(gh pr view "$pr" --json state,isDraft,reviewDecision,statusCheckRollup,headRefName,headRefOid 2>/dev/null || true)"
-  # Skip the poll on an empty OR malformed fetch: a non-empty but truncated
-  # response would make the unguarded `jq -r` extractions below exit nonzero
-  # and, under `set -e`, kill the monitor silently.
-  if [ -z "$pr_json" ] || ! echo "$pr_json" | jq -e . >/dev/null 2>&1; then
+  # Requiring `.state` rather than mere parseability: `{}` parses, and an
+  # empty `state` reaches the comparison below while an empty `headRefOid`
+  # resets `seen_runs` twice over, replaying every failing run.
+  if ! echo "$pr_json" | jq -e '.state? // empty' >/dev/null 2>&1; then
+    poll_error "gh pr view"
     sleep "$interval"
     continue
   fi
+  poll_ok "gh pr view"
   state="$(echo "$pr_json" | jq -r '.state // ""')"
   isdraft="$(echo "$pr_json" | jq -r '.isDraft // ""')"
   decision="$(echo "$pr_json" | jq -r '.reviewDecision // ""')"
@@ -171,8 +188,11 @@ while true; do
     prev_isdraft="$isdraft"
   fi
 
-  if [ -n "$decision" ] && [ "$decision" != "$prev_decision" ]; then
-    if [ "$first_poll" -eq 0 ]; then
+  # `prev_decision` tracks the empty value too: a dismissal clears
+  # `reviewDecision`, and holding the stale one here would then swallow
+  # the re-approval that follows.
+  if [ "$decision" != "$prev_decision" ]; then
+    if [ "$first_poll" -eq 0 ] && [ -n "$decision" ]; then
       echo "REVIEW: $decision"
     fi
     prev_decision="$decision"
@@ -183,12 +203,13 @@ while true; do
     prev_ci_sha="$head_sha"
   fi
   # `gh run list` answers `[]` for a branch with no runs, so an empty or
-  # unparseable result means the call failed. Swallowing it would read as
-  # a clean run and leave `seen_runs` unseeded for the next poll.
+  # unparseable result means the call failed rather than that CI is clean.
   runs_json="$(gh run list --branch "$head_branch" --json databaseId,name,conclusion,headSha,attempt --limit 20 2>/dev/null || true)"
   if [ -z "$runs_json" ] || ! echo "$runs_json" | jq -e . >/dev/null 2>&1; then
-    echo "POLL_ERROR: gh run list"
+    poll_error "gh run list"
     runs_json=""
+  else
+    poll_ok "gh run list"
   fi
   if [ -n "$runs_json" ]; then
     # Keyed on the attempt: `gh run rerun` reuses the databaseId and

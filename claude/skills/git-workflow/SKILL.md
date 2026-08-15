@@ -177,10 +177,10 @@ is itself a monitored event, so an arm deferred until after the ready
 flip can never observe it. It polls every 60s and emits one stdout line
 per actionable change; quiet periods stay silent.
 
-1. Each event line is `<EVENT>: <details>`, carrying GitHub's own field
-   values. The steps below cover the events with a fixed procedure; read
-   any other line and judge from what it says. `pr-monitor`'s header
-   documents the full set.
+1. Each event line is `<EVENT>` or `<EVENT>: <details>`, carrying
+   GitHub's own field values. The steps below cover the events with a
+   fixed procedure; read any other line and judge from what it says.
+   `pr-monitor`'s header documents the full set.
 
 1. Re-fetch detail on each event with:
    - `gh pr view <number> --json state,isDraft,reviewDecision,latestReviews,statusCheckRollup,comments,updatedAt,mergedAt,headRefName`
