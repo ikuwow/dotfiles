@@ -204,11 +204,10 @@ per actionable change; quiet periods stay silent.
    on an event line is a routing hint; the rule's thread walk still
    governs mutations.
 
-1. `CI_RUN`: get the `databaseId` from `gh run list`, then inspect the
-   run — `gh run view --log-failed <databaseId>` reaches failed steps,
-   which a conclusion like `cancelled` or `timed_out` does not have, so
-   fall back to `gh run view <databaseId>` there. Fix and push under the
-   same pre-push checks.
+1. `CHECK`: `gh pr checks` links the failing check. For an Actions job,
+   `gh run view --log-failed <databaseId>` from `gh run list` reaches the
+   failed steps, which a conclusion like `cancelled` or `timed_out` does
+   not have. Fix and push under the same pre-push checks.
 
 1. Exit conditions:
    - `STATE: MERGED` → execute Step 6 (Cleanup).

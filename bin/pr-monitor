@@ -19,11 +19,11 @@
 #   NEW_COMMENT: [BOT|USER] <author> <path>:<line>
 #   NEW_TOP_COMMENT: [BOT|USER] <author>
 #   NEW_REVIEW: [BOT|USER] <author> <state>
-#   CI_RUN: <workflow run name> (<conclusion>)
+#   CHECK: <check name> (<conclusion>)
 #   POLL_ERROR: <call that failed>
 #
-# CI_RUN covers Actions runs concluding as anything but success; other
-# checks need `gh pr checks`.
+# CHECK covers every check on the head commit, Actions or not, settling
+# on anything but success.
 
 set -eu
 
@@ -66,7 +66,7 @@ prev_state=""
 prev_decision=""
 prev_isdraft=""
 prev_ci_sha=""
-declare -A seen_runs=()
+declare -A seen_checks=()
 declare -A poll_failed=()
 seen_comments="$(mktemp)"
 seen_top_comments="$(mktemp)"
@@ -158,10 +158,10 @@ emit_new() {
 }
 
 while true; do
-  pr_json="$(gh pr view "$pr" --json state,isDraft,reviewDecision,statusCheckRollup,headRefName,headRefOid 2>/dev/null || true)"
+  pr_json="$(gh pr view "$pr" --json state,isDraft,reviewDecision,statusCheckRollup,headRefOid 2>/dev/null || true)"
   # Requiring `.state` rather than mere parseability: `{}` parses, and an
   # empty `state` reaches the comparison below while an empty `headRefOid`
-  # resets `seen_runs` twice over, replaying every failing run.
+  # resets `seen_checks` twice over, replaying every failing check.
   if ! echo "$pr_json" | jq -e '.state? // empty' >/dev/null 2>&1; then
     poll_error "gh pr view"
     sleep "$interval"
@@ -171,7 +171,6 @@ while true; do
   state="$(echo "$pr_json" | jq -r '.state // ""')"
   isdraft="$(echo "$pr_json" | jq -r '.isDraft // ""')"
   decision="$(echo "$pr_json" | jq -r '.reviewDecision // ""')"
-  head_branch="$(echo "$pr_json" | jq -r '.headRefName // ""')"
   head_sha="$(echo "$pr_json" | jq -r '.headRefOid // ""')"
 
   if [ "$state" != "$prev_state" ]; then
@@ -199,35 +198,32 @@ while true; do
   fi
 
   if [ "$head_sha" != "$prev_ci_sha" ]; then
-    seen_runs=()
+    seen_checks=()
     prev_ci_sha="$head_sha"
   fi
-  # `gh run list` answers `[]` for a branch with no runs, so an empty or
-  # unparseable result means the call failed rather than that CI is clean.
-  runs_json="$(gh run list --branch "$head_branch" --json databaseId,name,conclusion,headSha,attempt --limit 20 2>/dev/null || true)"
-  if [ -z "$runs_json" ] || ! echo "$runs_json" | jq -e . >/dev/null 2>&1; then
-    poll_error "gh run list"
-    runs_json=""
-  else
-    poll_ok "gh run list"
-  fi
-  if [ -n "$runs_json" ]; then
-    # Keyed on the attempt: `gh run rerun` reuses the databaseId and
-    # leaves the head SHA alone, so a run-keyed map swallows every rerun.
-    while IFS=$'\t' read -r run_key run_name run_conclusion; do
-      [ -z "$run_key" ] && continue
-      if [ -z "${seen_runs[$run_key]:-}" ]; then
-        if [ "$first_poll" -eq 0 ]; then
-          echo "CI_RUN: $run_name ($run_conclusion)"
-        fi
-        seen_runs[$run_key]=1
-      fi
-    done < <(echo "$runs_json" | jq -r --arg sha "$head_sha" \
-      '.[] | select(.headSha == $sha and (.conclusion // "") != "" and .conclusion != "success") | "\(.databaseId):\(.attempt)\t\(.name)\t\(.conclusion)"' \
-      || true)
-  fi
+  # The rollup rides along on the poll above and covers every check on the
+  # head commit, Actions or not. `completedAt` moves with each rerun, so
+  # it keys attempts of one check apart. `SUCCESS` and `PENDING` are the
+  # values that mean nothing to report; the rest travel as they came.
+  while IFS=$'\t' read -r check_key check_name check_conclusion; do
+    [ -z "$check_key" ] && continue
+    if [ -z "${seen_checks[$check_key]:-}" ]; then
+      echo "CHECK: $check_name ($check_conclusion)"
+      seen_checks[$check_key]=1
+    fi
+  done < <(echo "$pr_json" | jq -r '
+    .statusCheckRollup[]?
+    | {n: (.name // .context // "?"), c: (.conclusion // .state // ""),
+       done: (.status // "COMPLETED"), at: (.completedAt // "")}
+    | select(.done == "COMPLETED" and .c != "" and .c != "SUCCESS" and .c != "PENDING")
+    | "\(.n):\(.at)\t\(.n)\t\(.c)"' || true)
 
   threads_json="$(gh api graphql -f owner="$owner" -f repo="$repo" -F num="$pr" -f query="$threads_query" 2>/dev/null || true)"
+  if [ -z "$threads_json" ]; then
+    poll_error "gh api graphql (threads)"
+  else
+    poll_ok "gh api graphql (threads)"
+  fi
   fresh_comments="$(echo "$threads_json" | jq -r --arg me "$me" '
     .data.repository.pullRequest.reviewThreads.nodes[]
     | select(.isResolved == false and .isOutdated == false)
@@ -243,6 +239,11 @@ while true; do
   # by the `REVIEW:` decision event, and an empty COMMENTED has nothing
   # to read.
   reviews_json="$(gh api graphql -f owner="$owner" -f repo="$repo" -F num="$pr" -f query="$reviews_query" 2>/dev/null || true)"
+  if [ -z "$reviews_json" ]; then
+    poll_error "gh api graphql (reviews)"
+  else
+    poll_ok "gh api graphql (reviews)"
+  fi
   fresh_top="$(echo "$reviews_json" | jq -r --arg me "$me" '
     .data.repository.pullRequest.comments.nodes[]
     | select(.author.login != $me)
