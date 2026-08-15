@@ -90,7 +90,7 @@ Launch all three in a single assistant message so they execute concurrently:
 - the `narrative-sweeper` agent — process-record narration in the comments
   and Markdown prose the branch added. Pass it the repository path and
   the branch name, and nothing else
-- `gh pr checks --watch --fail-fast -i 30` — CI monitoring. Run with
+- `gh pr checks --watch --fail-fast` — CI monitoring. Run with
   `run_in_background: true`. It returns as soon as one check fails, so a
   fast job's failure is actionable while slower jobs are still running and
   the checks it reports as failed are not the full set
@@ -104,9 +104,8 @@ If any of the three fails:
 The sweep commits locally without pushing. Whenever it produced commits,
 push them together with any self-review and CI fixes in one push,
 regardless of whether the three checks passed, then re-run all three
-until all pass. After any push, re-arm
-`gh pr checks --watch --fail-fast -i 30` (the running watch is bound to
-the pre-push head).
+until all pass. After any push, re-arm `gh pr checks --watch --fail-fast`
+(the running watch is bound to the pre-push head).
 
 Note: `/pr-selfcheck` and the narrative sweep are mechanical checks, not
 a code review. Re-running them after fixes is expected. The
@@ -131,8 +130,8 @@ Once the review finishes, review the results:
    Skip it when the review produced no code changes — its previous pass
    already covers the branch
 1. Push the fixes and the sweep's commits in one push, then re-run
-   `/pr-selfcheck` and `gh pr checks --watch --fail-fast -i 30` to
-   confirm the PR is still consistent and CI passes.
+   `/pr-selfcheck` and `gh pr checks --watch --fail-fast` to confirm the
+   PR is still consistent and CI passes.
 
 The code review is single-pass — do not re-run after fixes.
 `/pr-selfcheck` and the narrative sweep run again in Phase 3 to catch
@@ -141,8 +140,8 @@ inconsistencies introduced by review fix changes.
 Never end a turn that claims ongoing waiting (delegated fix push,
 CI run, CI rerun, external state change) without an armed event
 source — a Monitor on the branch head, or
-`gh pr checks --watch --fail-fast -i 30` with `run_in_background: true`.
-After every `gh run rerun` or other
+`gh pr checks --watch --fail-fast` with `run_in_background: true`. After
+every `gh run rerun` or other
 re-kick, re-arm the watch before yielding. State what is being
 awaited in the final message before going idle.
 
