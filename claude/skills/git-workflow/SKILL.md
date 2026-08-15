@@ -140,9 +140,8 @@ Never end a turn that claims ongoing waiting (delegated fix push,
 CI run, CI rerun, external state change) without an armed event
 source — a Monitor on the branch head, or
 `gh pr checks --watch --fail-fast` with `run_in_background: true`. After
-every `gh run rerun` or other
-re-kick, re-arm the watch before yielding. State what is being
-awaited in the final message before going idle.
+every `gh run rerun` or other re-kick, re-arm the watch before yielding.
+State what is being awaited in the final message before going idle.
 
 ### Phase 4: Finalize PR for review readiness
 
