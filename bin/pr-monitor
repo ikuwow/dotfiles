@@ -19,7 +19,7 @@
 #   NEW_COMMENT: [BOT|USER] <author> <path>:<line>
 #   NEW_TOP_COMMENT: [BOT|USER] <author>
 #   NEW_REVIEW: [BOT|USER] <author> <state>
-#   CHECK: <check name> (<conclusion>)
+#   CHECK: <check name> (<conclusion or state>)
 #   POLL_ERROR: <call that failed>
 #
 # CHECK covers every check on the head commit, Actions or not, settling
@@ -76,6 +76,8 @@ trap 'rm -f "$seen_comments" "$seen_top_comments" "$seen_reviews"' EXIT
 # First-poll seeding: do not emit events for state that already held at
 # arm time. Only transitions during this monitor's lifetime should wake
 # the operator. The flag is flipped after the first successful poll.
+# `CHECK` is the exception — a check already red when the monitor is
+# armed is the reader's problem now, so it reports rather than seeds.
 first_poll=1
 
 # One line per outage, not per poll: an unauthorized token or an outage
@@ -202,9 +204,16 @@ while true; do
     prev_ci_sha="$head_sha"
   fi
   # The rollup rides along on the poll above and covers every check on the
-  # head commit, Actions or not. `completedAt` moves with each rerun, so
-  # it keys attempts of one check apart. `SUCCESS` and `PENDING` are the
-  # values that mean nothing to report; the rest travel as they came.
+  # head commit, Actions or not. Its timestamp moves with each rerun or
+  # re-post, keying attempts of one check apart; a status context carries
+  # `startedAt` alone. Excluded are the values GitHub itself counts as
+  # passing or not yet settled; the rest travel as they came, so a value
+  # added later reports rather than vanishes.
+  if ! echo "$pr_json" | jq -e '.statusCheckRollup | type == "array"' >/dev/null 2>&1; then
+    poll_error "gh pr view (rollup)"
+  else
+    poll_ok "gh pr view (rollup)"
+  fi
   while IFS=$'\t' read -r check_key check_name check_conclusion; do
     [ -z "$check_key" ] && continue
     if [ -z "${seen_checks[$check_key]:-}" ]; then
@@ -214,12 +223,17 @@ while true; do
   done < <(echo "$pr_json" | jq -r '
     .statusCheckRollup[]?
     | {n: (.name // .context // "?"), c: (.conclusion // .state // ""),
-       done: (.status // "COMPLETED"), at: (.completedAt // "")}
-    | select(.done == "COMPLETED" and .c != "" and .c != "SUCCESS" and .c != "PENDING")
+       done: (.status // "COMPLETED"), at: (.completedAt // .startedAt // "")}
+    | select(.done == "COMPLETED" and .c != "" and .c != "SUCCESS"
+             and .c != "NEUTRAL" and .c != "SKIPPED"
+             and .c != "PENDING" and .c != "EXPECTED")
     | "\(.n):\(.at)\t\(.n)\t\(.c)"' || true)
 
   threads_json="$(gh api graphql -f owner="$owner" -f repo="$repo" -F num="$pr" -f query="$threads_query" 2>/dev/null || true)"
-  if [ -z "$threads_json" ]; then
+  # Testing the field rather than the string: GraphQL answers an error
+  # with a parseable body on stdout, which a non-empty test would read as
+  # a healthy poll and, worse, clear a running outage's suppression.
+  if ! echo "$threads_json" | jq -e '.data.repository.pullRequest.reviewThreads' >/dev/null 2>&1; then
     poll_error "gh api graphql (threads)"
   else
     poll_ok "gh api graphql (threads)"
@@ -239,7 +253,7 @@ while true; do
   # by the `REVIEW:` decision event, and an empty COMMENTED has nothing
   # to read.
   reviews_json="$(gh api graphql -f owner="$owner" -f repo="$repo" -F num="$pr" -f query="$reviews_query" 2>/dev/null || true)"
-  if [ -z "$reviews_json" ]; then
+  if ! echo "$reviews_json" | jq -e '.data.repository.pullRequest.reviews' >/dev/null 2>&1; then
     poll_error "gh api graphql (reviews)"
   else
     poll_ok "gh api graphql (reviews)"
