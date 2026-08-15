@@ -19,26 +19,6 @@ are symlinks pointing to files in this repository.
   `~/.codex/`, etc.) generally require a permission prompt
 - Check `scripts/deploy.sh` for the full list of symlink mappings
 
-## Key Commands
-
-```bash
-# Deploy/update dotfiles (creates symlinks)
-./scripts/deploy.sh
-
-# Validate shell scripts
-shellcheck scripts/*.sh bootstrap/*.sh
-
-# Run pre-commit hooks
-pre-commit run --all-files
-```
-
-## How to Add a New Dotfile
-
-1. Place the file in the repository root (e.g., `.newconfig`)
-1. Add a `link` call in `scripts/deploy.sh` under the appropriate category:
-   `link .newconfig "$HOME/.newconfig"`
-1. Run `./scripts/deploy.sh` to create the symlink
-
 ## Git Workflow
 
 - Always create a branch before making changes. When the user explicitly requests direct work on main, proceed after the default-branch guard hook's first deny — its retry is sanctioned for the rest of the session
@@ -58,8 +38,6 @@ pre-commit run --all-files
 ## Script Requirements
 
 - Bootstrap scripts use `/bin/bash` (not `/usr/bin/env bash`) for compatibility
-- All scripts must pass shellcheck validation
-- Use `set -eu` for error handling in critical scripts
 
 ## Machine-local Git Config
 
