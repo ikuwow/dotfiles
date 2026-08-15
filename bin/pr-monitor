@@ -10,9 +10,8 @@
 #
 # Usage: pr-monitor <pr-number> [interval-seconds]
 #
-# Events, one per stdout line. Field values are GitHub's own and are
-# passed through rather than sorted into categories here, so a vocabulary
-# this script has never seen still reaches the reader intact:
+# Events, one per stdout line. Field values are GitHub's own, passed
+# through rather than classified here:
 #
 #   STATE: <state>
 #   REVIEW: <reviewDecision>
@@ -21,11 +20,10 @@
 #   NEW_TOP_COMMENT: [BOT|USER] <author>
 #   NEW_REVIEW: [BOT|USER] <author> <state>
 #   CI_RUN: <workflow run name> (<conclusion>)
-#   POLL_ERROR: <call that failed>: <message>
+#   POLL_ERROR: <call that failed>
 #
-# CI_RUN covers Actions runs whose conclusion is anything but success.
-# Checks that are not Actions runs never reach it; `gh pr checks` sees
-# those.
+# CI_RUN covers Actions runs concluding as anything but success; other
+# checks need `gh pr checks`.
 
 set -eu
 
@@ -185,20 +183,16 @@ while true; do
     prev_ci_sha="$head_sha"
   fi
   # `gh run list` answers `[]` for a branch with no runs, so an empty or
-  # unparseable result means the call itself failed. That gets its own
-  # event because silence here otherwise reads exactly like a clean run,
-  # while the GraphQL sections below keep emitting normally. A swallowed
-  # failure also leaves `seen_runs` unseeded, so the next poll would
-  # replay every run that was already settled at arm time.
+  # unparseable result means the call failed. Swallowing it would read as
+  # a clean run and leave `seen_runs` unseeded for the next poll.
   runs_json="$(gh run list --branch "$head_branch" --json databaseId,name,conclusion,headSha,attempt --limit 20 2>/dev/null || true)"
   if [ -z "$runs_json" ] || ! echo "$runs_json" | jq -e . >/dev/null 2>&1; then
     echo "POLL_ERROR: gh run list"
     runs_json=""
   fi
   if [ -n "$runs_json" ]; then
-    # Keyed on the attempt, not the run: `gh run rerun` reuses the run's
-    # databaseId and bumps `attempt`, and a rerun leaves the head SHA
-    # alone, so a run-keyed map would swallow every result after the first.
+    # Keyed on the attempt: `gh run rerun` reuses the databaseId and
+    # leaves the head SHA alone, so a run-keyed map swallows every rerun.
     while IFS=$'\t' read -r run_key run_name run_conclusion; do
       [ -z "$run_key" ] && continue
       if [ -z "${seen_runs[$run_key]:-}" ]; then
