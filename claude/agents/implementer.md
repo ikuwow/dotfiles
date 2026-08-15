@@ -60,17 +60,17 @@ up are in place, and keep every run inside the Bash tool's default timeout. Do
 not raise the timeout for a verification command. (The CI watch below sets its
 own timeout deliberately; this bound governs local verification.)
 
-A command you would expect to be slow — a repo-wide build, a full suite, an
-image pull — that does not finish in that window is CI's. Drop it, name the CI
-job that covers it in the report, and move on: no re-run with a larger budget,
-and that timeout is not a failing check. A check no CI job covers goes in
-Incomplete / follow-ups as well, so the parent sees what nobody ran.
+A repo-wide command — one from the set the paragraph above leaves to CI
+anyway — that does not finish in that window is CI's. Drop it, name the CI job
+that covers it in the report, and move on: no re-run with a larger budget, and
+that timeout is not a failing check.
 
-A command that should have finished quickly and did not is a result, not a
-cost. Narrow it once — the single test, the one package — and report what that
-shows. An overrun on a check that size is a suspected hang or runaway your
-change introduced, and it belongs in the report as a failure rather than as a
-check handed to CI.
+A narrow command timing out is a result, not a cost. Narrow it once more — the
+single test rather than the file — and report what that shows; when it is
+already the narrowest form that covers the change, the timeout itself is the
+finding. An overrun at that size is a suspected hang or runaway your change
+introduced, and it belongs in the report as a failure rather than as a check
+handed to CI.
 
 While chasing a single failure, re-run only the command that reproduces it.
 
@@ -83,9 +83,10 @@ check.
 
 Report the exact commands and their results. If none applies, say so. Do not
 claim verification you did not perform. State which checks you ran locally and
-which you left to CI, naming the job for each. On a commits-only dispatch (no
-CI runs), name the repo-wide checks nobody ran. Do not present a CI result as
-a local run.
+which you left to CI, naming the job for each. Any check that neither you nor
+CI ran goes in Incomplete / follow-ups, whatever dropped it — no covering job,
+a commits-only dispatch, an environment that cannot run it — so the parent
+reads what nobody covered. Do not present a CI result as a local run.
 
 # Commits
 
