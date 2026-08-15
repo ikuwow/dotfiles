@@ -34,8 +34,8 @@ Prerequisite: the `agynio/gh-pr-review` gh extension is installed
 
 ## 1. Start Work
 
-1. Pull the latest default branch:
-   `git pull`
+1. From the main clone, not a worktree, switch to the default branch and
+   pull: `git home`
 1. Create a worktree and branch (defaults to branching from origin's default branch):
    `git-worktree-create <branch-name>`
    - To branch from somewhere other than origin's default:
@@ -103,8 +103,7 @@ The sweep commits locally without pushing. Whenever it produced commits,
 push them together with any self-review and CI fixes in one push,
 regardless of whether the three checks passed, then re-run all three
 until all pass. After any push, and after a watch exits with checks still
-pending, re-arm `gh pr checks --watch --fail-fast` (the running watch is
-bound to the pre-push head).
+pending, re-arm `gh pr checks --watch --fail-fast`.
 
 Note: `/pr-selfcheck` and the narrative sweep are mechanical checks, not
 a code review. Re-running them after fixes is expected. The
@@ -193,7 +192,9 @@ per actionable change; quiet periods stay silent.
    - `NEW_REVIEW: [BOT|USER] <author> <state>` — new PR review
      (summary body). `state` ∈ `COMMENTED` / `APPROVED` /
      `CHANGES_REQUESTED` / `DISMISSED`. Empty-body reviews filtered.
-   - `CI_FAILURE: <check name>` — new `FAILURE` on the PR's head SHA.
+   - `CI_FAILURE: <workflow run name>` — new `FAILURE` Actions run on
+     the PR's head SHA. Checks that are not Actions runs never produce
+     this line; reach them through `gh pr checks`.
 
 1. Re-fetch detail on each event with:
    - `gh pr view <number> --json state,isDraft,reviewDecision,latestReviews,statusCheckRollup,comments,updatedAt,mergedAt,headRefName`
@@ -220,9 +221,8 @@ per actionable change; quiet periods stay silent.
    pre-push checks).
 
 1. Exit conditions:
-   - `STATE: MERGED` → execute Step 6 (Cleanup), then `TaskStop` the
-     monitor.
-   - `STATE: CLOSED` without merge → `TaskStop`, skip cleanup.
+   - `STATE: MERGED` → execute Step 6 (Cleanup).
+   - `STATE: CLOSED` without merge → skip cleanup.
    - Session ends → Monitor terminates with the session (best-effort).
 
 1. Conflict handling:
