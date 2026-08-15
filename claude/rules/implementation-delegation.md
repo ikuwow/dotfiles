@@ -48,9 +48,9 @@ of implementing in the main session.
   the git-workflow Phase 1 checks instead of waiting on it
 - Hand a CI failure back to the same implementer, addressed by the name
   or agentId from its spawn result, instead of dispatching a fresh one
-  or taking the fix loop into the parent
-- Once the implementer reports its fix-round cap hit, the failure stops
-  being handback material and is the parent's call
+  or taking the fix loop into the parent. One handback per PR — the
+  implementer gets a single fix round per dispatch, and a failure that
+  survives the handback is the parent's call
 - The parent still owns the PR's real title and body, code review,
   ready-for-review, and merge
 
