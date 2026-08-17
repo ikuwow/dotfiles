@@ -157,12 +157,16 @@ once and applies to both perspectives.
      nothing remains to add, one line such as "realigned stale
      wording with the actual code/config" is a complete description.
    - Length budget: the main description section (実装内容 or
-     equivalent) stays within roughly 10 lines — one background
-     paragraph plus change bullets. When the whole body excluding
-     template-mandated sections exceeds ~30 lines, treat it as a
-     Progressive disclosure violation: compress mechanism deep-dives,
-     history, and repeated explanations into a link or delete them.
-     `/pr-selfcheck` reports budget overruns as Should Fix.
+     equivalent) stays within roughly 10 lines, and the whole body
+     excluding template-mandated sections within ~30 lines. These are
+     hard ceilings, not targets. Exceeding one is a Progressive
+     disclosure violation: compress mechanism deep-dives, history, and
+     repeated explanations into a link or delete them. Staying within
+     one says nothing about whether the violations above are present —
+     a three-bullet section that walks the diff hunk by hunk is as much
+     a paraphrase as a thirty-line one. `/pr-selfcheck` reports an
+     overrun as Must Fix and judges a body under the ceiling on the
+     same criteria as one over it.
 
 1. Title / body / diff consistency
    - The title accurately reflects the change

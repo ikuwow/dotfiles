@@ -46,11 +46,22 @@ escalate to Must Fix.
 - Bullets in the same list that restate the same decision or fact in different wording, with no distinct information per item
 - Content copied verbatim from a design doc, spec, linked issue, or primary source where a one-line summary plus link would suffice
 
-When the implementation-summary section exceeds ~10 lines, or the
-whole body (excluding template-mandated sections) exceeds ~30 lines,
-report the overrun itself as Should Fix (pr-guidelines: Length
-budget), and re-examine the body against the signals above to decide
-what to cut and whether to escalate.
+The pr-guidelines line budgets (~10 lines for the
+implementation-summary section, ~30 lines for the whole body excluding
+template-mandated sections) are hard ceilings. Report an overrun as
+Must Fix. A body within the ceilings earns nothing for it — apply the
+signals above at any length, and never let a line count stand in for
+them.
+
+Read the implementation-summary section against the diff on every run
+and ask what a reviewer learns from it that the diff does not already
+show. A section whose items each map to a hunk is a paraphrase of the
+diff, and that is Must Fix on its own however short it is. What
+belongs there is the outcome plus what a reviewer cannot reconstruct
+from the code: the concrete trigger that made the change necessary
+(an incident, a failed investigation, a request — not a general
+statement of the problem class), what was deliberately left out, and
+which invariant the change preserves.
 
 ### Process-record signals
 
