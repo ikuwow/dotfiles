@@ -19,9 +19,11 @@ Perform a self-review of the specified PR to catch issues before a human reviewe
    `gh pr diff <number>`
 1. When verifying a body claim needs file contents at the PR head,
    run `git fetch origin pull/<number>/head` once and read via
-   `git show FETCH_HEAD:<path>`. Do not create local branches and do
-   not run `git branch -D`/`-d` (branch deletion blocks on a
-   permission prompt)
+   `git show FETCH_HEAD:<path>`. When a body claim asserts repository
+   state at the PR head and shows the query it rests on, re-run that
+   query against `FETCH_HEAD` and report a mismatch as Must Fix. Do
+   not create local branches and do not run `git branch -D`/`-d`
+   (branch deletion blocks on a permission prompt)
 1. Read `~/.claude/skills/git-workflow/pr-guidelines.md` to load the PR Body Checklist
 1. For each URL found in the PR body, verify accessibility with WebFetch
    If a URL is unreachable (network error, 403, etc.), report it as "unverifiable" rather than a must-fix.
@@ -61,6 +63,27 @@ signals fire across the body, escalate to Must Fix.
 - Records of direction changes made mid-implementation
 - References to the session, to plan-mode phases, or to individual commits within the branch
 - Rejected alternatives described at implementation-attempt granularity rather than as design alternatives weighed for the delivered design
+
+### Claim-grounding signals
+
+Applies to the PR body only. The forked self-review has no access to
+the authoring session, so a claim is judged on the evidence the body
+itself carries, never on whether the author is likely to have run the
+check.
+
+Flag each of these as Must Fix on a single occurrence:
+
+- A verification item marked complete whose line carries no command, output excerpt, exit code, or log line; when the diff is documentation or prose only and no command applies, naming what the item was checked against (the source, the spec, the linked issue) satisfies this
+- A negative or absence claim ("no X remains", "該当なし", "影響なし") that does not show the query, command, or enumeration it rests on
+
+Flag each of these as Should Fix; if multiple signals fire across the
+body, escalate to Must Fix:
+
+- A claim about external tool, service, or platform behavior stated without a link to a primary source
+- A causal claim about the system under change ("because X locks the table", "this keeps Y traceable") with no evidence or source attached
+- A value presented as a measured or derived result whose derivation is neither shown nor linked; identifiers and version strings are not in scope
+- Rationale attributed to a linked issue, PR, or document without quoting the sentence it rests on
+- An absence claim whose shown query could under-match its own scope, through a line anchor, a single pattern, or a path filter narrower than the claim
 
 ### Hard-wrap detection (GitHub-posted markdown)
 
