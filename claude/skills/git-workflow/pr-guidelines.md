@@ -99,9 +99,12 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   man page section or `--help` output counts)
 - A causal claim asserting a mechanism a reader cannot check from the
   diff ("because X locks the table") carries evidence or a source
-- A value presented as a measured or derived result shows or links its
-  derivation
-  - Identifiers and version strings are outside this rule
+- A value the reader would rely on to stop checking — a count that
+  asserts completeness, a uniqueness claim, a coverage figure — shows or
+  links its derivation
+  - Identifiers, version strings, and figures that only describe the
+    change are outside this rule; a count being off by a little is a
+    Nice to Have, not a defect in the claim
 - Rationale attributed to a linked issue, PR, or document quotes the
   one sentence it rests on, or links to the section carrying it
 - All URLs and anchor links resolve to the expected content
