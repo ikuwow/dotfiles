@@ -11,15 +11,16 @@ need why the change was made and the shape of the decision behind it;
 neither needs what the diff already shows.
 
 A body is ready when it holds all five properties below. Every rule in
-this file belongs to exactly one of them, and `/pr-selfcheck` evaluates
-them one at a time.
+the five property sections belongs to exactly one of them, and
+`/pr-selfcheck` evaluates them one at a time.
 
 - Decidable — a reviewer can decide approve or reject from the body
   alone, reading top-down
 - Grounded — every claim is checkable on the evidence the body itself
   carries
-- Necessary — the body carries nothing the diff, the Checks panel, or a
-  linked source already carries
+- Necessary — the body carries nothing the diff or the Checks panel
+  already carries, states each thing once, and takes from a linked
+  source no more than the summary that survives the link going dead
 - Scoped — the diff carries only what the stated intent needs, and the
   body accounts for all of it
 - Conformant — the body renders and behaves as intended on GitHub
@@ -30,16 +31,15 @@ them one at a time.
   etc.). The body alone should convey the intent and let a reviewer
   understand the purpose, what changed, and the impact.
 - Give the shape of the decision: the approach taken vs. the approaches
-  rejected, what was deliberately left out of scope, and risks or
-  things a reviewer should watch out for. "Approaches rejected" covers
-  design alternatives weighed for the delivered design.
+  rejected, and risks or things a reviewer should watch out for.
+  "Approaches rejected" covers design alternatives weighed for the
+  delivered design.
 - Inverted pyramid — place the most important information first. A
   reviewer reading only the first few lines should be able to tell what
   kind of PR this is and where to focus.
 - Progressive disclosure — surface only what a reviewer needs to
-  decide. Move implementation details, history, or full alternatives
-  narrative behind a link or to a "Notes" / "Background" section at the
-  end.
+  decide. Move implementation details or full alternatives narrative
+  behind a link or to a "Notes" / "Background" section at the end.
 - Future work, out-of-scope follow-ups, and "next PR" notes belong at
   the end of the body (e.g., in a "Follow-up" / "Notes" section). Do
   not surface them in the opening sections (purpose, scope, summary),
@@ -101,7 +101,10 @@ them one at a time.
   flight checklist when every item is "N/A" (collapse it to one line).
 - Keep CI, lint, formatter, type-check, and build / test command
   results (`go build`, `go test`, `go vet`, `pre-commit`) out of the
-  body, whether or not the repository's CI runs them.
+  body, whether or not the repository's CI runs them. Output that CI or
+  another automation posts on the PR itself (build status, terraform /
+  CDK plan output, lint and type-check results) stays where it was
+  posted; the body does not restate it.
 - Focus on what changes from the user's or system's perspective —
   behavior changes, new capabilities, removed limitations — rather than
   on implementation details (resources added, files touched).
@@ -119,9 +122,9 @@ them one at a time.
   the same list do not restate one another in different wording.
 - Rationale, background, or requirements that live elsewhere (issue,
   design doc, ADR, prior PR, official spec) are summarized under a
-  link, not copied. A bare link is itself a defect: the target is the
-  shortest summary that survives the link going dead, and anything past
-  that point is duplication.
+  link, not copied. A bare link is itself a defect: write the shortest
+  summary that survives the link going dead, and anything past that
+  point is duplication.
 - When the diff is self-explanatory — documentation or config edits
   whose changed lines a reviewer can read directly, especially in the
   team's own language — keep the body to what the diff cannot convey
@@ -131,11 +134,8 @@ them one at a time.
 - A section heading grants no exemption. "diff から読み取れない設計判断",
   "補足", or "詳細" does not excuse its contents from this property —
   each paragraph under it still has to be needed for the decision.
-- Length is not a criterion, and a body that is long because every part
-  of it is needed is correct as it is. When the body reads as
-  noticeably long for the size of the change, re-read it against this
-  property and Scoped; report what that pass finds, and nothing when it
-  finds nothing.
+- A body that is long because every part of it is needed is correct as
+  it is, and length itself is never a finding.
 
 ## Scoped
 
@@ -150,8 +150,10 @@ them one at a time.
 - The body conveys the holistic intent of the change — what the PR is
   trying to achieve across the whole diff — accounts for every file and
   change in it, and leaves no unexplained hunks.
-- Every changed code path is covered by CI, manual test steps in the PR
-  body, or another verification mechanism.
+- The body names a verification mechanism — CI, manual test steps, or
+  another check — for the code paths the diff changes. The test is
+  whether the body makes that claim; judging how adequate the coverage
+  is belongs to code review.
 - Keep the PR self-contained. Verification items, acceptance criteria,
   and follow-up actions that depend on changes outside this PR's diff
   (other repos, downstream releases, E2E flows) belong in the parent
@@ -171,15 +173,18 @@ them one at a time.
 - Do NOT use auto-close keywords (`Closes`, `Fixes`, `Resolves`).
 - Checkbox syntax (`- [ ]` / `- [x]`) is reserved for verification
   items: `- [x]` for one the author verified, `- [ ]` for one the user
-  is expected to verify or act on later so it can be ticked off. Prose
-  statements do not take a checkbox.
-- Inside GitHub PR / issue bodies and PR / issue comments only — that
-  is, Markdown posted through the GitHub web UI — do not hard-wrap
-  paragraphs or list items. Write each paragraph as a single line and
-  let the browser wrap it; use blank lines for paragraph breaks. GitHub
-  Flavored Markdown renders soft line breaks inside a paragraph as
-  visible breaks (or runs lines together awkwardly) only in these
-  contexts. Plain Markdown files (READMEs, ADRs, this guidelines file
+  is expected to verify or act on later so it can be ticked off, and
+  `- [ ]` carrying a one-line reason for an author-owed item that
+  Grounded exempts as unverifiable by the author. Prose statements do
+  not take a checkbox.
+- Inside GitHub issues, pull requests, and discussions — bodies and
+  comments alike, that is Markdown posted through the GitHub web UI —
+  do not hard-wrap paragraphs or list items. Write each paragraph as a
+  single line and let the browser wrap it; use blank lines for
+  paragraph breaks. GitHub Flavored Markdown renders soft line breaks
+  inside a paragraph as visible breaks only in these contexts
+  ([basic writing and formatting syntax](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax)).
+  Plain Markdown files (READMEs, ADRs, this guidelines file
   itself, and any other in-repo documentation) follow standard Markdown
   rendering and may be hard-wrapped for file-side readability.
 

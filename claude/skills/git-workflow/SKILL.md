@@ -59,8 +59,8 @@ formatting or indentation.
 ## 3. Create a PR
 
 1. If the branch already has a PR (`gh pr view --json number,url`),
-   skip creation. Bring its title and body up to `pr-guidelines.md`
-   using the section 5 procedure, display the PR URL to the user, then
+   skip creation. Bring its title and body into conformance with
+   `pr-guidelines.md` using the section 5 procedure, display the PR URL to the user, then
    proceed to CI wait (step 4).
 1. Write the PR body to a fresh file under the session scratchpad
    directory using the Write tool (new filename per revision — a new
