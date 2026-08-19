@@ -21,83 +21,36 @@ Perform a self-review of the specified PR to catch issues before a human reviewe
    run `git fetch origin pull/<number>/head` once and read via
    `git show FETCH_HEAD:<path>`. When a body claim asserts repository
    state at the PR head and shows the query it rests on, re-run it as
-   `git grep <pattern> FETCH_HEAD` and report Must Fix when the result
-   contradicts the claim that query is cited for; incidental
-   differences such as line numbers or unrelated new hits are not a
-   contradiction, and a query with no tree-ish form is unverifiable
-   rather than a Must Fix. Do not create local branches and do not run
-   `git branch -D`/`-d` (branch deletion blocks on a permission
-   prompt)
-1. Read `~/.claude/skills/git-workflow/pr-guidelines.md` to load the PR Body Checklist
-1. For each URL found in the PR body, verify accessibility with WebFetch
-   If a URL is unreachable (network error, 403, etc.), report it as "unverifiable" rather than a must-fix.
-1. Analyze the PR against the review criteria below
-1. Output the result in the format described below
+   `git grep <pattern> FETCH_HEAD`; incidental differences such as line
+   numbers or unrelated new hits are not a contradiction. Do not create
+   local branches and do not run `git branch -D`/`-d` (branch deletion
+   blocks on a permission prompt)
+1. Read `~/.claude/skills/git-workflow/pr-guidelines.md` to load the
+   five properties the PR body is judged against
+1. For each URL found in the PR body, fetch it with WebFetch. A host
+   that does not answer (network error, timeout, 403) makes the URL
+   unverifiable; a 404 from a host that answered, or content that
+   contradicts what the body cites the URL for, is Must Fix
+1. Walk the five properties one at a time, in the order
+   `pr-guidelines.md` states them, judging the PR against that
+   property's rules and the severity table below
+1. Output the result in the format described below, reporting a line
+   for every property including those with no finding
 
-## Review Criteria
+## Severity
 
-Evaluate the PR against the PR Body Checklist loaded in Step 4 (`~/.claude/skills/git-workflow/pr-guidelines.md`).
+| Verdict | Condition |
+| --- | --- |
+| Must Fix | An objective presence or absence test on the body, or a contradiction confirmed against a checked source (the diff, `FETCH_HEAD`, a fetched URL) |
+| Should Fix | A judgment of degree: redundancy, ordering, bullet granularity |
+| Nice to Have | Wording or formatting with no effect on the decision |
+| Escalation | Two or more Should Fix within one property escalates that property to Must Fix |
+| Unverifiable | An unreachable URL, or a query with no tree-ish form. Reported as unverifiable, never Must Fix |
 
-In addition to the high-level checklist, apply the following concrete
-signals so detection does not rely on subagent interpretation alone.
+## Hard-wrap detection (GitHub-posted markdown)
 
-### Redundancy / essence-first signals
-
-Flag each as Should Fix; if multiple signals fire across the body,
-escalate to Must Fix.
-
-- Sentences or bullets that paraphrase what the diff already shows ("edited file X", "bumped value from A to B", "added N items", per-file summaries)
-- CI / lint / type-check / `go build` / `go test` / `go vet` / `pre-commit` results recorded in the Verification section (the Checks panel and bot comments are the authoritative source)
-- The same fact (environment variable name, file name, design decision, summary of a linked source) repeated in multiple places in the body
-- Bullets in the same list that restate the same decision or fact in different wording, with no distinct information per item
-- Content copied verbatim from a design doc, spec, linked issue, or primary source where a one-line summary plus link would suffice
-
-When the implementation-summary section exceeds ~10 lines, or the
-whole body (excluding template-mandated sections) exceeds ~30 lines,
-report the overrun itself as Should Fix (pr-guidelines: Length
-budget), and re-examine the body against the signals above to decide
-what to cut and whether to escalate.
-
-### Process-record signals
-
-Applies to the PR body only. Flag each as Should Fix; if multiple
-signals fire across the body, escalate to Must Fix.
-
-- Chronological narration of implementation attempts ("first tried X, it failed, so Y")
-- Records of direction changes made mid-implementation
-- References to the session, to plan-mode phases, or to individual commits within the branch
-- Rejected alternatives described at implementation-attempt granularity rather than as design alternatives weighed for the delivered design
-
-### Claim-grounding signals
-
-Applies to the PR body only. Judge each claim on the evidence the body
-itself carries.
-
-Results that belong in the Checks panel (CI, lint, type-check,
-formatter) are outside this block — the redundancy signal above takes
-them out of the body rather than asking for their output.
-
-Flag each of these as Must Fix on a single occurrence:
-
-- A `- [x]` verification item carrying no command, output excerpt, exit code, or log line, counting any code block or sub-bullet attached to it; when the item covers documentation or prose and no command applies, naming what it was checked against (the source, the spec, the linked issue) satisfies this
-- A negative or absence claim ("no X remains", "該当なし") that shows neither the query it rests on nor the scope it examined; template-mandated N/A fields are outside this block
-
-Flag each of these as Should Fix; if multiple signals fire across the
-body, escalate to Must Fix:
-
-- A claim about the behavior of a tool, service, or platform this diff does not modify, carrying no link to or citation of a primary source (a man page section or `--help` output counts)
-- A causal claim asserting a mechanism a reader cannot check from the diff ("because X locks the table") with no evidence or source attached
-- A value presented as a measured or derived result whose derivation is neither shown nor linked; identifiers and version strings are not in scope
-- Rationale attributed to a linked issue, PR, or document that neither quotes the one sentence it rests on nor links to the section carrying it
-- An absence claim whose shown query is visibly narrower than the claim it supports, through a regex anchored to line start or end, a single literal where the claim covers a family of spellings, or a path filter covering fewer paths than the claim
-
-### Hard-wrap detection (GitHub-posted markdown)
-
-For PR bodies, PR comments, issue bodies, and issue comments, GitHub
-Flavored Markdown renders soft line breaks inside a paragraph as
-visible breaks. Blank lines between paragraphs serve as paragraph
-separators and are allowed. Flag each violation as Should Fix;
-multiple violations across the body escalate to Must Fix.
+Conformant forbids hard-wrapping in GitHub-posted markdown. Apply this
+parser rather than judging line breaks by eye.
 
 A "block marker" below means a line starting with any of: `#`, `-`,
 `*`, `+`, a digit followed by `.` (e.g. `1.`), `>`, `|`, four spaces
@@ -121,13 +74,23 @@ Excluded from detection to avoid false positives:
 ## PR Self-Check Result
 
 ### Must Fix
-- (Critical issues: broken links, title/content mismatch, missing rationale for important changes, verification items and absence claims carrying no evidence)
+- [<property>] <finding>
 
 ### Should Fix
-- (Recommended improvements: missing source URLs, unclear scope description)
+- [<property>] <finding>
 
 ### Nice to Have
-- (Minor polish: wording, formatting)
+- [<property>] <finding>
+
+### Unverifiable
+- [<property>] <item, and why it could not be checked>
+
+### Property walk
+- Decidable: <one line>
+- Grounded: <one line>
+- Necessary: <one line>
+- Scoped: <one line>
+- Conformant: <one line>
 
 ### Verdict
 PASS | NEEDS_IMPROVEMENT
@@ -138,5 +101,4 @@ If there are no items for a severity level, write "None."
 ## Important Notes
 
 - This check may be re-run after fixes (e.g., Phase 1 retry, Phase 3 consistency check in the git workflow)
-- Focus on the PR as a communication artifact for human reviewers, not on code correctness (CI covers that)
-- When in doubt, prefer "Should Fix" over "Must Fix" to avoid blocking on subjective issues. Each signal block above states its own severity, and its tests turn on whether something is present in the body, so those verdicts are settled by the block rather than by this preference
+- Focus on the PR as a communication artifact, not on code correctness (CI covers that)
