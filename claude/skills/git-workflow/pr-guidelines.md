@@ -3,181 +3,200 @@
 Quality criteria for pull requests. Follow these when writing a PR body
 and when self-reviewing your own PR.
 
-## Writing Style
-
 A PR body is a summary that helps a reviewer decide, not a complete
-record of the change. Follow the Essence-first principle: surface
-what a reviewer needs to approve or reject the PR; everything else
-lives in the diff, the issue, or a linked source.
+record of the change: everything else lives in the diff, the issue, or
+a linked source. It serves two audiences — the reviewer deciding now,
+and the future reader who reaches this PR from `git log` or blame. Both
+need why the change was made and the shape of the decision behind it;
+neither needs what the diff already shows.
 
-The title is a one-line summary in the team's review language. Any
-content that doesn't fit on one line — including issue references
-(`#123`, `org/repo#123`) — belongs in the body, not the title.
+A body is ready when it holds all five properties below. Every rule in
+the five property sections belongs to exactly one of them, and
+`/pr-selfcheck` evaluates them one at a time.
 
-### Principles
+- Decidable — a reviewer can decide approve or reject from the body
+  alone, reading top-down
+- Grounded — every claim is checkable on the evidence the body itself
+  carries
+- Necessary — the body carries nothing the PR already carries
+  elsewhere (the diff, its commits, the Checks panel, output an
+  automation posted on it), states each thing once, and takes from a
+  linked source no more than the summary that survives the link going
+  dead
+- Scoped — the diff carries only what the stated intent needs, and the
+  body accounts for all of it
+- Conformant — the body renders and behaves as intended on GitHub
 
-- Why over what — The diff already shows what changed. The body
-  explains why, and the shape of the decision (the approach taken
-  vs. approaches rejected, what was deliberately left out of scope,
-  risks or things a reviewer should watch out for). Do not paraphrase
-  the diff (file lists, "added X to Y", per-file summaries).
+## Decidable
+
+- State what changed and why (bug, feature, tech debt, compliance,
+  etc.). The body alone should convey the intent and let a reviewer
+  understand the purpose, what changed, and the impact.
+- Give the shape of the decision: the approach taken vs. the approaches
+  rejected, and risks or things a reviewer should watch out for.
   "Approaches rejected" covers design alternatives weighed for the
-  delivered design; the sequence of implementation attempts made
-  along the way stays out of the body.
-- Single source of truth (DRY) — If the rationale, background, or
-  requirements live elsewhere (issue, design doc, ADR, prior PR,
-  official spec), do not duplicate them. Replace with a one-line
-  summary plus a link. Two copies drift apart over time.
-  This also applies to information that CI or automation posts on
-  the PR (build status, terraform/CDK plan output, lint results,
-  type check results): do not restate those facts in the body —
-  let the bot comments and checks panel speak for themselves.
-- Inverted pyramid — Place the most important information first. A
-  reviewer reading only the first few lines should be able to tell
-  what kind of PR this is and where to focus.
-- Progressive disclosure — Surface only what a reviewer needs to
-  decide. Move implementation details, history, or full alternatives
-  narrative behind a link or to a "Notes" / "Background" section at
-  the end.
-- Diff scope discipline — The PR diff itself is a deliverable
-  Edits, reformats, renames, and "while I'm here" cleanups that fall
-  outside the PR's stated scope should not appear in the diff. Out-
-  of-scope hunks force the reviewer to separate "intent vs incidental"
-  and inflate review load. Adjacent incidental fixes (an obvious
-  typo) are tolerable in moderation, but the default is to leave them
-  for a separate PR. The body should convey the holistic intent of
-  the change — what the PR is trying to achieve across the whole
-  diff — and the diff should reflect only that intent.
-- Language follows the target repository, not the conversation —
-  honor any explicit rule in the repo's `CLAUDE.md` / `AGENTS.md`
-  first, otherwise match the existing PR / commit history. Don't let
-  the language of the chat with the user decide.
-
-### Style rules
-
-- Keep bullet points few and meaningful. Each bullet should convey a
-  distinct decision or outcome, not an individual code change.
-- Focus on what changes from the user's or system's perspective —
-  behavior changes, new capabilities, removed limitations, etc. —
-  rather than listing implementation details (resources added, files
-  touched).
+  delivered design.
+- Inverted pyramid — place the most important information first. A
+  reviewer reading only the first few lines should be able to tell what
+  kind of PR this is and where to focus.
+- Progressive disclosure — surface only what a reviewer needs to
+  decide. Move implementation details or full alternatives narrative
+  behind a link or to a "Notes" / "Background" section at the end.
+- Future work, out-of-scope follow-ups, and "next PR" notes belong at
+  the end of the body (e.g., in a "Follow-up" / "Notes" section). Do
+  not surface them in the opening sections (purpose, scope, summary),
+  where they compete with the approve/reject decision.
 - Tables must stand alone. Give each table a caption or a one-line
-  lead-in that tells the reader what it shows (e.g., "Alert firings
-  in the past 7 days"). A reader who skips the surrounding prose
-  should still understand what the table represents. Avoid placing
-  tables mid-sentence where their meaning depends on parsing the
-  prose around them.
-- Future work, out-of-scope follow-ups, and "next PR" notes belong
-  at the end of the body (e.g., in a "Follow-up" / "Notes" section).
-  Do not surface them in the opening sections (purpose, scope,
-  summary), where they compete with the approve/reject decision.
-- Inside GitHub PR / issue bodies and PR / issue comments only — that
-  is, Markdown posted through the GitHub web UI — do not hard-wrap
-  paragraphs or list items. Write each paragraph as a single line and
-  let the browser wrap it; use blank lines for paragraph breaks. GitHub
-  Flavored Markdown renders soft line breaks inside a paragraph as
-  visible breaks (or runs lines together awkwardly) only in these
-  contexts. Plain Markdown files (READMEs, ADRs, this guidelines file
+  lead-in that tells the reader what it shows (e.g., "Alert firings in
+  the past 7 days"). A reader who skips the surrounding prose should
+  still understand what the table represents. Avoid placing tables
+  mid-sentence where their meaning depends on parsing the prose around
+  them.
+
+## Grounded
+
+- Attempt every verification within reach before drafting the
+  Verification section: shell commands, API calls, file inspection,
+  mocked failure modes, simulated missing-config tests. Punting
+  reachable items to "Pending" or "User to verify" is itself the
+  violation — overstating what is "untestable" is the common failure
+  mode.
+- List only items actually verified, each carrying its evidence: a
+  command, output excerpt, exit code, or log line, counting any code
+  block or sub-bullet attached to it. When the item covers
+  documentation or prose and no command applies, name what it was
+  checked against (the source, the spec, the linked issue).
+- Items that genuinely require interactive UI, user-only credentials,
+  target environments unreachable from a shell, or the live session
+  itself must be clearly distinguished with reproduction steps and a
+  one-line reason why the author could not verify them.
+- A negative or absence claim ("no X remains", "該当なし") shows the
+  query it rests on and the scope it examined; template-mandated N/A
+  fields are outside this rule. The shown query covers the whole claim
+  — a regex anchored to line start or end, a single literal where the
+  claim covers a family of spellings, or a path filter narrower than
+  the claim does not.
+- Provide official documentation URLs or other authoritative sources
+  that justify configuration values, tool choices, or version
+  selections. Especially important for dotfiles / infrastructure
+  changes where "why this value" matters. A claim about the behavior of
+  a tool, service, or platform this diff does not modify carries a link
+  to or citation of a primary source (a man page section or `--help`
+  output counts).
+- A causal claim asserting a mechanism a reader cannot check from the
+  diff ("because X locks the table") carries evidence or a source.
+- A value presented as a measured or derived result shows or links its
+  derivation; identifiers and version strings are outside this rule.
+- Rationale attributed to a linked issue, PR, or document quotes the
+  one sentence it rests on, or links to the section carrying it.
+- All URLs and anchor links resolve to the expected content.
+- The title accurately reflects the change, and the body does not
+  contradict the diff.
+
+## Necessary
+
+- Do not paraphrase the diff. Keep out file lists, line counts,
+  percentage of lines removed, per-file summaries, enumerations of
+  added rules, linters, settings, constants, or values, self-paraphrase
+  of own edits ("edited file X", "bumped value from A to B", "added N
+  items", "raised timeout to M"), and per-item rendering of a pre-
+  flight checklist when every item is "N/A" (collapse it to one line).
+- Keep CI, lint, formatter, type-check, and build / test command
+  results (`go build`, `go test`, `go vet`, `pre-commit`) out of the
+  body, whether or not the repository's CI runs them. Output that CI or
+  another automation posts on the PR itself (build status, terraform /
+  CDK plan output, lint and type-check results) stays where it was
+  posted; the body does not restate it.
+- Focus on what changes from the user's or system's perspective —
+  behavior changes, new capabilities, removed limitations — rather than
+  on implementation details (resources added, files touched).
+- The body records the delivered design, not the path to it. Keep out
+  chronological narration of implementation attempts ("first tried X,
+  it failed, so Y"), records of direction changes made mid-
+  implementation, references to the session, to plan-mode phases, or to
+  individual commits within the branch, and rejected alternatives
+  described at implementation-attempt granularity.
+- State a fact once. The same environment variable name, file name,
+  design decision, or summary of a linked source does not appear in two
+  places in the body.
+- Keep bullet points few and meaningful. Each bullet conveys a distinct
+  decision or outcome, not an individual code change, and bullets in
+  the same list do not restate one another in different wording.
+- Rationale, background, or requirements that live elsewhere (issue,
+  design doc, ADR, prior PR, official spec) are summarized under a
+  link, not copied. A bare link is itself a defect: write the shortest
+  summary that survives the link going dead, and anything past that
+  point is duplication.
+- When the diff is self-explanatory — documentation or config edits
+  whose changed lines a reviewer can read directly, especially in the
+  team's own language — keep the body to what the diff cannot convey
+  (rationale, scope boundary). When nothing remains to add, one line
+  such as "realigned stale wording with the actual code/config" is a
+  complete description.
+- A section heading grants no exemption. "diff から読み取れない設計判断",
+  "補足", or "詳細" does not excuse its contents from this property —
+  each paragraph under it still has to be needed for the decision.
+- A body that is long because every part of it is needed is correct as
+  it is, and length itself is never a finding.
+
+## Scoped
+
+- Describe the boundary of the change and call out anything
+  intentionally left out of scope.
+- The PR diff itself is a deliverable. Edits, reformats, renames, and
+  "while I'm here" cleanups that fall outside the PR's stated scope
+  should not appear in the diff. Out-of-scope hunks force the reviewer
+  to separate "intent vs incidental" and inflate review load. Adjacent
+  incidental fixes (an obvious typo) are tolerable in moderation, but
+  the default is to leave them for a separate PR.
+- The body conveys the holistic intent of the change — what the PR is
+  trying to achieve across the whole diff — accounts for every file and
+  change in it, and leaves no unexplained hunks.
+- The body names a verification mechanism — CI, manual test steps, or
+  another check — for the code paths the diff changes. The test is
+  whether the body makes that claim; judging how adequate the coverage
+  is belongs to code review.
+- Keep the PR self-contained. Verification items, acceptance criteria,
+  and follow-up actions that depend on changes outside this PR's diff
+  (other repos, downstream releases, E2E flows) belong in the parent
+  issue.
+- A description that keeps growing is a prompt to ask whether the diff
+  should be split into finer-grained PRs.
+
+## Conformant
+
+- The title is a one-line summary in the team's review language. Any
+  content that doesn't fit on one line — including issue references
+  (`#123`, `org/repo#123`) — belongs in the body, not the title.
+- Language follows the target repository, not the conversation — honor
+  any explicit rule in the repo's `CLAUDE.md` / `AGENTS.md` first,
+  otherwise match the existing PR / commit history. Don't let the
+  language of the chat with the user decide.
+- Do NOT use auto-close keywords (`Closes`, `Fixes`, `Resolves`).
+- Checkbox syntax (`- [ ]` / `- [x]`) is reserved for verification
+  items: `- [x]` for one the author verified, `- [ ]` for one the user
+  is expected to verify or act on later so it can be ticked off, and
+  `- [ ]` carrying a one-line reason for an author-owed item that
+  Grounded exempts as unverifiable by the author. Prose statements do
+  not take a checkbox.
+- Inside GitHub issues, pull requests, and discussions — bodies and
+  comments alike, that is Markdown posted through the GitHub web UI —
+  do not hard-wrap paragraphs or list items. Write each paragraph as a
+  single line and let the browser wrap it; use blank lines for
+  paragraph breaks. GitHub Flavored Markdown renders soft line breaks
+  inside a paragraph as visible breaks only in these contexts
+  ([basic writing and formatting syntax](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax)).
+  Plain Markdown files (READMEs, ADRs, this guidelines file
   itself, and any other in-repo documentation) follow standard Markdown
   rendering and may be hard-wrapped for file-side readability.
-
-## PR Body Checklist
-
-Used both when authoring a PR body and when self-reviewing it (via
-`/pr-selfcheck`). Cover every applicable item — each rule is stated
-once and applies to both perspectives.
-
-1. Purpose, scope, intent
-   - State what changed and why (bug, feature, tech debt, compliance,
-     etc.). The body alone should convey the intent and let a reviewer
-     understand the purpose, what changed, and the impact.
-   - Describe the boundary of the change and call out anything
-     intentionally left out of scope.
-   - Keep the PR self-contained. Verification items, acceptance
-     criteria, and follow-up actions that depend on changes outside
-     this PR's diff (other repos, downstream releases, E2E flows)
-     belong in the parent issue, not in the PR body.
-
-1. Sources and references
-   - Provide official documentation URLs or other authoritative
-     sources that justify configuration values, tool choices, or
-     version selections. Especially important for dotfiles /
-     infrastructure changes where "why this value" matters.
-   - All URLs and anchor links must resolve to the expected content
-
-1. Issue linking
-   - Do NOT use auto-close keywords (`Closes`, `Fixes`, `Resolves`)
-
-1. Verification
-   - Attempt every verification within reach before drafting this
-     section: shell commands, API calls, file inspection, mocked
-     failure modes, simulated missing-config tests. Punting reachable
-     items to "Pending" or "User to verify" is itself the violation —
-     overstating what is "untestable" is the common failure mode.
-   - List only items actually verified, with evidence (command
-     output, exit code, log excerpt). Never record what the diff or
-     GitHub UI already shows: line counts, `wc -l` of a file you
-     edited, the list of changed files, percentage removed,
-     paraphrase of own edits, or CI / lint / type-check results
-     (those live in the Checks panel and bot comments).
-   - Items that genuinely require interactive UI, user-only
-     credentials, target environments unreachable from a shell, or
-     the live session itself must be clearly distinguished with
-     reproduction steps and a one-line reason why the author could
-     not verify them.
-   - Use `- [ ] …` markdown checkboxes for items the user is
-     expected to verify or act on later, so they can be ticked off
-     after completion.
-   - Every changed code path is covered by CI, manual test steps in
-     the PR body, or another verification mechanism. All verification
-     items are scoped to this PR's diff alone; cross-component or E2E
-     items belong in the parent issue.
-
-1. Conciseness (Essence-first)
-   - The principles above (Why over what, DRY, Inverted pyramid,
-     Progressive disclosure, Diff scope discipline) apply directly
-     here — they are not restated as separate review questions.
-     A sentence that paraphrases the diff, duplicates a linked
-     source, or buries the lead is a violation regardless of which
-     principle names it.
-   - Never include in the body:
-     - Enumerations of added rules, linters, settings, constants,
-       or values (visible in the diff)
-     - CI job pass/fail, lint results, type-check results
-     - Self-paraphrase of own edits ("edited file X", "bumped value
-       from A to B", "added N items", "raised timeout to M")
-     - File lists, line counts, percentage of lines removed
-     - Per-item rendering of a pre-flight checklist when every item
-       is "N/A" — collapse to one line
-   - Bullets are few and meaningful, each conveying a distinct point
-   - When the diff is self-explanatory — documentation or config
-     edits whose changed lines a reviewer can read directly,
-     especially in the team's own language — keep the body to what
-     the diff cannot convey (rationale, scope boundary). When
-     nothing remains to add, one line such as "realigned stale
-     wording with the actual code/config" is a complete description.
-   - Length budget: the main description section (実装内容 or
-     equivalent) stays within roughly 10 lines — one background
-     paragraph plus change bullets. When the whole body excluding
-     template-mandated sections exceeds ~30 lines, treat it as a
-     Progressive disclosure violation: compress mechanism deep-dives,
-     history, and repeated explanations into a link or delete them.
-     `/pr-selfcheck` reports budget overruns as Should Fix.
-
-1. Title / body / diff consistency
-   - The title accurately reflects the change
-   - The body does not contradict the diff
-   - The body accounts for all files and changes in the diff; there
-     are no unexplained hunks.
 
 ## PR Body Template (fallback)
 
 Use this scaffold when the target repository has no `pull_request_template.md`.
 Repository templates always win — do not overlay this on top of one.
 Section names stay English; body language follows the repo (see
-"Language follows the target repository" above). Purpose / Key
-changes / Verification is the minimum. Sources / References /
-Issue-linking (checklist items 2-3) are inlined only when applicable.
+Conformant above). Purpose / Key changes / Verification is the minimum.
+Sources and issue links are inlined only when applicable.
 
 ```
 ## Purpose
