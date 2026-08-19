@@ -11,8 +11,9 @@ need why the change was made and the shape of the decision behind it;
 neither needs what the diff already shows.
 
 A body is ready when it holds all five properties below. Every rule in
-the five property sections belongs to exactly one of them, and
-`/pr-selfcheck` evaluates them one at a time.
+the five property sections belongs to exactly one of them, and within a
+section the top-level line is the rule while the lines beneath it
+qualify it. `/pr-selfcheck` evaluates the properties one at a time.
 
 - Decidable — a reviewer can decide approve or reject from the body
   alone, reading top-down
@@ -43,14 +44,14 @@ the five property sections belongs to exactly one of them, and
 - Progressive disclosure — surface only what a reviewer needs to decide
   - Implementation details and full alternatives narrative move behind
     a link or to a "Notes" / "Background" section at the end
-- The top level of a section carries the change or claim itself, so the
-  section reads from its top-level lines alone
-  - Rationale, evidence, superseded behavior, and mechanical
-    consequences nest beneath the item they support
-- A heading that claims selection ("Key changes", "要点") carrying more
-  peers than a reader can hold is a prompt to group them rather than to
-  keep listing
-  - The PR Body Template's 3-5 bullets is the target
+- In a bulleted section, the top level carries the change or claim
+  itself, so the section reads from its top-level lines alone
+  - Supporting material — rationale, evidence, the behavior this change
+    replaces, mechanical consequences, and the like — does not displace
+    it from the top level
+- When one top-level item in a section supports, qualifies, or follows
+  from another, it belongs beneath that one rather than beside it
+  - A long flat list is usually a hierarchy that was never encoded
 - Future work, out-of-scope follow-ups, and "next PR" notes belong at
   the end of the body (e.g., in a "Follow-up" / "Notes" section)
   - Do not surface them in the opening sections (purpose, scope,
@@ -139,9 +140,8 @@ the five property sections belongs to exactly one of them, and
   - The same environment variable name, file name, design decision, or
     summary of a linked source does not appear in two places in the
     body
-- Keep bullet points few and meaningful
-  - Each bullet conveys a distinct decision or outcome, not an
-    individual code change
+- Each bullet conveys a distinct decision or outcome, not an individual
+  code change
   - Bullets in the same list do not restate one another in different
     wording
 - Rationale, background, or requirements that live elsewhere (issue,
