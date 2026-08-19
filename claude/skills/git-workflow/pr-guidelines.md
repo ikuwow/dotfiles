@@ -69,8 +69,8 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
 - Attempt every verification within reach before drafting the
   Verification section: shell commands, API calls, file inspection,
   mocked failure modes, simulated missing-config tests
-  - Punting reachable items to "Pending" or "User to verify" is itself
-    the violation
+  - Punting a reachable item to "Pending" or "User to verify" violates
+    this rule
   - Overstating what is "untestable" is the common failure mode
 - List only items actually verified, each carrying its evidence: a
   command, output excerpt, exit code, or log line
@@ -117,7 +117,7 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   - Keep out self-paraphrase of own edits ("edited file X", "bumped
     value from A to B", "added N items", "raised timeout to M")
   - Keep out per-item rendering of a pre-flight checklist when every
-    item is "N/A", collapsing it to one line
+    item is "N/A" — collapse it to one line
 - Keep CI, lint, formatter, type-check, and build / test command
   results (`go build`, `go test`, `go vet`, `pre-commit`) out of the
   body
@@ -149,7 +149,7 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   link, not copied
   - A bare link is itself a defect: write the shortest summary that
     survives the link going dead
-  - Anything past that point is duplication
+  - Anything past that shortest summary is duplication
 - When the diff is self-explanatory — documentation or config edits
   whose changed lines a reviewer can read directly, especially in the
   team's own language — keep the body to what the diff cannot convey
@@ -167,11 +167,11 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
 
 - Describe the boundary of the change and call out anything
   intentionally left out of scope
-- The PR diff itself is a deliverable
-  - Edits, reformats, renames, and "while I'm here" cleanups that fall
-    outside the PR's stated scope should not appear in the diff
-  - Out-of-scope hunks force the reviewer to separate "intent vs
-    incidental" and inflate review load
+- Edits, reformats, renames, and "while I'm here" cleanups that fall
+  outside the PR's stated scope should not appear in the diff
+  - The PR diff itself is a deliverable, and out-of-scope hunks force
+    the reviewer to separate "intent vs incidental" and inflate review
+    load
   - Adjacent incidental fixes (an obvious typo) are tolerable in
     moderation, but the default is to leave them for a separate PR
 - The body conveys the holistic intent of the change — what the PR is
@@ -181,10 +181,10 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   another check — for the code paths the diff changes
   - The test is whether the body makes that claim
   - Judging how adequate the coverage is belongs to code review
-- Keep the PR self-contained
-  - Verification items, acceptance criteria, and follow-up actions that
-    depend on changes outside this PR's diff (other repos, downstream
-    releases, E2E flows) belong in the parent issue
+- Keep the PR self-contained: verification items, acceptance criteria,
+  and follow-up actions that depend on changes outside this PR's diff
+  (other repos, downstream releases, E2E flows) belong in the parent
+  issue
 - A description that keeps growing is a prompt to ask whether the diff
   should be split into finer-grained PRs
 
@@ -194,10 +194,10 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   - Any content that doesn't fit on one line — including issue
     references (`#123`, `org/repo#123`) — belongs in the body, not the
     title
-- Language follows the target repository, not the conversation
+- Language follows the target repository, not the language of the chat
+  with the user
   - Honor any explicit rule in the repo's `CLAUDE.md` / `AGENTS.md`
     first, otherwise match the existing PR / commit history
-  - Don't let the language of the chat with the user decide
 - Do NOT use auto-close keywords (`Closes`, `Fixes`, `Resolves`)
 - Checkbox syntax (`- [ ]` / `- [x]`) is reserved for verification
   items
