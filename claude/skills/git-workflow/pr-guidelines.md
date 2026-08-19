@@ -42,6 +42,13 @@ the five property sections belongs to exactly one of them, and
 - Progressive disclosure — surface only what a reviewer needs to
   decide. Move implementation details or full alternatives narrative
   behind a link or to a "Notes" / "Background" section at the end.
+- The top level of a section carries the change or claim itself, so the
+  section reads from its top-level lines alone. Rationale, evidence,
+  superseded behavior, and mechanical consequences nest beneath the item
+  they support.
+- A heading that claims selection ("Key changes", "要点") carrying more
+  peers than a reader can hold is a prompt to group them rather than to
+  keep listing. The PR Body Template's 3-5 bullets is the target.
 - Future work, out-of-scope follow-ups, and "next PR" notes belong at
   the end of the body (e.g., in a "Follow-up" / "Notes" section). Do
   not surface them in the opening sections (purpose, scope, summary),
