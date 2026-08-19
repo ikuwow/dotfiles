@@ -25,8 +25,8 @@ Perform a self-review of the specified PR to catch issues before a human reviewe
    numbers or unrelated new hits are not a contradiction. Do not create
    local branches and do not run `git branch -D`/`-d` (branch deletion
    blocks on a permission prompt)
-1. Read `~/.claude/skills/git-workflow/pr-guidelines.md` to load the
-   five properties the PR body is judged against
+1. Locate and read `pr-guidelines.md`, bundled with the `git-workflow`
+   skill, to load the five properties the PR body is judged against
 1. For each URL found in the PR body, fetch it with WebFetch. A host
    that does not answer (network error, timeout, 403) makes the URL
    unverifiable; a 404 from a host that answered, or content that

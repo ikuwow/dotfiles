@@ -3,21 +3,28 @@
 Quality criteria for pull requests. Follow these when writing a PR body
 and when self-reviewing your own PR.
 
-A PR body serves two audiences: the reviewer deciding now, and the
-future reader who reaches this PR from `git log` or blame. Both need
-why the change was made and the shape of the decision behind it;
+A PR body is a summary that helps a reviewer decide, not a complete
+record of the change: everything else lives in the diff, the issue, or
+a linked source. It serves two audiences — the reviewer deciding now,
+and the future reader who reaches this PR from `git log` or blame. Both
+need why the change was made and the shape of the decision behind it;
 neither needs what the diff already shows.
 
-Every rule below belongs to exactly one of five properties — Decidable,
-Grounded, Necessary, Scoped, Conformant. A body is ready when it holds
-all five, and `/pr-selfcheck` evaluates them one at a time.
+A body is ready when it holds all five properties below. Every rule in
+this file belongs to exactly one of them, and `/pr-selfcheck` evaluates
+them one at a time.
+
+- Decidable — a reviewer can decide approve or reject from the body
+  alone, reading top-down
+- Grounded — every claim is checkable on the evidence the body itself
+  carries
+- Necessary — the body carries nothing the diff, the Checks panel, or a
+  linked source already carries
+- Scoped — the diff carries only what the stated intent needs, and the
+  body accounts for all of it
+- Conformant — the body renders and behaves as intended on GitHub
 
 ## Decidable
-
-A reviewer can decide approve or reject from the body alone, reading
-top-down. The body is a summary that helps them decide, not a complete
-record of the change: everything else lives in the diff, the issue, or
-a linked source.
 
 - State what changed and why (bug, feature, tech debt, compliance,
   etc.). The body alone should convey the intent and let a reviewer
@@ -45,8 +52,6 @@ a linked source.
   them.
 
 ## Grounded
-
-Every claim is checkable, on the evidence the body itself carries.
 
 - Attempt every verification within reach before drafting the
   Verification section: shell commands, API calls, file inspection,
@@ -87,9 +92,6 @@ Every claim is checkable, on the evidence the body itself carries.
   contradict the diff.
 
 ## Necessary
-
-The body carries nothing the diff, the Checks panel, or a linked source
-already carries.
 
 - Do not paraphrase the diff. Keep out file lists, line counts,
   percentage of lines removed, per-file summaries, enumerations of
@@ -137,9 +139,6 @@ already carries.
 
 ## Scoped
 
-The diff carries only what the stated intent needs, and the body
-accounts for all of it.
-
 - Describe the boundary of the change and call out anything
   intentionally left out of scope.
 - The PR diff itself is a deliverable. Edits, reformats, renames, and
@@ -161,8 +160,6 @@ accounts for all of it.
   should be split into finer-grained PRs.
 
 ## Conformant
-
-The body renders and behaves as intended on GitHub.
 
 - The title is a one-line summary in the team's review language. Any
   content that doesn't fit on one line — including issue references
