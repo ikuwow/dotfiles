@@ -73,8 +73,8 @@ the five property sections belongs to exactly one of them, and
   - Overstating what is "untestable" is the common failure mode
 - List only items actually verified, each carrying its evidence: a
   command, output excerpt, exit code, or log line
-  - Evidence counts when it sits in a code block or sub-bullet attached
-    to the item
+  - A code block or sub-bullet attached to the item counts as evidence
+    the item carries
   - When the item covers documentation or prose and no command applies,
     name what it was checked against (the source, the spec, the linked
     issue)
@@ -93,9 +93,9 @@ the five property sections belongs to exactly one of them, and
   selections
   - Especially important for dotfiles / infrastructure changes where
     "why this value" matters
-  - A claim about the behavior of a tool, service, or platform this
-    diff does not modify carries a link to or citation of a primary
-    source (a man page section or `--help` output counts)
+- A claim about the behavior of a tool, service, or platform this diff
+  does not modify carries a link to or citation of a primary source (a
+  man page section or `--help` output counts)
 - A causal claim asserting a mechanism a reader cannot check from the
   diff ("because X locks the table") carries evidence or a source
 - A value presented as a measured or derived result shows or links its
