@@ -20,17 +20,26 @@ Perform a self-review of the specified PR to catch issues before a human reviewe
 1. When verifying a body claim needs file contents at the PR head,
    run `git fetch origin pull/<number>/head` once and read via
    `git show FETCH_HEAD:<path>`. When a body claim asserts repository
-   state at the PR head and shows the query it rests on, re-run it as
-   `git grep <pattern> FETCH_HEAD`; incidental differences such as line
-   numbers or unrelated new hits are not a contradiction. Do not create
-   local branches and do not run `git branch -D`/`-d` (branch deletion
-   blocks on a permission prompt)
+   state at the PR head and shows the query it rests on, re-run that
+   query with `FETCH_HEAD` as its tree-ish argument
+   (`git grep <pattern> FETCH_HEAD`). A result that contradicts the
+   claim is Must Fix; incidental differences such as line numbers or
+   unrelated new hits are not a contradiction. A query that takes no
+   tree-ish argument cannot be re-run at the PR head, and the claim
+   resting on it is unverifiable. Do not create local branches and do
+   not run `git branch -D`/`-d` (branch deletion blocks on a permission
+   prompt)
 1. Locate and read `pr-guidelines.md`, bundled with the `git-workflow`
    skill, to load the five properties the PR body is judged against
-1. For each URL found in the PR body, fetch it with WebFetch. A host
-   that does not answer (network error, timeout, 403) makes the URL
-   unverifiable; a 404 from a host that answered, or content that
-   contradicts what the body cites the URL for, is Must Fix
+1. For each URL found in the PR body, fetch it with WebFetch and
+   compare what comes back against what the body cites the URL for. A
+   fetch that returns no comparable content makes the URL unverifiable
+   — a network error, a timeout, a permission denial, any auth-gated
+   response (WebFetch is unauthenticated, so a correct link to a
+   private repository, issue, or dashboard answers with 404, 403, 401,
+   or a login page), a 429 or 5xx, and a domain `WebFetch` is denied
+   all land here. Must Fix only when fetched content contradicts the
+   citation
 1. Walk the five properties one at a time, in the order
    `pr-guidelines.md` states them, judging the PR against that
    property's rules and the severity table below
@@ -39,18 +48,22 @@ Perform a self-review of the specified PR to catch issues before a human reviewe
 
 ## Severity
 
-| Verdict | Condition |
+| Severity | Condition |
 | --- | --- |
-| Must Fix | An objective presence or absence test on the body, or a contradiction confirmed against a checked source (the diff, `FETCH_HEAD`, a fetched URL) |
-| Should Fix | A judgment of degree: redundancy, ordering, bullet granularity |
-| Nice to Have | Wording or formatting with no effect on the decision |
-| Escalation | Two or more Should Fix within one property escalates that property to Must Fix |
-| Unverifiable | An unreachable URL, or a query with no tree-ish form. Reported as unverifiable, never Must Fix |
+| Must Fix | The body or the diff misleads: it states something false or unsupported, or omits what the diff does |
+| Should Fix | The body or the diff is accurate but harder to use than it needs to be |
+| Nice to Have | Cosmetic, affecting neither |
+| Unverifiable | A check that produced nothing comparable against the claim (the `FETCH_HEAD` and URL steps above). Reported as unverifiable, never Must Fix |
+
+Two or more Should Fix findings within one property escalate that
+property: emit one Must Fix line naming the property, and keep the
+individual findings listed under Should Fix.
 
 ## Hard-wrap detection (GitHub-posted markdown)
 
 Conformant forbids hard-wrapping in GitHub-posted markdown. Apply this
-parser rather than judging line breaks by eye.
+parser rather than judging line breaks by eye. Each violation it finds
+is a Should Fix.
 
 A "block marker" below means a line starting with any of: `#`, `-`,
 `*`, `+`, a digit followed by `.` (e.g. `1.`), `>`, `|`, four spaces
@@ -96,7 +109,9 @@ Excluded from detection to avoid false positives:
 PASS | NEEDS_IMPROVEMENT
 ```
 
-If there are no items for a severity level, write "None."
+Write "None." under any of the four finding headings that has no
+items, Unverifiable included. The verdict is NEEDS_IMPROVEMENT when any
+Must Fix or Should Fix item is present, PASS otherwise.
 
 ## Important Notes
 
