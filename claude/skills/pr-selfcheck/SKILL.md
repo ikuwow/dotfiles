@@ -72,7 +72,7 @@ of indent, or a fenced code marker (``` or ~~~).
 Violations:
 
 - Two or more consecutive non-empty lines with no blank line between them, where neither line begins with a block marker (this catches paragraph-internal soft breaks while leaving tight lists, headings, and other block constructs alone)
-- An indented continuation line directly following a list-item line (`- `, `* `, `+ `, or `N. `) with no blank line between them; a blank-line gap before the indent denotes a valid continuation paragraph and is not a violation
+- An indented continuation line directly following a list-item line (`- `, `* `, `+ `, or `N. `) with no blank line between them, where that indented line does not itself begin with a list marker — an indented list marker opens a nested list item, which is a block construct rather than a wrapped continuation of the prose above; a blank-line gap before the indent denotes a valid continuation paragraph and is not a violation
 
 Excluded from detection to avoid false positives:
 
