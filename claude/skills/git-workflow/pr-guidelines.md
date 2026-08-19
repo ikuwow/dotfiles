@@ -18,9 +18,11 @@ the five property sections belongs to exactly one of them, and
   alone, reading top-down
 - Grounded — every claim is checkable on the evidence the body itself
   carries
-- Necessary — the body carries nothing the diff or the Checks panel
-  already carries, states each thing once, and takes from a linked
-  source no more than the summary that survives the link going dead
+- Necessary — the body carries nothing the PR already carries
+  elsewhere (the diff, its commits, the Checks panel, output an
+  automation posted on it), states each thing once, and takes from a
+  linked source no more than the summary that survives the link going
+  dead
 - Scoped — the diff carries only what the stated intent needs, and the
   body accounts for all of it
 - Conformant — the body renders and behaves as intended on GitHub
