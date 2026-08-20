@@ -68,6 +68,15 @@ subagents (same reference). Every tool the check uses — `Bash`, `Read`,
 `Grep`, `Glob`, `WebFetch` — is in that narrower set, so the check's tool pool
 is the same either way.
 
+Round 2's fixture carries one difference from the input it reconstructs. The
+recovered body cites `main` as the base its verification queries ran against,
+which named the merge base on 2026-08-20 and names a later commit now. Runs
+that re-run those queries against today's `main` see a divergence that did not
+exist when the body was written, and two of six reported it. The defect the
+round measures -- a rule the diff adds and the body never names -- is decided
+against the diff and the body alone, so it is unaffected; the round's other
+findings are not all free of this.
+
 Two conditions are local to the machine that ran the round.
 
 The evidence route that separated the one #369 run reporting the unaccounted
@@ -90,8 +99,15 @@ python3 judge.py     # groups findings into defects -> round1/clusters.json
 python3 analyze.py   # the three tables
 ```
 
+`PRSC_ROUND` selects the round; it defaults to `round1`.
+
 `run.py` skips runs already in `runs.jsonl`, so a round interrupted by a rate
-limit or a killed process restarts with the same command.
+limit or a killed process restarts with the same command. A run that exited
+non-zero is recorded as failed and taken again on the next start.
+
+Round 2 stopped at six runs rather than ten, on elapsed time. The decision was
+taken before any of its reports had been read, so the stopping rule is
+independent of what the runs found.
 
 Both transcripts are copied out of `~/.claude/projects` into `round1/runs/`
 as each run completes, because Claude Code prunes that directory and the

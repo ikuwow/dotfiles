@@ -1,0 +1,350 @@
+{
+  "items": [
+    {
+      "id": 0,
+      "run": 1,
+      "severity": "Note",
+      "property": "Scoped",
+      "text": "The title (\"Rule the altitude of information inside a PR body section\") names only the nesting/altitude change. The diff also collapses the severity taxonomy from three tiers to two and removes the escalation rule — a materially separate policy change. The body explains and justifies this (Key changes bullet 3, \"three tiers stood behind two behaviours...\"), so it is not an unexplained hunk, but a reviewer skimming the title alone would not anticipate a severity-scheme change."
+    },
+    {
+      "id": 1,
+      "run": 1,
+      "severity": "Note",
+      "property": "Grounded",
+      "text": "Checklist items 1 and 2 name `git show main:...` as their query. `main`'s tip has moved past this PR's merge base (`b9256e4`) and, for `pr-guidelines.md`, now happens to be byte-identical to this PR's head (a separate, differently-authored PR with the same title already landed on `main`). Re-running the literal query against today's `main` is degenerate — it can't discriminate \"untouched\" from \"identical for an unrelated reason.\" Re-running the same checks against the merge base instead independently confirms the substance: 45 top-level / 0 nested bullets in `pr-guidelines.md` at the merge base (the largest flat list among the 17 files, matching the count in `git ls-tree -r --name-only <merge-base> -- claude/rules claude/skills`), 37 rule bullets inside the five property sections, and the two \"restored\" `Grounded` rules preserve their pre-reformat requirement."
+    },
+    {
+      "id": 2,
+      "run": 1,
+      "severity": "Unverifiable",
+      "property": "Grounded",
+      "text": "The clause-by-clause mapping backing \"every clause landing at exactly one destination and none dropped or duplicated\" lives at `ikuwowfiles/pr-guidelines-reformat-check.md`, which is gitignored and not present in the fetched PR head — the aggregate counts check out (see Note above), but the full 1:1 mapping itself cannot be inspected from a clone."
+    },
+    {
+      "id": 3,
+      "run": 2,
+      "severity": "Fix",
+      "property": "Scoped",
+      "text": "The diff adds a wholly new rule under `Necessary` — \"Name a change in a line and leave its detail to the diff, which the reviewer can open; spelling out what an added rule, definition, or table row says is detail, whether quoted, summarized, or given with its consequence\" — that has no precedent in the base version of `pr-guidelines.md` (confirmed against `git show b9256e45:claude/skills/git-workflow/pr-guidelines.md`, which has no equivalent clause anywhere in `Necessary`). The Purpose and Key Changes sections describe the `pr-guidelines.md` edit only as a structural reformat (\"converting its rule bullets to a one-sentence top line … and lifting onto that line the requirements that sat behind a thesis sentence\") plus five explicitly named rule changes (two new `Decidable` rules, the `Fix`/`Note` severity collapse, three bounded rules, the hard-wrap parser fix). None of the five named items covers this new constraint, so a reviewer relying on Key Changes would reach this hunk unwarned."
+    },
+    {
+      "id": 4,
+      "run": 2,
+      "severity": "Note",
+      "property": "Scoped",
+      "text": "The one-line change to `claude/skills/git-workflow/SKILL.md` (`\"Must Fix\" / \"Should Fix\"` → `\"Fix\" items, and the \"Note\" items worth acting on`) is a mechanical consequence of the severity rename described in Key Changes bullet 3, but it is not itself named, and the base `Scoped` rule in effect for this PR (\"leaves no unexplained hunks\") has no mechanical-consequence exemption — that exemption is one of the changes this very PR is introducing."
+    },
+    {
+      "id": 5,
+      "run": 2,
+      "severity": "Note",
+      "property": "Scoped",
+      "text": "Purpose frames the PR's intent narrowly around the `Decidable` altitude/hierarchy problem; the severity-tier collapse (`Fix`/`Note`) and the bounding of three unrelated rules (`Approaches rejected`, `Scoped` hunks, `Grounded` derivation) are explained individually in Key Changes but are not foreshadowed by Purpose, which states only the altitude problem as the reason for the change."
+    },
+    {
+      "id": 6,
+      "run": 2,
+      "severity": "Note",
+      "property": "Grounded",
+      "text": "The Verification section's derivation queries cite `main` as the tree-ish (`git ls-tree -r --name-only main …`, `git show main:…`) while the prose claims the counts hold \"at the merge base.\" I independently reproduced the counts against the actual merge-base commit (`b9256e45`) and got matching results (pr-guidelines.md: 45 top-level bullets, 0 nested, the largest flat list among the 17 files; 37 rule bullets in the five property sections), so the claim is correct as authored — but a query keyed to `main` will silently diverge from \"the merge base\" once `main` moves past that commit, which is exactly what has since happened in this repository."
+    },
+    {
+      "id": 7,
+      "run": 2,
+      "severity": "Unverifiable",
+      "property": "Grounded",
+      "text": "`ikuwowfiles/pr-guidelines-reformat-check.md`, cited as the record backing the exhaustive clause-mapping claim, is gitignored and not part of the PR diff. It exists on this machine and its structure and row count (103 table rows) are consistent with the claim, but a full clause-by-clause audit against the claim (\"every clause landing at exactly one destination and none dropped or duplicated\") is not something a reviewer working from a clone can check."
+    },
+    {
+      "id": 8,
+      "run": 3,
+      "severity": "Fix",
+      "property": "Scoped",
+      "text": "`claude/skills/git-workflow/pr-guidelines.md`'s `Necessary` section gains a bullet not accounted for anywhere in the body: \"Name a change in a line and leave its detail to the diff, which the reviewer can open; spelling out what an added rule, definition, or table row says is detail, whether quoted, summarized, or given with its consequence.\" This is new normative text (no counterpart in `git show b9256e4:claude/skills/git-workflow/pr-guidelines.md`, the base the body cites as `main`) — it adds \"table row\" as a new banned-paraphrase category and closes a loophole (\"given with its consequence\") that base text never addressed. The body's Key changes section enumerates exactly five new-rule additions (Decidable's two, plus the \"three rules that licensed unbounded prose are bounded\"), and this sixth addition is absent from that list and from the \"Where a reformat can change a rule\" section, even though the Verification checkbox on the clause mapping explicitly flags that \"rules this branch adds are new text ... outside what the mapping checks\" without naming this one."
+    },
+    {
+      "id": 9,
+      "run": 3,
+      "severity": "Unverifiable",
+      "property": "Grounded",
+      "text": "\"Clause mapping ... covering the 37 rule bullets the reformat carried over\" — the record backing this count lives at `ikuwowfiles/pr-guidelines-reformat-check.md`, which is gitignored and confirmed absent from the PR diff/tree, so the exact count can't be reproduced from a clone. The author's own footnote acknowledges this (\"checkable on the authoring machine but not from a clone\")."
+    },
+    {
+      "id": 10,
+      "run": 4,
+      "severity": "Unverifiable",
+      "property": "Grounded",
+      "text": "\"Clause mapping built against `git show main:...pr-guidelines.md`, covering the 37 rule bullets the reformat carried over\" (verification item 1) rests on `ikuwowfiles/pr-guidelines-reformat-check.md`, which the body itself says is gitignored — not reachable from the diff or a clone. The countable sub-claims it supports (37 rule bullets in the five property sections, one-clause-per-destination) were independently re-derived and matched; the full clause-by-clause table itself could not be reproduced."
+    },
+    {
+      "id": 11,
+      "run": 5,
+      "severity": "Note",
+      "property": "Grounded",
+      "text": "The Verification item \"Clause mapping built against `git show main:...`, covering the 37 rule bullets the reformat carried over\" names a method but shows no command/output inline in the body; the diff-based method described applies to a command, yet the check relies on prose plus a reference to a local gitignored record (`ikuwowfiles/pr-guidelines-reformat-check.md`) rather than inline evidence. Spot-checking that file against `git show 3fdcae5:claude/skills/git-workflow/pr-guidelines.md` and against `origin/main` (byte-identical) confirms the underlying claim holds; flagged as a Note because the body's own evidence trail is thinner than the rule's default (command/output) even though the claim itself checks out."
+    },
+    {
+      "id": 12,
+      "run": 6,
+      "severity": "Note",
+      "property": "Grounded",
+      "text": "Verification checklist items 1, 2, and 5 name the comparison method (`git show main:...`, \"reading each section... filtered\") but don't inline the command output the way item 3 does (`diff ... both exit 0`). This is permitted by Grounded's documentation-comparison carve-out, and I independently re-verified the underlying claims against the merge-base commit (see below) and found them accurate, so this is a style observation, not a credibility concern."
+    },
+    {
+      "id": 13,
+      "run": 6,
+      "severity": "Unverifiable",
+      "property": "Grounded",
+      "text": "The clause-mapping record at `ikuwowfiles/pr-guidelines-reformat-check.md` is gitignored, so its contents can't be checked from a clone (the body says so itself)."
+    }
+  ],
+  "passes": [
+    {
+      "groups": [
+        {
+          "label": "top-level framing (title/Purpose) omits the severity-tier collapse, though Key Changes explains it",
+          "ids": [
+            0,
+            5
+          ],
+          "unaccounted_hunk": false
+        },
+        {
+          "label": "verification queries cite `main`, which has diverged from the merge base",
+          "ids": [
+            1,
+            6
+          ],
+          "unaccounted_hunk": false
+        },
+        {
+          "label": "clause-mapping record backing the reformat claim is gitignored and unverifiable from a clone",
+          "ids": [
+            2,
+            7,
+            9,
+            10,
+            13
+          ],
+          "unaccounted_hunk": false
+        },
+        {
+          "label": "new `Necessary` rule bullet added to pr-guidelines.md is unaccounted for in the body",
+          "ids": [
+            3,
+            8
+          ],
+          "unaccounted_hunk": true
+        },
+        {
+          "label": "SKILL.md severity-label hunk is never itself named in the body",
+          "ids": [
+            4
+          ],
+          "unaccounted_hunk": true
+        },
+        {
+          "label": "verification items state their method without inline command/output evidence",
+          "ids": [
+            11,
+            12
+          ],
+          "unaccounted_hunk": false
+        }
+      ]
+    },
+    {
+      "groups": [
+        {
+          "label": "PR's title/Purpose framing doesn't foreshadow the severity-tier collapse",
+          "ids": [
+            0,
+            5
+          ],
+          "unaccounted_hunk": false
+        },
+        {
+          "label": "verification queries pinned to moving `main` rather than the merge base",
+          "ids": [
+            1,
+            6
+          ],
+          "unaccounted_hunk": false
+        },
+        {
+          "label": "clause-mapping record backing the exhaustiveness claim is gitignored and unverifiable from a clone",
+          "ids": [
+            2,
+            7,
+            9,
+            10,
+            13
+          ],
+          "unaccounted_hunk": false
+        },
+        {
+          "label": "new `Necessary` bullet in pr-guidelines.md unaccounted for in the PR body",
+          "ids": [
+            3,
+            8
+          ],
+          "unaccounted_hunk": true
+        },
+        {
+          "label": "SKILL.md severity-label change unaccounted for in the PR body",
+          "ids": [
+            4
+          ],
+          "unaccounted_hunk": true
+        },
+        {
+          "label": "Verification items name a method without inlining command/output",
+          "ids": [
+            11,
+            12
+          ],
+          "unaccounted_hunk": false
+        }
+      ]
+    },
+    {
+      "groups": [
+        {
+          "label": "Purpose section frames the change as only an altitude/nesting fix and doesn't foreshadow the severity-tier collapse and rule-bounding it also makes",
+          "ids": [
+            0,
+            5
+          ],
+          "unaccounted_hunk": false
+        },
+        {
+          "label": "new Necessary-section rule bullet (barring paraphrase of a line's detail, including table rows and consequences) added without being named anywhere in the PR body",
+          "ids": [
+            3,
+            8
+          ],
+          "unaccounted_hunk": true
+        },
+        {
+          "label": "SKILL.md severity-label update ('Must Fix'/'Should Fix' to 'Fix'/'Note') not itself named in the PR body",
+          "ids": [
+            4
+          ],
+          "unaccounted_hunk": true
+        },
+        {
+          "label": "verification queries are pinned to the moving `main` branch instead of the merge base, so they degrade as `main` advances",
+          "ids": [
+            1,
+            6
+          ],
+          "unaccounted_hunk": false
+        },
+        {
+          "label": "clause-by-clause mapping evidence backing the reformat claim lives in a gitignored file, unverifiable from a clone",
+          "ids": [
+            2,
+            7,
+            9,
+            10,
+            13
+          ],
+          "unaccounted_hunk": false
+        },
+        {
+          "label": "verification checklist items state their comparison method but omit inline command/output evidence",
+          "ids": [
+            11,
+            12
+          ],
+          "unaccounted_hunk": false
+        }
+      ]
+    }
+  ],
+  "groups": [
+    {
+      "label": "clause-mapping record backing the reformat claim is gitignored and unverifiable from a clone",
+      "ids": [
+        2,
+        7,
+        9,
+        10,
+        13
+      ],
+      "runs": [
+        1,
+        2,
+        3,
+        4,
+        6
+      ],
+      "unaccounted_hunk": false,
+      "pairs_not_unanimous": 0
+    },
+    {
+      "label": "new `Necessary` rule bullet added to pr-guidelines.md is unaccounted for in the body",
+      "ids": [
+        3,
+        8
+      ],
+      "runs": [
+        2,
+        3
+      ],
+      "unaccounted_hunk": true,
+      "pairs_not_unanimous": 0
+    },
+    {
+      "label": "top-level framing (title/Purpose) omits the severity-tier collapse, though Key Changes explains it",
+      "ids": [
+        0,
+        5
+      ],
+      "runs": [
+        1,
+        2
+      ],
+      "unaccounted_hunk": false,
+      "pairs_not_unanimous": 0
+    },
+    {
+      "label": "verification items state their method without inline command/output evidence",
+      "ids": [
+        11,
+        12
+      ],
+      "runs": [
+        5,
+        6
+      ],
+      "unaccounted_hunk": false,
+      "pairs_not_unanimous": 0
+    },
+    {
+      "label": "verification queries cite `main`, which has diverged from the merge base",
+      "ids": [
+        1,
+        6
+      ],
+      "runs": [
+        1,
+        2
+      ],
+      "unaccounted_hunk": false,
+      "pairs_not_unanimous": 0
+    },
+    {
+      "label": "SKILL.md severity-label hunk is never itself named in the body",
+      "ids": [
+        4
+      ],
+      "runs": [
+        2
+      ],
+      "unaccounted_hunk": true,
+      "pairs_not_unanimous": 0
+    }
+  ]
+}
