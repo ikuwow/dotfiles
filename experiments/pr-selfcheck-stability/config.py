@@ -3,11 +3,18 @@
 Everything a run depends on lives here, so changing the design is a diff
 against one file rather than an edit scattered across the scripts.
 
-The target is a merged PR. Its body, its diff and its head commit are frozen,
-so every run of the check sees byte-identical input and any difference between
-runs comes from the checker. An open PR cannot serve here: a body edited
-between runs makes disagreement uninterpretable, and two of the runs recorded
-in ikuwow/dotfiles#369 reported the body changing between their own fetches.
+A round targets a PR that is no longer open, so its body, its diff and its
+head commit are frozen and every run of the check sees byte-identical input.
+Any difference between runs then comes from the checker. An open PR cannot
+serve: a body edited between runs makes disagreement uninterpretable, and two
+of the runs recorded in ikuwow/dotfiles#369 reported the body changing between
+their own fetches.
+
+Round 1 targets the merged #367 and asks how reproducible the output is.
+Round 2 targets a fixture carrying #367's diff under the body that PR held at
+13:54 on 2026-08-20, which is the input the three runs in #369 disagreed over,
+and asks how often the check reaches the defect one of them found. The two
+rounds answer different questions and neither substitutes for the other.
 
 `/pr-selfcheck` is invoked exactly as a session invokes it -- the slash
 command, no model or effort override, no permission-mode override, under this
@@ -20,12 +27,17 @@ detector that is not the deployed one.
 import os
 
 REPO = "ikuwow/dotfiles"
-PR = 367
 
 RUNS = 10
 TIMEOUT_SEC = 900
 
-DATA_DIR = "round1"
+# Which round the scripts operate on. Set PRSC_ROUND to pick one; every script
+# reads it, so a round is analysed with the same selection that produced it.
+ROUNDS = {"round1": 367, "round2": 370}
+DATA_DIR = os.environ.get("PRSC_ROUND", "round1")
+if DATA_DIR not in ROUNDS:
+    raise SystemExit("PRSC_ROUND must be one of: " + ", ".join(sorted(ROUNDS)))
+PR = ROUNDS[DATA_DIR]
 RUNS_DIR = os.path.join(DATA_DIR, "runs")
 RECORD_FILE = os.path.join(DATA_DIR, "runs.jsonl")
 FINDINGS_FILE = os.path.join(DATA_DIR, "findings.jsonl")

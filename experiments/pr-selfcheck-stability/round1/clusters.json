@@ -1,0 +1,263 @@
+{
+  "items": [
+    {
+      "id": 0,
+      "run": 1,
+      "severity": "Note",
+      "property": "Grounded/Decidable",
+      "text": "The claim \"`pr-selfcheck/SKILL.md`'s hard-wrap parser stops matching nested list items, which it would otherwise flag throughout every body now that nesting is the required shape\" is only partially realized by the diff. Only violation-rule 2 (indented continuation line after a list item) was updated to exempt lines that themselves start with a list marker. Violation-rule 1 (\"two or more consecutive non-empty lines with no blank line between them, where neither line begins with a block marker\") and the block-marker definition itself were left untouched, and that definition literally says \"a line starting with\" `-`/`*`/`+`/etc. Read at face value (marker checked at column 0, before stripping indentation), two stacked 2-space-indented sub-bullets with no blank line between them — the exact style this PR now mandates, and the style used throughout this very PR body and the reformatted `pr-guidelines.md` — would still match rule 1 as a false-positive hard-wrap violation. Read with indentation stripped first (the natural way an LLM executing this natural-language spec would apply it), there is no false positive: I ran both interpretations against this PR's own body — the strict column-0 reading found 5 \"violations,\" the indentation-stripped reading found 0. Since `pr-selfcheck` is executed by an LLM doing reading comprehension rather than a literal regex engine, the loose reading is the one that will actually run, so this is unlikely to cause real misfires — flagged as a Note rather than a Fix because it turns on how an ambiguous natural-language rule gets read, not on a settled contradiction."
+    },
+    {
+      "id": 1,
+      "run": 1,
+      "severity": "Unverifiable",
+      "property": "Grounded",
+      "text": "\"Clause mapping built against `git show main:claude/skills/git-workflow/pr-guidelines.md`, covering the 37 rule bullets the reformat carried over\" — the record lives at `ikuwowfiles/pr-guidelines-reformat-check.md`, which the body itself notes is gitignored and not checkable from a clone. The body already discloses this limitation."
+    },
+    {
+      "id": 2,
+      "run": 2,
+      "severity": "Unverifiable",
+      "property": "Grounded",
+      "text": "The verification item at line 34 (\"Clause mapping built against `main`, covering the 37 rule bullets... none dropped or duplicated\") rests on `ikuwowfiles/pr-guidelines-reformat-check.md`, which is gitignored and outside the repo — a fresh clone cannot re-run this check. It exists on this machine (same author host); I read it and spot-checked its Decidable and Grounded rows against the merge-base text, and they matched, but did not walk all 37 rows, so full coverage is unconfirmed from repo state alone."
+    },
+    {
+      "id": 3,
+      "run": 4,
+      "severity": "Note",
+      "property": "Decidable",
+      "text": "The \"Where a reformat can change a rule\" section's sub-bullet — `\"Approaches rejected\" accepted any contrast, and \"leaves no unexplained hunks\" reads as an obligation to give every hunk its own item` — quotes `\"Approaches rejected\"`, which is the phrase from the (unchanged) Decidable rule about naming rejected design alternatives. The rule that actually changed to fix this problem is in `Necessary` (`Keep out rejected alternatives described at implementation-attempt granularity, and alternatives a reviewer would not arrive at and ask about`), not Decidable's approaches-rejected bullet. A reviewer tracing this explanation back to the diff could momentarily map it to the wrong section before finding the real change in `Necessary`."
+    },
+    {
+      "id": 4,
+      "run": 4,
+      "severity": "Unverifiable",
+      "property": "Grounded",
+      "text": "The Verification item \"Clause mapping built against `git show main:...pr-guidelines.md`, covering the 37 rule bullets the reformat carried over, ... with every clause landing at exactly one destination and none dropped or duplicated\" — the count of 37 top-level bullets in the five property sections at the merge base is independently confirmed (`grep -c '^- '` over lines 30-192 of `pr-guidelines.md` at `b9256e4`), but the full clause-by-clause destination trace lives in `ikuwowfiles/pr-guidelines-reformat-check.md`, which is gitignored and not reproducible from a clone, as the PR itself states."
+    },
+    {
+      "id": 5,
+      "run": 5,
+      "severity": "Unverifiable",
+      "property": "Grounded",
+      "text": "The clause-mapping record backing \"37 rule bullets carried over, none dropped or duplicated\" lives at `ikuwowfiles/pr-guidelines-reformat-check.md`, which is gitignored and not present in the clone — the body itself flags this as checkable only on the authoring machine."
+    },
+    {
+      "id": 6,
+      "run": 8,
+      "severity": "Unverifiable",
+      "property": "Grounded",
+      "text": "The clause-mapping record (`ikuwowfiles/pr-guidelines-reformat-check.md`) backing the verification checklist's clause-completeness claim is gitignored and not present in the diff or a clone; its content is internally consistent with what I could independently re-derive (45 top-level bullets at merge base, 37 mapped to originals, 5 property-definition + 3 template bullets accounting for the remaining 8 — arithmetic checks out), but the mapping file itself is only checkable on the authoring machine, as the body itself discloses."
+    },
+    {
+      "id": 7,
+      "run": 9,
+      "severity": "Note",
+      "property": "Grounded",
+      "text": "The Verification checklist's last item (\"No rule belongs to two properties\") is a negative/absence claim but doesn't show a runnable query the way the other four checklist items do — it's supported by narrative reasoning (\"grouping and nesting appear only under `Decidable`...\") rather than a shown search. The claim is semantic (about rule meaning, not a literal string), so it may not reduce to a grep-able query; flagged for the reader's judgment rather than as a required fix."
+    },
+    {
+      "id": 8,
+      "run": 10,
+      "severity": "Note",
+      "property": "Necessary",
+      "text": "Bullets 9 and 19 in \"Key changes\" spell out what each newly added rule requires (e.g. \"in a bulleted section the top level carries the change or claim itself...\"), which is close to the case the rule these bullets describe now forbids (\"spelling out what an added rule, definition, or table row says is detail, whether quoted, summarized, or given with its consequence\"). Plausible exception applies: for a PR whose diff *is* a rules file, a reviewer likely can't judge the design decision without seeing what the added rules say, so this may be the \"shape of the decision\" Decidable requires rather than diff paraphrase. Flagged because the checker isn't fully confident this reads as a defect rather than a legitimate exception."
+    }
+  ],
+  "passes": [
+    {
+      "groups": [
+        {
+          "label": "hard-wrap parser's rule 1 and block-marker definition weren't updated to exempt indented nested list items, only rule 2 was",
+          "ids": [
+            0
+          ],
+          "unaccounted_hunk": false
+        },
+        {
+          "label": "clause-mapping verification evidence lives in a gitignored file not reproducible from a clone",
+          "ids": [
+            1,
+            2,
+            4,
+            5,
+            6
+          ],
+          "unaccounted_hunk": false
+        },
+        {
+          "label": "explanation cites Decidable's 'approaches rejected' phrase when the actual changed rule is in Necessary",
+          "ids": [
+            3
+          ],
+          "unaccounted_hunk": false
+        },
+        {
+          "label": "verification checklist's 'no rule belongs to two properties' item shows no runnable query unlike the other items",
+          "ids": [
+            7
+          ],
+          "unaccounted_hunk": false
+        },
+        {
+          "label": "Key changes bullets restate what the newly added rules say",
+          "ids": [
+            8
+          ],
+          "unaccounted_hunk": false
+        }
+      ]
+    },
+    {
+      "groups": [
+        {
+          "label": "clause-mapping verification rests on a gitignored, unreproducible record",
+          "ids": [
+            1,
+            2,
+            4,
+            5,
+            6
+          ],
+          "unaccounted_hunk": false
+        },
+        {
+          "label": "hard-wrap rule 1/block-marker definition not updated to exempt nested list items",
+          "ids": [
+            0
+          ],
+          "unaccounted_hunk": false
+        },
+        {
+          "label": "explanation misattributes the fix to Decidable's 'Approaches rejected' instead of Necessary",
+          "ids": [
+            3
+          ],
+          "unaccounted_hunk": false
+        },
+        {
+          "label": "negative verification claim lacks a shown runnable query",
+          "ids": [
+            7
+          ],
+          "unaccounted_hunk": false
+        },
+        {
+          "label": "Key-changes bullets paraphrase the added rules' content",
+          "ids": [
+            8
+          ],
+          "unaccounted_hunk": false
+        }
+      ]
+    },
+    {
+      "groups": [
+        {
+          "label": "SKILL.md hard-wrap rule 1 / block-marker definition not updated to exempt nested list markers (only rule 2 was)",
+          "ids": [
+            0
+          ],
+          "unaccounted_hunk": false
+        },
+        {
+          "label": "clause-mapping verification claim rests on a gitignored file unverifiable from a clone",
+          "ids": [
+            1,
+            2,
+            4,
+            5,
+            6
+          ],
+          "unaccounted_hunk": false
+        },
+        {
+          "label": "reformat-explanation sub-bullet cites the wrong section (Decidable) for a rule change that actually lives in Necessary",
+          "ids": [
+            3
+          ],
+          "unaccounted_hunk": false
+        },
+        {
+          "label": "'No rule belongs to two properties' verification item lacks a shown runnable query",
+          "ids": [
+            7
+          ],
+          "unaccounted_hunk": false
+        },
+        {
+          "label": "Key-changes bullets 9 and 19 spell out added rules' content, bordering on the rule-paraphrase violation they describe",
+          "ids": [
+            8
+          ],
+          "unaccounted_hunk": false
+        }
+      ]
+    }
+  ],
+  "groups": [
+    {
+      "label": "clause-mapping verification evidence lives in a gitignored file not reproducible from a clone",
+      "ids": [
+        1,
+        2,
+        4,
+        5,
+        6
+      ],
+      "runs": [
+        1,
+        2,
+        4,
+        5,
+        8
+      ],
+      "unaccounted_hunk": false,
+      "pairs_not_unanimous": 0
+    },
+    {
+      "label": "Key changes bullets restate what the newly added rules say",
+      "ids": [
+        8
+      ],
+      "runs": [
+        10
+      ],
+      "unaccounted_hunk": false,
+      "pairs_not_unanimous": 0
+    },
+    {
+      "label": "explanation cites Decidable's 'approaches rejected' phrase when the actual changed rule is in Necessary",
+      "ids": [
+        3
+      ],
+      "runs": [
+        4
+      ],
+      "unaccounted_hunk": false,
+      "pairs_not_unanimous": 0
+    },
+    {
+      "label": "hard-wrap parser's rule 1 and block-marker definition weren't updated to exempt indented nested list items, only rule 2 was",
+      "ids": [
+        0
+      ],
+      "runs": [
+        1
+      ],
+      "unaccounted_hunk": false,
+      "pairs_not_unanimous": 0
+    },
+    {
+      "label": "verification checklist's 'no rule belongs to two properties' item shows no runnable query unlike the other items",
+      "ids": [
+        7
+      ],
+      "runs": [
+        9
+      ],
+      "unaccounted_hunk": false,
+      "pairs_not_unanimous": 0
+    }
+  ]
+}
