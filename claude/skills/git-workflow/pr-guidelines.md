@@ -38,6 +38,9 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   rejected, and risks or things a reviewer should watch out for
   - "Approaches rejected" covers design alternatives weighed for the
     delivered design
+  - Name a rejected alternative when a reviewer would arrive at it and
+    ask; ruling out an option nobody would propose argues by contrast
+    and earns no space
 - Inverted pyramid — place the most important information first
   - A reviewer reading only the first few lines can tell what kind of
     PR this is and where to focus
@@ -178,8 +181,11 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   - Adjacent incidental fixes (an obvious typo) are tolerable in
     moderation, but the default is to leave them for a separate PR
 - The body conveys the holistic intent of the change — what the PR is
-  trying to achieve across the whole diff — accounts for every file and
-  change in it, and leaves no unexplained hunks
+  trying to achieve across the whole diff — and accounts for the diff
+  well enough that no part of it arrives unexplained
+  - Coverage is a gradient, not a sentence per hunk: the decisions a
+    reviewer's judgement rests on are stated in full, and the detail
+    below them is carried in as little as a clause
 - The body names a verification mechanism — CI, manual test steps, or
   another check — for the code paths the diff changes
   - The test is whether the body makes that claim
