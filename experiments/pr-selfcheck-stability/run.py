@@ -143,6 +143,12 @@ def one_run(index):
                     if block.get("type") == "text":
                         text = block["text"]
 
+    # Transcripts are collected only for a run that reached the check. A run
+    # that exited before starting has no transcript of its own, and the session
+    # id it was refused may already name another round's, whose transcript
+    # would then be copied in and read as this round's data.
+    transcripts = collect_transcripts(session_id, index) if outcome != "failed" else []
+
     return {"run": index,
             "session_id": session_id,
             "outcome": outcome,
@@ -151,7 +157,7 @@ def one_run(index):
             "elapsed_sec": round(elapsed, 1),
             "cost_usd": result.get("total_cost_usd"),
             "report": text,
-            "transcripts": collect_transcripts(session_id, index)}
+            "transcripts": transcripts}
 
 
 def main():
