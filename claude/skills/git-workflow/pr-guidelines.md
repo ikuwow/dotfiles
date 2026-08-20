@@ -182,12 +182,19 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   - Adjacent incidental fixes (an obvious typo) are tolerable in
     moderation, but the default is to leave them for a separate PR
 - The body states the intent of the change — what the PR is trying to
-  achieve across the whole diff — and every part of the diff sits inside
-  that intent
-  - A hunk sits inside when a reviewer holding that intent is not
+  achieve across the whole diff — and every piece of content the diff
+  introduces sits inside that intent
+  - The unit is the content itself, not the file or the hunk carrying
+    it: a file the body names can hold an addition the body accounts for
+    nowhere, and a hunk that moves or reformats existing text can carry
+    a new line among it
+  - Content the diff introduces is what the base does not already carry,
+    which a comparison against the base separates from text the diff
+    only moved
+  - A piece sits inside when a reviewer holding that intent is not
     surprised to find it, which a mechanical consequence of a described
     change does without being named
-  - A hunk outside it is a disagreement between the body and the diff,
+  - A piece outside it is a disagreement between the body and the diff,
     and the author chooses which of the two moves
 - The body names a verification mechanism — CI, manual test steps, or
   another check — for the code paths the diff changes
