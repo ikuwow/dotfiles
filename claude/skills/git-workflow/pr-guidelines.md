@@ -38,9 +38,6 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   rejected, and risks or things a reviewer should watch out for
   - "Approaches rejected" covers design alternatives weighed for the
     delivered design
-  - Name a rejected alternative when a reviewer would arrive at it and
-    ask; ruling out an option nobody would propose argues by contrast
-    and earns no space
 - Inverted pyramid — place the most important information first
   - A reviewer reading only the first few lines can tell what kind of
     PR this is and where to focus
@@ -140,7 +137,8 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   - Keep out references to the session, to plan-mode phases, or to
     individual commits within the branch
   - Keep out rejected alternatives described at implementation-attempt
-    granularity
+    granularity, and alternatives a reviewer would not arrive at and
+    ask about
 - State a fact once
   - The same environment variable name, file name, design decision, or
     summary of a linked source does not appear in two places in the
