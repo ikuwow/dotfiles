@@ -77,8 +77,8 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   - Overstating what is "untestable" is the common failure mode
 - List only items actually verified, each carrying its evidence: a
   command, output excerpt, exit code, or log line
-  - A code block or sub-bullet attached to the item counts as evidence
-    the item carries
+  - Evidence carried in a code block or sub-bullet attached to the item
+    counts as evidence the item carries
   - When the item covers documentation or prose and no command applies,
     name what it was checked against (the source, the spec, the linked
     issue)
@@ -106,8 +106,7 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   asserts completeness, a uniqueness claim, a coverage figure — shows or
   links its derivation
   - Identifiers, version strings, and figures that only describe the
-    change are outside this rule; a count being off by a little is a
-    Nice to Have, not a defect in the claim
+    change are outside this rule
 - Rationale attributed to a linked issue, PR, or document quotes the
   one sentence it rests on, or links to the section carrying it
 - All URLs and anchor links resolve to the expected content
