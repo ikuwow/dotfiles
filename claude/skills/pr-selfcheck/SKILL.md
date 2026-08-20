@@ -50,7 +50,7 @@ Perform a self-review of the specified PR to catch issues before a human reviewe
 
 | Severity | Condition |
 | --- | --- |
-| Must Fix | A reviewer acting on the body would be misled about what the change does, or would stop checking something they should check |
+| Must Fix | A reviewer acting on the body would be misled about what the change does, would reach a part of the diff the body never accounts for, or would treat a claim the body makes as settled when the body does not carry what settles it |
 | Should Fix | The body or the diff is accurate enough to act on but harder to use than it needs to be |
 | Nice to Have | An inaccuracy or blemish that changes neither what the reviewer understands nor where they look |
 | Unverifiable | A check that produced nothing comparable against the claim (the `FETCH_HEAD` and URL steps above). Reported as unverifiable, never Must Fix |
