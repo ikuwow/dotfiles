@@ -35,8 +35,17 @@ level, or the permission mode. The skill's own frontmatter decides how the
 check runs, and overriding any of it measures a detector that is not the
 deployed one.
 
-Runs are sequential. The check's step 3 runs `git fetch origin pull/<n>/head`
-and reads through that ref, which concurrent runs would race on.
+Each run executes in its own clone. The check's step 3 runs `git fetch origin
+pull/<n>/head` and reads through that ref, so runs sharing one repository would
+race on FETCH_HEAD. The clone carries the gitignored paths the check reads
+(`config.MIRRORED_PATHS`) and points `origin` at the real remote, and it is
+taken from the main tree at the branch that tree has checked out.
+
+Which rules the check reads is decided by the main tree either way, because
+`~/.claude/skills` resolves into it and every run recorded so far loaded
+`pr-guidelines.md` through that path or the tree's own. A round measuring a
+rule variant therefore requires that variant checked out in the main tree, and
+for the length of the round any other session on the machine reads it too.
 
 A round refuses to start unless the working tree is clean, and keeps it clean
 while it runs. One run in #369 declined to read a file after judging the
@@ -108,6 +117,11 @@ non-zero is recorded as failed and taken again on the next start.
 Round 2 stopped at six runs rather than ten, on elapsed time. The decision was
 taken before any of its reports had been read, so the stopping rule is
 independent of what the runs found.
+
+Each round's sample size is fixed in `config.ROUNDS` before the round starts.
+Rounds 3 and 4 measure a variant of the `Scoped` rule and are read against the
+round above them that shares a PR; `round3/preregistration.md` states what
+counts as detection and fixes it before those rounds run.
 
 Both transcripts are copied out of `~/.claude/projects` into `round1/runs/`
 as each run completes, because Claude Code prunes that directory and the

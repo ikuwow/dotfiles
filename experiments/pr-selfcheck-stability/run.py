@@ -1,21 +1,34 @@
-"""Run `/pr-selfcheck` against the fixed PR N times and record each run.
+"""Run `/pr-selfcheck` against the round's PR N times and record each run.
 
 Appends to runs.jsonl as each run completes and skips runs already recorded,
 so a round interrupted by a rate limit or a killed process restarts with the
 same command and redoes only what is missing.
 
-Runs are sequential, never concurrent. The check's own steps write to the
-shared repository: `git fetch origin pull/<n>/head` moves FETCH_HEAD, which
-concurrent runs would race on, and step 3 reads through that ref.
+Each run executes in its own clone of the repository. The check's step 3 runs
+`git fetch origin pull/<n>/head` and reads through that ref, so runs sharing
+one repository would race on FETCH_HEAD; a clone per run removes the shared
+state and lets the round run several at a time. The clone's `origin` is
+repointed at the real remote, because a clone taken from a local path would
+otherwise resolve both `gh` and the PR ref against that path.
 
-The working tree must be clean before a round starts, and stays clean
-throughout. One of the runs recorded in ikuwow/dotfiles#369 declined to read a
-file after judging the tree's uncommitted changes to belong to another
-session, so uncommitted state is an input to the detector and not a neutral
-background. A round's own output would otherwise accumulate as untracked files
-and give each run a different tree from the one before it, so the output
+The clone carries the gitignored paths named in `config.MIRRORED_PATHS`. They
+are part of what the check reads -- one route to the evidence in
+ikuwow/dotfiles#369 was a gitignored record -- and a clone without them
+measures a different detector.
+
+The main working tree must be clean before a round starts, and stays clean
+throughout. One of the runs recorded in #369 declined to read a file after
+judging the tree's uncommitted changes to belong to another session, so
+uncommitted state is an input to the detector and not a neutral background. A
+round's own output would otherwise accumulate as untracked files, so the output
 directory goes into .git/info/exclude for the duration and is committed
 afterwards.
+
+The main tree still decides which rules the check reads: `~/.claude/skills`
+resolves into it, and every run recorded so far loaded `pr-guidelines.md`
+through that path or through the tree's own. A round therefore measures
+whatever the main tree has checked out, and the clones inherit it because they
+are taken from that tree at that branch.
 
 Each run gets its own session id, which is also where Claude Code writes the
 transcripts. The final report comes back on the parent's stream, but the parent
@@ -25,20 +38,27 @@ separates a run that gathered the evidence and judged differently from one that
 never gathered it.
 """
 
+import glob
 import json
 import os
 import shutil
 import subprocess
 import sys
+import threading
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import config
 
+_write_lock = threading.Lock()
+
+
+def git(*args, cwd=None):
+    return subprocess.run(["git", *args], cwd=cwd or config.REPO_ROOT,
+                          capture_output=True, text=True, check=True).stdout.strip()
+
 
 def repo_state():
-    def git(*args):
-        return subprocess.run(["git", *args], cwd=config.REPO_ROOT,
-                              capture_output=True, text=True, check=True).stdout.strip()
     return {"head": git("rev-parse", "HEAD"),
             "branch": git("rev-parse", "--abbrev-ref", "HEAD"),
             "dirty": git("status", "--porcelain")}
@@ -58,6 +78,26 @@ def hide_output_dir():
             return
     with open(path, "a") as f:
         f.write(entry + "\n")
+
+
+def make_workspace(index, branch):
+    """Clone the repository for one run and mirror the paths git does not carry."""
+    path = os.path.join(config.WORKSPACE_ROOT, "run-%02d" % index)
+    if os.path.exists(path):
+        shutil.rmtree(path)
+    os.makedirs(config.WORKSPACE_ROOT, exist_ok=True)
+    git("clone", "--quiet", "--branch", branch, config.REPO_ROOT, path)
+    git("remote", "set-url", "origin", config.REMOTE_URL, cwd=path)
+    for relative in config.MIRRORED_PATHS:
+        source = os.path.join(config.REPO_ROOT, relative)
+        if not os.path.exists(source):
+            continue
+        destination = os.path.join(path, relative)
+        if os.path.isdir(source):
+            shutil.copytree(source, destination, dirs_exist_ok=True)
+        else:
+            shutil.copy(source, destination)
+    return path
 
 
 def completed_runs():
@@ -85,27 +125,32 @@ def collect_transcripts(session_id, index):
     They are copied rather than read in place because Claude Code prunes that
     directory, and a round's analysis has to stay reproducible from the
     committed files alone.
+
+    A run in a clone writes under the project directory named after the clone's
+    path, so the session is located by searching for its id rather than by
+    reconstructing the name Claude Code derives from a working directory.
     """
-    session_dir = os.path.join(config.PROJECTS_DIR, session_id)
     copied = []
-    parent = os.path.join(config.PROJECTS_DIR, session_id + ".jsonl")
-    if os.path.exists(parent):
+    for parent in glob.glob(os.path.join(config.PROJECTS_ROOT, "*",
+                                         session_id + ".jsonl")):
         dest = os.path.join(config.RUNS_DIR, "run-%02d.session.jsonl" % index)
         shutil.copy(parent, dest)
         copied.append(os.path.basename(dest))
-    agents_dir = os.path.join(session_dir, "subagents")
-    if os.path.isdir(agents_dir):
-        for n, name in enumerate(sorted(f for f in os.listdir(agents_dir)
-                                        if f.endswith(".jsonl"))):
-            dest = os.path.join(config.RUNS_DIR, "run-%02d.agent%d.jsonl" % (index, n))
-            shutil.copy(os.path.join(agents_dir, name), dest)
-            copied.append(os.path.basename(dest))
+        agents_dir = os.path.join(os.path.dirname(parent), session_id, "subagents")
+        if os.path.isdir(agents_dir):
+            for n, name in enumerate(sorted(f for f in os.listdir(agents_dir)
+                                            if f.endswith(".jsonl"))):
+                dest = os.path.join(config.RUNS_DIR,
+                                    "run-%02d.agent%d.jsonl" % (index, n))
+                shutil.copy(os.path.join(agents_dir, name), dest)
+                copied.append(os.path.basename(dest))
     return copied
 
 
-def one_run(index):
+def one_run(index, branch):
     session_id = config.SESSION_UUID % (config.SESSION_OFFSET + index)
     stream_path = os.path.join(config.RUNS_DIR, "run-%02d.stream.jsonl" % index)
+    workspace = make_workspace(index, branch)
     started = time.time()
     with open(stream_path, "w") as out:
         try:
@@ -113,7 +158,7 @@ def one_run(index):
                 ["claude", "-p", "/pr-selfcheck %d" % config.PR,
                  "--output-format", "stream-json", "--verbose",
                  "--session-id", session_id],
-                cwd=config.REPO_ROOT, stdout=out, stderr=subprocess.PIPE,
+                cwd=workspace, stdout=out, stderr=subprocess.PIPE,
                 text=True, timeout=config.TIMEOUT_SEC)
             # A non-zero exit is recorded as its own outcome. Reading it as a
             # completed run would enter the round as a run that reported
@@ -128,17 +173,13 @@ def one_run(index):
             outcome, returncode, stderr = "timeout", None, ""
     elapsed = time.time() - started
 
-    result = {}
+    result, text = {}, ""
     with open(stream_path) as f:
         for line in f:
             event = json.loads(line)
             if event.get("type") == "result":
                 result = event
-    text = ""
-    with open(stream_path) as f:
-        for line in f:
-            event = json.loads(line)
-            if event.get("type") == "assistant":
+            elif event.get("type") == "assistant":
                 for block in event["message"].get("content") or []:
                     if block.get("type") == "text":
                         text = block["text"]
@@ -151,13 +192,24 @@ def one_run(index):
 
     return {"run": index,
             "session_id": session_id,
+            "workspace": workspace,
             "outcome": outcome,
             "returncode": returncode,
-            "stderr": stderr[-2000:],
+            "stderr": (stderr or "")[-2000:],
             "elapsed_sec": round(elapsed, 1),
             "cost_usd": result.get("total_cost_usd"),
             "report": text,
             "transcripts": transcripts}
+
+
+def record(row, state):
+    row["repo"] = state
+    with _write_lock:
+        with open(config.RECORD_FILE, "a") as f:
+            f.write(json.dumps(row, ensure_ascii=False) + "\n")
+        print("run %02d %s in %ss, $%s" % (row["run"], row["outcome"],
+                                           row["elapsed_sec"], row["cost_usd"]),
+              flush=True)
 
 
 def main():
@@ -168,17 +220,14 @@ def main():
         sys.exit("working tree is dirty; commit or stash before a round:\n"
                  + state["dirty"])
     done = completed_runs()
-    for index in range(1, config.RUNS + 1):
-        if index in done:
-            print("run %02d already recorded" % index)
-            continue
-        print("run %02d ..." % index, flush=True)
-        record = one_run(index)
-        record["repo"] = state
-        with open(config.RECORD_FILE, "a") as f:
-            f.write(json.dumps(record, ensure_ascii=False) + "\n")
-        print("  %s in %ss, $%s" % (record["outcome"], record["elapsed_sec"],
-                                    record["cost_usd"]), flush=True)
+    pending = [index for index in range(1, config.RUNS + 1) if index not in done]
+    print("round %s, PR #%d, branch %s, %d run(s) pending, %d worker(s)"
+          % (config.DATA_DIR, config.PR, state["branch"], len(pending),
+             config.WORKERS), flush=True)
+    with ThreadPoolExecutor(max_workers=config.WORKERS) as pool:
+        futures = [pool.submit(one_run, index, state["branch"]) for index in pending]
+        for future in as_completed(futures):
+            record(future.result(), state)
 
 
 if __name__ == "__main__":
