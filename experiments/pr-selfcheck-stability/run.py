@@ -61,10 +61,22 @@ def hide_output_dir():
 
 
 def completed_runs():
+    """Runs already recorded, dropping ones that failed so they are retried.
+
+    A timeout counts as recorded: a run that stalls is a result the round
+    reports. A non-zero exit is not a result -- it means the run never reached
+    the check -- so its record is removed and the run is taken again.
+    """
     if not os.path.exists(config.RECORD_FILE):
         return set()
     with open(config.RECORD_FILE) as f:
-        return {json.loads(line)["run"] for line in f if line.strip()}
+        records = [json.loads(line) for line in f if line.strip()]
+    kept = [record for record in records if record["outcome"] != "failed"]
+    if len(kept) != len(records):
+        with open(config.RECORD_FILE, "w") as f:
+            for record in kept:
+                f.write(json.dumps(record, ensure_ascii=False) + "\n")
+    return {record["run"] for record in kept}
 
 
 def collect_transcripts(session_id, index):
@@ -92,7 +104,7 @@ def collect_transcripts(session_id, index):
 
 
 def one_run(index):
-    session_id = config.SESSION_UUID % index
+    session_id = config.SESSION_UUID % (config.SESSION_OFFSET + index)
     stream_path = os.path.join(config.RUNS_DIR, "run-%02d.stream.jsonl" % index)
     started = time.time()
     with open(stream_path, "w") as out:
@@ -103,7 +115,12 @@ def one_run(index):
                  "--session-id", session_id],
                 cwd=config.REPO_ROOT, stdout=out, stderr=subprocess.PIPE,
                 text=True, timeout=config.TIMEOUT_SEC)
-            outcome, returncode, stderr = "completed", proc.returncode, proc.stderr
+            # A non-zero exit is recorded as its own outcome. Reading it as a
+            # completed run would enter the round as a run that reported
+            # nothing, which is indistinguishable in the tables from a run that
+            # looked and found nothing.
+            outcome = "completed" if proc.returncode == 0 else "failed"
+            returncode, stderr = proc.returncode, proc.stderr
         except subprocess.TimeoutExpired:
             # Recorded as an outcome rather than raised. One run in
             # ikuwow/dotfiles#369 terminated on a 600s stall with no output,

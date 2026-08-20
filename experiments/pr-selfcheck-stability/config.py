@@ -33,11 +33,16 @@ TIMEOUT_SEC = 900
 
 # Which round the scripts operate on. Set PRSC_ROUND to pick one; every script
 # reads it, so a round is analysed with the same selection that produced it.
-ROUNDS = {"round1": 367, "round2": 370}
+# `session_offset` keeps each round's session ids disjoint from every other
+# round's. Claude Code refuses an id it has already recorded, so two rounds
+# numbering their runs from 1 would collide on every run of the second.
+ROUNDS = {"round1": {"pr": 367, "session_offset": 0},
+          "round2": {"pr": 370, "session_offset": 100}}
 DATA_DIR = os.environ.get("PRSC_ROUND", "round1")
 if DATA_DIR not in ROUNDS:
     raise SystemExit("PRSC_ROUND must be one of: " + ", ".join(sorted(ROUNDS)))
-PR = ROUNDS[DATA_DIR]
+PR = ROUNDS[DATA_DIR]["pr"]
+SESSION_OFFSET = ROUNDS[DATA_DIR]["session_offset"]
 RUNS_DIR = os.path.join(DATA_DIR, "runs")
 RECORD_FILE = os.path.join(DATA_DIR, "runs.jsonl")
 FINDINGS_FILE = os.path.join(DATA_DIR, "findings.jsonl")
