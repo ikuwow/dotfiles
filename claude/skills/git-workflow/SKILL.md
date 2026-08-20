@@ -94,7 +94,7 @@ Launch all three in a single assistant message so they execute concurrently:
   `run_in_background: true`
 
 If any of the three fails:
-- Fix self-review "Must Fix" / "Should Fix" items
+- Fix self-review "Fix" items, and the "Note" items worth acting on
 - Move anything the sweep escalated into the PR body
 - Fix CI failures (`gh run view --log-failed`), or hand them back to
   the implementer when one is dispatched
