@@ -120,9 +120,10 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
     value from A to B", "added N items", "raised timeout to M")
   - Keep out per-item rendering of a pre-flight checklist when every
     item is "N/A" — collapse it to one line
-  - Keep out a summary of text the diff introduces, such as a rule,
-    definition, or table row it adds; name what changed and leave the
-    new text to be read where it lives
+  - When the change replaces something, name what it replaced and what
+    replaced it; what the replacement contains is in the diff, so
+    describing a rule, definition, or table row the change introduces
+    is paraphrase even when its consequence is attached
 - Keep CI, lint, formatter, type-check, and build / test command
   results (`go build`, `go test`, `go vet`, `pre-commit`) out of the
   body
