@@ -25,7 +25,7 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   linked source no more than the summary that survives the link going
   dead
 - Scoped — the diff carries only what the stated intent needs, and the
-  body accounts for all of it
+  body conveys the change as a whole
 - Conformant — the body renders and behaves as intended on GitHub
 
 ## Decidable
@@ -181,14 +181,13 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
     load
   - Adjacent incidental fixes (an obvious typo) are tolerable in
     moderation, but the default is to leave them for a separate PR
-- The body states the intent of the change — what the PR is trying to
-  achieve across the whole diff — and every part of the diff sits inside
-  that intent
-  - A hunk sits inside when a reviewer holding that intent is not
-    surprised to find it, which a mechanical consequence of a described
-    change does without being named
-  - A hunk outside it is a disagreement between the body and the diff,
-    and the author chooses which of the two moves
+- The body conveys the change as a whole: the intent behind it, and the
+  parts a reader needs in order to hold that intent, with the rest left
+  to the diff
+  - A reader who finishes the body and then opens the diff finds what
+    the body led them to expect
+  - Where they do not, the body and the diff disagree, and the author
+    chooses which of the two moves
 - The body names a verification mechanism — CI, manual test steps, or
   another check — for the code paths the diff changes
   - The test is whether the body makes that claim

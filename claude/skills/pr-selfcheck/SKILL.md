@@ -50,7 +50,7 @@ Perform a self-review of the specified PR to catch issues before a human reviewe
 
 | Severity | Condition |
 | --- | --- |
-| Fix | Acting on it is required before the PR is ready: a reviewer acting on the body would be misled about what the change does, would reach a part of the diff the body never accounts for, or would treat a claim the change rests on as settled when the body does not carry what settles it |
+| Fix | Acting on it is required before the PR is ready: a reviewer acting on the body would be misled about what the change does, would find in the diff a change the body did not prepare them for, or would treat a claim the change rests on as settled when the body does not carry what settles it |
 | Note | Surfaced for the reader's judgement, and the reader decides whether to act: a blemish that changes nothing for the reviewer, or a finding the checker is not confident about, stated with the reason for the doubt |
 | Unverifiable | A check that produced nothing comparable against the claim (the `FETCH_HEAD` and URL steps above). Reported as unverifiable, never Fix |
 
