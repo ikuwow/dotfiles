@@ -8,10 +8,14 @@ Runs are sequential, never concurrent. The check's own steps write to the
 shared repository: `git fetch origin pull/<n>/head` moves FETCH_HEAD, which
 concurrent runs would race on, and step 3 reads through that ref.
 
-The working tree must be clean before a round starts. One of the runs recorded
-in ikuwow/dotfiles#369 declined to read a file after judging the tree's
-uncommitted changes to belong to another session, so uncommitted state is an
-input to the detector and not a neutral background.
+The working tree must be clean before a round starts, and stays clean
+throughout. One of the runs recorded in ikuwow/dotfiles#369 declined to read a
+file after judging the tree's uncommitted changes to belong to another
+session, so uncommitted state is an input to the detector and not a neutral
+background. A round's own output would otherwise accumulate as untracked files
+and give each run a different tree from the one before it, so the output
+directory goes into .git/info/exclude for the duration and is committed
+afterwards.
 
 Each run gets its own session id, which is also where Claude Code writes the
 transcripts. The final report comes back on the parent's stream, but the parent
@@ -38,6 +42,22 @@ def repo_state():
     return {"head": git("rev-parse", "HEAD"),
             "branch": git("rev-parse", "--abbrev-ref", "HEAD"),
             "dirty": git("status", "--porcelain")}
+
+
+def hide_output_dir():
+    """Keep the round's own output out of `git status` while the round runs.
+
+    Written to .git/info/exclude rather than to a tracked .gitignore: the
+    exclusion is an artifact of collection, and the files it hides are meant to
+    be committed once the round is over.
+    """
+    path = os.path.join(config.REPO_ROOT, ".git", "info", "exclude")
+    entry = "experiments/pr-selfcheck-stability/" + config.DATA_DIR + "/"
+    with open(path) as f:
+        if entry in f.read().splitlines():
+            return
+    with open(path, "a") as f:
+        f.write(entry + "\n")
 
 
 def completed_runs():
@@ -119,6 +139,7 @@ def one_run(index):
 
 def main():
     os.makedirs(config.RUNS_DIR, exist_ok=True)
+    hide_output_dir()
     state = repo_state()
     if state["dirty"]:
         sys.exit("working tree is dirty; commit or stash before a round:\n"

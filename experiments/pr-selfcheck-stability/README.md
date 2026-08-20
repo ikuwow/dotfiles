@@ -38,10 +38,13 @@ deployed one.
 Runs are sequential. The check's step 3 runs `git fetch origin pull/<n>/head`
 and reads through that ref, which concurrent runs would race on.
 
-A round refuses to start unless the working tree is clean. One run in #369
-declined to read a file after judging the tree's uncommitted changes to belong
-to another session, which makes uncommitted state an input to the detector
-rather than a neutral background.
+A round refuses to start unless the working tree is clean, and keeps it clean
+while it runs. One run in #369 declined to read a file after judging the
+tree's uncommitted changes to belong to another session, which makes
+uncommitted state an input to the detector rather than a neutral background.
+The round's own output would otherwise accumulate as untracked files and hand
+each run a different tree from the one before it, so `run.py` adds the output
+directory to `.git/info/exclude` and it is committed once the round is over.
 
 Grouping findings into defects is a judgement, so `judge.py` takes three
 passes over the same input and treats two findings as one defect when at least
