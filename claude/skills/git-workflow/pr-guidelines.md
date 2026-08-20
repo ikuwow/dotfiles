@@ -183,13 +183,15 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
     moderation, but the default is to leave them for a separate PR
 - The body states the intent of the change — what the PR is trying to
   achieve across the whole diff — and names the changes in it that carry
-  weight: one that moves behavior, and one large enough to redirect how
-  a reviewer reads the diff
-  - Weight is the threshold, not presence: a mechanical consequence of a
-    described change needs no mention of its own, and neither does an
-    edit too small to change what a reviewer would do
-  - A change carrying weight can sit inside a file the body already
-    names, or among lines a reformat moved
+  weight
+  - A change carries weight when a reviewer would do something different
+    for knowing it, because it changes behavior or because it is
+    consequential enough on its own to redirect the review
+  - A mechanical consequence of a described change is owed no mention of
+    its own, and neither is an edit that changes nothing a reviewer does
+  - Naming the file a change sits in does not name the change: one
+    carrying weight can sit inside a file the body already names, or
+    among lines a reformat moved
   - One left unnamed is a disagreement between the body and the diff,
     and the author chooses which of the two moves
 - The body names a verification mechanism — CI, manual test steps, or
