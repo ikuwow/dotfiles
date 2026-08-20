@@ -23,7 +23,7 @@ Perform a self-review of the specified PR to catch issues before a human reviewe
    state at the PR head and shows the query it rests on, re-run that
    query with `FETCH_HEAD` as its tree-ish argument
    (`git grep <pattern> FETCH_HEAD`). A result that contradicts the
-   claim is Must Fix; incidental differences such as line numbers or
+   claim is a Fix; incidental differences such as line numbers or
    unrelated new hits are not a contradiction. A query that takes no
    tree-ish argument cannot be re-run at the PR head, and the claim
    resting on it is unverifiable. Do not create local branches and do
@@ -38,7 +38,7 @@ Perform a self-review of the specified PR to catch issues before a human reviewe
    response (WebFetch is unauthenticated, so a correct link to a
    private repository, issue, or dashboard answers with 404, 403, 401,
    or a login page), a 429 or 5xx, and a domain `WebFetch` is denied
-   all land here. Must Fix only when fetched content contradicts the
+   all land here. A Fix only when fetched content contradicts the
    citation
 1. Walk the five properties one at a time, in the order
    `pr-guidelines.md` states them, judging the PR against that
@@ -50,20 +50,15 @@ Perform a self-review of the specified PR to catch issues before a human reviewe
 
 | Severity | Condition |
 | --- | --- |
-| Must Fix | The body or the diff misleads: it states something false or unsupported, or omits what the diff does |
-| Should Fix | The body or the diff is accurate but harder to use than it needs to be |
-| Nice to Have | Cosmetic, affecting neither |
-| Unverifiable | A check that produced nothing comparable against the claim (the `FETCH_HEAD` and URL steps above). Reported as unverifiable, never Must Fix |
-
-Two or more Should Fix findings within one property escalate that
-property: emit one Must Fix line naming the property, and keep the
-individual findings listed under Should Fix.
+| Fix | Acting on it is required before the PR is ready: a reviewer acting on the body would be misled about what the change does, would reach a part of the diff the body never accounts for, or would treat a claim the change rests on as settled when the body does not carry what settles it |
+| Note | Surfaced for the reader's judgement, and the reader decides whether to act: a blemish that changes nothing for the reviewer, or a finding the checker is not confident about, stated with the reason for the doubt |
+| Unverifiable | A check that produced nothing comparable against the claim (the `FETCH_HEAD` and URL steps above). Reported as unverifiable, never Fix |
 
 ## Hard-wrap detection (GitHub-posted markdown)
 
 Conformant forbids hard-wrapping in GitHub-posted markdown. Apply this
 parser rather than judging line breaks by eye. Each violation it finds
-is a Should Fix.
+is a Fix.
 
 A "block marker" below means a line starting with any of: `#`, `-`,
 `*`, `+`, a digit followed by `.` (e.g. `1.`), `>`, `|`, four spaces
@@ -72,7 +67,7 @@ of indent, or a fenced code marker (``` or ~~~).
 Violations:
 
 - Two or more consecutive non-empty lines with no blank line between them, where neither line begins with a block marker (this catches paragraph-internal soft breaks while leaving tight lists, headings, and other block constructs alone)
-- An indented continuation line directly following a list-item line (`- `, `* `, `+ `, or `N. `) with no blank line between them; a blank-line gap before the indent denotes a valid continuation paragraph and is not a violation
+- An indented continuation line directly following a list-item line (`- `, `* `, `+ `, or `N. `) with no blank line between them, where that indented line does not itself begin with `- `, `* `, `+ `, or `N. ` — a blank-line gap before the indent denotes a valid continuation paragraph and is not a violation
 
 Excluded from detection to avoid false positives:
 
@@ -86,13 +81,10 @@ Excluded from detection to avoid false positives:
 ```
 ## PR Self-Check Result
 
-### Must Fix
+### Fix
 - [<property>] <finding>
 
-### Should Fix
-- [<property>] <finding>
-
-### Nice to Have
+### Note
 - [<property>] <finding>
 
 ### Unverifiable
@@ -109,9 +101,9 @@ Excluded from detection to avoid false positives:
 PASS | NEEDS_IMPROVEMENT
 ```
 
-Write "None." under any of the four finding headings that has no
+Write "None." under any of the three finding headings that has no
 items, Unverifiable included. The verdict is NEEDS_IMPROVEMENT when any
-Must Fix or Should Fix item is present, PASS otherwise.
+Fix item is present, PASS otherwise.
 
 ## Important Notes
 
