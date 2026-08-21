@@ -119,9 +119,9 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
     value from A to B", "added N items", "raised timeout to M")
   - Keep out per-item rendering of a pre-flight checklist when every
     item is "N/A" — collapse it to one line
-  - Keep out changes that follow mechanically from another change
-    already stated (documentation updated to match a code change,
-    counts adjusted to match a removed item)
+  - Keep out mention of a change that follows mechanically from another
+    change the body already states (documentation updated to match a
+    code change, counts adjusted to match a removed item)
   - Name a change in a line and leave its detail to the diff, which the
     reviewer can open; spelling out what an added rule, definition, or
     table row says is detail, whether quoted, summarized, or given with
