@@ -19,10 +19,11 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   what the change is for and where their attention belongs
 - Grounded — every claim is checkable on the evidence the body itself
   carries
-- Necessary — read a line of the body and the reader can say where else
-  its content lives: the diff, the branch's commits, the Checks panel,
-  a linked source, elsewhere in the body, or nowhere. A line answering
-  with anything but the last is carried twice
+- Necessary — read each line of the body for where else its content
+  already lives, and the body carries nothing the diff, its commits,
+  the Checks panel or an automation's output carry, states each thing
+  once, and takes from a linked source no more than the summary that
+  survives the link going dead
 - Scoped — the diff carries only what the stated intent needs, and the
   body conveys the change as a whole
 - Conformant — the body renders and behaves as intended on GitHub
@@ -124,11 +125,13 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
 - Take the body a line at a time and name where else that line's content
   lives — the diff, the branch's commits, the Checks panel, a linked
   source, another line of this body, or nowhere
-  - A line answering with anything but `nowhere` is content the reader
-    reaches more cheaply where it already sits
-  - The rules below are where this walk lands most often, together with
-    the `nowhere` cases it does not reach on its own. A line that fails
-    the walk is a finding whether or not one of them names it
+  - What the answer forfeits is the part it already carries: detail the
+    diff or the commits show, output the Checks panel holds, a fact
+    another line of the body states, and anything past the shortest
+    summary a linked source needs
+  - A line the walk lands on is a finding whether or not a rule below
+    names it, and the rules below reach lines answering `nowhere` that
+    the walk does not
 - Do not paraphrase the diff
   - Keep out file lists, line counts, percentage of lines removed,
     per-file summaries, and enumerations of added rules, linters,
