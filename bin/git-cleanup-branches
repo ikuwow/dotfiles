@@ -10,27 +10,69 @@
 # Worktrees attached to removable branches are removed first, without
 # --force; a dirty worktree skips that branch and the loop continues.
 #
+# Usage: git-cleanup-branches [--dry-run] [--keep <glob>]...
+#
 # Origin of the squash-merge detection trick:
 # https://github.com/not-an-aardvark/git-delete-squashed#sh
 
 set -euo pipefail
+
+dry_run=0
+keep_globs=()
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --dry-run) dry_run=1; shift ;;
+    --keep)
+      if [ $# -lt 2 ]; then
+        echo "git-cleanup-branches: --keep needs a glob." >&2
+        exit 2
+      fi
+      keep_globs+=("$2"); shift 2 ;;
+    *)
+      echo "git-cleanup-branches: unknown argument '$1'." >&2
+      exit 2 ;;
+  esac
+done
 
 if [ -n "$(git status --porcelain)" ]; then
   echo "git-cleanup-branches: uncommitted changes present; commit or stash first." >&2
   exit 1
 fi
 
-default_branch=main
-if [ ! "$(git rev-parse --verify "$default_branch" 2>/dev/null)" ]; then
-  default_branch=master
+# The remote decides which branch is the default; the local names are a
+# fallback for a repository with no origin.
+default_branch=$(git symbolic-ref --quiet --short refs/remotes/origin/HEAD 2>/dev/null \
+  | sed 's|^origin/||' || true)
+if [ -z "$default_branch" ]; then
+  default_branch=main
+  if [ ! "$(git rev-parse --verify "$default_branch" 2>/dev/null)" ]; then
+    default_branch=master
+  fi
 fi
 
-git checkout -q "$default_branch"
+kept() {
+  local branch="$1" glob
+  for glob in ${keep_globs+"${keep_globs[@]}"}; do
+    # shellcheck disable=SC2053
+    if [[ "$branch" == $glob ]]; then
+      return 0
+    fi
+  done
+  return 1
+}
+
+if [ "$dry_run" -eq 0 ]; then
+  git checkout -q "$default_branch"
+fi
 
 # Reap stale worktree entries (working dir gone, admin dir orphaned, etc.).
 # `-v` writes one line per pruned entry to stderr; merge it into stdout so
 # `wc -l` can count them.
-pruned_count=$(git worktree prune -v 2>&1 | wc -l | tr -d ' ')
+if [ "$dry_run" -eq 1 ]; then
+  pruned_count=$(git worktree prune --dry-run -v 2>&1 | wc -l | tr -d ' ')
+else
+  pruned_count=$(git worktree prune -v 2>&1 | wc -l | tr -d ' ')
+fi
 
 # Build branch -> worktree path map once.
 worktree_map=$(git worktree list --porcelain | awk '
@@ -62,6 +104,15 @@ merged_count=0
 squashed_count=0
 gone_count=0
 removed_count=0
+
+count_category() {
+  case "$1" in
+    merged)   merged_count=$((merged_count + 1)) ;;
+    squashed) squashed_count=$((squashed_count + 1)) ;;
+    gone)     gone_count=$((gone_count + 1)) ;;
+  esac
+  removed_count=$((removed_count + 1))
+}
 
 while read -r branch; do
   [ -z "$branch" ] && continue
@@ -95,6 +146,16 @@ while read -r branch; do
     continue
   fi
 
+  if kept "$branch"; then
+    continue
+  fi
+
+  if [ "$dry_run" -eq 1 ]; then
+    echo "would remove $branch ($category)"
+    count_category "$category"
+    continue
+  fi
+
   wt_path=$(lookup_worktree "$branch")
   if [ -n "$wt_path" ]; then
     if ! git worktree remove "$wt_path"; then
@@ -108,12 +169,11 @@ while read -r branch; do
     continue
   fi
 
-  case "$category" in
-    merged)   merged_count=$((merged_count + 1)) ;;
-    squashed) squashed_count=$((squashed_count + 1)) ;;
-    gone)     gone_count=$((gone_count + 1)) ;;
-  esac
-  removed_count=$((removed_count + 1))
+  count_category "$category"
 done < <(git for-each-ref refs/heads/ '--format=%(refname:short)')
 
-echo "removed $removed_count branches (merged: $merged_count, squashed: $squashed_count, gone: $gone_count); pruned $pruned_count worktree entries"
+verb=removed
+if [ "$dry_run" -eq 1 ]; then
+  verb="would remove"
+fi
+echo "$verb $removed_count branches (merged: $merged_count, squashed: $squashed_count, gone: $gone_count); pruned $pruned_count worktree entries"
