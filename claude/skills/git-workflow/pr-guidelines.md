@@ -34,10 +34,16 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   etc.)
   - Purpose and impact come from the body; the changed lines
     themselves are the diff's to show
+  - The why names what prompted this change now — the incident, the
+    investigation that could not conclude, the request — and the class
+    it belongs to does not stand in for that
 - Give the shape of the decision: the approach taken vs. the approaches
   rejected, and risks or things a reviewer should watch out for
   - "Approaches rejected" covers design alternatives weighed for the
     delivered design
+  - Where the change sits next to behavior callers depend on, name the
+    invariant it holds, so a reviewer knows what the diff is not free
+    to move
 - Inverted pyramid — place the most important information first
   - A reviewer reading only the first few lines can tell what kind of
     PR this is and where to focus
@@ -48,9 +54,14 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   itself, so the section reads from its top-level lines alone
   - Supporting material — rationale, evidence, the behavior this change
     replaces, and the like — does not displace it from the top level
-- When one top-level item in a section supports, qualifies, or follows
-  from another, it belongs beneath that one rather than beside it
+- When one top-level item supports, qualifies, or follows from another,
+  it belongs beneath that one rather than beside it, in whichever
+  section that one sits
   - A long flat list is usually a hierarchy that was never encoded
+  - Sections carry what a reviewer or an operator needs (purpose, key
+    changes, prerequisites, verification), so a section gathering items
+    by a shared property — "safety valves", "performance notes" —
+    empties when this is applied, and its heading goes with it
 - Future work, out-of-scope follow-ups, and "next PR" notes belong at
   the end of the body (e.g., in a "Follow-up" / "Notes" section)
   - Do not surface them in the opening sections (purpose, scope,
@@ -98,6 +109,11 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   man page section or `--help` output counts)
 - A causal claim asserting a mechanism a reader cannot check from the
   diff ("because X locks the table") carries evidence or a source
+- Naming an external tool or service in a step the reader is meant to
+  follow — verification, rollout, rollback, monitoring — asserts the
+  project uses it, and the body shows what settles that: a dependency
+  or config file, the project's own documentation, or the user saying
+  so
 - A value the reader would rely on to stop checking — a count that
   asserts completeness, a uniqueness claim, a coverage figure — shows or
   links its derivation
