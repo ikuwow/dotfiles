@@ -19,11 +19,11 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   what the change is for and where their attention belongs
 - Grounded — every claim is checkable on the evidence the body itself
   carries
-- Necessary — the body carries nothing the PR already carries
-  elsewhere (the diff, its commits, the Checks panel, output an
-  automation posted on it), states each thing once, and takes from a
-  linked source no more than the summary that survives the link going
-  dead
+- Necessary — read each line of the body for where else its content
+  already lives, and the body carries nothing the diff, its commits,
+  the Checks panel or an automation's output carry, states each thing
+  once, and takes from a linked source no more than the summary that
+  survives the link going dead
 - Scoped — the diff carries only what the stated intent needs, and the
   body conveys the change as a whole
 - Conformant — the body renders and behaves as intended on GitHub
@@ -122,6 +122,16 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
 
 ## Necessary
 
+- Take the body a line at a time and name where else that line's content
+  lives — the diff, the branch's commits, the Checks panel, a linked
+  source, another line of this body, or nowhere
+  - What the answer forfeits is the part it already carries: detail the
+    diff or the commits show, output the Checks panel holds, a fact
+    another line of the body states, and anything past the shortest
+    summary a linked source needs
+  - A line the walk lands on is a finding whether or not a rule below
+    names it, and the rules below reach lines answering `nowhere` that
+    the walk does not
 - Do not paraphrase the diff
   - Keep out file lists, line counts, percentage of lines removed,
     per-file summaries, and enumerations of added rules, linters,
@@ -160,10 +170,10 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   - The same environment variable name, file name, design decision, or
     summary of a linked source does not appear in two places in the
     body
+  - Two bullets in one list saying the same thing in different wording
+    are one fact stated twice
 - Each bullet conveys a distinct decision or outcome, not an individual
   code change
-  - Bullets in the same list do not restate one another in different
-    wording
 - Rationale, background, or requirements that live elsewhere (issue,
   design doc, ADR, prior PR, official spec) are summarized under a
   link, not copied
