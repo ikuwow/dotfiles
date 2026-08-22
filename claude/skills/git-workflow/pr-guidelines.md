@@ -19,11 +19,10 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   what the change is for and where their attention belongs
 - Grounded — every claim is checkable on the evidence the body itself
   carries
-- Necessary — the body carries nothing the PR already carries
-  elsewhere (the diff, its commits, the Checks panel, output an
-  automation posted on it), states each thing once, and takes from a
-  linked source no more than the summary that survives the link going
-  dead
+- Necessary — read a line of the body and the reader can say where else
+  its content lives: the diff, the branch's commits, the Checks panel,
+  a linked source, elsewhere in the body, or nowhere. A line answering
+  with anything but the last is carried twice
 - Scoped — the diff carries only what the stated intent needs, and the
   body conveys the change as a whole
 - Conformant — the body renders and behaves as intended on GitHub
@@ -122,6 +121,14 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
 
 ## Necessary
 
+- Take the body a line at a time and name where else that line's content
+  lives — the diff, the branch's commits, the Checks panel, a linked
+  source, another line of this body, or nowhere
+  - A line answering with anything but `nowhere` is content the reader
+    reaches more cheaply where it already sits
+  - The rules below are where this walk lands most often, together with
+    the `nowhere` cases it does not reach on its own. A line that fails
+    the walk is a finding whether or not one of them names it
 - Do not paraphrase the diff
   - Keep out file lists, line counts, percentage of lines removed,
     per-file summaries, and enumerations of added rules, linters,
@@ -160,10 +167,10 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   - The same environment variable name, file name, design decision, or
     summary of a linked source does not appear in two places in the
     body
+  - Two bullets in one list saying the same thing in different wording
+    are one fact stated twice
 - Each bullet conveys a distinct decision or outcome, not an individual
   code change
-  - Bullets in the same list do not restate one another in different
-    wording
 - Rationale, background, or requirements that live elsewhere (issue,
   design doc, ADR, prior PR, official spec) are summarized under a
   link, not copied
