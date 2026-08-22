@@ -39,6 +39,14 @@ are symlinks pointing to files in this repository.
 
 - Bootstrap scripts use `/bin/bash` (not `/usr/bin/env bash`) for compatibility
 
+## Measurement Data
+
+This repository tracks configuration, not the evidence behind it.
+Measurement harnesses, run transcripts, per-run outputs, and analysis
+records stay untracked. Findings that a rule change rests on go in the
+PR body or the tracking issue, where a reader reaches them without a
+clone.
+
 ## Machine-local Git Config
 
 Machine-specific git settings (host-only URL rewrites, per-repo
