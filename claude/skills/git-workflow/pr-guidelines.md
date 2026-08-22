@@ -24,8 +24,10 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   the Checks panel or an automation's output carry, states each thing
   once, and takes from a linked source no more than the summary that
   survives the link going dead
-- Scoped — the diff carries only what the stated intent needs, and the
-  body conveys the change as a whole
+- Scoped — the diff read against the body carries only what the stated
+  intent needs and nothing the body did not lead the reader to expect,
+  and the body conveys the change as a whole: its boundary, and how it
+  is verified within this PR
 - Conformant — the body renders and behaves as intended on GitHub
 
 ## Decidable
