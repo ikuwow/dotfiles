@@ -18,7 +18,8 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
 - Decidable — reading top-down, a reviewer arrives at the diff knowing
   what the change is for and where their attention belongs
 - Grounded — every claim is checkable on the evidence the body itself
-  carries
+  carries, and the code paths the diff changes have a verification
+  mechanism named
 - Necessary — read each line of the body for where else its content
   already lives, and the body carries nothing the diff, its commits,
   the Checks panel or an automation's output carry, states each thing
@@ -26,8 +27,8 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   survives the link going dead
 - Scoped — the diff read against the body carries only what the stated
   intent needs and nothing the body did not lead the reader to expect,
-  and the body conveys the change as a whole: its boundary, and how it
-  is verified within this PR
+  and the body conveys the change as a whole: its boundary, and what it
+  holds within this PR
 - Conformant — the body renders and behaves as intended on GitHub
 
 ## Decidable
@@ -74,6 +75,10 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
 
 ## Grounded
 
+- The body names a verification mechanism — CI, manual test steps, or
+  another check — for the code paths the diff changes
+  - The test is whether the body makes that claim
+  - Judging how adequate the coverage is belongs to code review
 - Attempt every verification within reach before drafting the
   Verification section: shell commands, API calls, file inspection,
   mocked failure modes, simulated missing-config tests
@@ -218,10 +223,6 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
     the body led them to expect
   - Where they do not, the body and the diff disagree, and the author
     chooses which of the two moves
-- The body names a verification mechanism — CI, manual test steps, or
-  another check — for the code paths the diff changes
-  - The test is whether the body makes that claim
-  - Judging how adequate the coverage is belongs to code review
 - Keep the PR self-contained: verification items, acceptance criteria,
   and follow-up actions that depend on changes outside this PR's diff
   (other repos, downstream releases, E2E flows) belong in the parent
