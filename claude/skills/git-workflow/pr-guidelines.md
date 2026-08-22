@@ -26,7 +26,8 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   survives the link going dead
 - Scoped — the diff read against the body carries only what the stated
   intent needs and nothing the body did not lead the reader to expect,
-  and the body says how the change is verified
+  and the body conveys the change as a whole: its boundary, and how it
+  is verified within this PR
 - Conformant — the body renders and behaves as intended on GitHub
 
 ## Decidable
