@@ -30,14 +30,18 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
 
 ## Decidable
 
-- State what changed and why (bug, feature, tech debt, compliance,
-  etc.)
+- State what changed, and what prompted it now — the incident, the
+  investigation that could not conclude, the request, the obligation
+  that came due
   - Purpose and impact come from the body; the changed lines
     themselves are the diff's to show
 - Give the shape of the decision: the approach taken vs. the approaches
   rejected, and risks or things a reviewer should watch out for
   - "Approaches rejected" covers design alternatives weighed for the
     delivered design
+  - Where the diff changes something other code reaches — a function
+    signature, a config key, an exit code, a file another script reads
+    — name the invariant it still holds
 - Inverted pyramid — place the most important information first
   - A reviewer reading only the first few lines can tell what kind of
     PR this is and where to focus
@@ -48,9 +52,12 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   itself, so the section reads from its top-level lines alone
   - Supporting material — rationale, evidence, the behavior this change
     replaces, and the like — does not displace it from the top level
-- When one top-level item in a section supports, qualifies, or follows
-  from another, it belongs beneath that one rather than beside it
+- When one top-level item supports, qualifies, or follows from another,
+  it belongs beneath that one rather than beside it, in whichever
+  section that one sits, unless another rule here places it in a
+  section of its own
   - A long flat list is usually a hierarchy that was never encoded
+  - A section this empties loses its heading with it
 - Future work, out-of-scope follow-ups, and "next PR" notes belong at
   the end of the body (e.g., in a "Follow-up" / "Notes" section)
   - Do not surface them in the opening sections (purpose, scope,
@@ -98,6 +105,10 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   man page section or `--help` output counts)
 - A causal claim asserting a mechanism a reader cannot check from the
   diff ("because X locks the table") carries evidence or a source
+- Naming an external tool or service in a step the reader is meant to
+  follow — verification, rollout, rollback, monitoring — asserts the
+  project uses it, and the body shows what settles that: a dependency
+  file, a config file, or the project's own documentation
 - A value the reader would rely on to stop checking — a count that
   asserts completeness, a uniqueness claim, a coverage figure — shows or
   links its derivation
