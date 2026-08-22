@@ -14,7 +14,7 @@ Perform a self-review of the specified PR to catch issues before a human reviewe
 ## Steps
 
 1. Retrieve PR metadata:
-   `gh pr view <number> --json title,body,url,additions,deletions,files`
+   `gh pr view <number> --json title,body,url,additions,deletions,files,baseRefName`
 1. Retrieve the diff:
    `gh pr diff <number>`
 1. When verifying a body claim needs file contents at the PR head,
@@ -29,6 +29,16 @@ Perform a self-review of the specified PR to catch issues before a human reviewe
    resting on it is unverifiable. Do not create local branches and do
    not run `git branch -D`/`-d` (branch deletion blocks on a permission
    prompt)
+1. When a check needs a file as it stood before the change, resolve the
+   base from the PR rather than from the default branch. Record the head
+   with `git rev-parse FETCH_HEAD` after the fetch above, fetch the
+   `baseRefName` from step 1, and take `git merge-base FETCH_HEAD <head
+   sha>`; read the file at that commit. The default branch's tip has
+   moved past the merge point whenever anything landed since the branch
+   was cut, so `git show main:<path>` answers about a tree the PR was
+   never proposed against, and a change already merged there reads as
+   text the diff did not add. `gh pr diff` is computed against the
+   correct base and needs none of this
 1. Locate and read `pr-guidelines.md`, bundled with the `git-workflow`
    skill, to load the five properties the PR body is judged against
 1. For each URL found in the PR body, fetch it with WebFetch and
