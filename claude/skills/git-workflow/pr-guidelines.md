@@ -15,8 +15,8 @@ the five property sections belongs to exactly one of them, and within a
 section the top-level line is the rule while the lines beneath it
 qualify it. `/pr-selfcheck` evaluates the properties one at a time.
 
-- Decidable — a reviewer can decide approve or reject from the body
-  alone, reading top-down
+- Decidable — reading top-down, a reviewer arrives at the diff knowing
+  what the change is for and where their attention belongs
 - Grounded — every claim is checkable on the evidence the body itself
   carries
 - Necessary — the body carries nothing the PR already carries
@@ -32,8 +32,8 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
 
 - State what changed and why (bug, feature, tech debt, compliance,
   etc.)
-  - The body alone conveys the intent and lets a reviewer understand
-    the purpose, what changed, and the impact
+  - Purpose and impact come from the body; the changed lines
+    themselves are the diff's to show
 - Give the shape of the decision: the approach taken vs. the approaches
   rejected, and risks or things a reviewer should watch out for
   - "Approaches rejected" covers design alternatives weighed for the
