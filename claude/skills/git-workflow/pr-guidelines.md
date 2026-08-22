@@ -32,8 +32,8 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
 
 - State what changed and why (bug, feature, tech debt, compliance,
   etc.)
-  - Purpose and impact come from the body; how the change achieves
-    them is the diff's to show
+  - Purpose and impact come from the body; the changed lines
+    themselves are the diff's to show
 - Give the shape of the decision: the approach taken vs. the approaches
   rejected, and risks or things a reviewer should watch out for
   - "Approaches rejected" covers design alternatives weighed for the
