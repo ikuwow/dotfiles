@@ -18,7 +18,8 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
 - Decidable — reading top-down, a reviewer arrives at the diff knowing
   what the change is for and where their attention belongs
 - Grounded — every claim is checkable on the evidence the body itself
-  carries
+  carries, and the body names a verification mechanism for the code
+  paths the diff changes
 - Necessary — read each line of the body for where else its content
   already lives, and the body carries nothing the diff, its commits,
   the Checks panel or an automation's output carry, states each thing
@@ -26,8 +27,8 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   survives the link going dead
 - Scoped — the diff read against the body carries only what the stated
   intent needs and nothing the body did not lead the reader to expect,
-  and the body conveys the change as a whole: its boundary, and how it
-  is verified within this PR
+  and the body conveys the change as a whole: its boundary, and what it
+  leaves to the parent issue
 - Conformant — the body renders and behaves as intended on GitHub
 
 ## Decidable
@@ -91,6 +92,10 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   target environments unreachable from a shell, or the live session
   itself must be clearly distinguished with reproduction steps and a
   one-line reason why the author could not verify them
+- The body names a verification mechanism — CI, manual test steps, or
+  another check — for the code paths the diff changes
+  - The test is whether the body makes that claim
+  - Judging how adequate the coverage is belongs to code review
 - A negative or absence claim ("no X remains", "該当なし") shows the
   query it rests on and the scope it examined
   - Template-mandated N/A fields are outside this rule
@@ -131,6 +136,12 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
     diff or the commits show, output the Checks panel holds, a fact
     another line of the body states, and anything past the shortest
     summary a linked source needs
+  - A heading is a line the walk takes, and answers for its own text
+    rather than for the lines beneath it
+  - A table row is a line of the walk, read with the caption or lead-in
+    that says what the table shows
+  - A line carrying more than one claim is answered a claim at a time,
+    and each claim forfeits what its own answer names
   - A line the walk lands on is a finding whether or not a rule below
     names it, and the rules below reach lines answering `nowhere` that
     the walk does not
@@ -213,10 +224,6 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
     the body led them to expect
   - Where they do not, the body and the diff disagree, and the author
     chooses which of the two moves
-- The body names a verification mechanism — CI, manual test steps, or
-  another check — for the code paths the diff changes
-  - The test is whether the body makes that claim
-  - Judging how adequate the coverage is belongs to code review
 - Keep the PR self-contained: verification items, acceptance criteria,
   and follow-up actions that depend on changes outside this PR's diff
   (other repos, downstream releases, E2E flows) belong in the parent
