@@ -131,6 +131,11 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
     diff or the commits show, output the Checks panel holds, a fact
     another line of the body states, and anything past the shortest
     summary a linked source needs
+  - A heading is a line the walk takes, and answers for its own text
+    rather than for the lines beneath it
+  - A table is one line of the walk, its lead-in and its rows together
+  - A line carrying more than one claim is answered a claim at a time,
+    and each claim forfeits or survives on its own answer
   - A line the walk lands on is a finding whether or not a rule below
     names it, and the rules below reach lines answering `nowhere` that
     the walk does not
