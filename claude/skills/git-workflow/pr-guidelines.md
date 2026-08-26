@@ -8,13 +8,11 @@ record of the change: everything else lives in the diff, the issue, or
 a linked source. It serves two audiences — the reviewer deciding now,
 and the future reader who reaches this PR from `git log` or blame.
 
-The diff is the default carrier. A reviewer opens it, reads the changed
-lines, and derives from them most of what the change is. The body adds
-what the diff cannot state and what a reader would not derive from it.
-No rule below is a requirement to write a section, and none is
-discharged by writing more: each names something the body carries when
-the diff does not carry it, and asks nothing when the diff does. The
-shortest body that leaves a reviewer able to decide is the correct one.
+The diff is the default carrier: the body adds what the diff cannot
+state and what a reader would not derive from it. No rule under
+Decidable or Scoped is discharged by writing more, and none asks for a
+section the diff's own content would fill. The shortest body that
+leaves a reviewer able to decide is the correct one.
 
 A body is ready when it holds all five properties below. Every rule in
 the five property sections belongs to exactly one of them, and within a
@@ -29,8 +27,9 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
 - Necessary — read each line of the body for where else its content
   already lives, and the body carries nothing the diff, its commits,
   the Checks panel or an automation's output carry, states each thing
-  once, and takes from a linked source no more than the summary that
-  survives the link going dead
+  once, takes from a linked source no more than the summary that
+  survives the link going dead, and writes what remains at its tightest
+  expression
 - Scoped — the diff read against the body carries only what the stated
   intent needs and nothing the body did not lead the reader to expect,
   and the body conveys the change as a whole: a boundary the reader
@@ -51,9 +50,9 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
     inventing an alternative to name is itself a defect
   - "Approaches rejected" covers design alternatives weighed for the
     delivered design
-  - Where the diff changes something other code reaches — a function
-    signature, a config key, an exit code, a file another script reads
-    — name the invariant it still holds
+- Where the diff changes something other code reaches — a function
+  signature, a config key, an exit code, a file another script reads —
+  name the invariant it still holds
 - Inverted pyramid — place the most important information first
   - A reviewer reading only the first few lines can tell what kind of
     PR this is and where to focus
@@ -61,12 +60,13 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   - Implementation details and full alternatives narrative move behind
     a link or to a "Notes" / "Background" section at the end
 - The body's structure comes from the decisions the change carries, not
-  from the shape of the diff. A heading, section, or top-level bullet
-  standing for one hunk, one file, or one edited section of a document
-  is a defect, and a change carrying a single decision takes one
-  paragraph and no headings
+  from the shape of the diff. A subheading or top-level bullet standing
+  for one hunk, one file, or one edited section of a document is a
+  defect, and a change carrying a single decision is described in one
+  paragraph under whichever section the template puts it in
   - A structure a reader could reconstruct from the diff's file list or
-    hunk boundaries alone conveys nothing the diff does not
+    hunk boundaries alone tells the reviewer nothing about where their
+    attention belongs
 - In a bulleted section, the top level carries the change or claim
   itself, so the section reads from its top-level lines alone
   - Supporting material — rationale, evidence, the behavior this change
@@ -162,9 +162,15 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   - A line the walk lands on is a finding whether or not a rule below
     names it, and the rules below reach lines answering `nowhere` that
     the walk does not
-  - After that pass, take each paragraph and ask whether a list would
-    carry the same content in fewer words, then take each list item and
-    count its sentences
+- After that pass, walk the body again for how densely what survived is
+  written
+  - One sentence per list item: a second sentence becomes a sub-bullet
+    under the first, or it was not needed, and an item taking three
+    sentences to land is usually two items
+  - A paragraph enumerating three or more parallel items of the same
+    kind — reasons, rejected alternatives, caveats, options — is a
+    finding, and the items belong in a list, one per line
+  - A single claim carrying its own qualifier stays prose
 - Do not paraphrase the diff
   - Keep out file lists, line counts, percentage of lines removed,
     per-file summaries, and enumerations of added rules, linters,
@@ -207,15 +213,6 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
     are one fact stated twice
 - Each bullet conveys a distinct decision or outcome, not an individual
   code change
-- One sentence per list item
-  - A second sentence becomes a sub-bullet under the first, or it was
-    not needed
-  - An item that takes three sentences to land is usually two items
-- A paragraph that enumerates parallel items is a finding; the items
-  belong in a list, one per line
-  - Parallel means the same kind: reasons, rejected alternatives,
-    caveats, affected files, options
-  - A single claim carrying its own qualifier stays prose
 - Rationale, background, or requirements that live elsewhere (issue,
   design doc, ADR, prior PR, official spec) are summarized under a
   link, not copied
@@ -225,11 +222,12 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
 - When the diff is self-explanatory — documentation or config edits
   whose changed lines a reviewer can read directly, especially in the
   team's own language — the body keeps to what the diff cannot convey,
-  and Decidable and Scoped ask nothing further of it
+  and neither Decidable nor Scoped asks for a rationale or boundary
+  beyond that
   - When nothing remains to add, one line such as "realigned stale
     wording with the actual code/config" is a complete description
-  - Apply this rule before any other rule in this section, so what it
-    leaves is what the rest of the walk reads
+  - Apply this rule before the others in this section, so what it
+    leaves is what they read
 - A section heading grants no exemption
   - "diff から読み取れない設計判断", "補足", or "詳細" does not excuse its
     contents from this property — each paragraph under it still has to
@@ -238,12 +236,6 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   tightest expression, is correct as it is
   - Raw length, and the ratio of body size to diff size, are never
     findings on their own
-  - Content that survives the walk above still answers for how densely
-    it is written
-  - A main description section that outweighs the diff it describes
-    mandates the walk that opens this section be run strictly: each
-    claim answered separately, and the self-explanatory-diff rule
-    applied first
 
 ## Scoped
 
@@ -304,24 +296,24 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
     and any other in-repo documentation) follow standard Markdown
     rendering and may be hard-wrapped for file-side readability
 
-## Worked example: a self-explanatory diff
+## Worked example: a minimal body
 
 A design document gains a retry on one forwarding hop, and the sending
-side's request spec is gathered into a new prerequisites section. One
-Markdown file, 15 lines added and 7 removed, in the team's own
-language. The whole main description section:
+side's request spec, until then split across two places, is gathered
+into a new prerequisites section. One Markdown file, 15 lines added and
+7 removed, in the team's own language. The body's whole account of the
+change, under whichever heading the repository's template gives it:
 
 ```
 転送失敗時のリトライを設計として追加しました。
+
 合わせて、「前提: 送信仕様」節を新設するなど文章の整理をしました。
 ```
 
-The first sentence names the change and the second names the
-reorganization that came with it. What each added table row says, which
-bullets were merged, and how the sections were rearranged are the
-diff's. A heading per edited section would carry the diff's shape
-rather than the change's decisions, and a paragraph justifying each
-edit would be rationale the changed lines already carry.
+The first sentence names the decision and the second names the
+reorganization. Creating that section is the change; which lines moved
+into it, and how the surrounding text was rewritten to point at it, are
+the edits carrying it out, and the reviewer reads those in the diff.
 
 ## PR Body Template (fallback)
 
