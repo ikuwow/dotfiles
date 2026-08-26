@@ -157,11 +157,9 @@ Write "None." under any of the three finding headings that has no
 items, Unverifiable included. The verdict is NEEDS_IMPROVEMENT when any
 Fix item is present, PASS otherwise.
 
-A Necessary finding names where the content already lives — the diff, a
-commit, the Checks panel, the linked source, or the line of this body
-that already states it — so the finding reads as "X carries this"
-rather than as "this is redundant", which an author discharges by
-rewording.
+A Necessary finding carries the location the walk answered for that
+line, so the finding reads as "X carries this" rather than as "this is
+redundant", which an author discharges by rewording.
 
 ## Important Notes
 
