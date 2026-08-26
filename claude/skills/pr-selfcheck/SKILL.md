@@ -92,9 +92,9 @@ Excluded from detection to avoid false positives:
 
 ## Density pass
 
-Necessary's walk ends with a pass over how densely the surviving content
-is written. Apply the count below rather than judging density by eye.
-Each violation it finds is a Fix.
+Decidable asks each item to carry one claim at the shortest length that
+lands it. Apply the count below rather than judging length by eye. Each
+violation it finds is a Fix.
 
 A sentence terminator is `.`, `。`, `!`, `?`, `！`, or `？`. Ignore one
 that falls inside inline code, a fenced block, a URL, a version string,

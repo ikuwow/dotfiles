@@ -20,16 +20,16 @@ section the top-level line is the rule while the lines beneath it
 qualify it. `/pr-selfcheck` evaluates the properties one at a time.
 
 - Decidable — reading top-down, a reviewer arrives at the diff knowing
-  what the change is for and where their attention belongs
+  what the change is for and where their attention belongs, each item
+  carrying one claim at the shortest length that lands it
 - Grounded — every claim is checkable on the evidence the body itself
   carries, and the body names a verification mechanism for the code
   paths the diff changes
 - Necessary — read each line of the body for where else its content
   already lives, and the body carries nothing the diff, its commits,
   the Checks panel or an automation's output carry, states each thing
-  once, takes from a linked source no more than the summary that
-  survives the link going dead, and writes what remains at its tightest
-  expression
+  once, and takes from a linked source no more than the summary that
+  survives the link going dead
 - Scoped — the diff read against the body carries only what the stated
   intent needs and nothing the body did not lead the reader to expect,
   and the body conveys the change as a whole: a boundary the reader
@@ -78,6 +78,16 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   - A long flat list is usually diff paraphrase; where it survives
     Necessary, it is usually a hierarchy that was never encoded
   - A section this empties loses its heading with it
+- Each item carries one claim at the shortest length that lands it
+  - A list item carrying two or more sentences is a finding: the second
+    becomes a sub-bullet under the first, or it was not needed, and an
+    item taking three sentences to land is usually two items
+    - A verification item's evidence is exempt, since Grounded requires
+      the item to carry it
+  - A paragraph enumerating three or more parallel items of the same
+    kind — reasons, rejected alternatives, caveats, options — is a
+    finding, and the items belong in a list, one per line
+    - A single claim carrying its own qualifier stays prose
 - Future work, out-of-scope follow-ups, and "next PR" notes belong at
   the end of the body (e.g., in a "Follow-up" / "Notes" section)
   - Do not surface them in the opening sections (purpose, scope,
@@ -162,17 +172,6 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   - A line the walk lands on is a finding whether or not a rule below
     names it, and the rules below reach lines answering `nowhere` that
     the walk does not
-- After that pass, walk the body again for how densely what survived is
-  written
-  - A list item carrying two or more sentences is a finding: the second
-    becomes a sub-bullet under the first, or it was not needed, and an
-    item taking three sentences to land is usually two items
-    - A verification item's evidence is exempt, since Grounded requires
-      the item to carry it
-  - A paragraph enumerating three or more parallel items of the same
-    kind — reasons, rejected alternatives, caveats, options — is a
-    finding, and the items belong in a list, one per line
-    - A single claim carrying its own qualifier stays prose
 - Do not paraphrase the diff
   - Keep out file lists, line counts, percentage of lines removed,
     per-file summaries, and enumerations of added rules, linters,
@@ -234,8 +233,8 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   - "diff から読み取れない設計判断", "補足", or "詳細" does not excuse its
     contents from this property — each paragraph under it still has to
     be needed for the decision
-- A body long because every part of it is needed, each part at its
-  tightest expression, is correct as it is
+- A body long because every part of it is needed, each item at the
+  length Decidable asks of it, is correct as it is
   - Raw length, and the ratio of body size to diff size, are never
     findings on their own
 
