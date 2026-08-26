@@ -54,6 +54,9 @@ Perform a self-review of the specified PR to catch issues before a human reviewe
 1. Walk the five properties one at a time, in the order
    `pr-guidelines.md` states them, judging the PR against that
    property's rules and the severity table below
+1. Run the density pass described below over the body's list items and
+   paragraphs. It is a count, not a judgement, and it does not depend
+   on the body's language
 1. Output the result in the format described below, reporting a line
    for every property including those with no finding
 
@@ -86,6 +89,32 @@ Excluded from detection to avoid false positives:
 - GFM tables in either form: rows whose first and last non-whitespace characters are `|`, or pipeless rows recognized by the `---|---` divider line directly below the header row
 - HTML comments (`<!-- ... -->`)
 - Blockquotes (lines starting with `> `)
+
+## Density pass
+
+Necessary's walk ends with a pass over how densely the surviving content
+is written. Apply the count below rather than judging density by eye.
+Each violation it finds is a Fix.
+
+A sentence terminator is `.`, `。`, `!`, `?`, `！`, or `？`. Ignore one
+that falls inside inline code, a fenced block, a URL, a version string,
+or a decimal number, and ignore a trailing terminator, so a one-sentence
+item counts zero.
+
+Violation:
+
+- A list item whose own text carries one or more sentence terminators after ignoring the trailing one — that is, two or more sentences
+
+Excluded from detection:
+
+- A `- [x]` or `- [ ]` item, whose extra sentences are the evidence Grounded requires it to carry
+- Sub-bullets, which are counted as their own items rather than as part of the parent
+- Fenced code blocks, GFM table rows, HTML comments, and blockquotes
+
+The companion rule — a paragraph enumerating three or more parallel
+items of the same kind belongs in a list — takes judgement rather than a
+count, so weigh it against the severity table instead of reporting it
+from this pass.
 
 ## Output Format
 

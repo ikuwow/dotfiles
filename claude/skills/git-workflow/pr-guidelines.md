@@ -164,13 +164,15 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
     the walk does not
 - After that pass, walk the body again for how densely what survived is
   written
-  - One sentence per list item: a second sentence becomes a sub-bullet
-    under the first, or it was not needed, and an item taking three
-    sentences to land is usually two items
+  - A list item carrying two or more sentences is a finding: the second
+    becomes a sub-bullet under the first, or it was not needed, and an
+    item taking three sentences to land is usually two items
+    - A verification item's evidence is exempt, since Grounded requires
+      the item to carry it
   - A paragraph enumerating three or more parallel items of the same
     kind — reasons, rejected alternatives, caveats, options — is a
     finding, and the items belong in a list, one per line
-  - A single claim carrying its own qualifier stays prose
+    - A single claim carrying its own qualifier stays prose
 - Do not paraphrase the diff
   - Keep out file lists, line counts, percentage of lines removed,
     per-file summaries, and enumerations of added rules, linters,
