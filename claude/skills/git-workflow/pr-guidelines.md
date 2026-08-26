@@ -162,6 +162,9 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   - A line the walk lands on is a finding whether or not a rule below
     names it, and the rules below reach lines answering `nowhere` that
     the walk does not
+  - After that pass, take each paragraph and ask whether a list would
+    carry the same content in fewer words, then take each list item and
+    count its sentences
 - Do not paraphrase the diff
   - Keep out file lists, line counts, percentage of lines removed,
     per-file summaries, and enumerations of added rules, linters,
@@ -204,6 +207,15 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
     are one fact stated twice
 - Each bullet conveys a distinct decision or outcome, not an individual
   code change
+- One sentence per list item
+  - A second sentence becomes a sub-bullet under the first, or it was
+    not needed
+  - An item that takes three sentences to land is usually two items
+- A paragraph that enumerates parallel items is a finding; the items
+  belong in a list, one per line
+  - Parallel means the same kind: reasons, rejected alternatives,
+    caveats, affected files, options
+  - A single claim carrying its own qualifier stays prose
 - Rationale, background, or requirements that live elsewhere (issue,
   design doc, ADR, prior PR, official spec) are summarized under a
   link, not copied
@@ -222,12 +234,16 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   - "diff から読み取れない設計判断", "補足", or "詳細" does not excuse its
     contents from this property — each paragraph under it still has to
     be needed for the decision
-- Length is not itself a finding, and a body long because every part of
-  it is needed is correct as it is
-  - A main description section that outweighs the diff it describes is
-    not a finding either, but it mandates the walk that opens this
-    section be run strictly: each claim answered separately, and the
-    self-explanatory-diff rule applied first
+- A body long because every part of it is needed, each part at its
+  tightest expression, is correct as it is
+  - Raw length, and the ratio of body size to diff size, are never
+    findings on their own
+  - Content that survives the walk above still answers for how densely
+    it is written
+  - A main description section that outweighs the diff it describes
+    mandates the walk that opens this section be run strictly: each
+    claim answered separately, and the self-explanatory-diff rule
+    applied first
 
 ## Scoped
 
