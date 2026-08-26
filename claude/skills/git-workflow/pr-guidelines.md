@@ -57,8 +57,14 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   - A reviewer reading only the first few lines can tell what kind of
     PR this is and where to focus
 - Progressive disclosure — surface only what a reviewer needs to decide
-  - Implementation details and full alternatives narrative move behind
-    a link or to a "Notes" / "Background" section at the end
+  - Material a reviewer would ask for rather than need in order to
+    decide — implementation detail, a derivation, a measurement, the
+    full alternatives narrative — moves behind a link, into a "Notes" /
+    "Background" section at the end, or into the review thread when the
+    question comes
+  - A decision a linked source delegates to this PR is stated as the
+    value and what bounds it, the derivation being material of that
+    kind
 - The body's structure comes from the decisions the change carries, not
   from the shape of the diff. A subheading or top-level bullet standing
   for one hunk, one file, or one edited section of a document is a
@@ -243,6 +249,10 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
 - Where the change stops short of what its intent would lead a reader
   to expect, the body says so; a boundary the reader would assume needs
   no statement
+  - The space outside a change is unbounded, so a list of what the
+    change is not conveys nothing on its own, and an out-of-scope item
+    earns its place only where the stated intent would lead a reader to
+    look for it in this diff
 - Edits, reformats, renames, and "while I'm here" cleanups that fall
   outside the PR's stated scope should not appear in the diff
   - The PR diff itself is a deliverable, and out-of-scope hunks force
