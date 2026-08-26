@@ -225,8 +225,8 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   design doc, ADR, prior PR, official spec) are summarized under a
   link, not copied
   - A bare link is itself a defect: write the shortest summary that
-    survives the link going dead, naming the value, constraint, or
-    decision this change rests on from that source
+    survives the link going dead, naming what this change rests on
+    from that source
   - Anything past that shortest summary is duplication
 - When the diff is self-explanatory — documentation or config edits
   whose changed lines a reviewer can read directly, especially in the
