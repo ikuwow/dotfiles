@@ -157,9 +157,10 @@ Write "None." under any of the three finding headings that has no
 items, Unverifiable included. The verdict is NEEDS_IMPROVEMENT when any
 Fix item is present, PASS otherwise.
 
-A Necessary finding carries the location the walk answered for that
-line, so the finding reads as "X carries this" rather than as "this is
-redundant", which an author discharges by rewording.
+A finding that Necessary's line-by-line walk produced carries the
+location it answered for that line, so the finding reads as "X carries
+this" rather than as "this is redundant", which an author discharges by
+rewording.
 
 ## Important Notes
 

@@ -27,9 +27,9 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   paths the diff changes
 - Necessary — read each line of the body for where else its content
   already lives, and the body carries nothing the diff, its commits,
-  the Checks panel or an automation's output carry, states each thing
-  once, and takes from a linked source no more than the summary that
-  survives the link going dead
+  the Checks panel, this PR's review threads or an automation's output
+  carry, states each thing once, and takes from a linked source no more
+  than the summary that survives the link going dead
 - Scoped — the diff read against the body carries only what the stated
   intent needs and nothing the body did not lead the reader to expect,
   and the body conveys the change as a whole: a boundary the reader
@@ -168,9 +168,9 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   nowhere
   - What the answer forfeits is the part it already carries: detail the
     diff or the commits show, output the Checks panel holds, the
-    attribution of a point to the review that raised it, a fact another
-    line of the body states, and anything past the shortest summary a
-    linked source needs
+    attribution of a point to the review thread that raised it and not
+    the point itself, a fact another line of the body states, and
+    anything past the shortest summary a linked source needs
   - A heading is a line the walk takes, and answers for its own text
     rather than for the lines beneath it
   - A table row is a line of the walk, read with the caption or lead-in
