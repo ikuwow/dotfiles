@@ -6,9 +6,15 @@ and when self-reviewing your own PR.
 A PR body is a summary that helps a reviewer decide, not a complete
 record of the change: everything else lives in the diff, the issue, or
 a linked source. It serves two audiences — the reviewer deciding now,
-and the future reader who reaches this PR from `git log` or blame. Both
-need why the change was made and the shape of the decision behind it;
-neither needs what the diff already shows.
+and the future reader who reaches this PR from `git log` or blame.
+
+The diff is the default carrier. A reviewer opens it, reads the changed
+lines, and derives from them most of what the change is. The body adds
+what the diff cannot state and what a reader would not derive from it.
+No rule below is a requirement to write a section, and none is
+discharged by writing more: each names something the body carries when
+the diff does not carry it, and asks nothing when the diff does. The
+shortest body that leaves a reviewer able to decide is the correct one.
 
 A body is ready when it holds all five properties below. Every rule in
 the five property sections belongs to exactly one of them, and within a
@@ -27,19 +33,22 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   survives the link going dead
 - Scoped — the diff read against the body carries only what the stated
   intent needs and nothing the body did not lead the reader to expect,
-  and the body conveys the change as a whole: its boundary, and what it
-  leaves to the parent issue
+  and the body conveys the change as a whole: a boundary the reader
+  would not assume, and what it leaves to the parent issue
 - Conformant — the body renders and behaves as intended on GitHub
 
 ## Decidable
 
-- State what changed, and what prompted it now — the incident, the
-  investigation that could not conclude, the request, the obligation
-  that came due
-  - Purpose and impact come from the body; the changed lines
-    themselves are the diff's to show
-- Give the shape of the decision: the approach taken vs. the approaches
-  rejected, and risks or things a reviewer should watch out for
+- Name the change in one sentence, and add what prompted it now where
+  the diff does not show it — the incident, the investigation that
+  could not conclude, the request, the obligation that came due
+  - The changed lines are the diff's to show, so the body names the
+    change rather than describing it
+- Where a design decision was weighed, the body carries its shape: the
+  approach taken against the approaches rejected, and risks or things a
+  reviewer should watch out for
+  - A change with one obvious approach carries none of this, and
+    inventing an alternative to name is itself a defect
   - "Approaches rejected" covers design alternatives weighed for the
     delivered design
   - Where the diff changes something other code reaches — a function
@@ -51,6 +60,13 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
 - Progressive disclosure — surface only what a reviewer needs to decide
   - Implementation details and full alternatives narrative move behind
     a link or to a "Notes" / "Background" section at the end
+- The body's structure comes from the decisions the change carries, not
+  from the shape of the diff. A heading, section, or top-level bullet
+  standing for one hunk, one file, or one edited section of a document
+  is a defect, and a change carrying a single decision takes one
+  paragraph and no headings
+  - A structure a reader could reconstruct from the diff's file list or
+    hunk boundaries alone conveys nothing the diff does not
 - In a bulleted section, the top level carries the change or claim
   itself, so the section reads from its top-level lines alone
   - Supporting material — rationale, evidence, the behavior this change
@@ -59,7 +75,8 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   it belongs beneath that one rather than beside it, in whichever
   section that one sits, unless another rule here places it in a
   section of its own
-  - A long flat list is usually a hierarchy that was never encoded
+  - A long flat list is usually diff paraphrase; where it survives
+    Necessary, it is usually a hierarchy that was never encoded
   - A section this empties loses its heading with it
 - Future work, out-of-scope follow-ups, and "next PR" notes belong at
   the end of the body (e.g., in a "Follow-up" / "Notes" section)
@@ -195,21 +212,28 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   - Anything past that shortest summary is duplication
 - When the diff is self-explanatory — documentation or config edits
   whose changed lines a reviewer can read directly, especially in the
-  team's own language — keep the body to what the diff cannot convey
-  (rationale, scope boundary)
+  team's own language — the body keeps to what the diff cannot convey,
+  and Decidable and Scoped ask nothing further of it
   - When nothing remains to add, one line such as "realigned stale
     wording with the actual code/config" is a complete description
+  - Apply this rule before any other rule in this section, so what it
+    leaves is what the rest of the walk reads
 - A section heading grants no exemption
   - "diff から読み取れない設計判断", "補足", or "詳細" does not excuse its
     contents from this property — each paragraph under it still has to
     be needed for the decision
-- A body that is long because every part of it is needed is correct as
-  it is, and length itself is never a finding
+- Length is not itself a finding, and a body long because every part of
+  it is needed is correct as it is
+  - A main description section that outweighs the diff it describes is
+    not a finding either, but it mandates the walk that opens this
+    section be run strictly: each claim answered separately, and the
+    self-explanatory-diff rule applied first
 
 ## Scoped
 
-- Describe the boundary of the change and call out anything
-  intentionally left out of scope
+- Where the change stops short of what its intent would lead a reader
+  to expect, the body says so; a boundary the reader would assume needs
+  no statement
 - Edits, reformats, renames, and "while I'm here" cleanups that fall
   outside the PR's stated scope should not appear in the diff
   - The PR diff itself is a deliverable, and out-of-scope hunks force
@@ -221,7 +245,9 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   parts a reader needs in order to hold that intent, with the rest left
   to the diff
   - A reader who finishes the body and then opens the diff finds what
-    the body led them to expect
+    the body led them to expect. The expectation is of the change's
+    intent, not of an inventory of where the diff touches — naming the
+    edited files, sections, or hunks does not discharge this
   - Where they do not, the body and the diff disagree, and the author
     chooses which of the two moves
 - Keep the PR self-contained: verification items, acceptance criteria,
@@ -261,6 +287,25 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   - Plain Markdown files (READMEs, ADRs, this guidelines file itself,
     and any other in-repo documentation) follow standard Markdown
     rendering and may be hard-wrapped for file-side readability
+
+## Worked example: a self-explanatory diff
+
+A design document gains a retry on one forwarding hop, and the sending
+side's request spec is gathered into a new prerequisites section. One
+Markdown file, 15 lines added and 7 removed, in the team's own
+language. The whole main description section:
+
+```
+転送失敗時のリトライを設計として追加しました。
+合わせて、「前提: 送信仕様」節を新設するなど文章の整理をしました。
+```
+
+The first sentence names the change and the second names the
+reorganization that came with it. What each added table row says, which
+bullets were merged, and how the sections were rearranged are the
+diff's. A heading per edited section would carry the diff's shape
+rather than the change's decisions, and a paragraph justifying each
+edit would be rationale the changed lines already carry.
 
 ## PR Body Template (fallback)
 
