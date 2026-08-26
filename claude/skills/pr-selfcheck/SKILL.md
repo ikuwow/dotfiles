@@ -54,6 +54,9 @@ Perform a self-review of the specified PR to catch issues before a human reviewe
 1. Walk the five properties one at a time, in the order
    `pr-guidelines.md` states them, judging the PR against that
    property's rules and the severity table below
+1. Run the density pass described below over the body's list items and
+   paragraphs. It is a count, not a judgement, and it does not depend
+   on the body's language
 1. Output the result in the format described below, reporting a line
    for every property including those with no finding
 
@@ -86,6 +89,44 @@ Excluded from detection to avoid false positives:
 - GFM tables in either form: rows whose first and last non-whitespace characters are `|`, or pipeless rows recognized by the `---|---` divider line directly below the header row
 - HTML comments (`<!-- ... -->`)
 - Blockquotes (lines starting with `> `)
+
+## Density pass
+
+Decidable asks each item to carry one claim at the shortest length that
+lands it. Apply the count below rather than judging length by eye. Each
+violation it finds is a Fix.
+
+Enumerate every list item in the body, top-level and nested alike, and
+count each one. Sampling reports a clean pass on a body full of
+violations, which is the failure this section exists to prevent. Start
+from the mechanical over-count below and remove the items the exclusions
+cover — do not start from the items that catch your eye.
+
+```
+grep -nE '^ *[-*+] ' <body file> | grep -cE '[.。!?！？].'
+```
+
+A sentence terminator is `.`, `。`, `!`, `?`, `！`, or `？`. A trailing
+terminator does not count, so a one-sentence item counts zero.
+
+Violation:
+
+- A list item whose own text carries one or more sentence terminators after ignoring the trailing one — that is, two or more sentences
+
+Excluded from detection:
+
+- A terminator inside inline code, a fenced block, a URL, a version string, a decimal number, or material the item quotes as its evidence
+- A `- [x]` or `- [ ]` item, whose extra sentences are the evidence Grounded requires it to carry
+- Sub-bullets, which are counted as their own items rather than as part of the parent
+- Fenced code blocks, GFM table rows, HTML comments, and blockquotes
+
+Report the enumerated count alongside the findings, so a reader can see
+the pass covered the whole body rather than a sample.
+
+The companion rule — a paragraph enumerating three or more parallel
+items of the same kind belongs in a list — takes judgement rather than a
+count, so weigh it against the severity table instead of reporting it
+from this pass.
 
 ## Output Format
 
