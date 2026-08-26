@@ -207,8 +207,9 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   - Keep out chronological narration of implementation attempts ("first
     tried X, it failed, so Y") and records of direction changes made
     mid-implementation
-  - Keep out references to the session, to plan-mode phases, or to
-    individual commits within the branch
+  - Keep out references to the session, to plan-mode phases, to
+    individual commits within the branch, or to the review that raised
+    a point ("raised in review", "per feedback")
   - Keep out rejected alternatives described at implementation-attempt
     granularity, and alternatives a reviewer would not arrive at and
     ask about
