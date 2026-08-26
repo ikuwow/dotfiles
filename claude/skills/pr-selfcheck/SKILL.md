@@ -153,12 +153,11 @@ from this pass.
 PASS | NEEDS_IMPROVEMENT
 ```
 
+A Necessary finding names where the line's content already lives.
+
 Write "None." under any of the three finding headings that has no
 items, Unverifiable included. The verdict is NEEDS_IMPROVEMENT when any
 Fix item is present, PASS otherwise.
-
-A Necessary finding names the location the Necessary walk answered for
-the line.
 
 ## Important Notes
 
