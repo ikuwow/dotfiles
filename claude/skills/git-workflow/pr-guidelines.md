@@ -164,11 +164,13 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
 
 - Take the body a line at a time and name where else that line's content
   lives — the diff, the branch's commits, the Checks panel, a linked
-  source, another line of this body, or nowhere
+  source, this PR's own review threads, another line of this body, or
+  nowhere
   - What the answer forfeits is the part it already carries: detail the
-    diff or the commits show, output the Checks panel holds, a fact
-    another line of the body states, and anything past the shortest
-    summary a linked source needs
+    diff or the commits show, output the Checks panel holds, the
+    attribution of a point to the review that raised it, a fact another
+    line of the body states, and anything past the shortest summary a
+    linked source needs
   - A heading is a line the walk takes, and answers for its own text
     rather than for the lines beneath it
   - A table row is a line of the walk, read with the caption or lead-in
