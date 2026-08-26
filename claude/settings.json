@@ -532,6 +532,7 @@
       ]
     }
   },
+  "language": "japanese",
   "effortLevel": "high",
   "advisorModel": "fable",
   "autoUpdatesChannel": "stable",
