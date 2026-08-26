@@ -96,10 +96,18 @@ Decidable asks each item to carry one claim at the shortest length that
 lands it. Apply the count below rather than judging length by eye. Each
 violation it finds is a Fix.
 
-A sentence terminator is `.`, `。`, `!`, `?`, `！`, or `？`. Ignore one
-that falls inside inline code, a fenced block, a URL, a version string,
-or a decimal number, and ignore a trailing terminator, so a one-sentence
-item counts zero.
+Enumerate every list item in the body, top-level and nested alike, and
+count each one. Sampling reports a clean pass on a body full of
+violations, which is the failure this section exists to prevent. Start
+from the mechanical over-count below and remove the items the exclusions
+cover — do not start from the items that catch your eye.
+
+```
+grep -nE '^ *[-*+] ' <body file> | grep -cE '[.。!?！？].'
+```
+
+A sentence terminator is `.`, `。`, `!`, `?`, `！`, or `？`. A trailing
+terminator does not count, so a one-sentence item counts zero.
 
 Violation:
 
@@ -107,9 +115,13 @@ Violation:
 
 Excluded from detection:
 
+- A terminator inside inline code, a fenced block, a URL, a version string, a decimal number, or material the item quotes as its evidence
 - A `- [x]` or `- [ ]` item, whose extra sentences are the evidence Grounded requires it to carry
 - Sub-bullets, which are counted as their own items rather than as part of the parent
 - Fenced code blocks, GFM table rows, HTML comments, and blockquotes
+
+Report the enumerated count alongside the findings, so a reader can see
+the pass covered the whole body rather than a sample.
 
 The companion rule — a paragraph enumerating three or more parallel
 items of the same kind belongs in a list — takes judgement rather than a

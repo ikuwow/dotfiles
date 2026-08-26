@@ -88,8 +88,8 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   - A list item carrying two or more sentences is a finding: the second
     becomes a sub-bullet under the first, or it was not needed, and an
     item taking three sentences to land is usually two items
-    - A verification item's evidence is exempt, since Grounded requires
-      the item to carry it
+    - Evidence the item quotes, and a verification item's evidence, are
+      exempt, since Grounded requires the item to carry them
   - A paragraph enumerating three or more parallel items of the same
     kind — reasons, rejected alternatives, caveats, options — is a
     finding, and the items belong in a list, one per line
