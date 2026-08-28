@@ -173,6 +173,12 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
     rather than for the lines beneath it
   - A table row is a line of the walk, read with the caption or lead-in
     that says what the table shows
+  - A diagram or a code block is a line of the walk, answered whole for
+    what it depicts. One that traces the control flow, structure, or
+    call order of code in the diff answers `the diff`
+  - The diff carries the comments and docstrings it adds, so a design
+    decision the changed code already explains in prose is content the
+    body forfeits
   - A line carrying more than one claim is answered a claim at a time,
     and each claim forfeits what its own answer names
   - A line the walk lands on is a finding whether or not a rule below
