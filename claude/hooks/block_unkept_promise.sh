@@ -16,8 +16,9 @@
 # status is a hook error. So set -e is absent, and every expansion that
 # may be unset carries a :- default, since set -u would otherwise abort
 # with exit 1. An empty verdict is not YES, so a broken call blocks
-# nothing — and stderr from the call is discarded, so a call that is
-# permanently broken fails silently rather than noisily.
+# nothing, and it leaves a stderr breadcrumb — on exit 0 that reaches
+# the debug log only, so it costs the user nothing and is the only
+# signal separating "no promise found" from "hook stopped working".
 set -u
 
 # --safe-mode on the claude call below disables hooks in that session,
@@ -33,11 +34,11 @@ INPUT=$(cat)
 
 # stop_hook_active is set once this hook has already blocked a stop;
 # blocking the resulting Stop again would loop.
-if [ "$(printf '%s' "$INPUT" | jq -r '.stop_hook_active // false')" = "true" ]; then
+if [ "$(printf '%s' "$INPUT" | jq -r '.stop_hook_active // false' 2>/dev/null)" = "true" ]; then
   exit 0
 fi
 
-TEXT=$(printf '%s' "$INPUT" | jq -r '.last_assistant_message // empty')
+TEXT=$(printf '%s' "$INPUT" | jq -r '.last_assistant_message // empty' 2>/dev/null)
 if [ -z "$TEXT" ]; then
   exit 0
 fi
@@ -76,12 +77,25 @@ $TEXT
 Reply with exactly one word, YES or NO, and nothing else.
 PROMPT_END
 
-VERDICT=$(CLAUDE_UNKEPT_PROMISE_CHECK=1 claude -p "$PROMPT" \
+# Captured whole rather than piped, so a call that streams some output
+# and then fails cannot have its exit status swallowed by the pipeline.
+# `|| RAW=` both discards the verdict on failure and keeps the status
+# off the script's own exit code.
+RAW=$(CLAUDE_UNKEPT_PROMISE_CHECK=1 claude -p "$PROMPT" \
   --model haiku \
   --output-format text \
   --safe-mode \
   --disallowedTools Bash Edit Write Read Glob Grep WebFetch WebSearch Task \
-  2>/dev/null | head -n 1 | tr -d '[:space:]')
+  2>/dev/null) || RAW=
+
+# First non-blank line, so a leading blank does not read as an empty
+# verdict. Anything that is not exactly YES is NO.
+VERDICT=$(printf '%s' "$RAW" | grep -m1 '[^[:space:]]' | tr -d '[:space:]')
+
+if [ -z "$VERDICT" ]; then
+  echo "block_unkept_promise: no verdict from claude -p, treating as NO" >&2
+  exit 0
+fi
 
 if [ "$VERDICT" != "YES" ]; then
   exit 0
