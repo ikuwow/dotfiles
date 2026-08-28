@@ -80,6 +80,13 @@ READONLY_BARE_COMMANDS = frozenset(
 # module note on keeping the Bash classifier simple.
 _PIPE_RE = re.compile(r"(?<!\|)\|(?!\|)")
 
+# An output redirect and its target. The target charset excludes "&" so
+# that fd duplications like "2>&1" yield no match and stay read-only.
+_REDIRECT_RE = re.compile(r">>?\s*([^\s|&]+)")
+
+# The one redirect target that writes nothing.
+_NULL_SINK = "/dev/null"
+
 VERDICT_SYSTEM_PROMPT = (
     "You judge whether an AI coding assistant's most recent turn committed "
     "to doing work and then ended the turn without starting it (an unkept "
@@ -111,6 +118,13 @@ def _pipeline_segments(command):
 
 
 def _is_segment_readonly(segment):
+    # A redirect makes any segment a write, whatever the command name.
+    # This is what keeps heredoc file writes ("cat > f <<EOF") from
+    # passing as read-only on the strength of "cat" alone.
+    if any(
+        target != _NULL_SINK for target in _REDIRECT_RE.findall(segment)
+    ):
+        return False
     tokens = segment.split()
     if not tokens:
         return True
@@ -187,6 +201,21 @@ def is_readonly_bash_command(command):
 
     >>> is_readonly_bash_command("some-unknown-tool --flag")
     False
+
+    A redirect makes the segment a write even when the command name is
+    on the allowlist, which covers the heredoc file-write idiom:
+
+    >>> is_readonly_bash_command("cat > out.txt <<EOF")
+    False
+    >>> is_readonly_bash_command("echo hi >> log.txt")
+    False
+
+    Redirects that write nothing stay read-only:
+
+    >>> is_readonly_bash_command("grep -r foo . 2>/dev/null")
+    True
+    >>> is_readonly_bash_command("ls missing 2>&1")
+    True
 
     An empty command is vacuously read-only (no segment to fail):
 
@@ -440,6 +469,13 @@ def main():
     if data.get("stop_hook_active"):
         sys.exit(0)
 
+    # Checked before the transcript read so the disabled state costs
+    # nothing: the poll loop below can otherwise spend POLL_INTERVAL_S *
+    # POLL_MAX_ITERATIONS on every Stop for a hook that will never fire.
+    api_key = os.environ.get(API_KEY_ENV, "")
+    if not api_key:
+        sys.exit(0)
+
     transcript_path = data.get("transcript_path", "")
     if not transcript_path:
         print("block_unkept_promise: no transcript_path in stdin", file=sys.stderr)
@@ -480,10 +516,6 @@ def main():
                 file=sys.stderr,
             )
             sys.exit(0)
-
-    api_key = os.environ.get(API_KEY_ENV, "")
-    if not api_key:
-        sys.exit(0)
 
     tool_calls = extract_tool_calls(blocks)
     if is_mutating_turn(tool_calls):
