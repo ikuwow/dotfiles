@@ -21,10 +21,10 @@ asyncRewake: true (exit 2 wakes Claude, with stderr — or stdout if
 stderr is empty — shown as a system reminder). The installed Claude
 Code binary's own config schema documents that general mechanism in
 those terms, including a default wake-message label of "Stop hook
-feedback" that suggests it targets this event; what remains unverified
-in this session is not that documented mechanism but whether it
-actually fires end to end on a live Stop event. If it does not, the
-fallback is deleting that one settings.json flag with no code change.
+feedback" that suggests it targets this event; whether it actually
+fires end to end on a live Stop event remains unverified. If it does
+not, the fallback is deleting that one settings.json flag with no code
+change.
 
 stop_hook_active guards the synchronous Stop chain, but an asyncRewake
 wake starts a fresh turn with a new assistant message uuid, so that
