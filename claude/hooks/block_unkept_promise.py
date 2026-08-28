@@ -1,12 +1,9 @@
 #!/usr/bin/env python3
 """Stop hook: catch turns that promise work and then end without doing it.
 
-Phrasing like "やっておくよ", "あとで直しとく", or "I'll handle that" spans
-an open-ended space that a fixed phrase list cannot cover and would need
-endless maintenance. Instead of matching text, this hook asks a Claude
-Haiku model to judge whether the current turn committed to work and then
-ended without starting it, given the turn's text and the names of the
-tools it called.
+This hook asks a Claude Haiku model to judge whether the current turn
+committed to work and then ended without starting it, given the turn's
+text and the names of the tools it called.
 
 Most turns that actually do work call a mutating tool (Edit, Write,
 NotebookEdit, or a non-read-only Bash command), so the prefilter in
@@ -76,8 +73,7 @@ READONLY_BARE_COMMANDS = frozenset(
     {"cat", "head", "tail", "grep", "rg", "ls", "find", "wc", "jq", "yq", "which", "echo"}
 )
 
-# A single "|" that is not part of "||". Quoting is not modeled — see
-# module note on keeping the Bash classifier simple.
+# A single "|" that is not part of "||". Quoting is not modeled.
 _PIPE_RE = re.compile(r"(?<!\|)\|(?!\|)")
 
 # An output redirect and its target. The target charset excludes "&" so
