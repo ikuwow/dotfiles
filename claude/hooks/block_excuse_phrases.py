@@ -265,7 +265,7 @@ def main():
     try:
         with open(transcript_path, encoding="utf-8") as f:
             events = [json.loads(line) for line in f if line.strip()]
-    except (OSError, json.JSONDecodeError) as e:
+    except (OSError, ValueError) as e:
         print(f"block_excuse_phrases: transcript read failed: {e}", file=sys.stderr)
         sys.exit(0)
 
@@ -279,7 +279,7 @@ def main():
             try:
                 with open(transcript_path, encoding="utf-8") as f:
                     events = [json.loads(line) for line in f if line.strip()]
-            except (OSError, json.JSONDecodeError) as e:
+            except (OSError, ValueError) as e:
                 last_err = e
                 continue
             blocks = collect_current_turn_assistant_text(events)
