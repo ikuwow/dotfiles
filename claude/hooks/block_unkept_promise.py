@@ -400,11 +400,13 @@ def build_verdict_request(texts, tool_names):
 
     Sends only the current turn's assistant text and tool names — no
     tool inputs or results — to keep token cost down and file contents
-    off the wire. No thinking/output_config.effort field is sent: the
-    task spec behind this hook states Haiku 4.5 predates adaptive
-    thinking and that effort errors on it, but that claim has not been
-    checked against Anthropic's own API docs in this session and
-    should be treated as unverified until it is.
+    off the wire. Neither a thinking nor an output_config.effort field
+    is sent, because Haiku 4.5 accepts neither: it is an
+    extended-thinking-only model, where thinking type "adaptive"
+    returns a 400, and Opus 4.5 is the only extended-thinking-only
+    model that supports effort. See
+    https://platform.claude.com/docs/en/build-with-claude/extended-thinking
+    ("Migrating to adaptive thinking" and "Budget rules and tuning").
 
     >>> req = build_verdict_request(["I'll fix that next."], ["Read"])
     >>> req["model"]

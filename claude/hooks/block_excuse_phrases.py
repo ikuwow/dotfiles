@@ -251,7 +251,17 @@ def main():
     try:
         data = json.load(sys.stdin)
     except (json.JSONDecodeError, ValueError) as e:
-        print(f"block_excuse_phrases: stdin parse failed: {e}", file=sys.stderr)
+        print(f"block_excuse_phrases: stdin parse failed: {e!r}", file=sys.stderr)
+        sys.exit(0)
+
+    # json.load accepts null, arrays, and scalars, none of which carry
+    # the hook payload's fields, so the parse guard alone would let them
+    # reach the first attribute access.
+    if not isinstance(data, dict):
+        print(
+            f"block_excuse_phrases: stdin was not a JSON object: {data!r}",
+            file=sys.stderr,
+        )
         sys.exit(0)
 
     if data.get("stop_hook_active"):
