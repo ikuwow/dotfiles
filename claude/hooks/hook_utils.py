@@ -1,4 +1,4 @@
-"""Shared utilities for Claude Code PermissionRequest hooks.
+"""Shared utilities for Claude Code hooks.
 
 Spec: https://code.claude.com/docs/en/hooks
 """
@@ -78,6 +78,105 @@ def has_unsafe_substitution(command: str) -> bool:
 
         i += 1
     return False
+
+
+def collect_current_turn_blocks(events):
+    """Collect raw assistant content blocks emitted since the last real user message.
+
+    Walks events backward and stops at a real user message; user events
+    whose content is purely tool_result blocks are tool-call re-entries,
+    not turn boundaries, and are skipped. Returns every content block
+    (text, tool_use, etc.) in reverse-walk order — a caller that needs
+    only text filters for block.get("type") == "text".
+
+    Single-turn capture, both a text and a tool_use block:
+
+    >>> events = [
+    ...     {"type": "user", "message": {"role": "user", "content": "hi"}},
+    ...     {"type": "assistant", "message": {"content": [
+    ...         {"type": "text", "text": "on it"},
+    ...         {"type": "tool_use", "name": "Bash", "input": {"command": "ls"}},
+    ...     ]}},
+    ... ]
+    >>> collect_current_turn_blocks(events) == [
+    ...     {"type": "text", "text": "on it"},
+    ...     {"type": "tool_use", "name": "Bash", "input": {"command": "ls"}},
+    ... ]
+    True
+
+    Tool-call re-entry does not end the turn; both text blocks are
+    captured (in reverse-walk order):
+
+    >>> events = [
+    ...     {"type": "user", "message": {"role": "user", "content": "x"}},
+    ...     {"type": "assistant", "message": {"content": [
+    ...         {"type": "text", "text": "first"}
+    ...     ]}},
+    ...     {"type": "assistant", "message": {"content": [
+    ...         {"type": "tool_use", "name": "Bash"}
+    ...     ]}},
+    ...     {"type": "user", "message": {"role": "user", "content": [
+    ...         {"type": "tool_result", "content": "ok"}
+    ...     ]}},
+    ...     {"type": "assistant", "message": {"content": [
+    ...         {"type": "text", "text": "second"}
+    ...     ]}},
+    ... ]
+    >>> [b.get("text") for b in collect_current_turn_blocks(events) if b.get("type") == "text"]
+    ['second', 'first']
+
+    A real user message ends the scan; older turns are not captured:
+
+    >>> events = [
+    ...     {"type": "assistant", "message": {"content": [
+    ...         {"type": "text", "text": "old"}
+    ...     ]}},
+    ...     {"type": "user", "message": {"role": "user", "content": "new turn"}},
+    ...     {"type": "assistant", "message": {"content": [
+    ...         {"type": "text", "text": "current"}
+    ...     ]}},
+    ... ]
+    >>> [b.get("text") for b in collect_current_turn_blocks(events) if b.get("type") == "text"]
+    ['current']
+
+    Empty input:
+
+    >>> collect_current_turn_blocks([])
+    []
+
+    Malformed events are skipped silently — system events, assistant
+    messages with missing or null content, etc.:
+
+    >>> events = [
+    ...     {"type": "system"},
+    ...     {"type": "assistant", "message": {}},
+    ...     {"type": "assistant", "message": {"content": None}},
+    ...     {"type": "user", "message": {"role": "user", "content": "hi"}},
+    ...     {"type": "assistant", "message": {"content": [
+    ...         {"type": "text", "text": "ok"}
+    ...     ]}},
+    ... ]
+    >>> [b.get("text") for b in collect_current_turn_blocks(events) if b.get("type") == "text"]
+    ['ok']
+    """
+    blocks = []
+    for event in reversed(events):
+        if event.get("type") == "user":
+            content = event.get("message", {}).get("content")
+            if isinstance(content, str):
+                break
+            if isinstance(content, list) and not all(
+                isinstance(c, dict) and c.get("type") == "tool_result"
+                for c in content
+            ):
+                break
+            continue
+        if event.get("type") != "assistant":
+            continue
+        for block in event.get("message", {}).get("content", []) or []:
+            if isinstance(block, dict):
+                blocks.append(block)
+    return blocks
 
 
 def approve_and_exit():

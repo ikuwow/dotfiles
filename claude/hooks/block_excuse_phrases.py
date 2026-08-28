@@ -38,6 +38,8 @@ import re
 import sys
 import time
 
+from hook_utils import collect_current_turn_blocks
+
 FORBIDDEN_PATTERN = re.compile(r"正直|本当のところ|ぶっちゃけ")
 
 POLL_INTERVAL_S = 0.05
@@ -238,24 +240,11 @@ def collect_current_turn_assistant_text(events):
     >>> collect_current_turn_assistant_text(events)
     ['正直そう思う']
     """
-    texts = []
-    for event in reversed(events):
-        if event.get("type") == "user":
-            content = event.get("message", {}).get("content")
-            if isinstance(content, str):
-                break
-            if isinstance(content, list) and not all(
-                isinstance(c, dict) and c.get("type") == "tool_result"
-                for c in content
-            ):
-                break
-            continue
-        if event.get("type") != "assistant":
-            continue
-        for block in event.get("message", {}).get("content", []) or []:
-            if isinstance(block, dict) and block.get("type") == "text":
-                texts.append(block.get("text", ""))
-    return texts
+    return [
+        block.get("text", "")
+        for block in collect_current_turn_blocks(events)
+        if block.get("type") == "text"
+    ]
 
 
 def main():
