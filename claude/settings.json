@@ -227,7 +227,6 @@
       "Bash(git push * --mirror *)",
       "Bash(git push * :*)",
       "Bash(git checkout -- *)",
-      "Bash(git checkout * -- *)",
       "Bash(git push --force-with-lease)",
       "Bash(git push --force-with-lease *)",
       "Bash(git push * --force-with-lease)",
