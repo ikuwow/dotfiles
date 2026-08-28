@@ -426,7 +426,7 @@
           },
           {
             "type": "command",
-            "command": "f=~/.claude/hooks/block_unkept_promise.py; if [ -f \"$f\" ] && command -v python3 >/dev/null; then python3 \"$f\"; fi",
+            "command": "f=~/.claude/hooks/block_unkept_promise.sh; if [ -f \"$f\" ]; then bash \"$f\"; fi",
             "asyncRewake": true
           },
           {
