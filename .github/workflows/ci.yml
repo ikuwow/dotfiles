@@ -12,6 +12,7 @@ jobs:
       - name: shellcheck
         run: |
           shellcheck -- **/*.sh
+          find claude/hooks/ -name '*.sh' -exec shellcheck {} +
           find bin/ -type f ! -name '*.md' -exec shellcheck {} +
           find xdg-config/git/hooks/ -type f -exec shellcheck {} +
           find gh-extensions/ -type f ! -name '*.md' ! -name 'LICENSE' -exec shellcheck {} +
