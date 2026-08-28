@@ -426,6 +426,11 @@
           },
           {
             "type": "command",
+            "command": "f=~/.claude/hooks/block_unkept_promise.py; if [ -f \"$f\" ] && command -v python3 >/dev/null; then python3 \"$f\"; fi",
+            "asyncRewake": true
+          },
+          {
+            "type": "command",
             "command": "if command -v noti >/dev/null; then NOTI_NSUSER_SOUNDNAME=Glass noti --title 'Claude Code' --message 'Done! Yay!'; fi"
           }
         ]
