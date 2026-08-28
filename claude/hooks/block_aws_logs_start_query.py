@@ -23,8 +23,7 @@ import re
 import shlex
 import sys
 
-from hook_utils import split_outside_quotes as _split_outside_quotes
-
+_SEPARATOR_RE = re.compile(r"&&|\|\||;|\||&|\n")
 _ENV_ASSIGN_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*=")
 
 _AWS_GLOBAL_VALUE_FLAGS = {
@@ -49,6 +48,59 @@ REASON = (
     "can scan large volumes of log data and are billed by scanned "
     "bytes. If genuinely needed, ask the user to run it directly."
 )
+
+
+def _split_outside_quotes(command: str) -> list[str]:
+    """Split by shell separators, ignoring separators inside quotes.
+
+    Bash line continuation ``\\`` + newline outside quotes is collapsed
+    before splitting so a multi-line ``aws logs start-query \\<NL> ...``
+    still lands in one segment.
+
+    >>> _split_outside_quotes("aws logs start-query | jq .")
+    ['aws logs start-query ', ' jq .']
+    >>> _split_outside_quotes("echo 'aws logs start-query | jq .'")
+    ["echo 'aws logs start-query | jq .'"]
+    >>> _split_outside_quotes("foo && aws logs start-query")
+    ['foo ', ' aws logs start-query']
+    >>> _split_outside_quotes("aws logs start-query \\\\\\n  --foo bar")
+    ['aws logs start-query   --foo bar']
+    """
+    segments: list[str] = []
+    current: list[str] = []
+    in_single = in_double = False
+    i = 0
+    while i < len(command):
+        ch = command[i]
+        if ch == "\\" and not in_single and i + 1 < len(command) and command[i + 1] == "\n":
+            i += 2
+            continue
+        if ch == "\\" and in_double and i + 1 < len(command):
+            current.append(ch)
+            current.append(command[i + 1])
+            i += 2
+            continue
+        if ch == "'" and not in_double:
+            in_single = not in_single
+            current.append(ch)
+            i += 1
+            continue
+        if ch == '"' and not in_single:
+            in_double = not in_double
+            current.append(ch)
+            i += 1
+            continue
+        if not in_single and not in_double:
+            m = _SEPARATOR_RE.match(command, i)
+            if m:
+                segments.append("".join(current))
+                current = []
+                i = m.end()
+                continue
+        current.append(ch)
+        i += 1
+    segments.append("".join(current))
+    return segments
 
 
 def _drop_env_prefix(tokens: list[str]) -> list[str]:
