@@ -7,22 +7,30 @@
 # `claude -p`, which runs on Claude Code's own credentials, so this
 # hook needs no API key of its own.
 #
-# Registered with asyncRewake, so the judgement runs in the background
-# and exit 2 wakes Claude with the stderr text. That keeps a multi-
-# second model call off the end of every turn.
+# Registered in claude/settings.json's Stop hooks with asyncRewake, so
+# the judgement runs in the background and exit 2 wakes Claude with the
+# stderr text. That keeps a multi-second model call off the end of
+# every turn.
 #
-# set -e is deliberately absent: a non-zero exit from any command here
-# would surface as a hook error in the transcript. Every failure has to
-# land on exit 0 instead, and an empty verdict is not YES, so a broken
-# call blocks nothing.
+# Only exit 0 and the deliberate exit 2 are verdicts; any other exit
+# status is a hook error. So set -e is absent, and every expansion that
+# may be unset carries a :- default, since set -u would otherwise abort
+# with exit 1. An empty verdict is not YES, so a broken call blocks
+# nothing — and stderr from the call is discarded, so a call that is
+# permanently broken fails silently rather than noisily.
 set -u
 
-# The claude call below starts a session that fires this same Stop hook
-# on exit. The variable is inherited by that child, which returns here
-# and leaves before spawning another.
+# --safe-mode on the claude call below disables hooks in that session,
+# so it fires neither this hook nor the sibling Stop hooks registered
+# alongside it. This variable is the second layer: hooks inherit the
+# spawning process's environment, so were the child ever to run hooks,
+# its copy of this script would see the variable and leave.
 if [ -n "${CLAUDE_UNKEPT_PROMISE_CHECK:-}" ]; then
   exit 0
 fi
+
+# Set once this hook has already blocked a stop. Blocking the resulting
+# Stop again would loop.
 
 INPUT=$(cat)
 
@@ -35,6 +43,7 @@ if [ -z "$TEXT" ]; then
   exit 0
 fi
 
+# read -d '' returns 1 at EOF; the status is discarded, not acted on.
 read -r -d '' PROMPT <<PROMPT_END || true
 Judge whether an AI coding assistant's most recent turn committed to doing
 work and then ended the turn without starting it.
@@ -62,6 +71,7 @@ PROMPT_END
 VERDICT=$(CLAUDE_UNKEPT_PROMISE_CHECK=1 claude -p "$PROMPT" \
   --model haiku \
   --output-format text \
+  --safe-mode \
   --disallowedTools Bash Edit Write \
   2>/dev/null | head -n 1 | tr -d '[:space:]')
 
@@ -73,8 +83,8 @@ cat >&2 <<'REASON_END'
 This turn looks like it promised follow-up work and then ended without doing
 it or explaining why not.
 
-That judgment came from a Haiku classifier reading this turn's final text,
-not a keyword match — it can be wrong, including on turns that are
+That judgment came from a classifier reading this turn's final text, not a
+keyword match — it can be wrong, including on turns that are
 legitimately waiting on you or the user, or that already stated a reason to
 defer.
 
