@@ -1,4 +1,4 @@
-"""Shared utilities for Claude Code hooks.
+"""Shared utilities for Claude Code PermissionRequest hooks.
 
 Spec: https://code.claude.com/docs/en/hooks
 """
@@ -78,61 +78,6 @@ def has_unsafe_substitution(command: str) -> bool:
 
         i += 1
     return False
-
-
-def collect_current_turn_blocks(events):
-    """Collect content blocks emitted since the last real user message.
-
-    Walks events backward, stopping at a real user message. A user
-    event whose content is purely tool_result blocks is a tool-call
-    re-entry, not a turn boundary, and does not stop the walk:
-
-    >>> events = [
-    ...     {"type": "assistant", "message": {"content": [{"type": "text", "text": "old"}]}},
-    ...     {"type": "user", "message": {"content": [{"type": "tool_result", "content": "ok"}]}},
-    ...     {"type": "assistant", "message": {"content": [{"type": "text", "text": "current"}]}},
-    ... ]
-    >>> [b.get("text") for b in collect_current_turn_blocks(events) if b.get("type") == "text"]
-    ['current', 'old']
-
-    Mixed content (a tool_result alongside a real block) is a genuine
-    boundary, not a re-entry — *every* block must be tool_result, not
-    merely *any*:
-
-    >>> events = [
-    ...     {"type": "assistant", "message": {"content": [{"type": "text", "text": "old"}]}},
-    ...     {"type": "user", "message": {"content": [
-    ...         {"type": "tool_result", "content": "ok"},
-    ...         {"type": "text", "text": "also human text"},
-    ...     ]}},
-    ...     {"type": "assistant", "message": {"content": [{"type": "text", "text": "reply"}]}},
-    ... ]
-    >>> [b.get("text") for b in collect_current_turn_blocks(events) if b.get("type") == "text"]
-    ['reply']
-    """
-    blocks = []
-    for event in reversed(events):
-        if not isinstance(event, dict):
-            continue
-        if event.get("type") == "user":
-            message = event.get("message")
-            content = message.get("content") if isinstance(message, dict) else None
-            if isinstance(content, str):
-                break
-            if isinstance(content, list) and not all(
-                isinstance(c, dict) and c.get("type") == "tool_result"
-                for c in content
-            ):
-                break
-            continue
-        if event.get("type") != "assistant":
-            continue
-        message = event.get("message")
-        content = message.get("content") if isinstance(message, dict) else None
-        for block in content or []:
-            if isinstance(block, dict):
-                blocks.append(block)
-    return blocks
 
 
 def approve_and_exit():
