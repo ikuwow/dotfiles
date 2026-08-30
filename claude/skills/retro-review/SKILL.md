@@ -120,7 +120,8 @@ session context and cross-rule judgment.
 
 ## Step 6: Checkpoint with the user
 
-Present the report summary and the proposed action list. Creating PRs
+Present `report.md`'s summary, its same-decision enumeration for every
+rule-edit action, and the proposed action list. Creating PRs
 and editing rules are external mutations — proceed only with the
 actions the user approves. Record deferred or declined proposals as
 planned/accept entries in Step 8.
