@@ -48,7 +48,9 @@ Note: `.worktrees/` is covered by the global gitignore.
 
 ## 2. Implement, commit, push
 
-The implementation work for this branch happens here.
+The implementation work for this branch happens here. When it is
+delegated to the `implementer` subagent, `implementer-dispatch.md`
+carries the dispatch procedure.
 
 When the commit message or PR body will claim an exhaustive
 replacement or update ("replaced all X with Y"), run
@@ -62,6 +64,8 @@ formatting or indentation.
    skip creation. Bring its title and body into conformance with
    `pr-guidelines.md` using the section 5 procedure, display the PR URL to the user, then
    proceed to CI wait (step 4).
+   - A PR the implementer opened carries a `WIP:` title prefix and a
+     placeholder body, both handled per `implementer-dispatch.md`
 1. Write the PR body to a fresh file under the session scratchpad
    directory using the Write tool (new filename per revision — a new
    file needs no prior Read step)
@@ -99,7 +103,8 @@ If any of the three fails:
   over in silence leaves the user unable to see the call was made
 - Move anything the sweep escalated into the PR body
 - Fix CI failures (`gh run view --log-failed`), or hand them back to
-  the implementer when one is dispatched
+  the implementer when one is dispatched, under the handback bound in
+  `implementer-dispatch.md`
 
 The sweep commits locally without pushing. Whenever it produced commits,
 push them together with any self-review and CI fixes in one push,
