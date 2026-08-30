@@ -106,9 +106,17 @@ session context and cross-rule judgment.
    cluster's action. Weigh cost of failure: cheap self-correcting
    failures lean accept; failures that reach persisted artifacts,
    infrastructure, or user-facing claims lean structural fixes.
+1. For each cluster whose disposition is rule-edit, enumerate every
+   statement across `AIRULES.md` and `claude/rules/` that decides the
+   same question as the proposed edit, and record for each whether it
+   agrees with the edit, contradicts it, or already states it. Run
+   this before Step 6 so the user arbitrates a contradiction while the
+   action is still a proposal, rather than after both statements are
+   in force.
 1. Write `report.md` to the workdir: cluster table (counts, severity
    mix, diagnosis, disposition), effect-measurement results, key
-   observations, and proposed actions in priority order.
+   observations, the same-decision enumeration behind each rule-edit
+   action, and proposed actions in priority order.
 
 ## Step 6: Checkpoint with the user
 
