@@ -2,16 +2,16 @@
 
 ## 採用基準（何を書くか）
 
-- 書いてよいのは、削除するとAIの挙動が変わる指示だけ
+- bulletを追加・温存するのは、削除するとAIの挙動が変わる場合のみ
 - セクション名・隣接bulletから導ける内容は書かない
 - 冗長な記述は省くのを基本とする
 - 指示 (何をする / いつする / どう分岐する) を rule body の主成分に据え、tool/libraryの動作説明・選択の理由・対比や履歴は書かない
     - 本当に必要な時は1行括弧内に圧縮するか、References 節に URL のみ残す
-- 次の内容は、削除でAIの挙動が変わるとしても採用しない
-    - モデルの弱点を補償するscaffolding（verification reminder、anti-rationalizationの言い換え反復、進捗報告の強制等）
+- 次の禁止は、削除でAIの挙動が変わるとしても適用する
+    - モデルの弱点を補償するscaffolding（verification reminder、anti-rationalizationの言い換え反復、進捗報告の強制等）をglobal ruleに書かない
         - 弱いモデルに必要な場合はinvocation site（agent定義本文・delegation brief）に置く
-    - 特定のAI agent・モデル世代に依存した書き方（モデル名での条件分岐等）
-    - Loading mechanismについてのmeta-statement（"already in context"、"auto-loaded as global rule" 等）
+    - 特定のAI agent・モデル世代に依存した書き方（モデル名での条件分岐等）をしない
+    - Loading mechanismについてのmeta-statement（"already in context"、"auto-loaded as global rule" 等）はどこにも入れない
         - mechanism変更でdriftし、ruleとしてはnoise
 
 ## 配置（どこに書くか）
