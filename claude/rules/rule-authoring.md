@@ -5,10 +5,10 @@
 
 ## 振り分け（どの仕組みに載せるか）
 
-ルールには常時成立する事実と制約のみを記述する。
+常時ロードされるrule文書には、常時成立する事実と制約のみを記述する。
 この振り分けは、削除で挙動が変わる内容にも適用する。
 
-ルールに書かないものの例:
+rule文書に書かないものの例:
 
 - 手順・チェックリスト・ワークフロー: skill
   - ruleは常時ロードされ、手順は使う時のみ必要となるため
@@ -16,7 +16,8 @@
   - guardrailは決定論的である必要があり、指示は破られうるため
 - 特定のファイル・作業でしか効かない制約: `paths` frontmatterでpath-scoped rule化
   - 無関係な作業のcontextから外すため
-- モデルの弱点を補償するscaffolding（verification reminder、言い換え反復、進捗報告の強制等）: invocation site（agent定義本文・delegation brief）
+- モデルの弱点を補償するscaffolding（verification reminder、anti-rationalizationの言い換え反復、進捗報告の強制等）: invocation site（agent定義本文・delegation brief）
+  - 必要なモデル・場面にだけ届け、常時ロードのcontextから外すため
 
 ## 採用基準
 
@@ -28,8 +29,10 @@
   - セクション名・隣接bulletから導ける内容
   - モデルが既に知っている一般慣習
   - 特定のAI agent・モデル世代に依存した書き方（モデル名での条件分岐等）
-  - Loading mechanismについてのmeta-statement（"already in context" 等）
+  - 文書自身のロード状態に言及するmeta-statement（"already in context" 等）
   - 代替案との対比・経緯・ツール動作の解説
+    - 制約に添えるwhyの1行は対象外
+    - 本当に必要な時は1行括弧内に圧縮するか、References節にURLのみ残す
 
 ## 書き方
 
@@ -38,20 +41,23 @@
   - whyは遵守率を上げるため
 - 肯定形で書く
   - 禁止を書く場合は望む行動の記述に言い換え、強制が必要ならhookにする
-- 強調マーカー（MUST / CRITICAL / 必ず / 絶対 等）は安全制約・不可逆操作・workflow契約に限定する
+  - 採用可否・除外の判定リストは列挙形で書いてよい
+- 強調マーカー（MUST / CRITICAL / 必ず / 絶対 等）はload-bearingなゲート（安全制約・不可逆操作・workflow契約等）に限定し、それ以外の指示は平叙形で書く
   - 濫用は強調の濃淡を壊すため
 
 ## 配置
 
 - 置き場所はscopeで決める
-  - そのルールが適用される作業・場面を管轄するファイル・節に置く
-  - 行数の超過は、冗長さを削るかpath-scoped rule / skillへの切り出しで解消する（置き場所はscopeが決め続ける）
+  - 全プロジェクト・全作業に効く方針: user-levelのglobal rule
+  - 特定プロジェクト固有の規約: そのprojectのCLAUDE.md / project rule
+  - 特定の作業・手順に付随する制約: skill / agent定義
 - 常時ロードのファイルは公式目安の200行/file以内に収める
   - 長いほど遵守率が落ちるため
-  - このrepoのpre-commit hookはより厳しい独自上限を強制する
+- 行数の超過は、冗長さの削減か意味のある単位での分割で解消する
+  - skill / path-scoped ruleへの切り出しは、振り分けの基準に該当する場合のみ行う
 - 各rule fileは他のrule fileへのpath参照なしで完結させる
   - renameで壊れ、auto-load同士では情報追加もゼロで、相対パスはsymlink経由で解決しないため
-  - 例外1: skill / workflow → ruleのframework名参照は残す
+  - 例外1: skill / workflow → ruleのframework名参照（"X defined in `file.md`" 等）は残す
     - skillが評価対象を名付けるためにload-bearing
   - 例外2: rule → skillの起動ポインタ（skill名のみ、pathなし）は残す
     - 常時ロードのruleから都度起動のskillへ誘導するため
@@ -61,7 +67,8 @@
 - 既存指示の適用を変える時は、影響を受ける指示文自体を書き換えて統合する
   - 隣への追記は矛盾した指示の併存を生むため
 - 追加・変更時は、全rule fileから同じ決定を扱う既存文を列挙し、矛盾・重複が無いことを確認する
-- 圧縮・簡素化では、元の全bullet・文との対応を突き合わせて政策落ちが無いことを検証し、検証方法をPR本文に明記する
+- 編集後、編集対象のファイルが本ルールに準拠していることを確認する
+- 圧縮・簡素化では、元の全bullet・文との対応を突き合わせて指示の欠落が無いことを検証し、検証方法を成果物（PR本文等）に明記する
 - scope（global / project）を把握し、変更時に明示する
 
 ## References
