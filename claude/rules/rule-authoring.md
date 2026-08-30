@@ -1,30 +1,28 @@
-# AI 向けルール・規約ドキュメントの編集
+# AI 向けrule文書の編集
 
-このルールはAI agentが指示として読み込む規約・ルール文書すべて（CLAUDE.md、AGENTS.md、rule file、agent・skill定義の指示部等）に適用される。
+このルールはAI agentが指示として読み込むrule文書（CLAUDE.md、AGENTS.md、rule file等）に適用される。
 ファイル名・置き場所は問わず、消費者がAI agentであることで判定する。
 
 ## 振り分け（どの仕組みに載せるか）
 
-常時ロードされるrule文書には、常時成立する事実と制約のみを記述する。
-これを守るため、書きたい内容はまずskill・hook等の専用の仕組みへの振り分けを検討し、どの仕組みにも載らないものだけをruleに書く。
-
-rule文書に書かないものの例:
+書きたい内容はまず以下の専用の仕組みへの振り分けを検討し、どの仕組みにも載らないものだけをruleに書く。
+以降の節は、ruleに書く内容とその書き方を定める。
 
 - 手順・チェックリスト・ワークフロー: skill
   - ruleは常時ロードされ、手順は使う時のみ必要となるため
+  - skillの作成・改善にはskill-creator skillを使う
 - 絶対に起きてはならない操作: hook / permissionによる強制
   - guardrailは決定論的である必要があり、指示は破られうるため
+  - hookの作成にはhookify skillを使う
 - 特定のファイル・作業でしか効かない制約: `paths` frontmatterでpath-scoped rule化
   - 無関係な作業のcontextから外すため
 - モデルの弱点を補償するscaffolding（verification reminder、anti-rationalizationの言い換え反復、進捗報告の強制等）: invocation site（agent定義本文・delegation brief）
   - 必要なモデル・場面にだけ届け、常時ロードのcontextから外すため
+- 常時成立する事実と制約: rule
 
 ## 採用基準
 
 - 削除するとAIの挙動が変わる指示だけを記述する
-- 具体的で検証可能に書く
-  - o: 「2-space indentation」
-  - x: 「適切にformatする」
 - 以下は採用しない
   - セクション名・隣接bulletから導ける内容
   - モデルが既に知っている一般慣習
@@ -37,6 +35,9 @@ rule文書に書かないものの例:
 ## 書き方
 
 - 指示（何をする / いつする / どう分岐する）を本文の主成分に据える
+- 具体的で検証可能に書く
+  - o: 「2-space indentation」
+  - x: 「適切にformatする」
 - 制約には従う理由を1行添える
   - whyは遵守率を上げるため
 - 肯定形で書く
