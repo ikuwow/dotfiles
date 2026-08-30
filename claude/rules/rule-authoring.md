@@ -14,14 +14,13 @@
 - 絶対に起きてはならない操作: hook / permissionによる強制
   - guardrailは決定論的である必要があり、指示は破られうるため
   - hookの作成にはhookify skillを使う
-- 特定のファイル・作業でしか効かない制約: `paths` frontmatterでpath-scoped rule化
-  - 無関係な作業のcontextから外すため
-- モデルの弱点を補償するscaffolding（verification reminder、anti-rationalizationの言い換え反復、進捗報告の強制等）: invocation site（agent定義本文・delegation brief）
+- モデルの弱点を補償するscaffolding（verification reminder、anti-rationalizationの言い換え反復、進捗報告の強制等）: invocation site（agent定義の本文、subagent呼び出し時のprompt等、そのモデルに仕事を渡す場所）
   - 必要なモデル・場面にだけ届け、常時ロードのcontextから外すため
-- 常時成立する事実と制約: rule
+- 上記のいずれにも該当しない事実と制約: rule
 
 ## 採用基準
 
+- 常時成立する事実と制約だけを記述する
 - 削除するとAIの挙動が変わる指示だけを記述する
 - 以下は採用しない
   - セクション名・隣接bulletから導ける内容
@@ -52,6 +51,8 @@
   - 全プロジェクト・全作業に効く方針: user-levelのglobal rule
   - 特定プロジェクト固有の規約: そのprojectのCLAUDE.md / project rule
   - 特定の作業・手順に付随する制約: skill / agent定義
+- 特定のファイル・作業でしか効かない制約は、`paths` frontmatterでpath-scoped rule化する
+  - 無関係な作業のcontextから外すため
 - 常時ロードのファイルは公式目安の200行/file以内に収める
   - 長いほど遵守率が落ちるため
 - 行数の超過は、冗長さの削減か意味のある単位での分割で解消する
