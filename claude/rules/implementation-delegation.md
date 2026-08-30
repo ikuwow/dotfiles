@@ -20,5 +20,5 @@ of implementing in the main session.
   or a Plan agent first)
 
 Once the decision is to delegate, the git-workflow skill carries the
-dispatch procedure: brief contents, ordering around the branch,
-parallel dispatch, and review of the returned work.
+dispatch procedure, from branch setup through review of the returned
+work.

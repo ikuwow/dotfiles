@@ -11,7 +11,8 @@ from the point where the answer is yes.
   branch — before dispatching, since the subagent implements on the
   branch it is handed
 - When the branch needs newer default-branch commits, the parent
-  merges them and re-dispatches
+  merges them and re-dispatches, since the subagent is barred from
+  merging the default branch mid-run
 
 ## Writing the brief
 
@@ -24,8 +25,9 @@ from the point where the answer is yes.
 
 ## What a dispatch does by default
 
-- Every implementer dispatch, single or parallel, ends with the branch
-  pushed, a draft PR open, and a time-bounded CI watch
+- Every implementer dispatch, single or parallel, ends by default with
+  the branch pushed, a PR open — its own draft, or one already on the
+  branch — and a time-bounded CI watch
   - To stop it at local commits, put "do not push" or "commits only"
     in the brief
 
@@ -38,12 +40,6 @@ from the point where the answer is yes.
 
 ## When it returns
 
-- When an implementer returns with CI still in flight, go straight to
-  the Phase 1 checks instead of waiting on it
-- When the implementer opened the PR, replace the placeholder body and
-  drop the `WIP:` prefix from the title before running `/pr-selfcheck`
-  - The body is a fixed stub carrying no content, and the title is a
-    real one-line summary that only needs the prefix removed
 - Always read the completion report and commit list (`git log --stat`)
 - Read the final diff once (`git diff main...`) by default
 - Deep manual re-review only when the report flags deviations or
@@ -51,6 +47,14 @@ from the point where the answer is yes.
   risky areas
 - Systematic review stays with the PR review pipeline (pr-selfcheck /
   pr-review-toolkit)
+- When the implementer opened the PR, replace the placeholder body and
+  drop the `WIP:` prefix from the title before launching the Phase 1
+  checks, since `/pr-selfcheck` is one of the three and reviews
+  whatever body it finds
+  - The body is a fixed stub carrying no content, and the title is a
+    real one-line summary that only needs the prefix removed
+- Once the body and title are rewritten, go straight to the Phase 1
+  checks even with CI still in flight, instead of waiting on it
 
 ## CI failures
 
@@ -73,6 +77,9 @@ from the point where the answer is yes.
 - Create one worktree and branch per parallel implementer before
   dispatching, since parallel implementers require worktree isolation
   per the implementer agent's Concurrency rule
+- State in each parallel brief that it runs alongside other
+  implementers, since the agent's isolation check arms only when the
+  brief says so
 - In projects that prohibit worktrees, fall back to sequential
   single-implementer dispatch
 - Dependent PR chains (B rebases on A's merge, C reviews A's design
