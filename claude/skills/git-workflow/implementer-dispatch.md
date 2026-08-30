@@ -2,8 +2,8 @@
 
 The parent-side procedure for a git-workflow run whose implementation
 step is handed to the `implementer` subagent. Whether to delegate at
-all is decided by the implementation-delegation rule; this file starts
-from the point where the answer is yes.
+all is decided by the agent's own description; this file starts from
+the point where the answer is yes.
 
 ## Before dispatching
 
