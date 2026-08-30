@@ -11,6 +11,7 @@ are symlinks pointing to files in this repository.
 
 - Files under `claude/` are symlinked into `~/.claude/` — always look at `claude/` in this repo first for Claude Code configuration (settings, hooks, MCP, skills, etc.). See `claude/README.md` for the source-to-target map. MCP server registration and plugin installation are handled by `scripts/claude-code-setup.sh`, not by symlink
 - `AIRULES.md` is also symlinked to `~/.codex/AGENTS.md` (Codex CLI) and `~/.junie/AGENTS.md` (Junie CLI) for their global instructions
+  - Its content therefore stays agent-agnostic: universal concepts such as agents and skills are fine, while agent-specific mechanisms and file formats belong under `claude/` (or the consuming agent's own directory)
 - When investigating, reading, or editing files managed by this repository,
   always start from the path within this repo. Examples: `bin/foo` not
   `~/bin/foo`, `claude/settings.json` not `~/.claude/settings.json`,
