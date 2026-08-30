@@ -1,12 +1,6 @@
----
-paths:
-  - "**/CLAUDE.md"
-  - "**/AGENTS.md"
-  - "AIRULES.md"
-  - "**/.claude/rules/**"
-  - "claude/rules/**"
----
 # AI 向けルール・規約ドキュメントの編集
+
+適用範囲: AI agentが指示として読み込む規約・ルール文書すべて（CLAUDE.md、AGENTS.md、rule file、agent・skill定義の指示部等）。ファイル名・置き場所は問わず、消費者がAI agentであることで判定する。
 
 ## 振り分け（どの仕組みに載せるか）
 
