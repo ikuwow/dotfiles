@@ -44,11 +44,17 @@ Prerequisite: the `agynio/gh-pr-review` gh extension is installed
 1. If the project rules explicitly prohibit worktrees, create a branch only:
    `git checkout -b <branch-name>`
 
+When the approved plan is several independent PRs, branch once per PR
+and dispatch them in parallel per `implementer-dispatch.md`, which
+decides the isolation each one needs before any of them starts.
+
 Note: `.worktrees/` is covered by the global gitignore.
 
 ## 2. Implement, commit, push
 
-The implementation work for this branch happens here.
+The implementation work for this branch happens here. When it is
+delegated to the `implementer` subagent, follow
+`implementer-dispatch.md`.
 
 When the commit message or PR body will claim an exhaustive
 replacement or update ("replaced all X with Y"), run
@@ -62,6 +68,8 @@ formatting or indentation.
    skip creation. Bring its title and body into conformance with
    `pr-guidelines.md` using the section 5 procedure, display the PR URL to the user, then
    proceed to CI wait (step 4).
+   - For a PR the implementer opened, apply `implementer-dispatch.md`'s
+     When it returns steps before that conformance pass
 1. Write the PR body to a fresh file under the session scratchpad
    directory using the Write tool (new filename per revision — a new
    file needs no prior Read step)
@@ -99,7 +107,8 @@ If any of the three fails:
   over in silence leaves the user unable to see the call was made
 - Move anything the sweep escalated into the PR body
 - Fix CI failures (`gh run view --log-failed`), or hand them back to
-  the implementer when one is dispatched
+  the implementer when one is dispatched, under the handback bound in
+  `implementer-dispatch.md`
 
 The sweep commits locally without pushing. Whenever it produced commits,
 push them together with any self-review and CI fixes in one push,
