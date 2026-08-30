@@ -30,7 +30,7 @@
 ## 配置
 
 - 置き場所はscopeで決める（そのルールが適用される作業・場面を管轄するファイル・節に置く）
-- 常時ロードのファイルは200行/file以内を目安にする（長いほど遵守率が落ちる。このrepoではpre-commit hookが強制）
+- 常時ロードのファイルは公式目安の200行/file以内に収める（長いほど遵守率が落ちる。このrepoのpre-commit hookはより厳しい独自上限を強制する）
 - 行数を理由に別scopeへ置かない。超える時は削るか、path-scoped rule / skillへ切り出す
 - Rule file間のcross-file path参照は入れない（renameで壊れ、auto-load同士なら情報追加ゼロ、相対パスがsymlink経由だと解決しない）
     - 例外1: skill / workflow → ruleのframework名参照は残す（skillが評価対象を名付けるためにload-bearing）
