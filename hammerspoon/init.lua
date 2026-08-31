@@ -1,5 +1,7 @@
--- Tapping a command key on its own switches the Japanese input mode:
--- left ⌘ sends 英数 (eisu), right ⌘ sends かな (kana).
+-- Releasing a command key that was held on its own, with no other modifier,
+-- key, click or scroll in between, switches the Japanese input mode: left ⌘
+-- sends 英数 (eisu), right ⌘ sends かな (kana). There is no hold-duration
+-- limit, so any length of solo hold fires on release.
 
 local TAP_TARGET = {
   [hs.keycodes.map.cmd] = hs.keycodes.map.eisu,
@@ -13,8 +15,9 @@ local function onFlagsChanged(event)
   local keyCode = event:getKeyCode()
   local target = TAP_TARGET[keyCode]
   if not target then
-    -- A different modifier joined in, so no command key is alone any more.
+    -- Any other modifier changing state means the command key was not alone.
     pendingCmd = nil
+    -- false leaves the event in place; these taps only observe.
     return false
   end
 
@@ -40,8 +43,8 @@ local function onOtherInput()
   return false
 end
 
--- These watchers are global on purpose: a local would be garbage collected
--- and the underlying event tap would stop delivering events.
+-- All three watchers below are global on purpose: a local would be garbage
+-- collected and the underlying event tap would stop delivering events.
 cmdFlagsWatcher = hs.eventtap.new({ hs.eventtap.event.types.flagsChanged }, onFlagsChanged)
 cmdFlagsWatcher:start()
 
@@ -54,7 +57,8 @@ otherInputWatcher = hs.eventtap.new({
 }, onOtherInput)
 otherInputWatcher:start()
 
--- Sleep can leave the taps inert even though they still report as enabled.
+-- Precautionary: waking has been reported to leave event taps not delivering
+-- events. Unverified on this machine, so the taps are re-armed unconditionally.
 sleepWatcher = hs.caffeinate.watcher.new(function(eventType)
   if eventType == hs.caffeinate.watcher.systemDidWake then
     pendingCmd = nil

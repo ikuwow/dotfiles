@@ -70,13 +70,16 @@ defaults write -g KeyRepeat -int 2
 defaults write -g ApplePressAndHoldEnabled -bool false  # Disable press-and-hold for accented characters
 
 # Caps lock -> left control, for every attached keyboard. The mapping the
-# Modifier Keys panel writes is keyed by vendor and product ID, so each
-# keyboard needs its own entry.
+# Modifier Keys panel writes is keyed by vendor ID, product ID and a third
+# component, which is 0 on every keyboard seen here. That third component is
+# undocumented, so treat it as unverified for other hardware. Only keyboards
+# attached at run time get an entry, so a new keyboard needs another run.
 CAPS_LOCK_USAGE=30064771129     # HID page 0x07, usage 0x39
 LEFT_CONTROL_USAGE=30064771296  # HID page 0x07, usage 0xE0
-hidutil list --matching '{"PrimaryUsagePage":1,"PrimaryUsage":6}' |
+hidutil list --matching '{"PrimaryUsagePage":1,"PrimaryUsage":6}' |  # Generic Desktop page, Keyboard usage
   grep '^0x' | tr -s ' ' | cut -d ' ' -f 1,2 | sort -u |
   while read -r vendor product; do
+    # hidutil prints the IDs in hex; the preference key uses decimal.
     defaults -currentHost write -g "com.apple.keyboard.modifiermapping.$((vendor))-$((product))-0" \
       -array "<dict><key>HIDKeyboardModifierMappingDst</key><integer>${LEFT_CONTROL_USAGE}</integer><key>HIDKeyboardModifierMappingSrc</key><integer>${CAPS_LOCK_USAGE}</integer></dict>"
   done
