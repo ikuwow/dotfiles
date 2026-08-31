@@ -14,8 +14,9 @@ not documented on the linked spec page), so ``PermissionRequest``
 would not fire for it.
 
 Exempt: subagent types whose ``~/.claude/agents/<subagent_type>.md``
-frontmatter pins ``model: fable`` — mechanizes the "agents that pin
-fable are exempt" clause of ``claude/rules/subagent-model.md``.
+frontmatter pins ``model: fable`` (or ``claude-fable-5``) — naming
+Fable in the agent definition is a deliberate per-agent choice, so
+calls to that agent are exempt however the model was supplied.
 
 On the first denied occurrence of a given (subagent_type, effective
 model) pair per session, the call is denied with a message steering
@@ -47,7 +48,8 @@ _FRONTMATTER_MODEL_RE = re.compile(r"""^model:\s*['"]?(fable|claude-fable-5)['"]
 
 MESSAGE = (
     "Subagent would run on Fable (either explicit model=\"fable\" or inherited "
-    "from session ANTHROPIC_MODEL=fable). Per claude/rules/subagent-model.md, "
+    "from session ANTHROPIC_MODEL=fable). Fable is the costliest tier and "
+    "most subagent work does not need it, so "
     "subagents should default to sonnet (search / formatting / well-defined "
     "code) or opus (multi-file implementation / deep debugging / adversarial "
     "review). Retry with an explicit \"model\": \"sonnet\" or \"model\": "

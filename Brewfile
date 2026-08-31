@@ -199,6 +199,7 @@ cask "utm"
 cask "wireshark-app"
 cask "zotero"
 cask "space-rabbit"
+cask "lookaway"
 
 # Work related
 
