@@ -1,0 +1,74 @@
+# AI 向けrule文書の基準
+
+対象はAI agentが指示として読み込む文書（CLAUDE.md、AGENTS.md、rule file、skill、agent定義等）で、ファイル名・置き場所は問わず消費者がAI agentであることで判定する。
+
+振り分けはそのうちどれに載せるかを決めるので全種に効く。採用基準・書き方・配置はruleに載せると決まった内容を判定するので、skillやagent定義の本文はそれぞれの文書種の書式に従う。
+
+## 振り分け（どの仕組みに載せるか）
+
+書きたい内容はまず以下の専用の仕組みへの振り分けを検討し、どの仕組みにも載らないものだけをruleに書く。
+
+- 手順・チェックリスト・ワークフロー: skill
+  - ruleは常時ロードされ、手順は使う時のみ必要となるため
+  - skillの作成・改善にはskill-creator skillを使う
+- 絶対に起きてはならない操作: hook / permissionによる強制
+  - guardrailは決定論的である必要があり、指示は破られうるため
+  - hookの作成にはhookify skillを使う
+- モデルの弱点を補償するscaffolding（verification reminder、anti-rationalizationの言い換え反復、進捗報告の強制等）: invocation site（agent定義の本文、subagent呼び出し時のprompt等、そのモデルに仕事を渡す場所）
+  - 必要なモデル・場面にだけ届け、常時ロードのcontextから外すため
+- 特定の作業・特定のファイルを触る時にしか効かない事実と制約: その作業のskill / agent定義 / path-scoped rule
+  - 無関係な作業のcontextから外すため
+- 上記のいずれにも該当しない事実と制約: rule
+
+## 採用基準
+
+- 常時成立する事実と制約だけを記述する
+- 削除するとAIの挙動が変わる指示だけを記述する
+- 以下は採用しない
+  - セクション名・隣接bulletから導ける内容
+  - モデルが既に知っている一般慣習
+  - 特定のAI agent・モデル世代に依存した書き方（モデル名での条件分岐等）
+  - 文書自身のロード状態に言及するmeta-statement（"already in context" 等）
+  - 代替案との対比・経緯・ツール動作の解説
+    - 制約に添えるwhyの1行は対象外
+    - 本当に必要な時は1行括弧内に圧縮するか、References節にURLのみ残す
+
+## 書き方
+
+- 指示（何をする / いつする / どう分岐する）を本文の主成分に据える
+- 具体的で検証可能に書く
+  - o: 「外部ツールの挙動の断定は公式ドキュメント・man pageを根拠にする」
+  - x: 「十分に裏取りする」
+- 制約には従う理由を1行添える
+  - whyがあるとモデルが意図を汎化でき、遵守率も上がるため
+- 肯定形で書く
+  - 禁止を書く場合は望む行動の記述に言い換え、強制が必要ならhookにする
+  - 採用可否・除外の判定リストは列挙形で書いてよい
+- 強調マーカー（MUST / CRITICAL / 必ず / 絶対 等）はload-bearingなゲート（安全制約・不可逆操作・workflow契約等）に限定し、それ以外の指示は平叙形で書く
+  - 濫用は強調の濃淡を壊すため
+
+## 配置
+
+- 置き場所はscopeで決める
+  - 全プロジェクト・全作業に効く方針: user-levelのglobal rule
+  - 特定プロジェクト固有の規約: そのprojectのCLAUDE.md / project rule
+- 作業限定の制約をpath-scoped rule（`paths` frontmatter）で載せるのは、対象ファイルを読んだ後に効けば足りる場合に限る
+  - path-scoped ruleはファイルを読んだ時に発火するので、着手前の判断に要る制約は間に合わないため
+- 常時ロードのファイルは公式目安の200行/file以内に収める
+  - 長いほど遵守率が落ちるため
+- 行数の超過は、冗長さの削減か意味のある単位での分割で解消する
+  - skill / path-scoped ruleへの切り出しは、振り分けの基準に該当する場合のみ行う
+- 各rule fileは他のrule fileへのpath参照なしで完結させる
+  - renameで壊れ、auto-load同士では情報追加もゼロのため
+  - 例外1: skill / workflow → ruleのframework名参照（"X defined in `file.md`" 等）は残す
+    - skillが評価対象を名付けるためにload-bearing
+  - 例外2: rule → skillの起動ポインタ（skill名のみ、pathなし）は残す
+    - 常時ロードのruleから都度起動のskillへ誘導するため
+
+## References
+
+- https://code.claude.com/docs/en/memory.md
+- https://code.claude.com/docs/en/best-practices.md
+- https://code.claude.com/docs/en/skills.md
+- https://claude.com/blog/steering-claude-code-skills-hooks-rules-subagents-and-more
+- https://claude.com/blog/best-practices-for-prompt-engineering

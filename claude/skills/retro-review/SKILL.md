@@ -109,11 +109,12 @@ session context and cross-rule judgment.
 1. For each cluster whose disposition is rule-edit, enumerate every
    statement that decides the same question as the proposed edit, and
    record for each whether it agrees with the edit, contradicts it, or
-   already states it. The search space is `AIRULES.md` and
-   `claude/rules/`, plus the target project's own rule files when the
-   edit targets a project asset. A contradiction found here reaches
-   the user while the action is still a proposal, rather than after
-   both statements are in force.
+   already states it. Search the user-level rule set (`AIRULES.md` and
+   `~/.claude/rules/`, whose entries are symlinks, so `grep -Rn`) and
+   the target project's own rule files. The rule-edit skill runs the
+   same enumeration against the edit as finally worded; running it here
+   is what puts a contradiction in front of the user while the action
+   is still a proposal, rather than after both statements are in force.
 1. When an enumerated statement already states the proposed edit,
    record the cluster's diagnosis as rule-not-followed and revisit the
    disposition that followed from it, since restating a rule already
@@ -134,13 +135,14 @@ planned/accept entries in Step 8.
 ## Step 7: Execute approved actions
 
 One action = one PR. For each approved action, invoke the git-workflow
-skill (branch, edit, draft PR, CI and review phases). Rule edits follow
-`rule-authoring.md` (integrate into the affected instruction) and the
-output-format rules in AIRULES.md (positive form, one sentence per
-bullet). Its enumeration requirement runs here against the edit as
-actually worded, which the checkpoint may have moved away from the
-proposal Step 5 covered. Record which
-review findings were adopted or declined, and why, in `report.md`.
+skill (branch, edit, draft PR, CI and review phases). Rule edits go
+through the rule-edit skill, which carries the adoption and wording
+criteria and the same-decision enumeration, alongside the output-format
+rules in AIRULES.md (positive form, one sentence per bullet). That
+enumeration runs here against the edit as actually worded, which the
+checkpoint may have moved away from the proposal Step 5 covered. Record
+which review findings were adopted or declined, and why, in
+`report.md`.
 
 ## Step 8: Persist lifecycle
 
