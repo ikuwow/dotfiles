@@ -70,6 +70,7 @@ Editing any dotfile means editing the source file in this repository.
 | `xdg-config/*` (all subdirectories) | `~/.config/` |
 | `bin/*` (executable files) | `~/bin/` |
 | `claude/` (settings, hooks, skills, agents, rules) | `~/.claude/`, plus shared parts to `~/.codex/` and `~/.junie/` |
+| `hammerspoon/*` (files) | `~/.hammerspoon/` |
 | `AIRULES.md` | Global AI instructions for Claude, Codex, and Junie |
 
 See `scripts/deploy.sh` for the exact mapping.
@@ -88,6 +89,7 @@ dotfiles/
 ├── xdg-config/     # XDG config files → ~/.config/
 ├── claude/         # Claude Code settings → ~/.claude/
 ├── codex/          # Codex CLI rules → ~/.codex/
+├── hammerspoon/    # Hammerspoon config → ~/.hammerspoon/
 ├── userscripts/    # Safari userscripts loaded by the Userscripts extension
 └── ... (dotfiles deployed to ~/, see Symlink Map)
 ```

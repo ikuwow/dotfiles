@@ -56,6 +56,13 @@ if [[ -d "$ICLOUD_DIR" ]]; then
   ln -fvns "$ICLOUD_DIR" "$HOME/iCloudDrive"
 fi
 
+# Hammerspoon: the app hardcodes ~/.hammerspoon, so this cannot ride the
+# xdg-config glob. Link per entry so app-created state (Spoons/) stays out
+# of the repository.
+mkdir -p "$HOME/.hammerspoon"
+find "$DOTPATH/hammerspoon" -maxdepth 1 -mindepth 1 -type f -exec ln -fvns {} "$HOME/.hammerspoon/" \;
+find "$HOME/.hammerspoon/" -maxdepth 1 -type l ! -exec test -e {} \; -print -delete
+
 # Agent CLIs (Claude Code, Codex, Junie). Each auto-discovered directory
 # below relinks first and prunes broken symlinks second, so a missing or
 # partial source tree aborts under `set -e` before anything is deleted.
