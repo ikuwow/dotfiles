@@ -69,6 +69,19 @@ defaults write -g InitialKeyRepeat -int 35
 defaults write -g KeyRepeat -int 2
 defaults write -g ApplePressAndHoldEnabled -bool false  # Disable press-and-hold for accented characters
 
+# Caps lock -> left control, for every attached keyboard. The mapping the
+# Modifier Keys panel writes is keyed by vendor and product ID, so each
+# keyboard needs its own entry. `hidutil property --set` would remap the
+# same keys but is dropped on restart (Apple TN2450).
+CAPS_LOCK_USAGE=30064771129     # HID page 0x07, usage 0x39
+LEFT_CONTROL_USAGE=30064771296  # HID page 0x07, usage 0xE0
+hidutil list --matching '{"PrimaryUsagePage":1,"PrimaryUsage":6}' |
+  grep '^0x' | tr -s ' ' | cut -d ' ' -f 1,2 | sort -u |
+  while read -r vendor product; do
+    defaults -currentHost write -g "com.apple.keyboard.modifiermapping.$((vendor))-$((product))-0" \
+      -array "<dict><key>HIDKeyboardModifierMappingDst</key><integer>${LEFT_CONTROL_USAGE}</integer><key>HIDKeyboardModifierMappingSrc</key><integer>${CAPS_LOCK_USAGE}</integer></dict>"
+  done
+
 echo "Configuring Japanese IME..."
 defaults write com.apple.inputmethod.Kotoeri JIMPrefLiveConversionKey -bool false  # Disable live conversion
 
