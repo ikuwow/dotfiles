@@ -69,10 +69,6 @@ defaults write -g InitialKeyRepeat -int 35
 defaults write -g KeyRepeat -int 2
 defaults write -g ApplePressAndHoldEnabled -bool false  # Disable press-and-hold for accented characters
 
-# Modifier key remapping (caps lock -> control) is a manual step: macOS
-# ignores writes to com.apple.keyboard.modifiermapping.* that do not come
-# from the Modifier Keys panel. See README.md.
-
 echo "Configuring Japanese IME..."
 defaults write com.apple.inputmethod.Kotoeri JIMPrefLiveConversionKey -bool false  # Disable live conversion
 
