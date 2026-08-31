@@ -124,8 +124,8 @@ default=$(git symbolic-ref --short refs/remotes/origin/HEAD | sed 's|^origin/||'
 - `mechanize` → Write the hook script or CI config; extend
   `.claude/settings.json`'s hooks section if the countermeasure needs
   a new hook entry
-- `new-rule` → invoke the rule-edit skill, whose placement step picks
-  the mechanism before a new rule file is the answer
+- `new-rule` → invoke the rule-edit skill, whose routing picks the
+  mechanism before a new rule file is the answer
 - `new-skill` → Create the skill directory with a `SKILL.md` skeleton
   and frontmatter; the content is fleshed out in a later session
 
