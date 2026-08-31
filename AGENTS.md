@@ -35,6 +35,7 @@ are symlinks pointing to files in this repository.
 - Write all text in English: commit messages, PR descriptions, issue comments, code comments, etc
 - Exception: `AIRULES.md` is written in Japanese; references to its content may also be in Japanese
 - Rule files under `claude/rules/` are mixed: match the language of the file being edited, and write new ones in English
+- Rule text relocated into a skill keeps the language it had, so the move stays verifiable as a verbatim one
 
 ## Script Requirements
 
