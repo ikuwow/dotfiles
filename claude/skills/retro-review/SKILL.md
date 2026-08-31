@@ -134,13 +134,14 @@ planned/accept entries in Step 8.
 ## Step 7: Execute approved actions
 
 One action = one PR. For each approved action, invoke the git-workflow
-skill (branch, edit, draft PR, CI and review phases). Rule edits follow
-`rule-authoring.md` (integrate into the affected instruction) and the
-output-format rules in AIRULES.md (positive form, one sentence per
-bullet). Its enumeration requirement runs here against the edit as
-actually worded, which the checkpoint may have moved away from the
-proposal Step 5 covered. Record which
-review findings were adopted or declined, and why, in `report.md`.
+skill (branch, edit, draft PR, CI and review phases). Rule edits go
+through the rule-edit skill, which carries the adoption and wording
+criteria and the same-decision enumeration, alongside the output-format
+rules in AIRULES.md (positive form, one sentence per bullet). That
+enumeration runs here against the edit as actually worded, which the
+checkpoint may have moved away from the proposal Step 5 covered. Record
+which review findings were adopted or declined, and why, in
+`report.md`.
 
 ## Step 8: Persist lifecycle
 
