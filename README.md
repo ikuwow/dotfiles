@@ -21,7 +21,6 @@ Complete these during initial Mac setup or from System Preferences (reboot requi
 * ☑️ Install Developer Tools: `xcode-select --install`
 * ☑️ Grant Full Disk Access to Terminal (System Preferences => Privacy & Security => Privacy => Full Disk Access => Add Terminal.app)
 * ☑️ Map Caps Lock to Control for each keyboard (System Settings => Keyboard => Keyboard Shortcuts => Modifier Keys)
-    * macOS ignores `defaults` writes to `com.apple.keyboard.modifiermapping.*`, so this panel is the only way in
 * ☑️ Swap ⌘ and ⌥ for external keyboards that need it, in the same panel
 * ☑️ Generate SSH key pair and register it to GitHub:
 
@@ -42,13 +41,6 @@ When you want to bootstrap a specific branch:
 ```
 curl -L https://raw.githubusercontent.com/ikuwow/dotfiles/main/bootstrap.sh | bash -s -- branchname
 ```
-
-### Grant Hammerspoon Accessibility permission
-
-`hammerspoon/init.lua` uses an event tap, which needs Accessibility. Without it `hs.eventtap:start()` fails to the Hammerspoon console only, so the ⌘ tap silently does nothing.
-
-* ☑️ System Settings => Privacy & Security => Accessibility => enable Hammerspoon
-* ☑️ Enable "Launch Hammerspoon at login" in Hammerspoon's own preferences
 
 ### Set login shell after bootstrapping
 
