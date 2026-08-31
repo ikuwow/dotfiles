@@ -21,7 +21,7 @@ cask "obsidian"
 cask "1password"
 mas "1Password for Safari", id: 1569813296
 mas "WiFi Signal", id: 525912054
-cask "karabiner-elements"
+cask "hammerspoon"
 cask "ghostty"
 cask "font-noto-sans-mono-cjk-jp"
 cask "istat-menus"
