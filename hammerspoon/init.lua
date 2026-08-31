@@ -1,24 +1,21 @@
--- Releasing a command key that was held on its own, with no other modifier,
--- key, click or scroll in between, switches the Japanese input mode: left ⌘
--- sends 英数 (eisu), right ⌘ sends かな (kana). There is no hold-duration
--- limit, so any length of solo hold fires on release. Secure Keyboard Entry
--- blocks event taps from other applications, so nothing fires while it is on.
--- Both callbacks return false, leaving every event in place; these taps only
--- observe.
+-- Releasing a command key held on its own, with no other modifier, key, click
+-- or scroll in between, switches the Japanese input mode. There is no
+-- hold-duration limit, so any length of solo hold fires on release, and
+-- Secure Keyboard Entry blocks event taps from other applications, so nothing
+-- fires while it is on. Both callbacks return false so every event passes
+-- through untouched.
 
 local TAP_TARGET = {
   [hs.keycodes.map.cmd] = hs.keycodes.map.eisu,
   [hs.keycodes.map.rightcmd] = hs.keycodes.map.kana,
 }
 
--- Keycode of the command key that is currently a solo-tap candidate.
 local pendingCmd = nil
 
 local function onFlagsChanged(event)
   local keyCode = event:getKeyCode()
   local target = TAP_TARGET[keyCode]
   if not target then
-    -- Any other modifier changing state means the command key was not alone.
     pendingCmd = nil
     return false
   end
@@ -32,9 +29,8 @@ local function onFlagsChanged(event)
     end
   else
     if pendingCmd == keyCode then
-      -- keyStroke's default delay is a 200ms usleep between key down and up,
-      -- which would block the main thread inside this callback and invite
-      -- macOS to disable the tap. Pass 0.
+      -- Pass 0: keyStroke's default delay is a 200ms usleep that would block
+      -- this callback and invite macOS to disable the tap.
       hs.eventtap.keyStroke({}, target, 0)
     end
     pendingCmd = nil
