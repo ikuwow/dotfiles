@@ -1,6 +1,6 @@
 ---
 name: rule-edit
-description: Changing or judging a rule document that an AI agent loads as instructions - CLAUDE.md, AGENTS.md, AIRULES.md, files under .claude/rules/, a SKILL.md, an agent definition, any file whose consumer is an agent rather than a person. Carries the criteria for what belongs in a rule (振り分け, 採用基準), how to word it (書き方), where to put it (配置), and the procedure - scope, enumerating every existing statement that decides the same question, integrating rather than appending, verifying a compression dropped nothing, and a fresh-context compliance check. Trigger whenever a task will add, reword, delete, compress, split, or relocate an instruction in such a file, including a one-line tweak, a "just add a rule so you stop doing X" request, and rule edits reached from /retro-review or a retrospective. Trigger equally when the user only asks about an existing rule rather than asking for an edit - whether it is worded well, whether it belongs where it sits, whether it duplicates another rule, whether it should be a rule at all or a skill or a hook - since answering that needs the same criteria.
+description: Changing or judging a rule document that an AI agent loads as instructions - CLAUDE.md, AGENTS.md, AIRULES.md, files under .claude/rules/, any file whose consumer is an agent rather than a person. Carries the criteria for what belongs in a rule (振り分け, 採用基準), how to word it (書き方), where to put it (配置), and the procedure - scope, enumerating every existing statement that decides the same question, integrating rather than appending, verifying a compression dropped nothing, and a fresh-context compliance check. Trigger whenever a task will add, reword, delete, compress, split, or relocate an instruction in such a file, including a one-line tweak, a "just add a rule so you stop doing X" request, and rule edits reached from /retro-review or a retrospective. Trigger equally when the user only asks about an existing rule rather than asking for an edit - whether it is worded well, whether it belongs where it sits, whether it duplicates another rule, whether it should be a rule at all or a skill or a hook - since answering that needs the same criteria.
 ---
 
 # Rule Edit
@@ -19,30 +19,42 @@ an edit already anchored.
 ## Step 1: Name the scope
 
 Say in the assistant message whether the change is global (every project,
-every task) or project-specific, and which file that puts it in. A rule placed
-one level too wide loads into work it cannot help, and one placed too narrow
-stops applying where the failure recurs.
+every task) or project-specific. A constraint scoped one level too wide loads
+into work it cannot help, and one scoped too narrow stops applying where the
+failure recurs. Which file it lands in follows from Step 3, once the mechanism
+is settled.
 
-Note which agents the file actually reaches. In this repository `AIRULES.md`
-is symlinked to Codex's and Junie's `AGENTS.md`, while `claude/rules/` reaches
-Claude alone, so moving a statement between them silently narrows or widens
-who obeys it.
+Note which agents a destination reaches, since a move between two of them
+narrows or widens who obeys the statement. In `ikuwow/dotfiles`,
+`scripts/deploy.sh` gives four classes:
+
+- `AIRULES.md` reaches Claude, Codex, and Junie
+- `claude/rules/` reaches Claude alone
+- `claude/skills/` reaches Claude and Junie
+- `codex/rules/` reaches Codex alone
 
 ## Step 2: Enumerate every statement that decides the same question
 
-Search every rule document in scope for statements bearing on the question
-this edit decides, and list them with file and line number. The search space is
-whatever the agents in play actually load: the user-level rule set, the target
-project's own rule files, and any agent definition or skill that restates the
-same decision. Grep on the terms the decision would be worded with, not on the
-wording you are about to write:
+Search for statements bearing on the question this edit decides, and list them
+with file and line number. The search space is whatever the agents in play
+actually load, which spans two roots that need different commands:
 
 ```
-git grep -n '<term>\|<synonym>\|<both the English and the Japanese form>' -- <the rule documents in scope>
+# the target project's own rule documents
+git grep -n '<term>\|<synonym>\|<both the English and the Japanese form>' -- <paths>
+
+# the user-level set, whose entries are symlinks, so -R rather than -r
+grep -Rn '<the same pattern>' ~/.claude/CLAUDE.md ~/.claude/rules/ ~/.claude/skills/ ~/.claude/agents/
 ```
 
-Widen the pattern until it catches statements phrased differently from yours.
-A term that only appears in your new wording proves nothing.
+`grep -r` skips symlinks it meets during recursion, and every entry under
+`~/.claude/rules/` is one, so a lowercase `-r` reports a clean search of
+nothing.
+
+Grep on the terms the decision would be worded with, not on the wording you
+are about to write, and widen the pattern until it catches statements phrased
+differently from yours. A term that only appears in your new wording proves
+nothing.
 
 Then read what comes back and classify each hit:
 
@@ -65,15 +77,18 @@ what each one claims. Read it there rather than from memory: a rule is what
 survives after every other mechanism has taken what it claims, so a route this
 step skips sends content to the always-loaded set by default.
 
-Check whether a hook already enforces the constraint. A hook that already
-blocks the action makes a matching rule line a pre-emption rather than a
-duplicate, so the rule earns its place by saving a denied tool call; a rule
-with no such role is text the hook already covers.
+Check whether a hook already enforces the constraint. In `ikuwow/dotfiles` the
+hooks are the scripts under `claude/hooks/` and their wiring in
+`claude/settings.json`'s `hooks` section. A hook that already blocks the action
+makes a matching rule line a pre-emption rather than a duplicate, so the rule
+earns its place by saving a denied tool call; a rule with no such role is text
+the hook already covers.
 
 When the routing lands the content in a skill and a rule still has to send the
 reader there, leave a trigger pointer in the rule naming the skill. 配置 例外2
 allows it, and the pointer is what makes an on-demand mechanism reachable from
-a session that has not loaded it.
+a session that has not loaded it. Content that stays a rule needs no pointer:
+a rule file without `paths` frontmatter loads unconditionally.
 
 ## Step 4: Integrate rather than append
 
@@ -107,21 +122,20 @@ claim, since the surviving statements are outside the diff.
 ## Step 6: Check compliance from a fresh context
 
 Dispatch a general-purpose subagent on `opus` to check the edited files against
-`${CLAUDE_SKILL_DIR}/criteria.md`. Its clean context is what makes the check
-worth running: the session that wrote the edit knows what it meant, and reads
-the intent back into the words. Name the model rather than inheriting, so the
-check does not land on whatever the session happens to be running.
+`criteria.md`. Its clean context is what makes the check worth running: the
+session that wrote the edit knows what it meant, and reads the intent back into
+the words. Name the model rather than inheriting, so the check does not land on
+whatever the session happens to be running.
 
 Brief it with the repository path, the branch, the resolved path of
-`criteria.md`, and the files to check, and ask for per-file findings plus
-whether any rule file gained a path reference to another rule file. Give it
-nothing about why the edit was made, for the same reason.
+`criteria.md`, and the files to check, and ask for per-file findings against
+the whole specification. Give it nothing about why the edit was made, for the
+same reason.
 
-Say which sections apply to which file. 採用基準, 書き方, and 配置 judge rule
-content, so a SKILL.md or an agent definition in the change set is judged
-against 振り分け (does this belong here at all) and against its own house
-style, and a reviewer left to guess will read the rule criteria onto a
-procedural document.
+`${CLAUDE_SKILL_DIR}` resolves the skill path for a subagent, and it points at
+the deployed copy under `$HOME`. When the edit targets the repository that
+backs that copy, hand over the in-repo path instead, so the reviewer reads the
+same file the branch changes.
 
 Act on what it returns, then re-read the edited file yourself once. The
 subagent judges wording against the specification; whether the rule still says

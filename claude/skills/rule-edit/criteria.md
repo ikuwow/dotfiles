@@ -59,7 +59,7 @@
 - 行数の超過は、冗長さの削減か意味のある単位での分割で解消する
   - skill / path-scoped ruleへの切り出しは、振り分けの基準に該当する場合のみ行う
 - 各rule fileは他のrule fileへのpath参照なしで完結させる
-  - renameで壊れ、auto-load同士では情報追加もゼロで、相対パスはsymlink経由で解決しないため
+  - renameで壊れ、auto-load同士では情報追加もゼロのため
   - 例外1: skill / workflow → ruleのframework名参照（"X defined in `file.md`" 等）は残す
     - skillが評価対象を名付けるためにload-bearing
   - 例外2: rule → skillの起動ポインタ（skill名のみ、pathなし）は残す
