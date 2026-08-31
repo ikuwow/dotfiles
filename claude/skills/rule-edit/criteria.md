@@ -1,7 +1,8 @@
 # AI 向けrule文書の基準
 
-AI agentが指示として読み込む文書（CLAUDE.md、AGENTS.md、rule file、agent定義等）に適用される。
-ファイル名・置き場所は問わず、消費者がAI agentであることで判定する。
+対象はAI agentが指示として読み込む文書（CLAUDE.md、AGENTS.md、rule file、skill、agent定義等）で、ファイル名・置き場所は問わず消費者がAI agentであることで判定する。
+
+振り分けはそのうちどれに載せるかを決めるので全種に効く。採用基準・書き方・配置はruleに載せると決まった内容を判定するので、skillやagent定義の本文はそれぞれの文書種の書式に従う。
 
 ## 振り分け（どの仕組みに載せるか）
 
@@ -16,9 +17,9 @@ AI agentが指示として読み込む文書（CLAUDE.md、AGENTS.md、rule file
   - hookの作成にはhookify skillを使う
 - モデルの弱点を補償するscaffolding（verification reminder、anti-rationalizationの言い換え反復、進捗報告の強制等）: invocation site（agent定義の本文、subagent呼び出し時のprompt等、そのモデルに仕事を渡す場所）
   - 必要なモデル・場面にだけ届け、常時ロードのcontextから外すため
-- 特定の作業・特定のファイルを触る時にしか効かない事実と制約: その作業のskill / path-scoped rule
+- 特定の作業・特定のファイルを触る時にしか効かない事実と制約: その作業のskill / agent定義 / path-scoped rule
   - 無関係な作業のcontextから外すため
-- 上記のいずれにも該当せず、どの作業でも成立する事実と制約: rule
+- 上記のいずれにも該当しない事実と制約: rule
 
 ## 採用基準
 
@@ -49,7 +50,7 @@ AI agentが指示として読み込む文書（CLAUDE.md、AGENTS.md、rule file
 
 ## 配置
 
-- 振り分けでruleに残った内容の置き場所はscopeで決める
+- 置き場所はscopeで決める
   - 全プロジェクト・全作業に効く方針: user-levelのglobal rule
   - 特定プロジェクト固有の規約: そのprojectのCLAUDE.md / project rule
 - 作業限定の制約をpath-scoped rule（`paths` frontmatter）で載せるのは、対象ファイルを読んだ後に効けば足りる場合に限る

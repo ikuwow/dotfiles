@@ -7,8 +7,10 @@ description: Changing or judging a rule document that an AI agent loads as instr
 
 `criteria.md`, beside this file, is the specification these steps enforce. It
 decides what belongs in a rule at all (振り分け), what to keep (採用基準), how
-to word it (書き方), and where to put it (配置). Read it before Step 1; the
-steps below sequence its checks and add nothing to them.
+to word it (書き方), and where to put it (配置). Read it before Step 1. The
+steps below sequence those criteria and add the checks that only apply while
+an edit is being made: the hook pre-emption test, the compression mapping, the
+fresh-context review, and what the PR body has to carry.
 
 Run Steps 1 through 3 before writing the edit. They are what keeps one
 question from ending up answered in two files, and an edit already written is
@@ -58,14 +60,20 @@ prevent.
 
 ## Step 3: Decide where the statement lands
 
-`criteria.md` 振り分け routes procedures to a skill, must-never-happen
-operations to a hook or permission, and model-weakness scaffolding to the
-invocation site. Only what none of those claim stays as a rule.
+Route the statement with `criteria.md` 振り分け, which lists the mechanisms and
+what each one claims. Read it there rather than from memory: a rule is what
+survives after every other mechanism has taken what it claims, so a route this
+step skips sends content to the always-loaded set by default.
 
 Check whether a hook already enforces the constraint. A hook that already
 blocks the action makes a matching rule line a pre-emption rather than a
 duplicate, so the rule earns its place by saving a denied tool call; a rule
 with no such role is text the hook already covers.
+
+When the routing lands the content in a skill and a rule still has to send the
+reader there, leave a trigger pointer in the rule naming the skill. 配置 例外2
+allows it, and the pointer is what makes an on-demand mechanism reachable from
+a session that has not loaded it.
 
 ## Step 4: Integrate rather than append
 

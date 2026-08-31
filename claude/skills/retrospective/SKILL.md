@@ -118,12 +118,14 @@ default=$(git symbolic-ref --short refs/remotes/origin/HEAD | sed 's|^origin/||'
 
 `apply now` (project-specific only), by destination:
 
-- `existing-rule-edit` / `new-rule` → invoke the rule-edit skill, which
-  carries the adoption criteria and the same-decision enumeration
+- `existing-rule-edit` → invoke the rule-edit skill, which carries the
+  adoption criteria and the same-decision enumeration
 - `existing-skill-update` → Edit the target file
 - `mechanize` → Write the hook script or CI config; extend
   `.claude/settings.json`'s hooks section if the countermeasure needs
   a new hook entry
+- `new-rule` → invoke the rule-edit skill, whose placement step decides
+  the mechanism and leaves the trigger pointer a new rule file needs
 - `new-skill` → Create the skill directory with a `SKILL.md` skeleton
   and frontmatter; the content is fleshed out in a later session
 
