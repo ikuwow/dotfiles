@@ -33,8 +33,9 @@ check_dir() {
 # Drift checks below are warnings, not failures: the live host's symlink
 # state is ambient, human-owned state (a stray dangling symlink might be
 # something intentionally left for manual review), not a repo-consistency
-# fact this script can safely gate a commit on. deploy.sh never
-# auto-deletes for the same reason. See check_symlink/check_dir above for
+# fact this script can safely gate a commit on. deploy.sh prunes the
+# dangling symlinks in the directories it owns, so a warning here names one
+# that appeared outside a deploy run. See check_symlink/check_dir above for
 # the deterministic, repo-driven checks that DO fail the build.
 
 check_no_dangling_symlinks() {
@@ -44,7 +45,7 @@ check_no_dangling_symlinks() {
   if [ -z "$dangling" ]; then
     echo "OK: $dir has no dangling symlinks"
   else
-    echo "WARN: $dir has dangling symlinks (review and remove manually if stale):"
+    echo "WARN: $dir has dangling symlinks (re-run scripts/deploy.sh to prune):"
     echo "$dangling"
     warnings=$((warnings + 1))
   fi
