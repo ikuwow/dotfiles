@@ -71,8 +71,7 @@ defaults write -g ApplePressAndHoldEnabled -bool false  # Disable press-and-hold
 
 # Caps lock -> left control, for every attached keyboard. The mapping the
 # Modifier Keys panel writes is keyed by vendor and product ID, so each
-# keyboard needs its own entry. `hidutil property --set` would remap the
-# same keys but is dropped on restart (Apple TN2450).
+# keyboard needs its own entry.
 CAPS_LOCK_USAGE=30064771129     # HID page 0x07, usage 0x39
 LEFT_CONTROL_USAGE=30064771296  # HID page 0x07, usage 0xE0
 hidutil list --matching '{"PrimaryUsagePage":1,"PrimaryUsage":6}' |
