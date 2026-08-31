@@ -22,6 +22,7 @@ Complete these during initial Mac setup or from System Preferences (reboot requi
 * ☑️ Grant Full Disk Access to Terminal (System Preferences => Privacy & Security => Privacy => Full Disk Access => Add Terminal.app)
 * ☑️ Map Caps Lock to Control for each keyboard (System Settings => Keyboard => Keyboard Shortcuts => Modifier Keys)
     * macOS ignores `defaults` writes to `com.apple.keyboard.modifiermapping.*`, so this panel is the only way in
+* ☑️ Swap ⌘ and ⌥ for external keyboards that need it, in the same panel
 * ☑️ Generate SSH key pair and register it to GitHub:
 
 ```bash
