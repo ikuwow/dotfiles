@@ -109,11 +109,13 @@ session context and cross-rule judgment.
 1. For each cluster whose disposition is rule-edit, enumerate every
    statement that decides the same question as the proposed edit, and
    record for each whether it agrees with the edit, contradicts it, or
-   already states it. The search space is `AIRULES.md` and
-   `claude/rules/`, plus the target project's own rule files when the
-   edit targets a project asset. A contradiction found here reaches
-   the user while the action is still a proposal, rather than after
-   both statements are in force.
+   already states it. The search space is the rule files alone —
+   `AIRULES.md`, `claude/rules/`, and the target project's own rule
+   files when the edit targets a project asset — because the target
+   asset is still a proposal here; the rule-edit skill widens it to
+   agent definitions and skills once the edit has a target. A
+   contradiction found here reaches the user while the action is still
+   a proposal, rather than after both statements are in force.
 1. When an enumerated statement already states the proposed edit,
    record the cluster's diagnosis as rule-not-followed and revisit the
    disposition that followed from it, since restating a rule already

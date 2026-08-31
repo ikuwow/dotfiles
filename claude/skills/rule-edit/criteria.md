@@ -49,12 +49,11 @@ AI agentが指示として読み込む文書（CLAUDE.md、AGENTS.md、rule file
 
 ## 配置
 
-- 置き場所はscopeで決める
+- 振り分けでruleに残った内容の置き場所はscopeで決める
   - 全プロジェクト・全作業に効く方針: user-levelのglobal rule
   - 特定プロジェクト固有の規約: そのprojectのCLAUDE.md / project rule
-  - 特定の作業・手順に付随する制約: skill / agent定義
-- 特定のファイルを触る時だけ効く制約は `paths` frontmatterでpath-scoped rule化し、特定の作業でだけ効く制約はその作業のskillに置く
-  - path-scoped ruleはファイルを読んだ時に発火するので、着手前の判断に要る制約はskill側に置く
+- 作業限定の制約をpath-scoped rule（`paths` frontmatter）で載せるのは、対象ファイルを読んだ後に効けば足りる場合に限る
+  - path-scoped ruleはファイルを読んだ時に発火するので、着手前の判断に要る制約は間に合わないため
 - 常時ロードのファイルは公式目安の200行/file以内に収める
   - 長いほど遵守率が落ちるため
 - 行数の超過は、冗長さの削減か意味のある単位での分割で解消する

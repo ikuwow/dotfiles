@@ -1,11 +1,11 @@
 ---
 name: rule-edit
-description: Procedure for changing a rule document that an AI agent loads as instructions - CLAUDE.md, AGENTS.md, AIRULES.md, files under .claude/rules/, an agent definition, and any file whose consumer is an agent rather than a person. Covers naming the scope, enumerating every existing statement that decides the same question, integrating rather than appending, verifying a compression dropped nothing, and the fresh-context compliance check afterward. Trigger whenever a task will add, reword, delete, compress, split, or relocate an instruction in such a file, including a one-line tweak, a "just add a rule so you stop doing X" request, and rule edits reached from /retro-review or a retrospective - not only tasks the user frames as rule authoring.
+description: Changing or judging a rule document that an AI agent loads as instructions - CLAUDE.md, AGENTS.md, AIRULES.md, files under .claude/rules/, a SKILL.md, an agent definition, any file whose consumer is an agent rather than a person. Carries the criteria for what belongs in a rule (振り分け, 採用基準), how to word it (書き方), where to put it (配置), and the procedure - scope, enumerating every existing statement that decides the same question, integrating rather than appending, verifying a compression dropped nothing, and a fresh-context compliance check. Trigger whenever a task will add, reword, delete, compress, split, or relocate an instruction in such a file, including a one-line tweak, a "just add a rule so you stop doing X" request, and rule edits reached from /retro-review or a retrospective. Trigger equally when the user only asks about an existing rule rather than asking for an edit - whether it is worded well, whether it belongs where it sits, whether it duplicates another rule, whether it should be a rule at all or a skill or a hook - since answering that needs the same criteria.
 ---
 
 # Rule Edit
 
-`${CLAUDE_SKILL_DIR}/criteria.md` is the specification these steps enforce. It
+`criteria.md`, beside this file, is the specification these steps enforce. It
 decides what belongs in a rule at all (振り分け), what to keep (採用基準), how
 to word it (書き方), and where to put it (配置). Read it before Step 1; the
 steps below sequence its checks and add nothing to them.
@@ -58,7 +58,7 @@ prevent.
 
 ## Step 3: Decide where the statement lands
 
-`${CLAUDE_SKILL_DIR}/criteria.md` 振り分け routes procedures to a skill, must-never-happen
+`criteria.md` 振り分け routes procedures to a skill, must-never-happen
 operations to a hook or permission, and model-weakness scaffolding to the
 invocation site. Only what none of those claim stays as a rule.
 
@@ -74,7 +74,7 @@ instruction. Appending a qualifier beside it leaves both readings loaded at
 once, and the model then picks one per session.
 
 Write the result in the file's own language, in the affirmative form and
-one-sentence-per-bullet shape `${CLAUDE_SKILL_DIR}/criteria.md` 書き方 and the AIRULES.md
+one-sentence-per-bullet shape `criteria.md` 書き方 and the AIRULES.md
 output-format rules ask for.
 
 ## Step 5: Verify a compression dropped nothing
@@ -105,10 +105,15 @@ the intent back into the words. Name the model rather than inheriting, so the
 check does not land on whatever the session happens to be running.
 
 Brief it with the repository path, the branch, the resolved path of
-`criteria.md`, and the files to check, and ask it to report per-file findings
-against 振り分け, 採用基準, 書き方, and 配置, plus whether any rule file gained
-a path reference to another rule file. Give it nothing about why the edit was
-made, for the same reason.
+`criteria.md`, and the files to check, and ask for per-file findings plus
+whether any rule file gained a path reference to another rule file. Give it
+nothing about why the edit was made, for the same reason.
+
+Say which sections apply to which file. 採用基準, 書き方, and 配置 judge rule
+content, so a SKILL.md or an agent definition in the change set is judged
+against 振り分け (does this belong here at all) and against its own house
+style, and a reviewer left to guess will read the rule criteria onto a
+procedural document.
 
 Act on what it returns, then re-read the edited file yourself once. The
 subagent judges wording against the specification; whether the rule still says
