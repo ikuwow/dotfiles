@@ -27,6 +27,10 @@ that pin `fable` in their own definition are exempt.
   final review
 - Write delegation briefs goal-first: state the outcome and
   constraints, not step-by-step procedures
+- Bound a delegated investigation with an explicit stop condition in
+  the brief (a file count, a number of checks), so the subagent stops
+  at the depth the task warrants
+- Delegate only what already-loaded context does not answer
 
 Do not set the `CLAUDE_CODE_SUBAGENT_MODEL` env var (it overrides
 per-invocation model parameters). Skills define their own model in
