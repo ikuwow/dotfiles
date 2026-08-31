@@ -1,7 +1,10 @@
 -- Releasing a command key that was held on its own, with no other modifier,
 -- key, click or scroll in between, switches the Japanese input mode: left ⌘
 -- sends 英数 (eisu), right ⌘ sends かな (kana). There is no hold-duration
--- limit, so any length of solo hold fires on release.
+-- limit, so any length of solo hold fires on release. Secure Keyboard Entry
+-- blocks event taps from other applications, so nothing fires while it is on.
+-- Both callbacks return false, leaving every event in place; these taps only
+-- observe.
 
 local TAP_TARGET = {
   [hs.keycodes.map.cmd] = hs.keycodes.map.eisu,
@@ -17,7 +20,6 @@ local function onFlagsChanged(event)
   if not target then
     -- Any other modifier changing state means the command key was not alone.
     pendingCmd = nil
-    -- false leaves the event in place; these taps only observe.
     return false
   end
 
@@ -30,7 +32,9 @@ local function onFlagsChanged(event)
     end
   else
     if pendingCmd == keyCode then
-      -- Without an explicit delay keyStroke sleeps 200ms inside this callback.
+      -- keyStroke's default delay is a 200ms usleep between key down and up,
+      -- which would block the main thread inside this callback and invite
+      -- macOS to disable the tap. Pass 0.
       hs.eventtap.keyStroke({}, target, 0)
     end
     pendingCmd = nil
@@ -43,8 +47,8 @@ local function onOtherInput()
   return false
 end
 
--- All three watchers below are global on purpose: a local would be garbage
--- collected and the underlying event tap would stop delivering events.
+-- The three watchers below are global so they outlive this chunk. Collecting
+-- a watcher runs its __gc, which stops it and takes its tap or observer down.
 cmdFlagsWatcher = hs.eventtap.new({ hs.eventtap.event.types.flagsChanged }, onFlagsChanged)
 cmdFlagsWatcher:start()
 
@@ -57,8 +61,8 @@ otherInputWatcher = hs.eventtap.new({
 }, onOtherInput)
 otherInputWatcher:start()
 
--- Precautionary: waking has been reported to leave event taps not delivering
--- events. Unverified on this machine, so the taps are re-armed unconditionally.
+-- Guard for a tap that does not resume after sleep, and discard a solo-tap
+-- candidate stranded from before it. Cycling a live tap is idempotent.
 sleepWatcher = hs.caffeinate.watcher.new(function(eventType)
   if eventType == hs.caffeinate.watcher.systemDidWake then
     pendingCmd = nil

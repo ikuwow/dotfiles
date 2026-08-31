@@ -58,7 +58,8 @@ fi
 
 # Hammerspoon: the app hardcodes ~/.hammerspoon, so this cannot ride the
 # xdg-config glob. Link per entry so app-created state (Spoons/) stays out
-# of the repository.
+# of the repository, and relink before pruning so a missing source tree aborts
+# under `set -e` before anything is deleted.
 mkdir -p "$HOME/.hammerspoon"
 find "$DOTPATH/hammerspoon" -maxdepth 1 -mindepth 1 -type f -exec ln -fvns {} "$HOME/.hammerspoon/" \;
 find "$HOME/.hammerspoon/" -maxdepth 1 -type l ! -exec test -e {} \; -print -delete
