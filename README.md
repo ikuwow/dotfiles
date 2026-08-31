@@ -20,6 +20,7 @@ Complete these during initial Mac setup or from System Preferences (reboot requi
 
 * ☑️ Install Developer Tools: `xcode-select --install`
 * ☑️ Grant Full Disk Access to Terminal (System Preferences => Privacy & Security => Privacy => Full Disk Access => Add Terminal.app)
+* ☑️ Map Caps Lock to Control for each keyboard (System Settings => Keyboard => Keyboard Shortcuts => Modifier Keys). macOS ignores `defaults` writes to `com.apple.keyboard.modifiermapping.*`, so this panel is the only way in
 * ☑️ Generate SSH key pair and register it to GitHub:
 
 ```bash
