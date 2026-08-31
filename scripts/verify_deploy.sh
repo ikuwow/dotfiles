@@ -96,6 +96,12 @@ else
 fi
 
 echo ""
+echo "=== Hammerspoon ==="
+check_dir "$HOME/.hammerspoon"
+check_symlink "$HOME/.hammerspoon/init.lua"
+check_no_dangling_symlinks "$HOME/.hammerspoon"
+
+echo ""
 echo "=== Claude Code ==="
 check_symlink "$HOME/.claude/.mcp.json"
 check_symlink "$HOME/.claude/settings.json"
