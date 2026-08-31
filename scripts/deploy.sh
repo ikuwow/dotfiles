@@ -31,7 +31,6 @@ link .sshrc         "$HOME/.sshrc"
 
 # Version / package managers
 link .tool-versions           "$HOME/.tool-versions"
-link .gemrc                   "$HOME/.gemrc"
 link .textlintrc.json         "$HOME/.textlintrc.json"
 
 # XDG config: all subdirs in xdg-config/ auto-discovered

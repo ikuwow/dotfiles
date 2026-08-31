@@ -2,8 +2,11 @@
 
 When delegating work to subagents via the Agent tool:
 
-- Write delegation briefs goal-first: state the outcome and
-  constraints, not step-by-step procedures
+- Write delegation briefs goal-first: state the outcome and the
+  constraints the conversation settled (branch and PR shape, scope
+  limits, what to leave alone), not step-by-step procedures
+  - The subagent does not see the conversation, so a constraint left
+    out of the brief is one it will not honor
 - Carry the task's depth ceiling into the brief as an explicit stop
   condition (a file count, a number of checks), so the subagent applies
   the same bound the session does
