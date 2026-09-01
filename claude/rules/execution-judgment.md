@@ -12,7 +12,7 @@
 
 ## deny への対応
 
-- permission denial・classifier拒否・block系hookに止められたら、denyを最終判断として受け止め、行為だけでなく方針自体を再検討する。再試行するのは方針を変えた場合に限る（別経路での同一目的の再実行はdenyの意味を失わせるため）
+- permission denial・classifier拒否・block系hookに止められたら、denyを最終判断として受け止め、行為だけでなく方針自体を再検討する。再試行するのは方針を変えた場合と、拒否メッセージ自身が再発行の条件を示している場合に限る（別経路での同一目的の再実行はdenyの意味を失わせる一方、条件を示すsoft gateをhard denyとして扱うと通るはずの経路が塞がるため）
 
 ## subagent への委譲
 
