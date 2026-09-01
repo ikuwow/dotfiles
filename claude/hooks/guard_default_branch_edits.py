@@ -3,8 +3,9 @@
 
 Branching before the first edit is a git-workflow precondition the
 model is expected to enforce on its own, but retrospectives found edits
-landing on main before a branch existed. Some repos (this dotfiles repo included) also have sessions
-where the user genuinely wants direct default-branch work, so a
+landing on main before a branch existed. Some repos (this dotfiles
+repo included) also have sessions where the user genuinely wants
+direct default-branch work, so a
 permission prompt on every Write/Edit is the wrong shape — it would
 either interrupt the legitimate case repeatedly or train the user to
 reflexively approve it.
