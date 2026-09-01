@@ -1,6 +1,6 @@
 ---
 name: retro-note
-description: Use for a lightweight, shallow log of AI-mistake analysis appended to a per-project jsonl file, as a lower-cost alternative to the full /retrospective. TRIGGER automatically when the user declares session completion (per the AIRULES.md rule), or when the user invokes /retro-note directly.
+description: Use for a lightweight, shallow log of AI-mistake analysis appended to a per-project jsonl file. TRIGGER automatically, without asking for confirmation, when the user declares the task complete or the session over ("終わり", "done", "これで完了" etc.), or when the user invokes /retro-note directly. Invoke /retrospective explicitly instead when a deep dive is warranted.
 ---
 
 # Retro Note
