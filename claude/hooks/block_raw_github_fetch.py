@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 """Deny curl/wget fetches of raw.githubusercontent.com in favor of ``gh``.
 
-The rule ("GitHubの操作は...`gh` コマンドを使う。ghが使えない環境や
-ghで実現できない操作の場合のみ...`raw.githubusercontent.com` 等を使って
-よい") only permits fetching raw.githubusercontent.com directly when
-``gh`` itself is unavailable. This PreToolUse hook mechanizes the
-default case: a Bash command that reaches for ``curl``/``wget`` against
-that domain is denied and pointed at the ``gh api`` equivalent instead.
+Fetching raw.githubusercontent.com directly is only warranted when
+``gh`` itself is unavailable. This PreToolUse hook carries that
+constraint: a Bash command that reaches for ``curl``/``wget`` against
+that domain is denied and pointed at the ``gh api`` equivalent instead,
+with the "ask the user" fallback for the case where ``gh`` cannot run.
 The predicate is narrowed to ``curl``/``wget`` invocations (not any
 mention of the domain) so commands that merely reference the domain in
 passing — a commit message, a comment, a grep pattern — are not

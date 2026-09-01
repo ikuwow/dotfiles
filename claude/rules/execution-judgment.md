@@ -1,27 +1,15 @@
 # 実行判断
 
-## primary path の選択と進行
+## パス選択
 
-- 承認された plan がある / 明示的な進行指示 (imperative form の「次進めて」「次やって」「任せる」等) が出ている状態では、実行パスが複数あっても primary path を1つ選んで着手する。パスの選択自体で承認待ちに入らない。「次？」「これでいい？」等の疑問形は質問として扱い、progression signal には数えない
-- パス選択時は blocking-cost を最小化する。以下は path コストとして扱い、他に選択肢があるパスを優先する
-  - Claude Code の permission prompt が挟まる操作 (`--force*`, `git reset --hard`, `git branch -D`, `rm -rf` 等)
-  - user 側で手動実行が必要な操作 (外部ツール auth、cloud profile 選択、sudo 等の権限昇格、手動 shell コマンド実行)
-  - user への回答を待つ確認提示 (A/B 選択の丸投げ、方針レビュー要求)
+- 実行パスが複数ある時は blocking-cost が小さい方を選ぶ。permission prompt が挟まる操作、user 側の手動実行が要る操作（外部ツール auth、cloud profile 選択、権限昇格）、user の回答を待つ確認提示は、いずれも path コストとして数える
 
 ## 停止条件
 
-- 承認待ちで stop するのは以下の場合のみ
-  - unrecoverable / 外部影響のある副作用 (delete、publish、external mutation、send message 等)。上の cat 1 destructive で他に代替パスが無い場合もこの stop に落ちる。plan 承認・進行指示がこれらを個別承認するのは、対象と操作がそこに明記されている場合と、起動済み workflow/skill の手順として pre-authorize されている場合のみ (例: issue body 編集の承認は comment 投稿の承認を含まない)
-  - スコープが元の task から広がる
-  - 評価／依頼の区別が本質的に曖昧
+- 承認待ちで stop するのは、スコープが元の task から広がる時と、評価と依頼の区別が本質的に曖昧な時
+- plan 承認・進行指示は、外部影響のある操作（publish、external mutation、送信等）を個別に承認したことにはならない。個別承認とみなすのは、対象と操作がそこに明記されている場合と、起動済み workflow/skill の手順として pre-authorize されている場合のみ（例: issue body 編集の承認は comment 投稿の承認を含まない）
 - permission denial・classifier拒否・block系hookに止められたら、denyを最終判断として受け止め、行為だけでなく方針自体を再検討する。別経路（alias回避、別コマンド、別フラグ等）での再試行はしない
-- 同一コマンドの再発行で通ることをメッセージ自身が示すwarn系hookは、確認を挟む一時停止として扱う。提案された代替手段を検討し、元の手段が必要だと確認できた時だけ同じコマンドを再発行する
 
-## 知見の記録
+## subagent への委譲
 
-- セッション中に得られた知見・成果物のうち、人間が参照すべきものは issue・PR・ドキュメント等に記録する
-
-## セッション終了時
-
-- ユーザーがタスク完了・セッション終了を宣言したら（「終わり」「done」「これで完了」等）、確認せず自動的に `/retro-note` skill を invoke する
-  - 深い分析が必要な時のみ明示的に `/retrospective` を呼ぶ
+- subagent は会話を見ていないため、brief には達成すべき outcome、会話で確定した制約（branch と PR の形、スコープの限界、触らない対象）、深さの停止条件（ファイル数・チェック数等）を書く
