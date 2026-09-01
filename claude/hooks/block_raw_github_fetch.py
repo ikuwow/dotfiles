@@ -7,13 +7,20 @@ constraint: a Bash command that reaches for ``curl``/``wget`` against
 that domain is denied and pointed at the ``gh api`` equivalent instead,
 with the "ask the user" fallback for the case where ``gh`` cannot run.
 
-The predicate asks for an invocation, not a mention. A command is
-denied when ``curl`` or ``wget`` stands at the head of a segment
-(splitting on ``&&``, ``||``, ``;``, newline, and ``|`` outside quotes)
-and the domain appears in that same segment. A commit message, a grep
-pattern, or a comment naming both the tool and the domain therefore
-passes, and so does a fetch of some other host piped into a command
-that mentions this one.
+The predicate asks for an invocation, not a mention. Line continuations
+are joined, the command is split on ``&&``, ``||``, ``;``, newline, and
+``|`` outside quotes, and each segment is denied when it names the
+domain and puts a fetch tool in command position — at the head of the
+segment, after a leading environment assignment or a wrapper such as
+``sudo`` or ``timeout``, or opening a substitution or subshell. A path
+qualifier such as ``/usr/bin/`` is accepted on the tool name.
+
+So a commit message, a grep pattern, or a comment naming both the tool
+and the domain passes, and so does a fetch of some other host piped
+into a command that mentions this one. Two shapes still match without
+fetching the domain: a heredoc body, whose lines are read as commands,
+and a fetch of another host that carries the domain elsewhere on the
+same segment, such as in a header value or an output filename.
 
 Spec: https://code.claude.com/docs/en/hooks
 """
@@ -21,11 +28,12 @@ import json
 import re
 import sys
 
+_CONTINUATION_RE = re.compile(r"\\\n")
 _SEPARATOR_RE = re.compile(r"&&|\|\||;|\n|\|")
 _DOMAIN_RE = re.compile(r"raw\.githubusercontent\.com")
-_FETCH_HEAD_RE = re.compile(r"(curl|wget)(\s|$)")
-_ENV_ASSIGN_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*=\S*\s+")
-_COMMAND_PREFIX_RE = re.compile(r"^(sudo|env|command|nohup|time)\s+")
+_FETCH_COMMAND_RE = re.compile(r"(?:^|[(`]|\$\()\s*(?:\S*/)?(?:curl|wget)(\s|$)")
+_ENV_ASSIGN_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*=[^\s$]*\s+")
+_WRAPPER_RE = re.compile(r"^(?:sudo|env|command|nohup|time)\s+|^timeout\s+\S+\s+")
 
 REASON = (
     'Use gh instead: gh api repos/<owner>/<repo>/contents/<path> '
@@ -90,27 +98,38 @@ def _split_outside_quotes(command: str) -> list[str]:
 
 
 def _strip_leading_prefixes(segment: str) -> str:
-    """Drop env assignments and wrappers that precede the real command.
+    """Drop env assignments and the wrappers named in ``_WRAPPER_RE``.
+
+    Each pass removes a prefix of at least two characters, so the loop
+    ends on every input.
 
     >>> _strip_leading_prefixes("HTTPS_PROXY=http://p curl x")
     'curl x'
     >>> _strip_leading_prefixes("sudo curl x")
     'curl x'
+    >>> _strip_leading_prefixes("timeout 10 curl x")
+    'curl x'
     >>> _strip_leading_prefixes("A=1 B=2 env curl x")
     'curl x'
     >>> _strip_leading_prefixes("curl x")
     'curl x'
+
+    An assignment whose value opens a substitution is left alone, so the
+    tool inside it stays visible:
+
+    >>> _strip_leading_prefixes("content=$(curl x)")
+    'content=$(curl x)'
     """
     previous = None
     while previous != segment:
         previous = segment
         segment = _ENV_ASSIGN_RE.sub("", segment)
-        segment = _COMMAND_PREFIX_RE.sub("", segment)
+        segment = _WRAPPER_RE.sub("", segment)
     return segment
 
 
 def is_raw_github_fetch(command: str) -> bool:
-    """Return True if a segment invokes curl/wget against the domain.
+    """Return True if a segment names the domain and invokes curl/wget.
 
     >>> is_raw_github_fetch("curl -sL https://raw.githubusercontent.com/a/b/main/x")
     True
@@ -118,15 +137,33 @@ def is_raw_github_fetch(command: str) -> bool:
     True
     >>> is_raw_github_fetch("cat urls | curl -K - https://raw.githubusercontent.com/a")
     True
+
+    Command position survives an assignment, a wrapper, a path
+    qualifier, a substitution, and a line continuation:
+
     >>> is_raw_github_fetch("HTTPS_PROXY=http://p curl https://raw.githubusercontent.com/a")
     True
+    >>> is_raw_github_fetch("timeout 10 curl https://raw.githubusercontent.com/a")
+    True
+    >>> is_raw_github_fetch("/usr/bin/curl -sL https://raw.githubusercontent.com/a")
+    True
+    >>> is_raw_github_fetch('bash -c "$(curl -fsSL https://raw.githubusercontent.com/a)"')
+    True
+    >>> is_raw_github_fetch("body=$(curl -sL https://raw.githubusercontent.com/a)")
+    True
+    >>> is_raw_github_fetch("curl -sL \\\\\\n  https://raw.githubusercontent.com/a")
+    True
 
-    Naming the tool and the domain without invoking one is not a fetch:
+    Naming the tool and the domain without putting the tool in command
+    position is not a fetch:
 
     >>> is_raw_github_fetch("git commit -m 'switch from curl to gh for raw.githubusercontent.com'")
     False
     >>> is_raw_github_fetch("git grep -n 'curl .*raw.githubusercontent.com'")
     False
+
+    Neither is a fetch whose domain sits in another segment, or none:
+
     >>> is_raw_github_fetch("curl -sL https://example.com | grep raw.githubusercontent.com")
     False
     >>> is_raw_github_fetch("curl -sL https://example.com/a/b")
@@ -134,9 +171,10 @@ def is_raw_github_fetch(command: str) -> bool:
     >>> is_raw_github_fetch("")
     False
     """
+    command = _CONTINUATION_RE.sub(" ", command)
     for segment in _split_outside_quotes(command):
         segment = _strip_leading_prefixes(segment.strip())
-        if _FETCH_HEAD_RE.match(segment) and _DOMAIN_RE.search(segment):
+        if _DOMAIN_RE.search(segment) and _FETCH_COMMAND_RE.search(segment):
             return True
     return False
 
