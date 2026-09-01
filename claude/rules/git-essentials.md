@@ -25,12 +25,6 @@ NOT restate the detailed procedures from the skill.
 - Step 4: CI wait and review (Phases 1-5)
 - Step 6: cleanup after merge (`git cleanup`)
 
-## Branch
-
-- Claude Code's `--worktree` flag and the EnterWorktree tool must
-  never be used (known bugs)
-- Never create or edit files on the default branch — branch first
-
 ## Commit
 
 - Append a blank line and exactly one Claude trailer block:
@@ -39,17 +33,14 @@ NOT restate the detailed procedures from the skill.
   rules prescribe a different trailer format, that format replaces
   this one (harness wins over project rules) — never stack a second
   trailer block.
-- Never modify commits that have already been pushed
 
 ## Push
 
 - First push: `git push -u origin HEAD`; afterwards `git push`
-- Force push variants (`--force`, `-f`, `--force-with-lease`) are
-  absolutely prohibited unless the user explicitly instructs
-  otherwise. If a chosen path would require one, or `git reset
-  --hard` on a published branch, back out to a merge-based path:
-  `gh pr update-branch <N>`, merge the default branch into the
-  feature branch, or a fresh commit on top.
+- When a path would need a force push, or `git reset --hard` on a
+  published branch, back out to a merge-based one: `gh pr
+  update-branch <N>`, merge the default branch into the feature
+  branch, or a fresh commit on top.
 
 ## PR / issue body edits
 

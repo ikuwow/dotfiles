@@ -62,3 +62,11 @@ hooks have no such prefix.
 Each subagent's model is chosen per invocation through the Agent tool's
 `model` parameter. The `CLAUDE_CODE_SUBAGENT_MODEL` environment variable
 overrides that parameter for every subagent at once, so it stays unset.
+
+## Worktrees
+
+`permissions.deny` carries `EnterWorktree`, which removes the tool from
+Claude's context entirely, and the CLI's own `--worktree` flag is left
+unused for the same reason: both have known bugs. Worktrees for a task
+are created with `git-worktree-create` instead, in projects that allow
+them.

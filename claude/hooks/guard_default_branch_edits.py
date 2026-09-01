@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """Deny once per session, then allow: guard default-branch edits.
 
-git-essentials.md ("Never create or edit files on the default branch")
-is a git-workflow precondition the model is expected to enforce on its
-own, but retrospectives found edits landing on main before a branch
-existed. Some repos (this dotfiles repo included) also have sessions
-where the user genuinely wants direct default-branch work, so a
+Branching before the first edit is a git-workflow precondition the
+model is expected to enforce on its own, but retrospectives found edits
+landing on main before a branch existed. Some repos (this dotfiles
+repo included) also have sessions where the user genuinely wants
+direct default-branch work, so a
 permission prompt on every Write/Edit is the wrong shape — it would
 either interrupt the legitimate case repeatedly or train the user to
 reflexively approve it.
@@ -190,8 +190,8 @@ def main():
             "permissionDecision": "deny",
             "permissionDecisionReason": (
                 f"Write/Edit targets a non-ignored path on the default "
-                f"branch '{current}' of {repo_root}. git-essentials "
-                f"prohibits editing files on the default branch — branch "
+                f"branch '{current}' of {repo_root}. Files are created "
+                f"and edited on a feature branch — branch "
                 f"first (invoke the git-workflow skill). Only when the "
                 f"user has explicitly asked for work directly on the "
                 f"default branch, retry this edit: retries in this "
