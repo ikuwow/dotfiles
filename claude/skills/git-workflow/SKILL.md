@@ -94,7 +94,6 @@ and the section 5 procedure.
    directory using the Write tool (new filename per revision — a new
    file needs no prior Read step)
    - Follow the repository's PR template if one exists
-   - Follow `pr-guidelines.md`
 1. Create the PR as a draft:
    `gh pr create --draft --body-file <body file path>`
    - Never use `--body` for PR creation. The `#`-prefixed lines in the body
@@ -231,11 +230,8 @@ per actionable change; quiet periods stay silent.
      user.
 
 1. Read [pr-reaction.md](pr-reaction.md) on the first monitor event,
-   before any reply, resolve, or push, and react under it. On a
-   `NEW_COMMENT` the `[BOT|USER]` label describes one comment, so that
-   file's thread walk governs the mutation; on `NEW_TOP_COMMENT` and
-   `NEW_REVIEW` the label is the classification of record and wins over
-   any conflicting signal.
+   before any reply, resolve, or push, and react under it — it governs
+   what the `[BOT|USER]` label settles for each event type
 
 1. `CHECK`: `gh pr checks` links the failing check. For an Actions job,
    `gh run view --log-failed <databaseId>` from `gh run list` reaches the
