@@ -12,6 +12,19 @@ structurally absent (e.g., no PR exists yet).
 Prerequisite: the `agynio/gh-pr-review` gh extension is installed
 (used by Phase 5 review-thread reactions).
 
+## Supporting files
+
+The step that needs one of these names when to read it.
+
+- [pr-guidelines.md](pr-guidelines.md) — the properties a PR title and
+  body are judged against, and what belongs in the body versus the diff
+- [pr-reaction.md](pr-reaction.md) — bot-versus-human targeting for PR
+  events, reply-channel routing, thread resolve, and the cap on
+  autonomous fix pushes
+- [implementer-dispatch.md](implementer-dispatch.md) — branch setup,
+  brief contents, isolation, and handback bounds for the `implementer`
+  subagent
+
 ## Principles
 
 - All steps within a single workflow run are pre-authorized by the user
@@ -44,17 +57,19 @@ Prerequisite: the `agynio/gh-pr-review` gh extension is installed
 1. If the project rules explicitly prohibit worktrees, create a branch only:
    `git checkout -b <branch-name>`
 
-When the approved plan is several independent PRs, branch once per PR
-and dispatch them in parallel per `implementer-dispatch.md`, which
-decides the isolation each one needs before any of them starts.
+When the approved plan is several independent PRs, read
+[implementer-dispatch.md](implementer-dispatch.md), then branch once per
+PR and dispatch them in parallel under it — it decides the isolation
+each one needs before any of them starts.
 
 Note: `.worktrees/` is covered by the global gitignore.
 
 ## 2. Implement, commit, push
 
 The implementation work for this branch happens here. When it is
-delegated to the `implementer` subagent, follow
-`implementer-dispatch.md`.
+delegated to the `implementer` subagent, read
+[implementer-dispatch.md](implementer-dispatch.md) before writing the
+brief, and follow it for the rest of the dispatch.
 
 When the commit message or PR body will claim an exhaustive
 replacement or update ("replaced all X with Y"), run
@@ -63,6 +78,9 @@ remaining matches — `replace_all` misses occurrences that differ in
 formatting or indentation.
 
 ## 3. Create a PR
+
+Read [pr-guidelines.md](pr-guidelines.md) before writing or editing a
+title or body anywhere in this step.
 
 1. If the branch already has a PR (`gh pr view --json number,url`),
    skip creation. Bring its title and body into conformance with
@@ -210,10 +228,10 @@ per actionable change; quiet periods stay silent.
    - Skip the push if either check fails; surface the conflict to the
      user.
 
-1. React per `pr-reaction.md` (bot check, reply-channel routing,
-   thread resolve, cap for autonomous fix pushes). A `[BOT|USER]` label
-   on an event line is a routing hint; the rule's thread walk still
-   governs mutations.
+1. Read [pr-reaction.md](pr-reaction.md) on the first event of the run,
+   before any reply, resolve, or push, and react under it. A
+   `[BOT|USER]` label on an event line is a routing hint; that file's
+   thread walk still governs mutations.
 
 1. `CHECK`: `gh pr checks` links the failing check. For an Actions job,
    `gh run view --log-failed <databaseId>` from `gh run list` reaches the
