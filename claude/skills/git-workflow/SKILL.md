@@ -47,6 +47,11 @@ Prerequisite: the `agynio/gh-pr-review` gh extension is installed
 
 ## 1. Start Work
 
+When the approved plan is several independent PRs, read
+[implementer-dispatch.md](implementer-dispatch.md) before the steps
+below — it decides whether they run in parallel or sequentially, and the
+isolation each one needs.
+
 1. From the main clone, not a worktree, switch to the default branch and
    pull: `git home`
 1. Create a worktree and branch (defaults to branching from origin's default branch):
@@ -56,11 +61,6 @@ Prerequisite: the `agynio/gh-pr-review` gh extension is installed
 1. Follow the command shown in the script output to move into the worktree
 1. If the project rules explicitly prohibit worktrees, create a branch only:
    `git checkout -b <branch-name>`
-
-When the approved plan is several independent PRs, read
-[implementer-dispatch.md](implementer-dispatch.md) before branching — it
-decides whether they run in parallel or sequentially, and the isolation
-each one needs.
 
 Note: `.worktrees/` is covered by the global gitignore.
 
