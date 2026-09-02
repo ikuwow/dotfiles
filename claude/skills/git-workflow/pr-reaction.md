@@ -30,6 +30,10 @@ gh pr-review review view -R <owner>/<repo> <number> \
   --unresolved --not_outdated --include-comment-node-id
 ```
 
+Drop `--unresolved --not_outdated` when inspecting one `NEW_COMMENT`,
+since a thread resolved or outdated in the interim is filtered out by
+them and Step 2 needs to see that state to skip the event.
+
 `gh api` is required here: the `gh pr-review` extension does not
 expose `user.type` on review comments (no equivalent flag), and no
 high-level `gh pr` subcommand returns per-line review comments.
@@ -51,7 +55,8 @@ kind, `NEW_COMMENT` is pre-filtered to unresolved / non-outdated).
 
 - Clear fix request (`CHANGES_REQUESTED`, or a `NEW_COMMENT` /
   `NEW_TOP_COMMENT` / `NEW_REVIEW` asking for a change): modify code
-  and push, subject to Phase 5's pre-push checks and the Step 5 cap.
+  and push, subject to Phase 5's pre-push checks and the fix-push cap
+  in the git-workflow skill's Principles.
   For a `NEW_COMMENT` whose thread is now `is_resolved` / `is_outdated`
   on re-fetch, skip it. For a `NEW_REVIEW`, re-fetch the body first.
 - Question / nit / ambiguous intent — reply, do not push. Bot author
@@ -90,11 +95,6 @@ top-level) and stop.
 
 If the user explicitly asks to reply, draft the text, wait for
 approval, then run the command. Resolution stays with the user.
-
-## Step 5: Cap for autonomous fix pushes
-
-Stop autonomous fix pushes after 3 fix commits for this PR in this
-session. Switch to reply-only and notify the user.
 
 ## Forbidden shortcuts
 
