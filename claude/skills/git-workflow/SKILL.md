@@ -12,6 +12,19 @@ structurally absent (e.g., no PR exists yet).
 Prerequisite: the `agynio/gh-pr-review` gh extension is installed
 (used by Phase 5 review-thread reactions).
 
+## Supporting files
+
+- [pr-guidelines.md](pr-guidelines.md) — the properties a PR title and
+  body are judged against, and what belongs in the body versus the diff
+- [pr-reaction.md](pr-reaction.md) — bot-versus-human targeting for PR
+  events, whether an event is answered by a reply or a fix push, which
+  channel a reply goes to, thread resolve, and the cap on autonomous
+  fix pushes
+- [implementer-dispatch.md](implementer-dispatch.md) — branch setup,
+  brief contents, what a dispatch does by default, what to do when it
+  returns, isolation, and handback bounds for the `implementer`
+  subagent
+
 ## Principles
 
 - All steps within a single workflow run are pre-authorized by the user
@@ -34,6 +47,11 @@ Prerequisite: the `agynio/gh-pr-review` gh extension is installed
 
 ## 1. Start Work
 
+When the approved plan is several independent PRs, read
+[implementer-dispatch.md](implementer-dispatch.md) before the steps
+below — it decides whether they run in parallel or sequentially, and the
+isolation each one needs.
+
 1. From the main clone, not a worktree, switch to the default branch and
    pull: `git home`
 1. Create a worktree and branch (defaults to branching from origin's default branch):
@@ -44,17 +62,14 @@ Prerequisite: the `agynio/gh-pr-review` gh extension is installed
 1. If the project rules explicitly prohibit worktrees, create a branch only:
    `git checkout -b <branch-name>`
 
-When the approved plan is several independent PRs, branch once per PR
-and dispatch them in parallel per `implementer-dispatch.md`, which
-decides the isolation each one needs before any of them starts.
-
 Note: `.worktrees/` is covered by the global gitignore.
 
 ## 2. Implement, commit, push
 
 The implementation work for this branch happens here. When it is
-delegated to the `implementer` subagent, follow
-`implementer-dispatch.md`.
+delegated to the `implementer` subagent, read
+[implementer-dispatch.md](implementer-dispatch.md) before writing the
+brief, and follow it through the Phase 1 handback bound.
 
 When the commit message or PR body will claim an exhaustive
 replacement or update ("replaced all X with Y"), run
@@ -64,17 +79,21 @@ formatting or indentation.
 
 ## 3. Create a PR
 
+Read [pr-guidelines.md](pr-guidelines.md) before writing or editing a PR
+title or body anywhere in this workflow, including the Phase 4 updates
+and the section 5 procedure.
+
 1. If the branch already has a PR (`gh pr view --json number,url`),
    skip creation. Bring its title and body into conformance with
    `pr-guidelines.md` using the section 5 procedure, display the PR URL to the user, then
    proceed to CI wait (step 4).
-   - For a PR the implementer opened, apply `implementer-dispatch.md`'s
-     When it returns steps before that conformance pass
+   - For a PR the implementer opened, read
+     [implementer-dispatch.md](implementer-dispatch.md) and apply its
+     `When it returns` steps before that conformance pass
 1. Write the PR body to a fresh file under the session scratchpad
    directory using the Write tool (new filename per revision — a new
    file needs no prior Read step)
    - Follow the repository's PR template if one exists
-   - Follow `pr-guidelines.md`
 1. Create the PR as a draft:
    `gh pr create --draft --body-file <body file path>`
    - Never use `--body` for PR creation. The `#`-prefixed lines in the body
@@ -210,10 +229,9 @@ per actionable change; quiet periods stay silent.
    - Skip the push if either check fails; surface the conflict to the
      user.
 
-1. React per `pr-reaction.md` (bot check, reply-channel routing,
-   thread resolve, cap for autonomous fix pushes). A `[BOT|USER]` label
-   on an event line is a routing hint; the rule's thread walk still
-   governs mutations.
+1. Read [pr-reaction.md](pr-reaction.md) on the first monitor event,
+   before any reply, resolve, or push, and react under it — it governs
+   what the `[BOT|USER]` label settles for each event type
 
 1. `CHECK`: `gh pr checks` links the failing check. For an Actions job,
    `gh run view --log-failed <databaseId>` from `gh run list` reaches the
