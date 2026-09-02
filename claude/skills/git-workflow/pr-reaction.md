@@ -30,6 +30,10 @@ gh pr-review review view -R <owner>/<repo> <number> \
   --unresolved --not_outdated --include-comment-node-id
 ```
 
+Drop `--unresolved --not_outdated` when inspecting one `NEW_COMMENT`,
+since a thread resolved or outdated in the interim is filtered out by
+them and Step 2 needs to see that state to skip the event.
+
 `gh api` is required here: the `gh pr-review` extension does not
 expose `user.type` on review comments (no equivalent flag), and no
 high-level `gh pr` subcommand returns per-line review comments.
@@ -93,8 +97,9 @@ approval, then run the command. Resolution stays with the user.
 
 ## Step 5: Cap for autonomous fix pushes
 
-Stop autonomous fix pushes after 3 fix commits for this PR in this
-session. Switch to reply-only and notify the user.
+Fix pushes made here count against the session-wide cap in the
+git-workflow skill's Principles, alongside the fixes its other phases
+push.
 
 ## Forbidden shortcuts
 

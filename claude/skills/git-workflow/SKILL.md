@@ -18,8 +18,7 @@ Prerequisite: the `agynio/gh-pr-review` gh extension is installed
   body are judged against, and what belongs in the body versus the diff
 - [pr-reaction.md](pr-reaction.md) — bot-versus-human targeting for PR
   events, whether an event is answered by a reply or a fix push, which
-  channel a reply goes to, thread resolve, and the cap on autonomous
-  fix pushes
+  channel a reply goes to, and thread resolve
 - [implementer-dispatch.md](implementer-dispatch.md) — branch setup,
   brief contents, what a dispatch does by default, what to do when it
   returns, isolation, and handback bounds for the `implementer`
@@ -31,9 +30,9 @@ Prerequisite: the `agynio/gh-pr-review` gh extension is installed
   who initiated the task. Do not pause between steps to ask for
   confirmation unless blocked by an error or ambiguity. Execute the
   full flow continuously and report results at the end.
-- Phase 2 code review and Phase 5 Monitor arming are pre-authorized —
-  run them without pausing for confirmation. The only user decision
-  point in the flow is flipping the PR from draft to ready for review.
+- Phase 2 code review and Phase 5 Monitor arming fall under that
+  pre-authorization. The only user decision point in the flow is
+  flipping the PR from draft to ready for review.
 - Signals like a small diff or personal-project scope affect how you
   weigh findings within a phase, never whether to run it. The only
   override to the pre-authorization above is an explicit user
@@ -44,6 +43,16 @@ Prerequisite: the `agynio/gh-pr-review` gh extension is installed
   worktree (or feature branch) first. Creating files before branching
   leads to redundant copy-and-delete work.
 - Never modify commits that have already been pushed
+- Stop autonomous fix pushes after 3 fix commits for this PR in this
+  session, counting the fixes made in every phase. Switch to reply-only
+  and notify the user.
+- Never end a turn that claims ongoing waiting (delegated fix push,
+  CI run, CI rerun, external state change) without an armed event
+  source — a Monitor on the branch head, or
+  `gh pr checks --watch --fail-fast` with `run_in_background: true`.
+  After every `gh run rerun` or other re-kick, re-arm the watch before
+  yielding. State what is being awaited in the final message before
+  going idle.
 
 ## 1. Start Work
 
@@ -81,29 +90,28 @@ formatting or indentation.
 
 Read [pr-guidelines.md](pr-guidelines.md) before writing or editing a PR
 title or body anywhere in this workflow, including the Phase 4 updates
-and the section 5 procedure.
+and the Update a PR / issue procedure.
 
 1. If the branch already has a PR (`gh pr view --json number,url`),
    skip creation. Bring its title and body into conformance with
-   `pr-guidelines.md` using the section 5 procedure, display the PR URL to the user, then
-   proceed to CI wait (step 4).
+   `pr-guidelines.md` using the Update a PR / issue procedure,
+   display the PR URL to the user, then proceed to step 4.
    - For a PR the implementer opened, read
      [implementer-dispatch.md](implementer-dispatch.md) and apply its
      `When it returns` steps before that conformance pass
 1. Write the PR body to a fresh file under the session scratchpad
-   directory using the Write tool (new filename per revision — a new
-   file needs no prior Read step)
+   directory using the Write tool (new filename per revision — no
+   temp-file generation, no Read of an empty file)
    - Follow the repository's PR template if one exists
 1. Create the PR as a draft:
    `gh pr create --draft --body-file <body file path>`
-   - Never use `--body` for PR creation. The `#`-prefixed lines in the body
-     trigger Claude Code's security pre-check, which cannot be bypassed by
-     hooks. Always go through `--body-file`.
+   - Never use `--body` for PR creation, for the reason the Update a PR
+     / issue section gives
 1. After creating the PR, display the PR URL to the user:
    `gh pr view --json url --jq '.url'`
-1. Proceed to CI wait (step 4)
+1. Proceed to step 4
 
-## 4. CI Wait & Review
+## 4. Checks, review, and merge
 
 Five phases: pass all mechanical checks, run the code review,
 consolidate fixes, finalize the PR for review readiness, then watch
@@ -135,10 +143,6 @@ regardless of whether the three checks passed, then re-run all three
 until all pass. After any push, and after a watch exits with checks still
 pending, re-arm `gh pr checks --watch --fail-fast`.
 
-Note: `/pr-selfcheck` and the narrative sweep are mechanical checks, not
-a code review. Re-running them after fixes is expected. The
-"single-pass" policy applies only to the code review in Phase 2.
-
 ### Phase 2: Code review
 
 Once Phase 1 passes, launch:
@@ -165,17 +169,9 @@ The code review is single-pass — do not re-run after fixes.
 `/pr-selfcheck` and the narrative sweep run again in Phase 3 to catch
 inconsistencies introduced by review fix changes.
 
-Never end a turn that claims ongoing waiting (delegated fix push,
-CI run, CI rerun, external state change) without an armed event
-source — a Monitor on the branch head, or
-`gh pr checks --watch --fail-fast` with `run_in_background: true`. After
-every `gh run rerun` or other re-kick, re-arm the watch before yielding.
-State what is being awaited in the final message before going idle.
-
 ### Phase 4: Finalize PR for review readiness
 
-Bring the PR into a state where a human reviewer can act on it. This
-covers three things:
+Bring the PR into a state where a human reviewer can act on it:
 
 1. Reflect actual verification in the PR body. Update the body to
    describe what was confirmed, with evidence (HTTP status, Location
@@ -190,21 +186,22 @@ covers three things:
 1. Surface Phase 4 completion so the user can decide whether to mark
    the PR ready for review. `gh pr ready` is the user's call — do
    not run it unless explicitly instructed.
+1. Arm the persistent `Monitor` running `pr-monitor <PR number>` in
+   that same turn, before handing control back to the user and before
+   they flip the PR to ready. `READY_FOR_REVIEW` is itself a monitored
+   event, so an arm deferred until after the ready flip can never
+   observe it.
 
 Update incrementally as conditions are confirmed (e.g., after Phase 1
 CI passes, after apply / deploy succeeds, after post-deploy
 verification with `curl`, `aws logs tail`, etc.).
 
-Use the section 5 procedure (`gh pr edit --body-file`) for body
+Use the Update a PR / issue procedure (`gh pr edit --body-file`) for body
 edits.
 
 ### Phase 5: Watch PR activity until merge
 
-Arm the persistent `Monitor` running `pr-monitor <PR number>` in the
-same turn you surface Phase 4 completion — before handing control back
-to the user and before they flip the PR to ready. `READY_FOR_REVIEW`
-is itself a monitored event, so an arm deferred until after the ready
-flip can never observe it. It polls every 60s and emits one stdout line
+The Monitor armed in Phase 4 polls every 60s and emits one stdout line
 per actionable change; quiet periods stay silent.
 
 1. Each event line is `<EVENT>` or `<EVENT>: <details>`, carrying
@@ -214,11 +211,9 @@ per actionable change; quiet periods stay silent.
 
 1. Re-fetch detail on each event with:
    - `gh pr view <number> --json state,isDraft,reviewDecision,latestReviews,statusCheckRollup,comments,updatedAt,mergedAt,headRefName`
-   - `gh pr-review review view -R <owner>/<repo> <number>` — add
-     `--unresolved --not_outdated` for full-PR sweeps; drop them when
-     inspecting a specific `NEW_COMMENT` that may have been resolved
-     in the interim.
    - `gh run list --branch <headRefName> --json databaseId,name,status,conclusion,createdAt,headSha,workflowName --limit 20`
+   - review threads: the listing in `pr-reaction.md`'s Step 1, which
+     carries the flags each use needs
 
    The notification is not a user reply — keep working.
 
@@ -239,7 +234,7 @@ per actionable change; quiet periods stay silent.
    not have. Fix and push under the same pre-push checks.
 
 1. Exit conditions:
-   - `STATE: MERGED` → execute Step 6 (Cleanup).
+   - `STATE: MERGED` → execute step 5 (Cleanup).
    - `STATE: CLOSED` without merge → skip cleanup.
    - Session ends → Monitor terminates with the session (best-effort).
 
@@ -253,7 +248,7 @@ per actionable change; quiet periods stay silent.
 next (merge, or "needs human attention" after the fix cap). Skip
 routine CI / comment events.
 
-## 5. Update a PR / issue (title / body)
+## Update a PR / issue (title / body)
 
 - Update title:
   `gh pr edit <number> --title '...'`
@@ -275,7 +270,7 @@ Note: Always use `--body-file` for any body update. The `#`-prefixed lines
 in PR/issue bodies trigger Claude Code's security pre-check when passed
 via `--body`, which cannot be bypassed by hooks.
 
-## 6. Cleanup After Task Completion
+## 5. Cleanup After Task Completion
 
 After the PR is merged (or the task is fully done):
 
