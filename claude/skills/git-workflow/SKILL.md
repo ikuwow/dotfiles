@@ -89,7 +89,7 @@ and the section 5 procedure.
    proceed to CI wait (step 4).
    - For a PR the implementer opened, read
      [implementer-dispatch.md](implementer-dispatch.md) and apply its
-     When it returns steps before that conformance pass
+     `When it returns` steps before that conformance pass
 1. Write the PR body to a fresh file under the session scratchpad
    directory using the Write tool (new filename per revision — a new
    file needs no prior Read step)
