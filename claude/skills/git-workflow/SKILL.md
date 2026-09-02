@@ -30,7 +30,7 @@ Prerequisite: the `agynio/gh-pr-review` gh extension is installed
   who initiated the task. Do not pause between steps to ask for
   confirmation unless blocked by an error or ambiguity. Execute the
   full flow continuously and report results at the end.
-- Phase 2 code review and Phase 5 Monitor arming fall under that
+- Phase 2 code review and Phase 4 Monitor arming fall under that
   pre-authorization. The only user decision point in the flow is
   flipping the PR from draft to ready for review.
 - Signals like a small diff or personal-project scope affect how you
@@ -43,9 +43,11 @@ Prerequisite: the `agynio/gh-pr-review` gh extension is installed
   worktree (or feature branch) first. Creating files before branching
   leads to redundant copy-and-delete work.
 - Never modify commits that have already been pushed
-- Stop autonomous fix pushes after 3 fix commits for this PR in this
-  session, counting the fixes made in every phase. Switch to reply-only
-  and notify the user.
+- Stop autonomous fix pushes after 3 for this PR in this session,
+  counting the pushes made in every phase, since past that the fixes
+  are no longer converging on their own. Surface the state and wait for
+  a user instruction — in Phase 5 that means answering further events
+  with replies and no push.
 - Never end a turn that claims ongoing waiting (delegated fix push,
   CI run, CI rerun, external state change) without an armed event
   source — a Monitor on the branch head, or
@@ -202,7 +204,8 @@ edits.
 ### Phase 5: Watch PR activity until merge
 
 The Monitor armed in Phase 4 polls every 60s and emits one stdout line
-per actionable change; quiet periods stay silent.
+per actionable change; quiet periods stay silent. Arm it here when the
+run entered the workflow at this phase.
 
 1. Each event line is `<EVENT>` or `<EVENT>: <details>`, carrying
    GitHub's own field values. The steps below cover the events with a
