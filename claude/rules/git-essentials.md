@@ -44,7 +44,6 @@ NOT restate the detailed procedures from the skill.
 
 ## PR / issue body edits
 
-- Before running `gh pr edit` / `gh issue edit` with `--body`,
-  `--body-file`, or `--title`, summarize the change in the assistant
-  message body — a short list of what is being added, removed, or
-  reworded, not the full before/after diff
+- Invoke `Skill(create-pull-request)` before writing or editing a PR or
+  issue title or body, including a `gh pr edit` / `gh issue edit` run
+  outside the git workflow
