@@ -58,10 +58,10 @@ Perform a self-review of the specified PR to catch issues before a human reviewe
    paragraphs. It is a count, not a judgement, and it does not depend
    on the body's language
 1. Invoke the `technical-writing` skill and read the body against it,
-   reporting each finding under the `Prose` label. The five properties
-   judge what the body carries; this pass judges how its sentences and
-   paragraphs are built, so a body can pass every property and still
-   be hard to read
+   reporting each finding under the `Prose` label
+   - The five properties judge what the body carries, and this pass
+     judges how its sentences and paragraphs are built, so a body can
+     pass every property and still be hard to read
    - A finding here is a Note unless the prose defect makes a claim
      unreadable or ambiguous, which is a Fix
 1. Output the result in the format described below, reporting a line
@@ -142,13 +142,13 @@ from this pass.
 ## PR Self-Check Result
 
 ### Fix
-- [<property>] <finding>
+- [<property or Prose>] <finding>
 
 ### Note
-- [<property>] <finding>
+- [<property or Prose>] <finding>
 
 ### Unverifiable
-- [<property>] <item, and why it could not be checked>
+- [<property or Prose>] <item, and why it could not be checked>
 
 ### Property walk
 - Decidable: <one line>
