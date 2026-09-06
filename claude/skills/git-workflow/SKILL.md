@@ -9,8 +9,9 @@ Standard git/GitHub workflow for all projects.
 Follow each step in order. Skip a step only when its precondition is
 structurally absent (e.g., no PR exists yet).
 
-Prerequisite: the `agynio/gh-pr-review` gh extension is installed
-(used by Phase 5 review-thread reactions).
+Prerequisites: the `agynio/gh-pr-review` gh extension (Phase 5 review
+threads), the `pr-review-toolkit` plugin (Phase 2), and `bin/pr-monitor`
+(Phases 4 and 5).
 
 ## Supporting files
 
@@ -26,19 +27,16 @@ Prerequisite: the `agynio/gh-pr-review` gh extension is installed
 
 ## Principles
 
-- All steps within a single workflow run are pre-authorized by the user
-  who initiated the task. Do not pause between steps to ask for
-  confirmation unless blocked by an error or ambiguity. Execute the
-  full flow continuously and report results at the end.
-- Phase 2 code review and Phase 4 Monitor arming fall under that
-  pre-authorization. The only user decision point in the flow is
-  flipping the PR from draft to ready for review.
-- Signals like a small diff or personal-project scope affect how you
-  weigh findings within a phase, never whether to run it. The only
-  override to the pre-authorization above is an explicit user
-  instruction that names a stopping point ("stop after creating the
-  draft PR", "skip Phase 2 for this PR", "no Monitor"). Absent that,
-  run every phase.
+- Every step and every phase of a single workflow run is pre-authorized
+  by the user who initiated the task. Execute the full flow
+  continuously and report results at the end
+  - Pause only when blocked by an error or ambiguity, or when the user
+    named a stopping point ("stop after creating the draft PR", "skip
+    Phase 2 for this PR", "no Monitor")
+  - How you weigh a finding is a judgment within a phase; whether the
+    phase runs is not
+  - Flipping the PR from draft to ready for review is the one action
+    the user takes
 - Never create or edit files on the default branch. Always move into the
   worktree (or feature branch) first. Creating files before branching
   leads to redundant copy-and-delete work.
@@ -93,8 +91,7 @@ formatting or indentation.
 Read [pr-guidelines.md](pr-guidelines.md) and invoke the
 `technical-writing` skill before writing or editing a PR title or body
 anywhere in this workflow, including the Phase 4 updates and the Update
-a PR / issue procedure. The guidelines decide what the body carries, the
-skill decides how its prose is built.
+a PR / issue procedure.
 
 1. If the branch already has a PR (`gh pr view --json number,url`),
    skip creation. Bring its title and body into conformance with
@@ -256,8 +253,7 @@ routine CI / comment events.
 ## Update a PR / issue (title / body)
 
 Read [pr-guidelines.md](pr-guidelines.md) and invoke the
-`technical-writing` skill before the steps below. `git-essentials.md`
-routes a body edit here directly, without passing section 3.
+`technical-writing` skill before the steps below.
 
 - Update title:
   `gh pr edit <number> --title '...'`

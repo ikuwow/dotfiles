@@ -75,8 +75,8 @@ the point where the answer is yes.
 - Send the parallel implementer Agent calls in a single message so
   they execute concurrently
 - Create one worktree and branch per parallel implementer before
-  dispatching, since parallel implementers require worktree isolation
-  per the implementer agent's Concurrency rule
+  dispatching, since two implementers sharing a working tree overwrite
+  each other's edits
 - State in each parallel brief that it runs alongside other
   implementers, since the agent's isolation check arms only when the
   brief says so

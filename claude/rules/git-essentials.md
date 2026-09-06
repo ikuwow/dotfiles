@@ -47,5 +47,4 @@ NOT restate the detailed procedures from the skill.
 - Before running `gh pr edit` / `gh issue edit` with `--body`,
   `--body-file`, or `--title`, summarize the change in the assistant
   message body — a short list of what is being added, removed, or
-  reworded, not the full before/after diff (procedure: the `Update a
-  PR / issue` section of the git-workflow skill)
+  reworded, not the full before/after diff
