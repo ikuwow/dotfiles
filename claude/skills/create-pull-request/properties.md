@@ -311,7 +311,7 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   - GitHub Flavored Markdown renders soft line breaks inside a
     paragraph as visible breaks only in these contexts
     ([basic writing and formatting syntax](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax))
-  - Plain Markdown files (READMEs, ADRs, this guidelines file itself,
+  - Plain Markdown files (READMEs, ADRs, this file itself,
     and any other in-repo documentation) follow standard Markdown
     rendering and may be hard-wrapped for file-side readability
 

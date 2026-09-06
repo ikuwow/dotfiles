@@ -87,15 +87,16 @@ formatting or indentation.
 
 ## 3. Create a PR
 
-Invoke the `create-pull-request` skill, which carries the properties a
-title and body are judged against and the commands that write them.
-This holds wherever the workflow writes or edits a title or body,
-including the Phase 4 updates.
+For a PR the implementer opened, read
+[implementer-dispatch.md](implementer-dispatch.md) first and apply its
+`When it returns` steps, since the body it left is a placeholder.
 
-- For a PR the implementer opened, read
-  [implementer-dispatch.md](implementer-dispatch.md) and apply its
-  `When it returns` steps before bringing the body into conformance
-- Proceed to step 4 once the PR exists and its URL is displayed
+Then invoke the `create-pull-request` skill, which carries the
+properties a title and body are judged against and the commands that
+write them. This holds wherever the workflow writes or edits a title or
+body, including the Phase 4 updates.
+
+Proceed to step 4 once the PR exists and its URL is displayed.
 
 ## 4. Checks, review, and merge
 
@@ -182,7 +183,6 @@ Update incrementally as conditions are confirmed (e.g., after Phase 1
 CI passes, after apply / deploy succeeds, after post-deploy
 verification with `curl`, `aws logs tail`, etc.).
 
-Invoke the `create-pull-request` skill for body edits.
 
 ### Phase 5: Watch PR activity until merge
 

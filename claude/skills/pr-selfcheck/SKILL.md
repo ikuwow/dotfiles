@@ -51,9 +51,9 @@ Perform a self-review of the specified PR to catch issues before a human reviewe
    or a login page), a 429 or 5xx, and a domain `WebFetch` is denied
    all land here. A Fix only when fetched content contradicts the
    citation
-1. Walk the five properties one at a time, in the order that skill
-   states them, judging the PR against that property's rules and the
-   severity table below
+1. Walk the five properties one at a time, in the order the
+   `create-pull-request` skill states them, judging the PR against that
+   property's rules and the severity table below
 1. Run the density pass described below over the body's list items and
    paragraphs. It is a count, not a judgement, and it does not depend
    on the body's language

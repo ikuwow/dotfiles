@@ -9,7 +9,7 @@ explicitly (e.g., "stop after Step 3, skip CI wait"). (Truly
 trivial fixes that don't warrant Plan Mode at all are a separate
 judgment call — see EnterPlanMode's own criteria.)
 
-The full procedure (worktree setup, PR body rules, CI phases,
+The full procedure (worktree setup, CI phases,
 monitoring, cleanup) lives in the git-workflow skill. Plans MUST
 NOT restate the detailed procedures from the skill.
 
