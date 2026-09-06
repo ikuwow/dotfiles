@@ -57,13 +57,18 @@ Perform a self-review of the specified PR to catch issues before a human reviewe
 1. Run the density pass described below over the body's list items and
    paragraphs. It is a count, not a judgement, and it does not depend
    on the body's language
-1. Invoke the `technical-writing` skill and read the body against it,
-   reporting each finding under the `Prose` label
+1. Invoke the `technical-writing` skill and read the title and every
+   paragraph and top-level list item of the body against it, reporting
+   each finding under the `Prose` label
    - The five properties judge what the body carries, and this pass
      judges how its sentences and paragraphs are built, so a body can
      pass every property and still be hard to read
-   - A finding here is a Note unless the prose defect makes a claim
-     unreadable or ambiguous, which is a Fix
+   - Walk the whole body. Reading a sample reports a clean pass on a
+     body that is defective throughout
+   - A finding here is a Note. A prose defect that leaves a claim
+     unreadable or open to two readings is a Fix
+   - The length of a list item belongs to the density pass, so a
+     two-sentence item is reported there and not here
 1. Output the result in the format described below, reporting a line
    for each of the five properties and for Prose, including those with
    no finding
@@ -72,7 +77,7 @@ Perform a self-review of the specified PR to catch issues before a human reviewe
 
 | Severity | Condition |
 | --- | --- |
-| Fix | Acting on it is required before the PR is ready: a reviewer acting on the body would be misled about what the change does, would find in the diff a change the body did not prepare them for, or would treat a claim the change rests on as settled when the body does not carry what settles it |
+| Fix | Acting on it is required before the PR is ready: a reviewer acting on the body would be misled about what the change does, would find in the diff a change the body did not prepare them for, would treat a claim the change rests on as settled when the body does not carry what settles it, or could not read a claim at all because of how it is written |
 | Note | Surfaced for the reader's judgement, and the reader decides whether to act: a blemish that changes nothing for the reviewer, or a finding the checker is not confident about, stated with the reason for the doubt. Carry the finding and that reason alone — a Note that also argues for or against acting on it answers the question it exists to hand over |
 | Unverifiable | A check that produced nothing comparable against the claim (the `FETCH_HEAD` and URL steps above). Reported as unverifiable, never Fix |
 
@@ -148,9 +153,9 @@ from this pass.
 - [<property or Prose>] <finding>
 
 ### Unverifiable
-- [<property or Prose>] <item, and why it could not be checked>
+- [<property>] <item, and why it could not be checked>
 
-### Property walk
+### Walk
 - Decidable: <one line>
 - Grounded: <one line>
 - Necessary: <one line>
