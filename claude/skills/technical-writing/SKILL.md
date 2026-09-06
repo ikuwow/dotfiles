@@ -1,6 +1,6 @@
 ---
 name: technical-writing
-description: Standards for technical prose - paragraph structure, argument rigor (a mechanism for every causal claim, conditional guarantees, hedges that survive editing), reader load, voice, restraint, hollow phrasing, redundancy and where compression stops, and headings. ALWAYS use this skill before writing or rewriting any prose longer than a sentence, even when the request looks like a one-step task you could answer directly: PR bodies, issue bodies and comments, design docs, ADRs, RFCs, README and documentation sections, code review comments, commit message bodies, postmortems, and status updates. Use it when the request only says "write the PR body", "draft the ADR", "summarize this in the issue", or "explain this in the README". Use it whenever the user asks to tighten, shorten, expand, restructure, proofread, edit, or fix prose, or says the writing is too verbose, too dense, or unclear. Use it when reviewing or critiquing someone else's writing. Read japanese.md as well when the text is Japanese.
+description: Standards for technical prose - paragraph structure, argument rigor (a mechanism for every causal claim, conditional guarantees, a claim narrowed to what its examples support), reader load, voice, restraint, hollow phrasing, redundancy and where compression stops, and headings. ALWAYS use this skill before writing or rewriting any prose longer than a sentence, even when the request looks like a one-step task you could answer directly: PR bodies, issue bodies and comments, design docs, ADRs, RFCs, README and documentation sections, code review comments, commit message bodies, postmortems, and status updates. Use it when the request only says "write the PR body", "draft the ADR", "summarize this in the issue", or "explain this in the README". Use it whenever the user asks to tighten, shorten, expand, restructure, proofread, edit, or fix prose, or says the writing is too verbose, too dense, or unclear. Use it when reviewing or critiquing someone else's writing. Read japanese.md as well when the text is Japanese.
 ---
 
 # Technical Writing
@@ -25,10 +25,10 @@ excerpt, a diff, and a passage quoted from another document are evidence,
 and trimming one to the lines that bear on the argument destroys what
 makes it evidence.
 
-## Paragraph and argument structure
+## Argument structure
 
-Build the text one paragraph per step of the argument, so a reader can
-follow the reasoning paragraph by paragraph.
+Build the text one paragraph per question the argument answers, so a
+reader can follow the reasoning paragraph by paragraph.
 
 - Give each paragraph one topic. Where the paragraph's steps answer one
   question, they are one paragraph however many steps there are; where
@@ -38,9 +38,13 @@ follow the reasoning paragraph by paragraph.
 - Where a paragraph's relation to the previous one is not already plain,
   name it in the opening words (therefore, in fact, however)
 - Introduce a new term by naming what it applies to, then what it does
-  or what it changes, and give the definition after that
-- Run the argument in one direction: handle the objections, then state
-  the conclusion once at the end
+  or what it changes, and give the definition after that. A definition
+  offered first has nothing for the reader to attach it to
+- Run the argument in one direction. State the conclusion once, after
+  the objections it rests on are handled, so the reader never meets it
+  twice with different support
+  - Where the document's own guidelines put the conclusion first, it
+    goes first and is not restated once the objections are handled
 - Where the text rejects a reading or an alternative, give the reason it
   fails in the same place, and put the rejected design in the
   conditional. An unbuilt alternative in the present tense reads as a
@@ -71,9 +75,10 @@ these.
   likely"
 - Check that the examples support the whole claim. Where they support
   part of it, narrow the claim to what they support
-- Keep one classification per concept across the whole document.
-  Something called a human decision in one section is not called a team
-  agreement in another
+- Keep one classification per concept across the whole document, since a
+  concept that changes class between sections leaves the reader unable to
+  tell whether two passages are about the same thing. Something called a
+  human decision in one section is not called a team agreement in another
 - Define a term, and the range of things it covers, before the section
   that turns on it
 - Before naming several things with one superordinate term, state in one
@@ -121,7 +126,7 @@ text introduces has to be worth holding.
 
 ## Restraint
 
-Rhetoric is allowed where it does work. These bound where that is.
+Rhetoric is allowed where it does work.
 
 - Write the claim itself instead of announcing that a claim is coming
 - State the finding directly instead of building up to it. Keep a
@@ -144,7 +149,7 @@ the perspective of", stacked "furthermore"), and empty intensifiers
 Keep the same word where it carries a claim. The defect is the empty
 use, not the vocabulary.
 
-## Redundancy and where compression stops
+## Compression
 
 Compress until removing anything more would remove one of these: the
 mechanism behind a claim, the reason a negation holds, an uncertainty
