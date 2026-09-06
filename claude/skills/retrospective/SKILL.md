@@ -89,8 +89,8 @@ For each finding, ask via AskUserQuestion using the choices below.
 
 - Project-specific finding: `apply now` / `create issue` / `skip` / `Other`
 - Global finding: `create issue` / `skip` / `Other` — no `apply now`
-  - A global finding lands in the dotfiles repository's issue queue,
-    and applying it here would skip the review that queue exists for
+  - A global finding targets `ikuwow/dotfiles`, not the current repo,
+    so `apply now` has no branch here to write it to
   - Use `Other` for a manual dotfiles-side edit
 
 `apply now` branch gate (project-specific only):
@@ -125,10 +125,13 @@ default=$(git symbolic-ref --short refs/remotes/origin/HEAD | sed 's|^origin/||'
 
 `create issue`:
 
+- The `retrospective`-labeled issues are a backlog the user reads by
+  hand, on no fixed cadence, so an issue waits until they pick it up
 - Batch by scope: all approved global findings become one issue in
   `ikuwow/dotfiles`, and all approved project findings become one
   issue in the current cwd's repo — never one issue per finding,
-  since whoever acts on the queue reads it at session granularity
+  since findings from one session share the context needed to judge
+  them
 - Global → `ikuwow/dotfiles`, label `retrospective`, via
   `--body-file` (never `--body`), title
   `Retrospective: <date> <one-line session summary>` (sanitized as

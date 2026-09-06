@@ -20,8 +20,8 @@ here only takes effect after a corresponding line is added to
 | `skills/<name>/`              | `~/.claude/skills/<name>/`        | Skills. Each directory symlinked as a whole.                                                                  |
 | `plugins/config.json`         | (not symlinked)                   | Plugin enablement, applied via `scripts/claude-code-setup.sh`. Read by the `claude` CLI from its own state.   |
 
-`scripts/deploy.sh` lines 63-74 are the authoritative version of this
-table — keep them in sync when adding new entries.
+The `# Claude Code` block in `scripts/deploy.sh` is the authoritative
+version of this table — keep them in sync when adding new entries.
 
 ## Setup script
 
