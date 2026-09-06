@@ -28,13 +28,14 @@ threads), the `pr-review-toolkit` plugin (Phase 2), and `bin/pr-monitor`
 ## Principles
 
 - Every step and every phase of a single workflow run is pre-authorized
-  by the user who initiated the task. Execute the full flow
-  continuously and report results at the end
+  by the user who initiated the task. Run every phase, continuously, and
+  report results at the end
   - Pause only when blocked by an error or ambiguity, or when the user
     named a stopping point ("stop after creating the draft PR", "skip
     Phase 2 for this PR", "no Monitor")
-  - How you weigh a finding is a judgment within a phase; whether the
-    phase runs is not
+  - A small diff, a documentation-only change, and personal-project
+    scope are signals for weighing a finding within a phase; whether
+    the phase runs is not a judgment they reach
   - Flipping the PR from draft to ready for review is the one action
     the user takes
 - Never create or edit files on the default branch. Always move into the

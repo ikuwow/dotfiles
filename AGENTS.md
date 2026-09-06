@@ -37,6 +37,7 @@ are symlinks pointing to files in this repository.
   - Frontmatter, identifiers, and cited titles keep the language they have
   - Content bound to Japanese text means rules that apply only to Japanese prose, or rule text relocated from a Japanese source
   - Keeping relocated text in its original language leaves the move checkable line-for-line against its source
+  - The Japanese files already under `claude/rules/` stay Japanese; this criterion governs what is added
 - `AIRULES.md` is written in Japanese, and references to its content may also be in Japanese
 - Match the language of an existing file when editing it
 - `SKILL.md` names any file of its skill that departs from the skill's language

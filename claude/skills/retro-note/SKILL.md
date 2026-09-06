@@ -27,8 +27,8 @@ In scope — AI-side judgment failures only:
 - (a) Starting from a wrong premise or an unchecked assumption
 - (b) Breaking a rule, or a choice that departs from a rule's intent
 - (c) Picking the wrong tool or the wrong path
-- (d) A response that was shallow, off-target, under-confirmed, or
-  pushy
+- (d) A response that fell short for the user: shallow, off-target,
+  under-confirmed, pushy, or inadequate in some other way
 - (e) Asserting something without checking a primary source
 
 Out of scope: recounting what the session did, successes, the user's

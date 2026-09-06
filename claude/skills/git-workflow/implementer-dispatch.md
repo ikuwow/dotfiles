@@ -78,8 +78,8 @@ the point where the answer is yes.
   dispatching, since two implementers sharing a working tree overwrite
   each other's edits
 - State in each parallel brief that it runs alongside other
-  implementers, since the agent's isolation check arms only when the
-  brief says so
+  implementers, since an implementer that is not told so treats the
+  working tree as its own
 - In projects that prohibit worktrees, fall back to sequential
   single-implementer dispatch
 - Dependent PR chains (B rebases on A's merge, C reviews A's design
