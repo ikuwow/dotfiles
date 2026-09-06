@@ -54,4 +54,4 @@
 
 ## References
 
-- 日本語技術文書の文章規範（この文書の土台）: https://gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d
+- 日本語技術文書の文章規範（この文書の土台とした版）: https://gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d/c7189cdc9c2520be50418209834145bdf3a46e97
