@@ -42,9 +42,6 @@ Perform a self-review of the specified PR to catch issues before a human reviewe
    and a change already merged there reads as text the diff did not add
 1. Locate and read `pr-guidelines.md`, bundled with the `git-workflow`
    skill, to load the five properties the PR body is judged against
-1. Invoke the `technical-writing` skill, which carries the caption or
-   lead-in Decidable's table rules rest on. Report a finding against it
-   under Decidable
 1. For each URL found in the PR body, fetch it with WebFetch and
    compare what comes back against what the body cites the URL for. A
    fetch that returns no comparable content makes the URL unverifiable
@@ -96,9 +93,8 @@ Excluded from detection to avoid false positives:
 ## Density pass
 
 Decidable asks each item to carry one claim at the shortest length that
-lands it, and makes a two-sentence item a finding. Apply the count below
-rather than judging length by eye, and read it against the exclusions
-further down. Each violation left after those is a Fix.
+lands it. Apply the count below rather than judging length by eye. Each
+violation it finds is a Fix.
 
 Enumerate every list item in the body, top-level and nested alike, and
 count each one. Sampling reports a clean pass on a body full of

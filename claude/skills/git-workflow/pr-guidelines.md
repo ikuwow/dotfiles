@@ -77,11 +77,14 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   - A structure a reader could reconstruct from the diff's file list or
     hunk boundaries alone tells the reviewer nothing about where their
     attention belongs
-- In a bulleted section, the top level carries the change itself, and
-  rationale, evidence, and the behavior this change replaces do not
-  displace it from there
-  - A nested item stays in whichever section its parent sits, unless
-    another rule here places it in a section of its own
+- In a bulleted section, the top level carries the change or claim
+  itself, so the section reads from its top-level lines alone
+  - Supporting material — rationale, evidence, the behavior this change
+    replaces, and the like — does not displace it from the top level
+- When one top-level item supports, qualifies, or follows from another,
+  it belongs beneath that one rather than beside it, in whichever
+  section that one sits, unless another rule here places it in a
+  section of its own
   - A long flat list is usually diff paraphrase; where it survives
     Necessary, it is usually a hierarchy that was never encoded
   - A section this empties loses its heading with it
@@ -99,8 +102,13 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   the end of the body (e.g., in a "Follow-up" / "Notes" section)
   - Do not surface them in the opening sections (purpose, scope,
     summary), where they compete with the approve/reject decision
-- Keep a table out of the middle of a sentence, where its meaning
-  depends on parsing the prose around it
+- Tables must stand alone
+  - Give each table a caption or a one-line lead-in that tells the
+    reader what it shows (e.g., "Alert firings in the past 7 days")
+  - A reader who skips the surrounding prose still understands what the
+    table represents
+  - Avoid placing tables mid-sentence where their meaning depends on
+    parsing the prose around them
 
 ## Grounded
 
@@ -131,11 +139,14 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   - The shown query covers the whole claim — a regex anchored to line
     start or end, a single literal where the claim covers a family of
     spellings, or a path filter narrower than the claim does not
-- A claim about a tool, service, or platform this diff does not modify,
-  and the configuration values, tool choices, and version selections the
-  diff introduces, carry their source in the body
-  - Official documentation, a man page section, `--help` output, the
-    tool's own source, and the project's own issues and PRs each count
+- Provide official documentation URLs or other authoritative sources
+  that justify configuration values, tool choices, or version
+  selections
+  - Especially important for dotfiles / infrastructure changes where
+    "why this value" matters
+- A claim about the behavior of a tool, service, or platform this diff
+  does not modify carries a link to or citation of a primary source (a
+  man page section or `--help` output counts)
 - A causal claim asserting a mechanism a reader cannot check from the
   diff ("because X locks the table") carries evidence or a source
 - Naming an external tool or service in a step the reader is meant to
@@ -149,7 +160,7 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
     change are outside this rule
 - Rationale attributed to a linked issue, PR, or document quotes the
   one sentence it rests on, or links to the section carrying it
-- Each URL and anchor link reaches the content the body cites it for
+- All URLs and anchor links resolve to the expected content
 - The title accurately reflects the change, and the body does not
   contradict the diff
 
@@ -165,7 +176,7 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   - A heading is a line the walk takes, and answers for its own text
     rather than for the lines beneath it
   - A table row is a line of the walk, read with the caption or lead-in
-    that the `technical-writing` skill asks every table to carry
+    that says what the table shows
   - A diagram or a code block is a line of the walk, answered whole for
     what it depicts. One that traces the control flow, structure, or
     call order of code in the diff answers `the diff`
@@ -202,17 +213,13 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
 - Focus on what changes from the user's or system's perspective —
   behavior changes, new capabilities, removed limitations — rather than
   on implementation details (resources added, files touched)
-- The body records the delivered design, not the path to it. Every line
-  has to mean something to a reader with no access to earlier revisions
-  of the branch or to the session that produced it
+- The body records the delivered design, not the path to it
   - Keep out chronological narration of implementation attempts ("first
     tried X, it failed, so Y") and records of direction changes made
     mid-implementation
-  - Keep out references to the session, to plan-mode phases, and to
-    individual commits within the branch
-  - Keep out attribution to the review that raised a point ("raised in
-    review", "per feedback"). The thread is on this PR, so the reader
-    criterion above passes it and only this line reaches it
+  - Keep out references to the session, to plan-mode phases, to
+    individual commits within the branch, or to the review that raised
+    a point ("raised in review", "per feedback")
   - Keep out rejected alternatives described at implementation-attempt
     granularity, and alternatives a reviewer would not arrive at and
     ask about
