@@ -32,10 +32,13 @@ are symlinks pointing to files in this repository.
 
 ## Language
 
-- Write all text in English: commit messages, PR descriptions, issue comments, code comments, etc
-- Exception: `AIRULES.md` is written in Japanese; references to its content may also be in Japanese
-- Rule files under `claude/rules/` are mixed: match the language of the file being edited, and write new ones in English
-- A skill that carries relocated rule text is written in that text's language throughout, so the move stays checkable line-for-line and the skill reads in one language
+- Write repository artifacts in English by default: commit messages, PR descriptions, issue comments, code comments, and new agent-consumed files
+- A file departs from that default when its content is bound to Japanese text, and then every line of it is Japanese, so a file reads in one language
+  - Content bound to Japanese text means rules that apply only to Japanese prose, or rule text relocated from a Japanese source
+  - Keeping relocated text in its original language leaves the move checkable line-for-line against its mapping table
+- `AIRULES.md` is written in Japanese, and references to its content may also be in Japanese
+- Match the language of an existing file when editing it
+- `SKILL.md` names any file of its skill that departs from the skill's language
 
 ## Script Requirements
 
