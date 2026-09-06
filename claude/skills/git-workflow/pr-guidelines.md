@@ -3,7 +3,9 @@
 Quality criteria for pull requests. Follow these when writing a PR body
 and when self-reviewing your own PR.
 
-Invoke the `technical-writing` skill alongside this file.
+Before writing a PR body or judging one against the properties below,
+invoke the `technical-writing` skill. These properties decide what the
+body carries, and that skill decides how its prose is built.
 
 A PR body is a summary that helps a reviewer decide, not a complete
 record of the change: everything else lives in the diff, the issue, or

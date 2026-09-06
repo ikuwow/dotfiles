@@ -31,8 +31,7 @@
 1. 編集 / 簡素化 / 整理タスクで、依頼されたスコープに含まれない既存の行・コメント・順序・命名・wordingは基本的に触らない
     - 明らかなtypo修正等で「ついで」が許容される場面もあるが、原則は別PRで提案する
 1. リポジトリへ永続化する出力（コミットメッセージ・PR本文・コード内コメント・docs等）の言語は、OSSはデフォルト英語、それ以外はプロジェクトのルール（`CLAUDE.md` / `AGENTS.md` 等）と既存資産（PR / commit history / docs）の言語に合わせる
-1. 1文を超える散文を永続化する前に `Skill(technical-writing)` を起動する（design doc、ADR、README、issue本文、issue / PRコメント、レビュー返信、commit messageの本文等）
-    - PR本文はgit-workflowの手順が起動するため対象外
+1. 1文を超える散文を永続化する前に `Skill(technical-writing)` を起動する
 
 ## ツール選択
 
