@@ -1,6 +1,6 @@
 ---
 name: technical-writing
-description: Standards for technical prose you write or revise - PR bodies, issue bodies, design docs, ADRs, README sections, review comments, and any explanatory text longer than a sentence. Covers paragraph structure, argument rigor (a mechanism for every causal claim, conditional guarantees, hedges that survive editing), reader load, voice, restraint, hollow phrasing, redundancy and where compression stops, and headings. Trigger whenever such text is being drafted or rewritten, including when the request only says "write the PR body", "draft the ADR", or "summarize this in the issue", and whenever the user asks to tighten, expand, restructure, or fix prose. Trigger equally when reviewing someone else's prose for quality.
+description: Standards for technical prose - paragraph structure, argument rigor (a mechanism for every causal claim, conditional guarantees, hedges that survive editing), reader load, voice, restraint, hollow phrasing, redundancy and where compression stops, and headings. ALWAYS use this skill before writing or rewriting any prose longer than a sentence, even when the request looks like a one-step task you could answer directly: PR bodies, issue bodies and comments, design docs, ADRs, RFCs, README and documentation sections, code review comments, commit message bodies, postmortems, and status updates. Use it when the request only says "write the PR body", "draft the ADR", "summarize this in the issue", or "explain this in the README". Use it whenever the user asks to tighten, shorten, expand, restructure, proofread, edit, or fix prose, or says the writing is too verbose, too dense, or unclear. Use it when reviewing or critiquing someone else's writing. Read japanese.md as well when the text is Japanese.
 ---
 
 # Technical Writing
@@ -16,16 +16,23 @@ apply only to Japanese text.
 ## Scope
 
 These rules govern how prose is built. They do not decide what content a
-document carries, how it is formatted, or which claims need evidence.
-Where a project rule or another skill decides one of those, it governs.
+document carries, how it is formatted, which claims need evidence, or
+whether a sentence is grammatical. Where a project rule or another skill
+decides one of those, it governs.
+
+Quoted material is outside these rules: a command transcript, a log
+excerpt, a diff, and a passage quoted from another document are evidence,
+and trimming one to the lines that bear on the argument destroys what
+makes it evidence.
 
 ## Paragraph and argument structure
 
 Build the text one paragraph per step of the argument, so a reader can
 follow the reasoning paragraph by paragraph.
 
-- Give each paragraph one topic. A paragraph that moves through
-  investigation, finding, and evaluation is that many paragraphs
+- Give each paragraph one topic. Where the paragraph's steps answer one
+  question, they are one paragraph however many steps there are; where
+  each step would survive on its own, they are that many paragraphs
 - Open each paragraph with the sentence that says what the paragraph is
   about
 - Where a paragraph's relation to the previous one is not already plain,
@@ -35,7 +42,9 @@ follow the reasoning paragraph by paragraph.
 - Run the argument in one direction: handle the objections, then state
   the conclusion once at the end
 - Where the text rejects a reading or an alternative, give the reason it
-  fails in the same place, often as a counterfactual
+  fails in the same place, and put the rejected design in the
+  conditional. An unbuilt alternative in the present tense reads as a
+  description of what shipped
 - Write out the proposition being denied in the words it would be stated
   in, rather than a vague denial such as "this does not solve
   everything"
@@ -71,9 +80,12 @@ these.
   sentence what makes them the same thing
 - After a concession or a qualification, carry the argument forward.
   Ending on the qualifier leaves the reader without the point
-- Write in terms that stay true as the document ages. "Currently", "now",
-  "new", "as of this writing", and "soon" expire without anyone noticing,
-  and a design document is read months later
+- Anchor every time reference to an event the document names, such as
+  the change it describes or a release. "Currently", "new", "as of this
+  writing", and "soon" anchored to nothing expire without anyone
+  noticing, and a design document is read months later
+- Where the text states a count, the list that follows carries that many
+  items, and anything outside the counted set says that it is outside
 
 ## Reader load
 
@@ -82,6 +94,8 @@ text introduces has to be worth holding.
 
 - Drop a proper name the text never refers to again, and use the general
   description instead
+  - An identifier a reader follows to check a claim stays, since it is
+    the claim's provenance
 - Where an abstract phrase has more than one possible referent, fix it in
   place with a parenthetical gloss rather than making the reader look
   back
@@ -90,11 +104,14 @@ text introduces has to be worth holding.
 - Cut detail that does not bear on the section's question, such as
   timestamps, status codes, and decorative precision, and keep the
   specifics the argument needs
+- Keep the cells of one table column the same kind of thing, since a
+  column the reader cannot predict has to be read row by row
 
 ## Voice
 
-- Write an example as actions with the actor as subject, so the reader
-  can tell who did what
+- Write an action with its actor as the subject, so the reader can tell
+  who did what. This binds hardest on a claim that something was
+  checked, where the actor is what the reader is judging
 - Name the specific thing rather than a wide word such as "AI" or "the
   tool"
 - Once the text introduces a term, keep using that term. Falling back to
@@ -134,10 +151,11 @@ mechanism behind a claim, the reason a negation holds, an uncertainty
 marker, or the bound on a claim's scope.
 
 - Leave out the intermediate steps a reader supplies without help
-- Where several sentences of argument compress into one, keep only the
-  compressed sentence
-- Where two adjacent sections make the same point from different angles,
-  merge them. The duplication is in their roles, not their sentences
+- Where several sentences of argument compress into one, or where naming
+  the structure conveys it, keep the compressed sentence and leave the
+  derivation out
+- Where two sections make the same point from different angles, merge
+  them. The duplication is in their roles, not their sentences
 - After showing something, add only the sentence that says what it
   means. Do not restate what was just shown
 - Cut a sentence that only connects or only evaluates, such as "this is
@@ -148,8 +166,6 @@ marker, or the bound on a claim's scope.
   - A question the reader actually has may stay in question form
 - State the fact and leave out the positioning around it, such as "this
   document does not dispute that"
-- Where naming the structure conveys it, name it and state the result
-  instead of walking the derivation
 - A connective that carries the move from one claim to the next is not
   redundancy
 
@@ -158,5 +174,8 @@ marker, or the bound on a claim's scope.
 - Make a heading name the question the section answers or the object it
   treats. A heading that only names a step, such as "back to the
   example", tells the reader nothing
-- Give a heading one phrase naming one thing, rather than two elements
-  joined by a separator
+- Give a heading one phrase naming one thing, rather than a category and
+  a subject joined by a dash or a rule
+- Keep a section inside what its heading names. Material the heading does
+  not reach belongs under its own heading, since a reader who trusts the
+  heading stops reading at its edge
