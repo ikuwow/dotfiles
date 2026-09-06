@@ -60,10 +60,15 @@
   - skill / path-scoped ruleへの切り出しは、振り分けの基準に該当する場合のみ行う
 - 各rule fileは他のrule fileへのpath参照なしで完結させる
   - renameで壊れ、auto-load同士では情報追加もゼロのため
-  - 例外1: skill / workflow → ruleのframework名参照（"X defined in `file.md`" 等）は残す
-    - skillが評価対象を名付けるためにload-bearing
-  - 例外2: rule → skillの起動ポインタ（skill名のみ、pathなし）は残す
+  - 例外: rule → skillの起動ポインタ（skill名のみ、pathなし）は残す
     - 常時ロードのruleから都度起動のskillへ誘導するため
+- skill / agent定義は、自分の判定に要る規則を自分のbundle内に持ち、他のskill / agent / rule fileを読まずに使える状態にする
+  - 多少の重複より独立を優先する（参照はrenameで黙って壊れる一方、重複した規則は壊れないため）
+  - 重複の解消を理由に、自分の規則を他ファイルへの参照に置き換えない
+  - 参照先の本文を書き写さない。改稿で黙って嘘になるため
+  - 他ファイルの規則に対する除外・免除を宣言しない。免除は規則を持つ側に書く
+  - 他のskill / agentは名前で起動する。名前が解決できなければ起動が失敗して露見するため、黙って壊れる参照に当たらない
+  - 対象はruleを引く参照で、記録・報告の値として資産名（AIRULES.mdの節名等）を書くのは対象外
 
 ## References
 

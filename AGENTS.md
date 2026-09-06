@@ -37,7 +37,7 @@ are symlinks pointing to files in this repository.
   - Frontmatter, identifiers, and cited titles keep the language they have
   - Content bound to Japanese text means rules that apply only to Japanese prose, or rule text relocated from a Japanese source
   - Keeping relocated text in its original language leaves the move checkable line-for-line against its source
-  - Japanese files under `claude/rules/` predate this criterion and stay as they are
+  - The Japanese files already under `claude/rules/` stay Japanese; this criterion governs what is added
 - `AIRULES.md` is written in Japanese, and references to its content may also be in Japanese
 - Match the language of an existing file when editing it
 - `SKILL.md` names any file of its skill that departs from the skill's language
@@ -82,7 +82,5 @@ This repository is a personal dotfiles repo. Scripts here may assume:
 Reviewer agents (silent-failure-hunter, pr-test-analyzer, etc.) are
 calibrated for production code and will recommend defensive handlers
 and test coverage that are over-engineering for personal-dotfiles
-scope. This governs how you weigh their findings (decline
-recommendations you judge over-engineered), never whether to run the
-review phases themselves — the git-workflow skill's phase pre-
-authorization is not overridable by this section.
+scope. This governs how you weigh their findings: decline
+recommendations you judge over-engineered.

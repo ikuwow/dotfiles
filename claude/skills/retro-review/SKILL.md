@@ -9,9 +9,9 @@ Batch-analyzes the retro-note records accumulated on this machine,
 clusters them by failure mechanism, diagnoses the rule set, and turns
 approved fixes into PRs.
 
-Data contract with retro-note: notes are append-only JSONL files at
-`${XDG_DATA_HOME:-$HOME/.local/share}/claude/retrospective/notes/<project-slug>/YYYY-MM.jsonl`
-(record schema defined in the retro-note skill). Review artifacts live
+Data contract with retro-note, which owns both the path and the record
+schema: notes are append-only JSONL files at
+`${XDG_DATA_HOME:-$HOME/.local/share}/claude/retrospective/notes/<project-slug>/YYYY-MM.jsonl`. Review artifacts live
 next to them under `.../retrospective/reviews/<cycle>/`. Both are
 machine-local by design; rule fixes propagate across machines through
 the dotfiles repo.
@@ -106,15 +106,13 @@ session context and cross-rule judgment.
    cluster's action. Weigh cost of failure: cheap self-correcting
    failures lean accept; failures that reach persisted artifacts,
    infrastructure, or user-facing claims lean structural fixes.
-1. For each cluster whose disposition is rule-edit, enumerate every
-   statement that decides the same question as the proposed edit, and
-   record for each whether it agrees with the edit, contradicts it, or
-   already states it. Search the user-level rule set (`AIRULES.md` and
-   `~/.claude/rules/`, whose entries are symlinks, so `grep -Rn`) and
-   the target project's own rule files. The rule-edit skill runs the
-   same enumeration against the edit as finally worded; running it here
-   is what puts a contradiction in front of the user while the action
-   is still a proposal, rather than after both statements are in force.
+1. For each cluster whose disposition is rule-edit, invoke the rule-edit
+   skill and run its same-decision enumeration against the proposed
+   edit, recording for each statement it finds whether that statement
+   agrees with the edit, contradicts it, or already states it. Running
+   it at this point puts a contradiction in front of the user while the
+   action is still a proposal, rather than after both statements are in
+   force.
 1. When an enumerated statement already states the proposed edit,
    record the cluster's diagnosis as rule-not-followed and revisit the
    disposition that followed from it, since restating a rule already
@@ -137,10 +135,7 @@ planned/accept entries in Step 8.
 One action = one PR. For each approved action, invoke the git-workflow
 skill (branch, edit, draft PR, CI and review phases). Rule edits go
 through the rule-edit skill, which carries the adoption and wording
-criteria and the same-decision enumeration, alongside the output-format
-rules in AIRULES.md (positive form, one sentence per bullet). That
-enumeration runs here against the edit as actually worded, which the
-checkpoint may have moved away from the proposal Step 5 covered. Record
+criteria and the same-decision enumeration. Record
 which review findings were adopted or declined, and why, in
 `report.md`.
 

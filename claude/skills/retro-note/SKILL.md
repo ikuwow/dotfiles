@@ -24,14 +24,15 @@ elsewhere, either fix the environment or update those rules.
 
 In scope — AI-side judgment failures only:
 
-- (a) 誤った前提や思い込みで着手したケース
-- (b) rule違反や rule趣旨から外れた選択
-- (c) tool選択・path選択のミス
-- (d) userへの応答の不適切さ（浅い、的外れ、確認不足、押し付け等）
-- (e) 情報検証の不足（一次情報を確認せずに断定した等）
+- (a) Starting from a wrong premise or an unchecked assumption
+- (b) Breaking a rule, or a choice that departs from a rule's intent
+- (c) Picking the wrong tool or the wrong path
+- (d) A response that fell short for the user: shallow, off-target,
+  under-confirmed, pushy, or inadequate in some other way
+- (e) Asserting something without checking a primary source
 
-Out of scope: session内容の振り返り、成功事例、user側の判断・行動、
-外部ツールの不具合。
+Out of scope: recounting what the session did, successes, the user's
+own judgment and actions, and external tool defects.
 
 ## Depth requirement
 
