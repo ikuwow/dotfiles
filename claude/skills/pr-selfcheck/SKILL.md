@@ -57,14 +57,29 @@ Perform a self-review of the specified PR to catch issues before a human reviewe
 1. Run the density pass described below over the body's list items and
    paragraphs. It is a count, not a judgement, and it does not depend
    on the body's language
+1. Invoke the `technical-writing` skill and read the title and every
+   paragraph and top-level list item of the body against it, reporting
+   each finding under the `Prose` label
+   - The five properties judge what the body carries, and this pass
+     judges how its sentences and paragraphs are built, so a body can
+     pass every property and still be hard to read
+   - Walk the whole body. Reading a sample reports a clean pass on a
+     body that is defective throughout
+   - Every violation of a rule the skill states is a Fix
+     - Prose the reviewer works through costs them attention the change
+       itself should have had, whether or not they still reach the
+       right decision
+   - The length of a list item belongs to the density pass, so a
+     two-sentence item is reported there and not here
 1. Output the result in the format described below, reporting a line
-   for every property including those with no finding
+   for each of the five properties and for Prose, including those with
+   no finding
 
 ## Severity
 
 | Severity | Condition |
 | --- | --- |
-| Fix | Acting on it is required before the PR is ready: a reviewer acting on the body would be misled about what the change does, would find in the diff a change the body did not prepare them for, or would treat a claim the change rests on as settled when the body does not carry what settles it |
+| Fix | Acting on it is required before the PR is ready: a reviewer acting on the body would be misled about what the change does, would find in the diff a change the body did not prepare them for, would treat a claim the change rests on as settled when the body does not carry what settles it, or would spend attention on how the body is written that the change itself should have had |
 | Note | Surfaced for the reader's judgement, and the reader decides whether to act: a blemish that changes nothing for the reviewer, or a finding the checker is not confident about, stated with the reason for the doubt. Carry the finding and that reason alone — a Note that also argues for or against acting on it answers the question it exists to hand over |
 | Unverifiable | A check that produced nothing comparable against the claim (the `FETCH_HEAD` and URL steps above). Reported as unverifiable, never Fix |
 
@@ -134,20 +149,21 @@ from this pass.
 ## PR Self-Check Result
 
 ### Fix
-- [<property>] <finding>
+- [<property or Prose>] <finding>
 
 ### Note
-- [<property>] <finding>
+- [<property or Prose>] <finding>
 
 ### Unverifiable
 - [<property>] <item, and why it could not be checked>
 
-### Property walk
+### Walk
 - Decidable: <one line>
 - Grounded: <one line>
 - Necessary: <one line>
 - Scoped: <one line>
 - Conformant: <one line>
+- Prose: <one line>
 
 ### Verdict
 PASS | NEEDS_IMPROVEMENT
