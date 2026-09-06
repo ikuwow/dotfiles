@@ -57,8 +57,16 @@ Perform a self-review of the specified PR to catch issues before a human reviewe
 1. Run the density pass described below over the body's list items and
    paragraphs. It is a count, not a judgement, and it does not depend
    on the body's language
+1. Invoke the `technical-writing` skill and read the body against it,
+   reporting each finding under the `Prose` label. The five properties
+   judge what the body carries; this pass judges how its sentences and
+   paragraphs are built, so a body can pass every property and still
+   be hard to read
+   - A finding here is a Note unless the prose defect makes a claim
+     unreadable or ambiguous, which is a Fix
 1. Output the result in the format described below, reporting a line
-   for every property including those with no finding
+   for each of the five properties and for Prose, including those with
+   no finding
 
 ## Severity
 
@@ -148,6 +156,7 @@ from this pass.
 - Necessary: <one line>
 - Scoped: <one line>
 - Conformant: <one line>
+- Prose: <one line>
 
 ### Verdict
 PASS | NEEDS_IMPROVEMENT
