@@ -22,6 +22,9 @@ description: Changing or judging a rule document that an AI agent loads as instr
   - 削除元と行き先が別ファイルに分かれる移動はrenameとして検出されず、対応がdiffから復元できないため
   - 受け皿の側が自分のscope文で当該ケースを除外していないかを、topicだけでなくscope文まで読んで確認する
 - 編集後、編集対象のファイルが `criteria.md` に準拠していることを確認する
+- 例外条項を根拠に変更を通す時は、条文の該当だけでなく、その条項に添えられた理由が今回の用途を含むかを照合する
+  - 条文だけで判定すると、別の目的で書かれた例外が汎用の抜け道になるため
+  - subagentやreview agentが「例外に該当」と返した場合も同じ照合を自分で行う
 
 ## 変更が大きい時に足す
 

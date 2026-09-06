@@ -85,11 +85,12 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   - A long flat list is usually diff paraphrase; where it survives
     Necessary, it is usually a hierarchy that was never encoded
   - A section this empties loses its heading with it
-- Each item carries one claim at the shortest length that lands it, and
-  an item taking three sentences to land is usually two items
-  - Evidence the item quotes, and a verification item's evidence, are
-    exempt from the one-sentence-per-item rule in `AIRULES.md`'s
-    出力フォーマット, since Grounded requires the item to carry them
+- Each item carries one claim at the shortest length that lands it
+  - A list item carrying two or more sentences is a finding: the second
+    becomes a sub-bullet under the first, or it was not needed, and an
+    item taking three sentences to land is usually two items
+    - Evidence the item quotes, and a verification item's evidence, are
+      exempt, since Grounded requires the item to carry them
   - A paragraph enumerating three or more parallel items of the same
     kind — reasons, rejected alternatives, caveats, options — is a
     finding, and the items belong in a list, one per line
@@ -132,8 +133,9 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
     spellings, or a path filter narrower than the claim does not
 - A claim about a tool, service, or platform this diff does not modify,
   and the configuration values, tool choices, and version selections the
-  diff introduces, carry their source in the body itself
-  (`AIRULES.md`'s 事実と確信度の管理 defines what counts as a primary source)
+  diff introduces, carry their source in the body
+  - Official documentation, a man page section, `--help` output, the
+    tool's own source, and the project's own issues and PRs each count
 - A causal claim asserting a mechanism a reader cannot check from the
   diff ("because X locks the table") carries evidence or a source
 - Naming an external tool or service in a step the reader is meant to
@@ -200,11 +202,17 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
 - Focus on what changes from the user's or system's perspective —
   behavior changes, new capabilities, removed limitations — rather than
   on implementation details (resources added, files touched)
-- The body records the delivered design, not the path to it, under
-  `AIRULES.md`'s 出力フォーマット reader criterion
+- The body records the delivered design, not the path to it. Every line
+  has to mean something to a reader with no access to earlier revisions
+  of the branch or to the session that produced it
+  - Keep out chronological narration of implementation attempts ("first
+    tried X, it failed, so Y") and records of direction changes made
+    mid-implementation
+  - Keep out references to the session, to plan-mode phases, and to
+    individual commits within the branch
   - Keep out attribution to the review that raised a point ("raised in
-    review", "per feedback"). The thread is on this PR, so that reader
-    criterion passes it and only this rule reaches it
+    review", "per feedback"). The thread is on this PR, so the reader
+    criterion above passes it and only this line reaches it
   - Keep out rejected alternatives described at implementation-attempt
     granularity, and alternatives a reviewer would not arrive at and
     ask about

@@ -62,6 +62,10 @@
   - renameで壊れ、auto-load同士では情報追加もゼロのため
   - 例外1: skill / workflow → ruleのframework名参照（"X defined in `file.md`" 等）は残す
     - skillが評価対象を名付けるためにload-bearing
+    - 参照先を読まないと判定できない状態にはしない。skillは自分の判定に要る規則を自分で持ち、多少の重複より独立を優先する
+    - 重複の解消を理由に、skill側の規則を参照へ置き換えない（rename耐性を失う一方、常時ロードのruleは元から全skillのcontextにあり、重複による遵守率の損失がないため）
+    - 参照先の本文を書き写さない。改稿で黙って嘘になるため
+    - skillからruleの規則に対する除外・免除を宣言しない。都度ロードが常時ロードの適用範囲を狭める向きになるため
   - 例外2: rule → skillの起動ポインタ（skill名のみ、pathなし）は残す
     - 常時ロードのruleから都度起動のskillへ誘導するため
 

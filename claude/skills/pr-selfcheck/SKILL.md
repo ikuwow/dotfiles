@@ -95,11 +95,10 @@ Excluded from detection to avoid false positives:
 
 ## Density pass
 
-`AIRULES.md`'s 出力フォーマット asks each list item to carry one sentence
-as its default, and Decidable asks it to carry one claim. Apply the
-count below rather than judging length by eye, and read it against the
-exclusions further down, which carry the cases that default admits.
-Each violation left after those is a Fix.
+Decidable asks each item to carry one claim at the shortest length that
+lands it, and makes a two-sentence item a finding. Apply the count below
+rather than judging length by eye, and read it against the exclusions
+further down. Each violation left after those is a Fix.
 
 Enumerate every list item in the body, top-level and nested alike, and
 count each one. Sampling reports a clean pass on a body full of
