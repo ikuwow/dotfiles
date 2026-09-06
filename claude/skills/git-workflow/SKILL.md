@@ -90,9 +90,11 @@ formatting or indentation.
 
 ## 3. Create a PR
 
-Read [pr-guidelines.md](pr-guidelines.md) before writing or editing a PR
-title or body anywhere in this workflow, including the Phase 4 updates
-and the Update a PR / issue procedure.
+Read [pr-guidelines.md](pr-guidelines.md) and invoke the
+`technical-writing` skill before writing or editing a PR title or body
+anywhere in this workflow, including the Phase 4 updates and the Update
+a PR / issue procedure. The guidelines decide what the body carries, the
+skill decides how its prose is built.
 
 1. If the branch already has a PR (`gh pr view --json number,url`),
    skip creation. Bring its title and body into conformance with
@@ -252,6 +254,10 @@ next (merge, or "needs human attention" after the fix cap). Skip
 routine CI / comment events.
 
 ## Update a PR / issue (title / body)
+
+Read [pr-guidelines.md](pr-guidelines.md) and invoke the
+`technical-writing` skill before the steps below. `git-essentials.md`
+routes a body edit here directly, without passing section 3.
 
 - Update title:
   `gh pr edit <number> --title '...'`

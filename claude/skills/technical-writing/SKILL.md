@@ -61,6 +61,9 @@ reader can follow the reasoning paragraph by paragraph.
   claim
 - Name the knowledge the document assumes its reader already has, since
   an author holding the whole problem leaves prerequisites unstated
+- In a list, put the claims at the top level and nest what supports or
+  qualifies a claim under it, so the list reads from its top-level lines
+  alone
 
 ## Rigor
 
@@ -115,6 +118,9 @@ text introduces has to be worth holding.
   specifics the argument needs
 - Keep the cells of one table column the same kind of thing, since a
   column the reader cannot predict has to be read row by row
+- Give each table a caption or a one-line lead-in saying what it shows,
+  so a reader who skips the surrounding prose still knows what they are
+  looking at
 
 ## Voice
 
@@ -156,8 +162,8 @@ use, not the vocabulary.
 ## Compression
 
 Compress until removing anything more would remove one of these: the
-mechanism behind a claim, the reason a negation holds, an uncertainty
-marker, or the bound on a claim's scope.
+mechanism behind a claim, the reason a negation holds, the bound on a
+claim's scope, or a hedge on a judgment or a prediction.
 
 - Leave out the intermediate steps a reader supplies without help
 - Where several sentences of argument compress into one, or where naming
