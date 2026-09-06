@@ -92,9 +92,9 @@ Excluded from detection to avoid false positives:
 
 ## Density pass
 
-Decidable asks each item to carry one claim at the shortest length that
-lands it. Apply the count below rather than judging length by eye. Each
-violation it finds is a Fix.
+`AIRULES.md`'s 出力フォーマット asks each list item to carry one sentence,
+and Decidable asks it to carry one claim. Apply the count below rather
+than judging length by eye. Each violation it finds is a Fix.
 
 Enumerate every list item in the body, top-level and nested alike, and
 count each one. Sampling reports a clean pass on a body full of
