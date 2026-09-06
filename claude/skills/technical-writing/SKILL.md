@@ -6,8 +6,8 @@ description: Standards for technical prose - paragraph structure, argument rigor
 # Technical Writing
 
 Standards for prose in technical documents. Apply them while drafting,
-then read the draft once more against the Rigor and Redundancy sections,
-which catch what drafting misses.
+then read the draft once more against Rigor and Compression, which catch
+what drafting misses.
 
 For a document written in Japanese, read
 [japanese.md](japanese.md) as well. It is written in Japanese and
@@ -16,9 +16,13 @@ carries the rules that apply only to Japanese text.
 ## Scope
 
 These rules govern how prose is built. They do not decide what content a
-document carries, how it is formatted, which claims need evidence, or
+document carries, how it is marked up, which claims need evidence, or
 whether a sentence is grammatical. Where a project rule or another skill
 decides one of those, it governs.
+
+Punctuation within a sentence is part of how prose is built, so
+[japanese.md](japanese.md) rules on it for Japanese. Markup around the
+prose, such as emphasis, headings levels, and line breaks, is not.
 
 Quoted material is outside these rules: a command transcript, a log
 excerpt, a diff, and a passage quoted from another document are evidence,

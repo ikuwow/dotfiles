@@ -33,7 +33,8 @@ are symlinks pointing to files in this repository.
 ## Language
 
 - Write repository artifacts in English by default: commit messages, PR descriptions, issue comments, code comments, and new agent-consumed files
-- A file departs from that default when its content is bound to Japanese text, and then every line of it is Japanese, so a file reads in one language
+- A file departs from that default when its content is bound to Japanese text, and then its prose is Japanese throughout, so a file reads in one language
+  - Frontmatter, identifiers, and cited titles keep the language they have
   - Content bound to Japanese text means rules that apply only to Japanese prose, or rule text relocated from a Japanese source
   - Keeping relocated text in its original language leaves the move checkable line-for-line against its source
   - Japanese files under `claude/rules/` predate this criterion and stay as they are
