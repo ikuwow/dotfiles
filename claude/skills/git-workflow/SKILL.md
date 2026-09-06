@@ -255,6 +255,10 @@ routine CI / comment events.
 
 ## Update a PR / issue (title / body)
 
+Read [pr-guidelines.md](pr-guidelines.md) and invoke the
+`technical-writing` skill before the steps below, which reach this
+section directly from `git-essentials.md` without passing section 3.
+
 - Update title:
   `gh pr edit <number> --title '...'`
 - Update body (always use `--body-file`, never `--body`):

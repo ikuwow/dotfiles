@@ -162,8 +162,8 @@ use, not the vocabulary.
 ## Compression
 
 Compress until removing anything more would remove one of these: the
-mechanism behind a claim, the reason a negation holds, or the bound on a
-claim's scope.
+mechanism behind a claim, the reason a negation holds, the bound on a
+claim's scope, or a hedge on a judgment or a prediction.
 
 - Leave out the intermediate steps a reader supplies without help
 - Where several sentences of argument compress into one, or where naming

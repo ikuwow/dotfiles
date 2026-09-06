@@ -3,8 +3,7 @@
 Quality criteria for pull requests. Follow these when writing a PR body
 and when self-reviewing your own PR.
 
-These decide what the body carries. The `technical-writing` skill
-decides how its prose is built, and is invoked alongside this file.
+Invoke the `technical-writing` skill alongside this file.
 
 A PR body is a summary that helps a reviewer decide, not a complete
 record of the change: everything else lives in the diff, the issue, or
@@ -79,10 +78,8 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
 - In a bulleted section, the top level carries the change itself, and
   rationale, evidence, and the behavior this change replaces do not
   displace it from there
-- When one top-level item supports, qualifies, or follows from another,
-  it belongs beneath that one rather than beside it, in whichever
-  section that one sits, unless another rule here places it in a
-  section of its own
+  - A nested item stays in whichever section its parent sits, unless
+    another rule here places it in a section of its own
   - A long flat list is usually diff paraphrase; where it survives
     Necessary, it is usually a hierarchy that was never encoded
   - A section this empties loses its heading with it
@@ -164,7 +161,7 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   - A heading is a line the walk takes, and answers for its own text
     rather than for the lines beneath it
   - A table row is a line of the walk, read with the caption or lead-in
-    that says what the table shows
+    that the `technical-writing` skill asks every table to carry
   - A diagram or a code block is a line of the walk, answered whole for
     what it depicts. One that traces the control flow, structure, or
     call order of code in the diff answers `the diff`
@@ -203,6 +200,9 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   on implementation details (resources added, files touched)
 - The body records the delivered design, not the path to it, under
   `AIRULES.md`'s 出力フォーマット reader criterion
+  - Keep out attribution to the review that raised a point ("raised in
+    review", "per feedback"). The thread is on this PR, so that reader
+    criterion passes it and only this rule reaches it
   - Keep out rejected alternatives described at implementation-attempt
     granularity, and alternatives a reviewer would not arrive at and
     ask about

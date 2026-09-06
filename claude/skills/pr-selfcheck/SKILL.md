@@ -42,6 +42,10 @@ Perform a self-review of the specified PR to catch issues before a human reviewe
    and a change already merged there reads as text the diff did not add
 1. Locate and read `pr-guidelines.md`, bundled with the `git-workflow`
    skill, to load the five properties the PR body is judged against
+1. Invoke the `technical-writing` skill, which carries the prose rules
+   Decidable rests on: a table's caption, and a list whose top level
+   reads alone. Findings against those rules are reported under
+   Decidable
 1. For each URL found in the PR body, fetch it with WebFetch and
    compare what comes back against what the body cites the URL for. A
    fetch that returns no comparable content makes the URL unverifiable
