@@ -65,8 +65,10 @@ Perform a self-review of the specified PR to catch issues before a human reviewe
      pass every property and still be hard to read
    - Walk the whole body. Reading a sample reports a clean pass on a
      body that is defective throughout
-   - A finding here is a Note. A prose defect that leaves a claim
-     unreadable or open to two readings is a Fix
+   - Every violation of a rule the skill states is a Fix
+     - Prose the reviewer works through costs them attention the change
+       itself should have had, whether or not they still reach the
+       right decision
    - The length of a list item belongs to the density pass, so a
      two-sentence item is reported there and not here
 1. Output the result in the format described below, reporting a line
@@ -77,7 +79,7 @@ Perform a self-review of the specified PR to catch issues before a human reviewe
 
 | Severity | Condition |
 | --- | --- |
-| Fix | Acting on it is required before the PR is ready: a reviewer acting on the body would be misled about what the change does, would find in the diff a change the body did not prepare them for, would treat a claim the change rests on as settled when the body does not carry what settles it, or could not read a claim at all because of how it is written |
+| Fix | Acting on it is required before the PR is ready: a reviewer acting on the body would be misled about what the change does, would find in the diff a change the body did not prepare them for, would treat a claim the change rests on as settled when the body does not carry what settles it, or would spend attention on how the body is written that the change itself should have had |
 | Note | Surfaced for the reader's judgement, and the reader decides whether to act: a blemish that changes nothing for the reviewer, or a finding the checker is not confident about, stated with the reason for the doubt. Carry the finding and that reason alone — a Note that also argues for or against acting on it answers the question it exists to hand over |
 | Unverifiable | A check that produced nothing comparable against the claim (the `FETCH_HEAD` and URL steps above). Reported as unverifiable, never Fix |
 
