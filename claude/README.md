@@ -19,10 +19,9 @@ here only takes effect after a corresponding line is added to
 | `rules/*.md`                  | `~/.claude/rules/*.md`            | Topic-scoped rule files (development practice, execution judgment, git, rule authoring, etc.).                |
 | `skills/<name>/`              | `~/.claude/skills/<name>/`        | Skills. Each directory symlinked as a whole.                                                                  |
 | `plugins/config.json`         | (not symlinked)                   | Plugin enablement, applied via `scripts/claude-code-setup.sh`. Read by the `claude` CLI from its own state.   |
-| `routines/*.md`               | (not symlinked)                   | Scheduled routines, applied via `scripts/claude-code-setup.sh`.                                               |
 
-`scripts/deploy.sh` lines 63-74 are the authoritative version of this
-table — keep them in sync when adding new entries.
+The `# Claude Code` block in `scripts/deploy.sh` is the authoritative
+version of this table — keep them in sync when adding new entries.
 
 ## Setup script
 

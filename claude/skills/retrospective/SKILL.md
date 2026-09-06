@@ -89,8 +89,8 @@ For each finding, ask via AskUserQuestion using the choices below.
 
 - Project-specific finding: `apply now` / `create issue` / `skip` / `Other`
 - Global finding: `create issue` / `skip` / `Other` — no `apply now`
-  - The weekly-improvement routine consumes global issues, so
-    silently applying them here would skip that queue
+  - A global finding targets `ikuwow/dotfiles`, not the current repo,
+    so `apply now` has no branch here to write it to
   - Use `Other` for a manual dotfiles-side edit
 
 `apply now` branch gate (project-specific only):
@@ -125,11 +125,13 @@ default=$(git symbolic-ref --short refs/remotes/origin/HEAD | sed 's|^origin/||'
 
 `create issue`:
 
+- The `retrospective`-labeled issues are a backlog the user reads by
+  hand, on no fixed cadence, so an issue waits until they pick it up
 - Batch by scope: all approved global findings become one issue in
   `ikuwow/dotfiles`, and all approved project findings become one
   issue in the current cwd's repo — never one issue per finding,
-  since the weekly-improvement routine and project maintainers
-  consume session-level issues
+  since findings from one session share the context needed to judge
+  them
 - Global → `ikuwow/dotfiles`, label `retrospective`, via
   `--body-file` (never `--body`), title
   `Retrospective: <date> <one-line session summary>` (sanitized as
@@ -140,9 +142,8 @@ default=$(git symbolic-ref --short refs/remotes/origin/HEAD | sed 's|^origin/||'
 - Project-specific → the current cwd's repository, via
   `--body-file`, no label
 - The issue body lists each included finding with its `Destination:`
-  tag and the concrete countermeasure content, so the
-  weekly-improvement routine (or the project's own maintainers) can
-  act on each item directly
+  tag and the concrete countermeasure content, so a reader can act on
+  each item without reopening the session it came from
 
 `skip` — drop the finding with no record.
 
