@@ -9,7 +9,7 @@ explicitly (e.g., "stop after Step 3, skip CI wait"). (Truly
 trivial fixes that don't warrant Plan Mode at all are a separate
 judgment call — see EnterPlanMode's own criteria.)
 
-The full procedure (worktree setup, PR body rules, CI phases,
+The full procedure (worktree setup, CI phases,
 monitoring, cleanup) lives in the git-workflow skill. Plans MUST
 NOT restate the detailed procedures from the skill.
 
@@ -44,7 +44,6 @@ NOT restate the detailed procedures from the skill.
 
 ## PR / issue body edits
 
-- Before running `gh pr edit` / `gh issue edit` with `--body`,
-  `--body-file`, or `--title`, summarize the change in the assistant
-  message body — a short list of what is being added, removed, or
-  reworded, not the full before/after diff
+- Invoke `Skill(create-pull-request)` before writing or editing a PR or
+  issue title or body, including a `gh pr edit` / `gh issue edit` run
+  outside the git workflow

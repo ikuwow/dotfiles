@@ -40,8 +40,8 @@ Perform a self-review of the specified PR to catch issues before a human reviewe
    reading the head for every later check. The default branch is not
    that merge base once anything has landed since the branch was cut,
    and a change already merged there reads as text the diff did not add
-1. Locate and read `pr-guidelines.md`, bundled with the `git-workflow`
-   skill, to load the five properties the PR body is judged against
+1. Invoke the `create-pull-request` skill to load the five properties
+   the PR body is judged against
 1. For each URL found in the PR body, fetch it with WebFetch and
    compare what comes back against what the body cites the URL for. A
    fetch that returns no comparable content makes the URL unverifiable
@@ -51,8 +51,8 @@ Perform a self-review of the specified PR to catch issues before a human reviewe
    or a login page), a 429 or 5xx, and a domain `WebFetch` is denied
    all land here. A Fix only when fetched content contradicts the
    citation
-1. Walk the five properties one at a time, in the order
-   `pr-guidelines.md` states them, judging the PR against that
+1. Walk the five properties one at a time, in the order the
+   `create-pull-request` skill states them, judging the PR against that
    property's rules and the severity table below
 1. Run the density pass described below over the body's list items and
    paragraphs. It is a count, not a judgement, and it does not depend

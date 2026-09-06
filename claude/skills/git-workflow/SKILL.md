@@ -15,8 +15,6 @@ threads), the `pr-review-toolkit` plugin (Phase 2), and `bin/pr-monitor`
 
 ## Supporting files
 
-- [pr-guidelines.md](pr-guidelines.md) — the properties a PR title and
-  body are judged against, and what belongs in the body versus the diff
 - [pr-reaction.md](pr-reaction.md) — bot-versus-human targeting for PR
   events, whether an event is answered by a reply or a fix push, which
   channel a reply goes to, and thread resolve
@@ -89,29 +87,16 @@ formatting or indentation.
 
 ## 3. Create a PR
 
-Read [pr-guidelines.md](pr-guidelines.md) and invoke the
-`technical-writing` skill before writing or editing a PR title or body
-anywhere in this workflow, including the Phase 4 updates and the Update
-a PR / issue procedure.
+For a PR the implementer opened, read
+[implementer-dispatch.md](implementer-dispatch.md) first and apply its
+`When it returns` steps, since the body it left is a placeholder.
 
-1. If the branch already has a PR (`gh pr view --json number,url`),
-   skip creation. Bring its title and body into conformance with
-   `pr-guidelines.md` using the Update a PR / issue procedure,
-   display the PR URL to the user, then proceed to step 4.
-   - For a PR the implementer opened, read
-     [implementer-dispatch.md](implementer-dispatch.md) and apply its
-     `When it returns` steps before that conformance pass
-1. Write the PR body to a fresh file under the session scratchpad
-   directory using the Write tool (new filename per revision — no
-   temp-file generation, no Read of an empty file)
-   - Follow the repository's PR template if one exists
-1. Create the PR as a draft:
-   `gh pr create --draft --body-file <body file path>`
-   - Never use `--body` for PR creation, for the reason the Update a PR
-     / issue section gives
-1. After creating the PR, display the PR URL to the user:
-   `gh pr view --json url --jq '.url'`
-1. Proceed to step 4
+Then invoke the `create-pull-request` skill, which carries the
+properties a title and body are judged against and the commands that
+write them. This holds wherever the workflow writes or edits a title or
+body, including the Phase 4 updates.
+
+Proceed to step 4 once the PR exists and its URL is displayed.
 
 ## 4. Checks, review, and merge
 
@@ -198,8 +183,6 @@ Update incrementally as conditions are confirmed (e.g., after Phase 1
 CI passes, after apply / deploy succeeds, after post-deploy
 verification with `curl`, `aws logs tail`, etc.).
 
-Use the Update a PR / issue procedure (`gh pr edit --body-file`) for body
-edits.
 
 ### Phase 5: Watch PR activity until merge
 
@@ -250,31 +233,6 @@ run entered the workflow at this phase.
 `PushNotification` only for events that change what the user would do
 next (merge, or "needs human attention" after the fix cap). Skip
 routine CI / comment events.
-
-## Update a PR / issue (title / body)
-
-Read [pr-guidelines.md](pr-guidelines.md) and invoke the
-`technical-writing` skill before the steps below.
-
-- Update title:
-  `gh pr edit <number> --title '...'`
-- Update body (always use `--body-file`, never `--body`):
-  1. Fetch the current body:
-     `gh pr view <number> --json body --jq .body`
-     (or `gh issue view <number> --json body --jq .body` for issues)
-  1. Summarize the change in the assistant message body — a short
-     list of what is being added, removed, or reworded, not the full
-     before/after diff
-  1. Write the new body to a fresh file under the session scratchpad
-     directory using the Write tool (new filename per revision — no
-     temp-file generation, no Read of an empty file)
-  1. Execute the edit:
-     `gh pr edit <number> --body-file <body file path>`
-     (or `gh issue edit <number> --body-file <body file path>`)
-
-Note: Always use `--body-file` for any body update. The `#`-prefixed lines
-in PR/issue bodies trigger Claude Code's security pre-check when passed
-via `--body`, which cannot be bypassed by hooks.
 
 ## 5. Cleanup After Task Completion
 
