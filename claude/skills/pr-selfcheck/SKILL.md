@@ -14,7 +14,7 @@ Perform a self-review of the specified PR to catch issues before a human reviewe
 ## Steps
 
 1. Retrieve PR metadata:
-   `gh pr view <number> --json title,body,url,additions,deletions,files,baseRefName`
+   `gh pr view <number> --json title,body,url,additions,deletions,files,commits,labels,headRefName,baseRefName`
 1. Retrieve the diff:
    `gh pr diff <number>`
 1. When verifying a body claim needs file contents at the PR head,
