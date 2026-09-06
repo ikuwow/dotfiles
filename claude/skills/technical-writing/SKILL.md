@@ -10,8 +10,8 @@ then read the draft once more against the Rigor and Redundancy sections,
 which catch what drafting misses.
 
 For a document written in Japanese, read
-[japanese.md](japanese.md) as well. It carries the rules that
-apply only to Japanese text.
+[japanese.md](japanese.md) as well. It is written in Japanese and
+carries the rules that apply only to Japanese text.
 
 ## Scope
 
