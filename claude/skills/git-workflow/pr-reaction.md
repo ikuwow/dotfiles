@@ -86,7 +86,18 @@ id from Step 1's `thread_id` field:
 gh pr-review threads resolve --thread-id <thread-id> -R <owner>/<repo> <number>
 ```
 
-## Step 4: Human-authored events
+## Step 4: `[USER]` events
+
+`pr-monitor` emits every author, so a `[USER]` event carrying the login
+this session's `gh` authenticates as is either the user acting on the PR
+or a comment this session posted coming back as an event. Fetch its body
+(Step 1's listing for a thread comment, the `comments` field for a
+top-level one) and compare it with what this session posted in this run.
+On a match, take no action and leave the event out of the report, since
+reporting it hands this session's own comment to the user as theirs.
+Every other `[USER]` event takes the path below, one posted by a
+concurrent session on the same account included — that one reads as the
+user's and no signal on the event separates them.
 
 Do not auto-reply or auto-resolve. Surface the content to the user
 (thread id / path / line / body excerpt for threads; body excerpt for
