@@ -9,21 +9,23 @@ when the author is a bot. Never touch anything with a human author
 autonomously — summarize to the user and wait for an explicit
 instruction.
 
+- This session's own account is the login `gh api user --jq .login`
+  returns, read once on the first monitor event. An event authored by it
+  never takes the bot path, whatever its tag.
+  - Where its body matches something this session posted in this run, it
+    is that post coming back: neither acted on nor reported, since
+    reporting presents the session's own post to the user as incoming
+    feedback. Take the body from Step 1's listing, or re-fetch it for a
+    top-level comment; no event line carries it.
+  - Every other event on that login is the user acting, as is one the
+    session cannot match either way.
 - Bot thread = every comment in it has REST `user.type == "Bot"`. Any
   single `User`-type comment flips the thread to the human path — a
   bot can open a thread that a human later joins.
 - Bot `NEW_TOP_COMMENT` / `NEW_REVIEW` = event line tag is `[BOT]`
   (derived from GraphQL `author.__typename` in `bin/pr-monitor`; on
-  conflict with any other signal, the tag wins).
-- `[SELF]` marks the account this session posts from, and wins over
-  `[BOT]`. An event on it whose body matches something this session
-  posted in this run is that post coming back: neither acted on nor
-  reported, since reporting presents the session's own post to the user
-  as incoming feedback.
-  - Match on the body, which no event line carries — take it from Step
-    1's listing, or re-fetch it for a top-level comment.
-  - Every other `[SELF]` event is the user acting, as is one the
-    session cannot match either way.
+  conflict with any other signal, the tag wins), except on the account
+  above.
 - Author type is always taken from a live API response
   (`user.type` / `__typename`), never assumed from a login name. The
   same GitHub App can show a different login string per API — e.g.
@@ -54,8 +56,8 @@ gh api /repos/<owner>/<repo>/pulls/<number>/comments \
 
 Walk every comment in each thread to classify per the targeting policy.
 
-`NEW_TOP_COMMENT` / `NEW_REVIEW` skip this step — take the
-`[BOT|USER|SELF]` tag directly from the event line.
+`NEW_TOP_COMMENT` / `NEW_REVIEW` skip this step — take the `[BOT|USER]`
+tag directly from the event line.
 
 ## Step 2: React by content
 
@@ -95,7 +97,7 @@ id from Step 1's `thread_id` field:
 gh pr-review threads resolve --thread-id <thread-id> -R <owner>/<repo> <number>
 ```
 
-## Step 4: `[USER]` and `[SELF]` events
+## Step 4: Human-authored events
 
 Do not auto-reply or auto-resolve. Surface the content to the user
 (thread id / path / line / body excerpt for threads; body excerpt for
