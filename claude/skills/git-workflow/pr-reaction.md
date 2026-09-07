@@ -15,6 +15,15 @@ instruction.
 - Bot `NEW_TOP_COMMENT` / `NEW_REVIEW` = event line tag is `[BOT]`
   (derived from GraphQL `author.__typename` in `bin/pr-monitor`; on
   conflict with any other signal, the tag wins).
+- `[SELF]` marks the account this session posts from, and wins over
+  `[BOT]`. An event on it whose body matches something this session
+  posted in this run is that post coming back: neither acted on nor
+  reported, since reporting presents the session's own post to the user
+  as incoming feedback.
+  - Match on the body, which no event line carries — take it from Step
+    1's listing, or re-fetch it for a top-level comment.
+  - Every other `[SELF]` event is the user acting, as is one the
+    session cannot match either way.
 - Author type is always taken from a live API response
   (`user.type` / `__typename`), never assumed from a login name. The
   same GitHub App can show a different login string per API — e.g.
@@ -92,10 +101,10 @@ Do not auto-reply or auto-resolve. Surface the content to the user
 (thread id / path / line / body excerpt for threads; body excerpt for
 top-level) and stop.
 
-A `[SELF]` event whose body matches something this session posted in
-this run is that post coming back, and is neither acted on nor
-reported — reporting it hands the session's own comment to the user as
-theirs.
+`[SELF]` marks the account this session posts from. An event on it whose
+body matches something this session posted in this run is that post
+coming back, and is neither acted on nor reported — reporting it hands
+the session's own comment to the user as theirs.
 
 If the user explicitly asks to reply, draft the text, wait for
 approval, then run the command. Resolution stays with the user.

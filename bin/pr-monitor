@@ -25,8 +25,10 @@
 # CHECK covers every check on the head commit, Actions or not, settling
 # on anything but success.
 #
-# `[SELF]` marks the account the monitor authenticates as, which is also
-# the account a reacting session posts from.
+# `[SELF]` marks the account the monitor authenticates as, taken to be
+# the account a reacting session posts from. It is tested before `[BOT]`,
+# so an account GitHub types as a Bot still tags `[SELF]` on its own
+# events and a session never reads its own posts as a bot's.
 
 set -eu
 
@@ -61,8 +63,8 @@ owner="${owner_repo%/*}"
 repo="${owner_repo#*/}"
 
 # The login behind the `[SELF]` tag. An empty `me` (lookup failed) tags
-# nothing `[SELF]`, leaving those events `[USER]` — the path that
-# surfaces them to the user.
+# nothing `[SELF]`, so the session's own posts arrive as `[USER]`:
+# surfaced to the user rather than acted on autonomously.
 me="$(gh api user --jq .login 2>/dev/null || true)"
 
 prev_state=""
@@ -98,8 +100,9 @@ poll_ok() {
 }
 
 # `__typename` on each author is the authoritative Bot/User signal per
-# `pr-reaction.md`. It flows into the event line as a `[BOT]`, `[USER]`,
-# or `[SELF]` prefix on the author label so a reaction turn can classify
+# `pr-reaction.md`, and `author.login` against `me` splits off the
+# monitor's own account. Together they settle the `[SELF]`, `[BOT]`, or
+# `[USER]` prefix on the author label so a reaction turn can classify
 # without re-fetching. For review-thread comments this is a per-comment
 # hint only — the rule still requires walking every comment in the
 # thread before mutating it.
@@ -252,7 +255,7 @@ while true; do
     .data.repository.pullRequest.reviewThreads.nodes[]
     | select(.isResolved == false and .isOutdated == false)
     | .comments.nodes[]
-    | "\(.id)\t\(if .author.__typename == "Bot" then "[BOT]" elif .author.login == $me then "[SELF]" else "[USER]" end) \(.author.login)\t\(.path // "?"):\(.line // "?")"' \
+    | "\(.id)\t\(if .author.login == $me then "[SELF]" elif .author.__typename == "Bot" then "[BOT]" else "[USER]" end) \(.author.login)\t\(.path // "?"):\(.line // "?")"' \
     2>/dev/null || true)"
   emit_new "$fresh_comments" "$seen_comments" "NEW_COMMENT"
 
@@ -270,14 +273,14 @@ while true; do
   fi
   fresh_top="$(echo "$reviews_json" | jq -r --arg me "$me" '
     .data.repository.pullRequest.comments.nodes[]
-    | "\(.id)\t\(if .author.__typename == "Bot" then "[BOT]" elif .author.login == $me then "[SELF]" else "[USER]" end) \(.author.login)"' \
+    | "\(.id)\t\(if .author.login == $me then "[SELF]" elif .author.__typename == "Bot" then "[BOT]" else "[USER]" end) \(.author.login)"' \
     2>/dev/null || true)"
   emit_new "$fresh_top" "$seen_top_comments" "NEW_TOP_COMMENT"
 
   fresh_reviews="$(echo "$reviews_json" | jq -r --arg me "$me" '
     .data.repository.pullRequest.reviews.nodes[]
     | select(.state != "PENDING" and (.body // "") != "")
-    | "\(.id)\t\(if .author.__typename == "Bot" then "[BOT]" elif .author.login == $me then "[SELF]" else "[USER]" end) \(.author.login)\t\(.state)"' \
+    | "\(.id)\t\(if .author.login == $me then "[SELF]" elif .author.__typename == "Bot" then "[BOT]" else "[USER]" end) \(.author.login)\t\(.state)"' \
     2>/dev/null || true)"
   emit_new "$fresh_reviews" "$seen_reviews" "NEW_REVIEW"
 
