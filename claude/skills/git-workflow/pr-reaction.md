@@ -15,8 +15,6 @@ instruction.
 - Bot `NEW_TOP_COMMENT` / `NEW_REVIEW` = event line tag is `[BOT]`
   (derived from GraphQL `author.__typename` in `bin/pr-monitor`; on
   conflict with any other signal, the tag wins).
-- `[SELF]` marks the account `bin/pr-monitor` authenticates as, which is
-  the account this session posts from. Step 4 covers it.
 - Author type is always taken from a live API response
   (`user.type` / `__typename`), never assumed from a login name. The
   same GitHub App can show a different login string per API — e.g.
@@ -90,17 +88,14 @@ gh pr-review threads resolve --thread-id <thread-id> -R <owner>/<repo> <number>
 
 ## Step 4: `[USER]` and `[SELF]` events
 
-For a `[SELF]` event, fetch its body (Step 1's listing for a thread
-comment, the `comments` field for a top-level one) and compare it with
-what this session posted in this run. A match is this session's own post
-returning as an event: take no action and leave it out of the report,
-since reporting it hands the session's own comment to the user as
-theirs. Everything else on `[SELF]` is the user acting from that
-account, and takes the same path as `[USER]` below.
-
 Do not auto-reply or auto-resolve. Surface the content to the user
 (thread id / path / line / body excerpt for threads; body excerpt for
 top-level) and stop.
+
+A `[SELF]` event whose body matches something this session posted in
+this run is that post coming back, and is neither acted on nor
+reported — reporting it hands the session's own comment to the user as
+theirs.
 
 If the user explicitly asks to reply, draft the text, wait for
 approval, then run the command. Resolution stays with the user.
