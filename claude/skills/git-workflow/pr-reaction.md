@@ -7,24 +7,14 @@ How to react to PR events emitted by `bin/pr-monitor`.
 Reply / resolve threads and reply to top-level comments / reviews only
 when the author is a bot. Never touch anything with a human author
 autonomously — summarize to the user and wait for an explicit
-instruction, except the session's own echo below.
+instruction.
 
 - This session's own account is the login `gh api user --jq .login`
-  returns, read once on the first monitor event and compared against
-  `author.login` — an identity check, separate from the author-type
-  rules below. An event authored by it never takes the bot path,
-  whatever its tag.
-  - Where its body is one this session posted verbatim in this run, it
-    is that post coming back: neither acted on nor reported, since
-    reporting presents the session's own post to the user as incoming
-    feedback. The match runs on the body the step for that event type
-    fetches.
-  - Every other event on that login is the user acting, as is one the
-    session cannot match either way.
+  returns, read once on the first monitor event. Events on it are the
+  owner acting on the PR, and the session's own posts coming back.
 - Bot thread = every comment in it has REST `user.type == "Bot"`. Any
-  single `User`-type comment other than the account above flips the
-  thread to the human path — a bot can open a thread that a human later
-  joins.
+  single `User`-type comment flips the thread to the human path — a
+  bot can open a thread that a human later joins.
 - Bot `NEW_TOP_COMMENT` / `NEW_REVIEW` = event line tag is `[BOT]`
   (derived from GraphQL `author.__typename` in `bin/pr-monitor`; on
   conflict with any other signal, the tag wins).
@@ -59,8 +49,7 @@ gh api /repos/<owner>/<repo>/pulls/<number>/comments \
 Walk every comment in each thread to classify per the targeting policy.
 
 `NEW_TOP_COMMENT` / `NEW_REVIEW` skip this step — take the `[BOT|USER]`
-tag and the author login directly from the event line, the login being
-what the targeting policy's own-account check runs on.
+tag directly from the event line.
 
 ## Step 2: React by content
 
@@ -104,8 +93,7 @@ gh pr-review threads resolve --thread-id <thread-id> -R <owner>/<repo> <number>
 
 Do not auto-reply or auto-resolve. Surface the content to the user
 (thread id / path / line / body excerpt for threads; body excerpt for
-top-level) and stop, unless the targeting policy reads the event as this
-session's own echo, which is dropped unsurfaced.
+top-level) and stop.
 
 If the user explicitly asks to reply, draft the text, wait for
 approval, then run the command. Resolution stays with the user.

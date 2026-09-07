@@ -26,8 +26,7 @@
 # on anything but success.
 #
 # Comment and review events carry every author, the one `gh`
-# authenticates as included; `pr-reaction.md` decides what a reacting
-# session does with those.
+# authenticates as included.
 
 set -eu
 
