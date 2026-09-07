@@ -212,7 +212,7 @@ run entered the workflow at this phase.
 
 1. Read [pr-reaction.md](pr-reaction.md) on the first monitor event,
    before any reply, resolve, or push, and react under it — it governs
-   what the `[BOT|USER]` label settles for each event type
+   what the `[BOT|USER|SELF]` label settles for each event type
 
 1. `CHECK`: `gh pr checks` links the failing check. For an Actions job,
    `gh run view --log-failed <databaseId>` from `gh run list` reaches the

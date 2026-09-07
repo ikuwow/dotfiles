@@ -15,6 +15,8 @@ instruction.
 - Bot `NEW_TOP_COMMENT` / `NEW_REVIEW` = event line tag is `[BOT]`
   (derived from GraphQL `author.__typename` in `bin/pr-monitor`; on
   conflict with any other signal, the tag wins).
+- `[SELF]` marks the account `bin/pr-monitor` authenticates as, which is
+  the account this session posts from. Step 4 covers it.
 - Author type is always taken from a live API response
   (`user.type` / `__typename`), never assumed from a login name. The
   same GitHub App can show a different login string per API — e.g.
@@ -45,8 +47,8 @@ gh api /repos/<owner>/<repo>/pulls/<number>/comments \
 
 Walk every comment in each thread to classify per the targeting policy.
 
-`NEW_TOP_COMMENT` / `NEW_REVIEW` skip this step — take the `[BOT|USER]`
-tag directly from the event line.
+`NEW_TOP_COMMENT` / `NEW_REVIEW` skip this step — take the
+`[BOT|USER|SELF]` tag directly from the event line.
 
 ## Step 2: React by content
 
@@ -86,18 +88,15 @@ id from Step 1's `thread_id` field:
 gh pr-review threads resolve --thread-id <thread-id> -R <owner>/<repo> <number>
 ```
 
-## Step 4: `[USER]` events
+## Step 4: `[USER]` and `[SELF]` events
 
-`pr-monitor` emits every author, so a `[USER]` event carrying the login
-this session's `gh` authenticates as is either the user acting on the PR
-or a comment this session posted coming back as an event. Fetch its body
-(Step 1's listing for a thread comment, the `comments` field for a
-top-level one) and compare it with what this session posted in this run.
-On a match, take no action and leave the event out of the report, since
-reporting it hands this session's own comment to the user as theirs.
-Every other `[USER]` event takes the path below, one posted by a
-concurrent session on the same account included — that one reads as the
-user's and no signal on the event separates them.
+For a `[SELF]` event, fetch its body (Step 1's listing for a thread
+comment, the `comments` field for a top-level one) and compare it with
+what this session posted in this run. A match is this session's own post
+returning as an event: take no action and leave it out of the report,
+since reporting it hands the session's own comment to the user as
+theirs. Everything else on `[SELF]` is the user acting from that
+account, and takes the same path as `[USER]` below.
 
 Do not auto-reply or auto-resolve. Surface the content to the user
 (thread id / path / line / body excerpt for threads; body excerpt for
