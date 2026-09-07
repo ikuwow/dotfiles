@@ -9,6 +9,9 @@ when the author is a bot. Never touch anything with a human author
 autonomously — summarize to the user and wait for an explicit
 instruction.
 
+- This session's own account is the login `gh api user --jq .login`
+  returns, read once on the first monitor event. Events on it are the
+  owner acting on the PR, and the session's own posts coming back.
 - Bot thread = every comment in it has REST `user.type == "Bot"`. Any
   single `User`-type comment flips the thread to the human path — a
   bot can open a thread that a human later joins.
@@ -102,8 +105,8 @@ approval, then run the command. Resolution stays with the user.
   when later comments include a human.
 - Posting a top-level `gh pr comment` in place of a review-thread
   reply to bypass the bot-check.
-- Classifying an author from a remembered login string instead of a
-  live `user.type` / `__typename` lookup.
+- Classifying an author's type from a remembered login string instead
+  of a live `user.type` / `__typename` lookup.
 
 ## References
 

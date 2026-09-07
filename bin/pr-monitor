@@ -24,6 +24,9 @@
 #
 # CHECK covers every check on the head commit, Actions or not, settling
 # on anything but success.
+#
+# Comment and review events carry every author, the one `gh`
+# authenticates as included.
 
 set -eu
 
@@ -56,11 +59,6 @@ fi
 owner_repo="$(gh repo view --json nameWithOwner --jq .nameWithOwner)"
 owner="${owner_repo%/*}"
 repo="${owner_repo#*/}"
-
-# The monitor's own account: exclude its own comments so that replies it
-# posts via `gh pr comment` (a step-4 reaction) do not re-emit as fresh
-# events on the next poll. Empty `me` (lookup failed) filters nothing.
-me="$(gh api user --jq .login 2>/dev/null || true)"
 
 prev_state=""
 prev_decision=""
@@ -245,10 +243,10 @@ while true; do
   else
     poll_ok "gh api graphql (threads)"
   fi
-  fresh_comments="$(echo "$threads_json" | jq -r --arg me "$me" '
+  fresh_comments="$(echo "$threads_json" | jq -r '
     .data.repository.pullRequest.reviewThreads.nodes[]
     | select(.isResolved == false and .isOutdated == false)
-    | .comments.nodes[] | select(.author.login != $me)
+    | .comments.nodes[]
     | "\(.id)\t\(if .author.__typename == "Bot" then "[BOT]" else "[USER]" end) \(.author.login)\t\(.path // "?"):\(.line // "?")"' \
     2>/dev/null || true)"
   emit_new "$fresh_comments" "$seen_comments" "NEW_COMMENT"
@@ -265,16 +263,15 @@ while true; do
   else
     poll_ok "gh api graphql (reviews)"
   fi
-  fresh_top="$(echo "$reviews_json" | jq -r --arg me "$me" '
+  fresh_top="$(echo "$reviews_json" | jq -r '
     .data.repository.pullRequest.comments.nodes[]
-    | select(.author.login != $me)
     | "\(.id)\t\(if .author.__typename == "Bot" then "[BOT]" else "[USER]" end) \(.author.login)"' \
     2>/dev/null || true)"
   emit_new "$fresh_top" "$seen_top_comments" "NEW_TOP_COMMENT"
 
-  fresh_reviews="$(echo "$reviews_json" | jq -r --arg me "$me" '
+  fresh_reviews="$(echo "$reviews_json" | jq -r '
     .data.repository.pullRequest.reviews.nodes[]
-    | select(.author.login != $me and .state != "PENDING" and (.body // "") != "")
+    | select(.state != "PENDING" and (.body // "") != "")
     | "\(.id)\t\(if .author.__typename == "Bot" then "[BOT]" else "[USER]" end) \(.author.login)\t\(.state)"' \
     2>/dev/null || true)"
   emit_new "$fresh_reviews" "$seen_reviews" "NEW_REVIEW"
