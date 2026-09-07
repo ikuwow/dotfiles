@@ -25,8 +25,9 @@
 # CHECK covers every check on the head commit, Actions or not, settling
 # on anything but success.
 #
-# Comment and review events carry every author, the account the monitor
-# authenticates as included.
+# Comment and review events carry every author, the one `gh`
+# authenticates as included; `pr-reaction.md` decides what a reacting
+# session does with those.
 
 set -eu
 
