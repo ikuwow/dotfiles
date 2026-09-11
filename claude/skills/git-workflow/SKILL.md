@@ -91,7 +91,7 @@ For a PR the implementer opened, read
 [implementer-dispatch.md](implementer-dispatch.md) first and apply its
 `When it returns` steps, since the body it left is a placeholder.
 
-Then invoke the `create-pull-request` skill, which carries the
+Then invoke the `pr-issue-writing` skill, which carries the
 properties a title and body are judged against and the commands that
 write them. This holds wherever the workflow writes or edits a title or
 body, including the Phase 4 updates.

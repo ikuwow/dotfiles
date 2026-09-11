@@ -1,18 +1,26 @@
-# The properties a PR body holds
+# The properties a PR or issue body holds
 
-Quality criteria for pull requests. Follow these when writing a PR body
-and when self-reviewing your own PR.
+Quality criteria for pull request and issue bodies. Follow these when
+writing a PR or issue body and when self-reviewing your own PR.
 
 A PR body is a summary that helps a reviewer decide, not a complete
 record of the change: everything else lives in the diff, the issue, or
 a linked source. It serves two audiences — the reviewer deciding now,
 and the future reader who reaches this PR from `git log` or blame.
 
-The diff is the default carrier: the body adds what the diff cannot
-state and what a reader would not derive from it. No rule under
+In a PR, the diff is the default carrier: the body adds what the diff
+cannot state and what a reader would not derive from it. No rule under
 Decidable or Scoped is discharged by writing more, and none asks for a
 section the diff's own content would fill. The shortest body that
 leaves a reviewer able to decide is the correct one.
+
+An issue has no diff behind it, so its body is the record itself. Read
+the rules below for an issue with "the change" meaning the problem or
+request the issue raises, and "the reviewer" meaning the reader deciding
+whether and how to act on it. A rule marked `(PR only)` does not apply
+to an issue body. The issue's structure comes from the repository's
+issue template, or from the skill that prescribes the issue's format
+when one does.
 
 A body is ready when it holds all five properties below. Every rule in
 the five property sections belongs to exactly one of them, and within a
@@ -23,17 +31,17 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   what the change is for and where their attention belongs, each item
   carrying one claim at the shortest length that lands it
 - Grounded — every claim is checkable on the evidence the body itself
-  carries, and the body names a verification mechanism for the code
+  carries, and a PR body names a verification mechanism for the code
   paths the diff changes
 - Necessary — read each line of the body for where else its content
   already lives, and the body carries nothing the diff, its commits,
   the PR page or an automation's output carry, states each thing once,
   and takes from a linked source no more than the summary that survives
   the link going dead
-- Scoped — the diff read against the body carries only what the stated
-  intent needs and nothing the body did not lead the reader to expect,
-  and the body conveys the change as a whole: a boundary the reader
-  would not assume, and what it leaves to the parent issue
+- Scoped `(PR only)` — the diff read against the body carries only what
+  the stated intent needs and nothing the body did not lead the reader
+  to expect, and the body conveys the change as a whole: a boundary the
+  reader would not assume, and what it leaves to the parent issue
 - Conformant — the body renders and behaves as intended on GitHub
 
 ## Decidable
@@ -43,16 +51,16 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   could not conclude, the request, the obligation that came due
   - The changed lines are the diff's to show, so the body names the
     change rather than describing it
-- Where a design decision was weighed, the body carries its shape: the
-  approach taken against the approaches rejected, and risks or things a
-  reviewer should watch out for
+- `(PR only)` Where a design decision was weighed, the body carries its
+  shape: the approach taken against the approaches rejected, and risks
+  or things a reviewer should watch out for
   - A change with one obvious approach carries none of this, and
     inventing an alternative to name is itself a defect
   - "Approaches rejected" covers design alternatives weighed for the
     delivered design
-- Where the diff changes something other code reaches — a function
-  signature, a config key, an exit code, a file another script reads —
-  name the invariant it still holds
+- `(PR only)` Where the diff changes something other code reaches — a
+  function signature, a config key, an exit code, a file another script
+  reads — name the invariant it still holds
 - Inverted pyramid — place the most important information first
   - A reviewer reading only the first few lines can tell what kind of
     PR this is and where to focus
@@ -108,25 +116,25 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
 
 ## Grounded
 
-- Attempt every verification within reach before drafting the
-  Verification section: shell commands, API calls, file inspection,
+- `(PR only)` Attempt every verification within reach before drafting
+  the Verification section: shell commands, API calls, file inspection,
   mocked failure modes, simulated missing-config tests
   - Punting a reachable item to "Pending" or "User to verify" violates
     this rule
   - Overstating what is "untestable" is the common failure mode
-- List only items actually verified, each carrying its evidence: a
-  command, output excerpt, exit code, or log line
+- `(PR only)` List only items actually verified, each carrying its
+  evidence: a command, output excerpt, exit code, or log line
   - Evidence carried in a code block or sub-bullet attached to the item
     counts as evidence the item carries
   - When the item covers documentation or prose and no command applies,
     name what it was checked against (the source, the spec, the linked
     issue)
-- Items that genuinely require interactive UI, user-only credentials,
-  target environments unreachable from a shell, or the live session
-  itself must be clearly distinguished with reproduction steps and a
-  one-line reason why the author could not verify them
-- The body names a verification mechanism — CI, manual test steps, or
-  another check — for the code paths the diff changes
+- `(PR only)` Items that genuinely require interactive UI, user-only
+  credentials, target environments unreachable from a shell, or the live
+  session itself must be clearly distinguished with reproduction steps
+  and a one-line reason why the author could not verify them
+- `(PR only)` The body names a verification mechanism — CI, manual test
+  steps, or another check — for the code paths the diff changes
   - The test is whether the body makes that claim
   - Judging how adequate the coverage is belongs to code review
 - A negative or absence claim ("no X remains", "該当なし") shows the
@@ -188,7 +196,7 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   - A line the walk lands on is a finding whether or not a rule below
     names it, and the rules below reach lines answering `nowhere` that
     the walk does not
-- Do not paraphrase the diff
+- `(PR only)` Do not paraphrase the diff
   - Keep out file lists, per-file summaries, figures derived from the
     diff's size such as the percentage of lines removed, and
     enumerations of added rules, linters, settings, constants, or values
@@ -203,16 +211,17 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
     reviewer can open; spelling out what an added rule, definition, or
     table row says is detail, whether quoted, summarized, or given with
     its consequence
-- Keep CI, lint, formatter, type-check, and build / test command
-  results (`go build`, `go test`, `go vet`, `pre-commit`) out of the
-  body
+- `(PR only)` Keep CI, lint, formatter, type-check, and build / test
+  command results (`go build`, `go test`, `go vet`, `pre-commit`) out of
+  the body
   - This holds whether or not the repository's CI runs them
   - Output that CI or another automation posts on the PR itself (build
     status, terraform / CDK plan output, lint and type-check results)
     stays where it was posted, and the body does not restate it
-- Focus on what changes from the user's or system's perspective —
-  behavior changes, new capabilities, removed limitations — rather than
-  on implementation details (resources added, files touched)
+- `(PR only)` Focus on what changes from the user's or system's
+  perspective — behavior changes, new capabilities, removed limitations
+  — rather than on implementation details (resources added, files
+  touched)
 - The body records the delivered design, not the path to it
   - Keep out chronological narration of implementation attempts ("first
     tried X, it failed, so Y") and records of direction changes made
@@ -223,14 +232,17 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   - Keep out rejected alternatives described at implementation-attempt
     granularity, and alternatives a reviewer would not arrive at and
     ask about
+  - In an issue body, the investigation that led to the problem or
+    request is content, and only the references to the session and to
+    plan-mode phases stay out
 - State a fact once
   - The same environment variable name, file name, design decision, or
     summary of a linked source does not appear in two places in the
     body
   - Two bullets in one list saying the same thing in different wording
     are one fact stated twice
-- Each bullet conveys a distinct decision or outcome, not an individual
-  code change
+- `(PR only)` Each bullet conveys a distinct decision or outcome, not an
+  individual code change
 - Rationale, background, or requirements that live elsewhere (issue,
   design doc, ADR, prior PR, official spec) are summarized under a
   link, not copied
@@ -238,11 +250,11 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
     survives the link going dead, naming what this change rests on
     from that source
   - Anything past that shortest summary is duplication
-- When the diff is self-explanatory — documentation or config edits
-  whose changed lines a reviewer can read directly, especially in the
-  team's own language — the body keeps to what the diff cannot convey,
-  and neither Decidable nor Scoped asks for a rationale or boundary
-  beyond that
+- `(PR only)` When the diff is self-explanatory — documentation or
+  config edits whose changed lines a reviewer can read directly,
+  especially in the team's own language — the body keeps to what the
+  diff cannot convey, and neither Decidable nor Scoped asks for a
+  rationale or boundary beyond that
   - When nothing remains to add, one line such as "realigned stale
     wording with the actual code/config" is a complete description
   - Apply this rule before the others in this section, so what it
@@ -256,7 +268,7 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   - Raw length, and the ratio of body size to diff size, are never
     findings on their own
 
-## Scoped
+## Scoped `(PR only)`
 
 - Where the change stops short of what its intent would lead a reader
   to expect, the body says so; a boundary the reader would assume needs
@@ -307,6 +319,8 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   - `- [ ]` carrying a one-line reason marks an author-owed item that
     Grounded exempts as unverifiable by the author
   - Prose statements do not take a checkbox
+  - In an issue body, `- [ ]` also marks a task or acceptance criterion
+    the issue asks for
 - Inside GitHub issues, pull requests, and discussions — bodies and
   comments alike, that is Markdown posted through the GitHub web UI —
   do not hard-wrap paragraphs or list items
@@ -319,7 +333,7 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
     and any other in-repo documentation) follow standard Markdown
     rendering and may be hard-wrapped for file-side readability
 
-## Worked example: a minimal body
+## Worked example: a minimal PR body
 
 A design document gains a retry on one forwarding hop, and the sending
 side's request spec, until then split across two places, is gathered
@@ -340,7 +354,7 @@ the edits carrying it out, and the reviewer reads those in the diff.
 
 ## PR Body Template (fallback)
 
-Use this scaffold when the target repository has no `pull_request_template.md`.
+Use this scaffold for a PR body when the target repository has no `pull_request_template.md`. An issue body does not use it.
 Repository templates always win — do not overlay this on top of one.
 Section names stay English; body language follows the repo (see
 Conformant above). Purpose / Key changes / Verification is the minimum.
