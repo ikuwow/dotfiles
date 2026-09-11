@@ -4,49 +4,53 @@ Criteria for the title and body of a GitHub issue. An issue has no diff
 behind it, so its body is the whole record: a reader who opens it
 decides from the body alone whether and how to act on it.
 
-The repository's issue template, when one exists, sets the sections.
-Otherwise a skill that prescribes the issue's format sets them, and
-failing both, the body follows the order of the first list below.
+The repository's issue template, when one exists, sets the sections and
+their order, and the content below goes into them. Otherwise a skill
+that prescribes the issue's format sets them, and failing both, the
+body carries the content below in the order listed.
 
 ## What the body carries
 
-- Open with the problem or the request in one or two sentences, so the
-  first lines tell a reader what the issue asks for
-- For a problem, give the symptom, the steps that reproduce it, and the
-  expected and actual behavior
-- For a request, give what is wanted and the need behind it
+- State the problem or the request in one or two sentences before the
+  detail that supports it
+- Give what a reader needs to act: what is wrong or wanted, and why it
+  matters
+  - Where the problem reproduces, include the steps and the expected and
+    actual behavior
 - Where the issue asks the reader to choose between approaches, lay out
   each option with its tradeoff
-- Keep the investigation that led to the issue: what was checked, what
+- Where an investigation led to the issue, keep what was checked, what
   it showed, and what remains open
-- Carry the evidence the issue rests on (an error message, a log
-  excerpt, a measurement, reproduction output) in the body, even when a
-  link also holds it, since the link may expire
-- List what closes the issue, its tasks or acceptance criteria, as
-  `- [ ]` items, and tick each one done as `- [x]`
-- Keep references to the chat session and to plan-mode phases out,
-  since a reader of the issue cannot see them
+- Quote the part of the evidence the issue rests on (an error message,
+  a log line, a measurement) in the body, even when a link holds the
+  rest, since the link may expire
+  - Remove credentials and other secrets from what is quoted
+- List what closes the issue, where it is already known, as `- [ ]`
+  items
+- Write every sentence so it reads without the chat session or the plan
+  that produced it, since a reader of the issue has seen neither
 
 ## Grounding
 
-- State a cause not yet established as a hypothesis, with the evidence
-  that points to it
-- Back a claim about how an external tool or service behaves with a
+- A claim about how an external tool or service behaves carries a
   primary source (official documentation, a man page section, `--help`
-  output) or with reproduction output that shows the behavior
+  output) or reproduction output that shows it
+  - Without either, and for any cause not yet established, state it as
+    a hypothesis with the evidence that points to it
 - Show the query and the scope behind a negative or absence claim ("no
   X remains")
-- Check that every URL resolves to the content it is cited for
-- Summarize background that lives elsewhere (another issue, a PR, a
-  design document) under its link, in the shortest form that survives
-  the link going dead
+- Check that every URL the writer can open resolves to the content it
+  is cited for
+- Summarize context that lives elsewhere (another issue, a PR, a design
+  document) under its link, in the shortest form that survives the link
+  going dead
 
 ## Form
 
 - The title is a one-line summary of the problem or request, and issue
   references and other detail go in the body
-- The language follows the target repository: its `CLAUDE.md` or
-  `AGENTS.md` first, otherwise its existing issues
+- The language follows the target repository's own rule when it states
+  one, otherwise its existing issues
 - Write each paragraph and each list item as a single line, with a
   blank line between paragraphs, since GitHub renders a line break
   inside an issue body as a visible break
