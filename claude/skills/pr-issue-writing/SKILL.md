@@ -1,6 +1,6 @@
 ---
 name: pr-issue-writing
-description: Write or edit the title and body of a pull request or an issue, and create either. Carries the five properties a body is judged against (Decidable, Grounded, Necessary, Scoped, Conformant) and which of them an issue body is held to, the PR body template, and the commands for creating a draft PR or an issue and for editing a title or body safely. Invoke before writing a PR or issue title or body, before editing one, and when bringing an existing PR into conformance.
+description: Write or edit the title and body of a pull request or an issue, and create either. Carries the five properties a PR body is judged against (Decidable, Grounded, Necessary, Scoped, Conformant), the criteria an issue body is judged against, the PR body template, and the commands for creating a draft PR or an issue and for editing a title or body safely. Invoke before writing a PR or issue title or body, before editing one, and when bringing an existing PR into conformance.
 ---
 
 # Write a Pull Request or Issue
@@ -8,8 +8,9 @@ description: Write or edit the title and body of a pull request or an issue, and
 Writing or editing the title or body of a PR or an issue runs through
 here.
 
-Read [properties.md](properties.md) for the five properties a body is
-judged against and the template to write into. Invoke the
+For a PR, read [properties.md](properties.md) for the five properties
+its body is judged against and the template to write into. For an
+issue, read [issue-body.md](issue-body.md) instead. Invoke the
 `technical-writing` skill for how the prose itself is built.
 
 Pass a body through `--body-file` and never `--body`, on creation and on
