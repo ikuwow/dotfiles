@@ -2,7 +2,9 @@
 
 Criteria for the title and body of a GitHub issue. An issue has no diff
 behind it, so its body is the whole record: a reader who opens it
-decides from the body alone whether and how to act on it.
+decides from the body alone whether and how to act on it. A security
+vulnerability goes through the repository's private reporting channel
+instead, since an issue may be public.
 
 The repository's issue template, when one exists, sets the sections and
 their order, and the content below goes into them. Otherwise a skill
@@ -24,7 +26,8 @@ body carries the content below in the order listed.
 - Quote the part of the evidence the issue rests on (an error message,
   a log line, a measurement) in the body, even when a link holds the
   rest, since the link may expire
-  - Remove credentials and other secrets from what is quoted
+- Keep credentials, personal data, and customer identifiers out of the
+  body, including what it quotes, since an issue may be public
 - List what closes the issue, where it is already known, as `- [ ]`
   items
 - Write every sentence so it reads without the chat session or the plan
