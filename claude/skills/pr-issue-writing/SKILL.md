@@ -1,15 +1,16 @@
 ---
-name: create-pull-request
-description: Write or edit the title and body of a pull request or an issue, and create a PR. Carries the five properties a PR body is judged against (Decidable, Grounded, Necessary, Scoped, Conformant), the body template, and the commands for creating a draft PR and for editing a PR or issue body safely. Invoke before writing a PR title or body, before editing one, before writing an issue body, and when bringing an existing PR into conformance.
+name: pr-issue-writing
+description: Write or edit the title and body of a pull request or an issue, and create either. Carries the five properties a PR body is judged against (Decidable, Grounded, Necessary, Scoped, Conformant), the criteria an issue body is judged against, the PR body template, and the commands for creating a draft PR or an issue and for editing a title or body safely. Invoke before writing a PR or issue title or body, before editing one, and when bringing an existing PR into conformance.
 ---
 
-# Create a Pull Request
+# Write a Pull Request or Issue
 
-Writing a PR title or body, editing one, and writing an issue body all
-run through here.
+Writing or editing the title or body of a PR or an issue runs through
+here.
 
-Read [properties.md](properties.md) for the five properties a body is
-judged against and the template to write into. Invoke the
+For a PR, read [properties.md](properties.md) for the five properties
+its body is judged against and the template to write into. For an
+issue, read [issue-body.md](issue-body.md) instead. Invoke the
 `technical-writing` skill for how the prose itself is built.
 
 Pass a body through `--body-file` and never `--body`, on creation and on
@@ -33,6 +34,17 @@ The branch exists, carries the commits, and is pushed before this runs.
    `gh pr create --draft --body-file <body file path>`
 1. Display the PR URL: `gh pr view --json url --jq '.url'`
 
+## Create an issue
+
+1. Write the body to a fresh file under the session scratchpad
+   directory using the Write tool, a new filename per revision. Do not
+   generate a temp filename, and do not Read a file that does not exist
+   yet
+   - Follow the repository's issue template when one exists
+1. Create the issue:
+   `gh issue create --title '...' --body-file <body file path>`
+1. Display the issue URL, which `gh issue create` prints to stdout
+
 ## Update an existing title or body
 
 Summarize the change in the assistant message body before either edit
@@ -40,6 +52,7 @@ below, as a short list of what is being added, removed, or reworded
 rather than the full before-and-after.
 
 - Update a title: `gh pr edit <number> --title '...'`
+  (`gh issue edit <number> --title '...'` for an issue)
 - Update a body:
   1. Fetch the current one:
      `gh pr view <number> --json body --jq .body`

@@ -44,6 +44,6 @@ NOT restate the detailed procedures from the skill.
 
 ## PR / issue body edits
 
-- Invoke `Skill(create-pull-request)` before writing or editing a PR or
+- Invoke `Skill(pr-issue-writing)` before writing or editing a PR or
   issue title or body, including a `gh pr edit` / `gh issue edit` run
   outside the git workflow
