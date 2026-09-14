@@ -10,8 +10,7 @@ This skill brings a session to a state where ending it loses nothing the
 user needs. Reading runs on its own. Every write this skill proposes,
 local ones included, runs only after the user selects it, since one
 wrap-up can touch several repositories and PRs and the user approves
-exactly the operations and text they were shown. The retro-note append
-in Step 5 runs under retro-note's own contract.
+exactly the operations and text they were shown.
 
 ## Step 1: Inventory
 
@@ -97,17 +96,10 @@ changed), stop it and every selected proposal that needs it, and carry
 them to the report with the steps that already ran, rather than running
 a version the user did not see.
 
-## Step 5: Retro note
-
-When retro-note has not recorded a note in this session yet, invoke the
-`retro-note` skill. When it already has, use that earlier result in the
-report instead, since each invocation appends another record.
-
-## Step 6: Report
+## Step 5: Report
 
 1. Open with the verdict
    - Safe to end: every selected proposal ran
    - Items remain: a selected proposal failed or was stopped in Step 4
-1. Give the retro-note result (finding count and path) in one line
 1. For each declined, failed, or stopped proposal, write one line naming where its item now lives: a PR or issue URL, a place that exists only on this machine (uncommitted changes, a stash entry, or an unpushed branch, with its repository), or what ending the session stops or discards
 1. Give the count of items already safe to leave
