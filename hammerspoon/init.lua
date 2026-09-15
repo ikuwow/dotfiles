@@ -67,3 +67,33 @@ sleepWatcher = hs.caffeinate.watcher.new(function(eventType)
   end
 end)
 sleepWatcher:start()
+
+-- The HHKB swaps Esc and `. hidutil sets the swap as a UserKeyMapping on the
+-- HID service of the device matching the vendor and product ID, so other
+-- keyboards keep their layout. macOS drops the mapping along with the service
+-- when the HHKB is unplugged and on restart, so it is applied when this config
+-- loads and again each time the HHKB is plugged in.
+
+local HHKB_VENDOR_ID = 0x0853
+local HHKB_PRODUCT_ID = 0x0100
+
+-- Keyboard usage page 7: 0x29 is Escape, 0x35 is the ` and ~ key.
+local HHKB_KEY_MAPPING = '{"UserKeyMapping":['
+  .. '{"HIDKeyboardModifierMappingSrc":0x700000029,"HIDKeyboardModifierMappingDst":0x700000035},'
+  .. '{"HIDKeyboardModifierMappingSrc":0x700000035,"HIDKeyboardModifierMappingDst":0x700000029}'
+  .. ']}'
+
+local function applyHHKBKeyMapping()
+  local matching = string.format('{"VendorID":%d,"ProductID":%d}', HHKB_VENDOR_ID, HHKB_PRODUCT_ID)
+  hs.execute("/usr/bin/hidutil property --matching '" .. matching .. "' --set '" .. HHKB_KEY_MAPPING .. "'")
+end
+
+-- Global for the same __gc reason as the watchers above.
+hhkbUsbWatcher = hs.usb.watcher.new(function(device)
+  if device.eventType == "added" and device.vendorID == HHKB_VENDOR_ID and device.productID == HHKB_PRODUCT_ID then
+    hhkbMappingTimer = hs.timer.doAfter(1, applyHHKBKeyMapping)
+  end
+end)
+hhkbUsbWatcher:start()
+
+applyHHKBKeyMapping()
