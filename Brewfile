@@ -26,7 +26,6 @@ cask "ghostty"
 cask "font-noto-sans-mono-cjk-jp"
 cask "istat-menus"
 cask "rambox"
-mas "Barbee", id: 1548711022
 mas "WireGuard", id: 1451685025
 brew "udp2raw-multiplatform"
 brew "bash"
