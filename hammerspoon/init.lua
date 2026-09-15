@@ -90,7 +90,7 @@ end
 
 hhkbUsbWatcher = hs.usb.watcher.new(function(device)
   if device.eventType == "added" and device.vendorID == HHKB_VENDOR_ID and device.productID == HHKB_PRODUCT_ID then
-    -- The 1-second delay is one a replug worked with, not a measured minimum.
+    -- The 1-second delay is not a measured minimum.
     hhkbMappingTimer = hs.timer.doAfter(1, applyHHKBKeyMapping)
   end
 end)
