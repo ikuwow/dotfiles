@@ -112,8 +112,9 @@ keyword match — it can be wrong, including on turns that are
 legitimately waiting on you or the user, or that already stated a reason to
 defer.
 
-Judge your own turn: if you committed to doing something, do it now. If
-nothing is left to do — the work is done, it waits on something, or it was
-never needed — end this turn without writing any text.
+Judge your own turn: if you committed to doing something, do it now. If the
+work is already done or waits on something, end this turn without writing
+any text. If you are dropping work you said you would do, say so in one
+sentence.
 REASON_END
 exit 2
