@@ -108,7 +108,7 @@ brew "ccat"
 brew "ghq"
 brew "fzf"
 brew "percona-toolkit"
-brew "noti"
+brew "noti" # https://codeberg.org/roble/noti (the GitHub repo is archived only because the project moved here)
 brew "pre-commit"
 brew "act"
 brew "tfmigrate"
