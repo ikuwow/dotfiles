@@ -409,6 +409,17 @@
         ]
       }
     ],
+    "Notification": [
+      {
+        "matcher": "permission_prompt|idle_prompt|elicitation_dialog|elicitation_url_dialog",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "f=~/.claude/hooks/notify.sh; if [ -f \"$f\" ]; then bash \"$f\"; fi"
+          }
+        ]
+      }
+    ],
     "Stop": [
       {
         "matcher": "",
@@ -495,6 +506,7 @@
   "skipWorkflowUsageWarning": true,
   "theme": "auto",
   "remoteControlAtStartup": true,
+  "preferredNotifChannel": "notifications_disabled",
   "inputNeededNotifEnabled": true,
   "agentPushNotifEnabled": true,
   "skipAutoPermissionPrompt": true,
