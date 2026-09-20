@@ -60,8 +60,9 @@ command, it belongs in this class. Sorting such an item into a proposal
 costs the user a decision to buy back state they can recreate, so the
 doubtful local cleanup runs and appears in the report.
 
-- Local branches whose content the default branch already holds, and the worktrees attached to them, removed by `git cleanup` in the repository this session worked in
+- Local branches whose content the default branch already holds, and the worktrees attached to them, removed by `git cleanup` run from the root worktree of each repository this session worked in
   - `git cleanup` decides each branch on its own content, deletes none while the working tree has uncommitted changes, and leaves a worktree it cannot remove without `--force`, so the run needs no per-branch gate from this skill
+  - It starts by checking out the default branch, which fails inside a linked worktree and, in the root worktree, moves the session off the branch it was on, so the report names the switch alongside the branches removed
 - A background shell, Monitor, subagent, session cron, or artifact watch this session started whose result the session has already reported
 
 Everything else is a proposal: a write to a repository or to GitHub, a
