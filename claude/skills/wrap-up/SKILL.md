@@ -124,7 +124,7 @@ a version the user did not see.
 
 1. Open with the verdict
    - Safe to end: the routine cleanup and every selected proposal ran
-   - Items remain: a cleanup operation or a selected proposal failed or was stopped in Step 4
+   - Items remain: a cleanup operation failed in Step 2, or a selected proposal failed or was stopped in Step 4
 1. List the routine cleanup that ran, one line per operation
 1. For each declined, failed, or stopped item, write one line naming where it now lives: a PR or issue URL, a place that exists only on this machine (uncommitted changes, a stash entry, or an unpushed branch, with its repository), or what ending the session stops or discards
 1. Give the count of items already safe to leave
