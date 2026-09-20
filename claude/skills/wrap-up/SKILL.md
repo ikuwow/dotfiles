@@ -56,16 +56,19 @@ appearing in Step 3, because a user asked to approve the removal of
 state that is already preserved has nothing to decide.
 
 - A worktree with no uncommitted changes whose branch is merged, removed with `git worktree remove <path>`
-- A local branch whose PR is merged, deleted with `git branch -D <branch>`, after switching to the default branch when the branch is checked out
+- A local branch whose PR is merged and whose commits a remote-tracking ref all contain, deleted with `git branch -D <branch>`, after switching to the default branch when the branch is checked out
+  - The Step 1 listing of local-branch commits no remote-tracking ref contains settles that condition, which `-D` itself does not check
   - The deletion names that branch, because `git cleanup` deletes every merged, squash-merged, or upstream-gone branch in the repository, beyond the branches this session's items name
 - A background shell, Monitor, subagent, session cron, or artifact watch this session started whose result the session has already reported
 
 Everything else is a proposal: a write to a repository or to GitHub, a
 removal of content held nowhere else (uncommitted changes, a stash
 entry, an unpushed commit, a finding that lives only in scratchpad
-content), and an operation on state another session created.
+content), and an operation on state another session created. A branch or
+worktree a proposal names as its target stays out of the cleanup, so the
+proposal still finds the state it was drafted against.
 
-- Each proposal names the operation (commit, push, create an issue, comment on a PR, stop a task, delete a branch, and so on)
+- Each proposal names the operation (commit, push, create an issue, comment on a PR, stop a task whose result is recorded nowhere, delete a branch whose PR is not merged, and so on)
 - Each proposal names its target: the repository, branch, and PR or issue number
 - A write that carries text includes the full draft of that text (title, body, comment, commit message)
 - A proposal that needs another to run first names that proposal, as a push names the commit it pushes
@@ -90,7 +93,7 @@ Local git proposals keep to what the session changed.
 
 ## Step 3: Select
 
-When there are no proposals, go to Step 5.
+When there are no proposals, go to Step 4, which still has the routine cleanup to run.
 
 1. Show every proposal in the conversation, numbered, with its draft in full
 1. Ask with AskUserQuestion, multiSelect, with each option labeled by its proposal number
