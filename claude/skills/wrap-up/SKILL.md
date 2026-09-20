@@ -26,7 +26,7 @@ tool-based listing when this session lacks that tool.
   - `git worktree list`
   - the current branch
 - PRs this session created or updated
-  - `gh pr view <number> --repo <owner>/<repo> --json state,isDraft,statusCheckRollup,reviewDecision`
+  - `gh pr view <number> --repo <owner>/<repo> --json state,isDraft,statusCheckRollup,reviewDecision,headRefOid`
   - unresolved review threads, listed by `gh pr-review review view -R <owner>/<repo> <number> --unresolved --not_outdated`
 - Work that runs only while this session is open
   - background shells, Monitors, and subagents this session started, identified from its own `run_in_background`, Monitor, and Agent calls
@@ -55,9 +55,14 @@ exists somewhere the user can still reach. It runs in Step 4 without
 appearing in Step 3, because a user asked to approve the removal of
 state that is already preserved has nothing to decide.
 
+Where the worst case of a local cleanup is that the user reruns a
+command, it belongs in this class. Sorting such an item into a proposal
+costs the user a decision to buy back state they can recreate, so the
+doubtful local cleanup runs and appears in the report.
+
 - A worktree with no uncommitted changes whose branch is merged, removed with `git worktree remove <path>`
-- A local branch whose PR is merged and whose commits a remote-tracking ref all contain, deleted with `git branch -D <branch>`, after switching to the default branch when the branch is checked out
-  - The Step 1 listing of local-branch commits no remote-tracking ref contains settles that condition, which `-D` itself does not check
+- A local branch whose PR is merged and whose head is the commit that PR merged, deleted with `git branch -D <branch>`, after switching to the default branch when the branch is checked out
+  - `git rev-parse <branch>` equal to the PR's `headRefOid` settles that condition, and holds whichever merge method the repository uses, since GitHub carries the content of the commit it names into the base branch
   - The deletion names that branch, because `git cleanup` deletes every merged, squash-merged, or upstream-gone branch in the repository, beyond the branches this session's items name
 - A background shell, Monitor, subagent, session cron, or artifact watch this session started whose result the session has already reported
 
@@ -77,6 +82,9 @@ A record goes where a later reader will look for it.
 
 - A fact about a PR's change goes in that PR's body when it changes what the reviewer decides, and in a comment on the PR otherwise
 - Unfinished work and investigation results not tied to a PR go in a comment on the open issue already tracking that work, or else in a new issue in the repository the work belongs to
+  - A defect this session introduced, in a change of its own already merged, is proposed as the fix: a branch, the edit, and a commit, ending there, with the edit and the commit message as the proposal's draft
+    - That proposal's question offers the issue as its other option, so a declined fix still leaves the defect recorded
+    - An issue carries the defect on its own when the session cannot fix it that way
 - Findings from scratchpad content are written into the issue or PR itself
   - A file path is not a record, because nobody looks in a place they do not remember
 
