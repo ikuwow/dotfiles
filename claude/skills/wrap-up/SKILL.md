@@ -1,16 +1,16 @@
 ---
 name: wrap-up
-description: Take stock of a session before it ends (unfinished work, state that ending the session discards, and findings recorded nowhere), propose the follow-up actions, run only the ones the user selects, and report whether the session is safe to end.
-disable-model-invocation: true
+description: Take stock of a session before it ends (unfinished work, state that ending the session discards, and findings recorded nowhere), clear the routine cleanup, propose the writes the user decides on, and report whether the session is safe to end. Trigger when the user signals that the session or the task is over ("終わり", "done", "これで完了", "おつかれ"), when they ask what is left before quitting, and when they invoke /wrap-up.
 ---
 
 # Wrap Up
 
 This skill brings a session to a state where ending it loses nothing the
-user needs. Reading runs on its own. Every write this skill proposes,
-local ones included, runs only after the user selects it, since one
-wrap-up can touch several repositories and PRs and the user approves
-exactly the operations and text they were shown.
+user needs. Reading and routine cleanup run on their own. A write the
+user decides on runs only after they select it, since one wrap-up can
+touch several repositories and PRs and the user approves exactly the
+operations and text they were shown. Step 2 draws the line between the
+two.
 
 ## Step 1: Inventory
 
@@ -43,11 +43,27 @@ list only those this session made. Another concurrent session may share
 the working tree and the stash, and committing its edits would ship them
 under this session's intent.
 
-## Step 2: Propose
+## Step 2: Sort into cleanup and proposals
 
-Turn each item that needs action into one proposal, and run nothing in
-this step. An item already safe to leave (pushed, recorded in an issue
-or PR, or finished) gets no proposal and is counted in the report.
+Sort each item that needs action into routine cleanup or a proposal, and
+run nothing in this step. An item already safe to leave (pushed,
+recorded in an issue or PR, or finished) gets neither and is counted in
+the report.
+
+Routine cleanup removes local state this session created whose content
+exists somewhere the user can still reach. It runs in Step 4 without
+appearing in Step 3, because a user asked to approve the removal of
+state that is already preserved has nothing to decide.
+
+- A worktree with no uncommitted changes whose branch is merged, removed with `git worktree remove <path>`
+- A local branch whose PR is merged, deleted with `git branch -D <branch>`, after switching to the default branch when the branch is checked out
+  - The deletion names that branch, because `git cleanup` deletes every merged, squash-merged, or upstream-gone branch in the repository, beyond the branches this session's items name
+- A background shell, Monitor, subagent, session cron, or artifact watch this session started whose result the session has already reported
+
+Everything else is a proposal: a write to a repository or to GitHub, a
+removal of content held nowhere else (uncommitted changes, a stash
+entry, an unpushed commit, a finding that lives only in scratchpad
+content), and an operation on state another session created.
 
 - Each proposal names the operation (commit, push, create an issue, comment on a PR, stop a task, delete a branch, and so on)
 - Each proposal names its target: the repository, branch, and PR or issue number
@@ -71,8 +87,6 @@ Local git proposals keep to what the session changed.
 
 - A commit proposal names the exact paths it stages, and stages them by path rather than with `git add -A` or `git commit -a`, so another session's changes stay out of it
 - Uncommitted changes on the default branch get a proposal to create a branch and commit there
-- A local branch whose PR is merged gets a proposal to delete that branch with `git branch -D <branch>`, after switching to the default branch when the branch is checked out
-  - `git cleanup` is not proposed, because it deletes every merged, squash-merged, or upstream-gone branch in the repository, beyond the branch the proposal names
 
 ## Step 3: Select
 
@@ -87,19 +101,21 @@ When there are no proposals, go to Step 5.
 
 ## Step 4: Execute
 
-Run the selected proposals as drafted. Each proposal ends at the last
-operation it names, so a commit proposal stops at the commit, without a
-push, a PR, or a CI watch that no selected proposal names.
+Run the routine cleanup from Step 2, then the selected proposals as
+drafted. Each proposal ends at the last operation it names, so a commit
+proposal stops at the commit, without a push, a PR, or a CI watch that
+no selected proposal names.
 
-When a proposal cannot run as shown (a command fails, or the target has
-changed), stop it and every selected proposal that needs it, and carry
-them to the report with the steps that already ran, rather than running
-a version the user did not see.
+When a cleanup operation or a proposal cannot run as shown (a command
+fails, or the target has changed), stop it and every selected proposal
+that needs it, and carry them to the report with the steps that already
+ran, rather than running a version the user did not see.
 
 ## Step 5: Report
 
 1. Open with the verdict
-   - Safe to end: every selected proposal ran
-   - Items remain: a selected proposal failed or was stopped in Step 4
-1. For each declined, failed, or stopped proposal, write one line naming where its item now lives: a PR or issue URL, a place that exists only on this machine (uncommitted changes, a stash entry, or an unpushed branch, with its repository), or what ending the session stops or discards
+   - Safe to end: the routine cleanup and every selected proposal ran
+   - Items remain: a cleanup operation or a selected proposal failed or was stopped in Step 4
+1. List the routine cleanup that ran, one line per operation
+1. For each declined, failed, or stopped item, write one line naming where it now lives: a PR or issue URL, a place that exists only on this machine (uncommitted changes, a stash entry, or an unpushed branch, with its repository), or what ending the session stops or discards
 1. Give the count of items already safe to leave
