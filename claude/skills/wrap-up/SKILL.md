@@ -26,7 +26,7 @@ tool-based listing when this session lacks that tool.
   - `git worktree list`
   - the current branch
 - PRs this session created or updated
-  - `gh pr view <number> --repo <owner>/<repo> --json state,isDraft,statusCheckRollup,reviewDecision,headRefOid`
+  - `gh pr view <number> --repo <owner>/<repo> --json state,isDraft,statusCheckRollup,reviewDecision`
   - unresolved review threads, listed by `gh pr-review review view -R <owner>/<repo> <number> --unresolved --not_outdated`
 - Work that runs only while this session is open
   - background shells, Monitors, and subagents this session started, identified from its own `run_in_background`, Monitor, and Agent calls
@@ -45,33 +45,33 @@ under this session's intent.
 
 ## Step 2: Sort into cleanup and proposals
 
-Sort each item that needs action into routine cleanup or a proposal, and
-run nothing in this step. An item already safe to leave (pushed,
-recorded in an issue or PR, or finished) gets neither and is counted in
-the report.
+Sort each item that needs action into routine cleanup or a proposal. An
+item already safe to leave (pushed, recorded in an issue or PR, or
+finished) gets neither and is counted in the report.
 
-Routine cleanup removes local state this session created whose content
-exists somewhere the user can still reach. It runs in Step 4 without
-appearing in Step 3, because a user asked to approve the removal of
-state that is already preserved has nothing to decide.
+Routine cleanup removes local state whose content exists somewhere the
+user can still reach. Run each cleanup operation here, as it is sorted,
+and carry the result to the report. Naming one before the selection
+would put it in front of the user as something to read and weigh, which
+is the cost this class exists to remove.
 
 Where the worst case of a local cleanup is that the user reruns a
 command, it belongs in this class. Sorting such an item into a proposal
 costs the user a decision to buy back state they can recreate, so the
 doubtful local cleanup runs and appears in the report.
 
-- A worktree with no uncommitted changes whose branch is merged, removed with `git worktree remove <path>`
-- A local branch whose PR is merged and whose head is the commit that PR merged, deleted with `git branch -D <branch>`, after switching to the default branch when the branch is checked out
-  - `git rev-parse <branch>` equal to the PR's `headRefOid` settles that condition, and holds whichever merge method the repository uses, since GitHub carries the content of the commit it names into the base branch
-  - The deletion names that branch, because `git cleanup` deletes every merged, squash-merged, or upstream-gone branch in the repository, beyond the branches this session's items name
+- Local branches whose content the default branch already holds, and the worktrees attached to them, removed by `git cleanup` run from the root worktree of each repository this session worked in
+  - `git cleanup` decides each branch on its own content, deletes none while the working tree has uncommitted changes, and leaves a worktree it cannot remove without `--force`, so the run needs no per-branch gate from this skill
+  - It starts by checking out the default branch, which fails inside a linked worktree and, in the root worktree, moves the session off the branch it was on, so the report names the switch alongside the branches removed
 - A background shell, Monitor, subagent, session cron, or artifact watch this session started whose result the session has already reported
 
 Everything else is a proposal: a write to a repository or to GitHub, a
 removal of content held nowhere else (uncommitted changes, a stash
 entry, an unpushed commit, a finding that lives only in scratchpad
-content), and an operation on state another session created. A branch or
-worktree a proposal names as its target stays out of the cleanup, so the
-proposal still finds the state it was drafted against.
+content), and an operation on state another session created. A proposal
+that holds local state keeps it: `git cleanup` deletes nothing while the
+working tree is dirty, and it spares a branch whose content the default
+branch lacks.
 
 - Each proposal names the operation (commit, push, create an issue, comment on a PR, stop a task whose result is recorded nowhere, delete a branch whose PR is not merged, and so on)
 - Each proposal names its target: the repository, branch, and PR or issue number
@@ -101,7 +101,7 @@ Local git proposals keep to what the session changed.
 
 ## Step 3: Select
 
-When there are no proposals, go to Step 4, which still has the routine cleanup to run.
+When there are no proposals, go to Step 5, where the cleanup Step 2 already ran is reported.
 
 1. Show every proposal in the conversation, numbered, with its draft in full
 1. Ask with AskUserQuestion, multiSelect, with each option labeled by its proposal number
@@ -112,21 +112,20 @@ When there are no proposals, go to Step 4, which still has the routine cleanup t
 
 ## Step 4: Execute
 
-Run the routine cleanup from Step 2, then the selected proposals as
-drafted. Each proposal ends at the last operation it names, so a commit
-proposal stops at the commit, without a push, a PR, or a CI watch that
-no selected proposal names.
+Run the selected proposals as drafted. Each proposal ends at the last
+operation it names, so a commit proposal stops at the commit, without a
+push, a PR, or a CI watch that no selected proposal names.
 
-When a cleanup operation or a proposal cannot run as shown (a command
-fails, or the target has changed), stop it and every selected proposal
-that needs it, and carry them to the report with the steps that already
-ran, rather than running a version the user did not see.
+When a proposal cannot run as shown (a command fails, or the target has
+changed), stop it and every selected proposal that needs it, and carry
+them to the report with the steps that already ran, rather than running
+a version the user did not see.
 
 ## Step 5: Report
 
 1. Open with the verdict
    - Safe to end: the routine cleanup and every selected proposal ran
-   - Items remain: a cleanup operation or a selected proposal failed or was stopped in Step 4
+   - Items remain: a cleanup operation failed in Step 2, or a selected proposal failed or was stopped in Step 4
 1. List the routine cleanup that ran, one line per operation
 1. For each declined, failed, or stopped item, write one line naming where it now lives: a PR or issue URL, a place that exists only on this machine (uncommitted changes, a stash entry, or an unpushed branch, with its repository), or what ending the session stops or discards
 1. Give the count of items already safe to leave
