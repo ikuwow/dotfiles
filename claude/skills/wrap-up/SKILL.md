@@ -63,7 +63,6 @@ doubtful local cleanup runs and appears in the report.
 - A worktree with no uncommitted changes whose branch is merged, removed with `git worktree remove <path>`
 - A local branch whose PR is merged and whose head is the commit that PR merged, deleted with `git branch -D <branch>`, after switching to the default branch when the branch is checked out
   - `git rev-parse <branch>` equal to the PR's `headRefOid` settles that condition, and holds whichever merge method the repository uses, since GitHub carries the content of the commit it names into the base branch
-  - A remote-tracking ref containing the commits does not settle it: a squash merge rewrites them into one commit under a new hash, and merging deletes the remote branch that held the originals
   - The deletion names that branch, because `git cleanup` deletes every merged, squash-merged, or upstream-gone branch in the repository, beyond the branches this session's items name
 - A background shell, Monitor, subagent, session cron, or artifact watch this session started whose result the session has already reported
 
@@ -83,7 +82,9 @@ A record goes where a later reader will look for it.
 
 - A fact about a PR's change goes in that PR's body when it changes what the reviewer decides, and in a comment on the PR otherwise
 - Unfinished work and investigation results not tied to a PR go in a comment on the open issue already tracking that work, or else in a new issue in the repository the work belongs to
-  - A defect this session introduced, in a change of its own already merged, is proposed as the fix itself under the `git-workflow` skill, and an issue carries only what the session cannot fix that way
+  - A defect this session introduced, in a change of its own already merged, is proposed as the fix: a branch, the edit, and a commit, ending there, with the edit and the commit message as the proposal's draft
+    - That proposal's question offers the issue as its other option, so a declined fix still leaves the defect recorded
+    - An issue carries the defect on its own when the session cannot fix it that way
 - Findings from scratchpad content are written into the issue or PR itself
   - A file path is not a record, because nobody looks in a place they do not remember
 
