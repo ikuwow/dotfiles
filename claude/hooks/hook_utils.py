@@ -8,15 +8,19 @@ import sys
 
 _SEPARATOR_RE = re.compile(r"&&|\|\||;|\||&|\n")
 _ENV_ASSIGN_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*=")
+_ENV_VALUE_FLAGS = {"-u", "--unset", "-C", "--chdir", "-S", "--split-string"}
 
 
 def split_outside_quotes(command: str) -> list[str]:
     """Split by shell separators, ignoring separators inside quotes.
 
-    Bash line continuation ``\\`` + newline outside quotes is collapsed
-    before splitting so a multi-line ``aws logs start-query \\<NL> ...``
-    still lands in one segment.
+    Bash line continuation ``\\`` + newline outside single quotes is
+    dropped, so a multi-line ``aws logs start-query \\<NL> ...`` stays in
+    one segment. A backslash outside quotes escapes the next character,
+    so ``\\'`` does not open a single-quoted string.
 
+    >>> split_outside_quotes("echo it\\\\'s; ssh host")
+    ["echo it\\\\'s", ' ssh host']
     >>> split_outside_quotes("aws logs start-query | jq .")
     ['aws logs start-query ', ' jq .']
     >>> split_outside_quotes("echo 'aws logs start-query | jq .'")
@@ -35,7 +39,7 @@ def split_outside_quotes(command: str) -> list[str]:
         if ch == "\\" and not in_single and i + 1 < len(command) and command[i + 1] == "\n":
             i += 2
             continue
-        if ch == "\\" and in_double and i + 1 < len(command):
+        if ch == "\\" and not in_single and i + 1 < len(command):
             current.append(ch)
             current.append(command[i + 1])
             i += 2
@@ -66,9 +70,14 @@ def split_outside_quotes(command: str) -> list[str]:
 def drop_env_prefix(tokens: list[str]) -> list[str]:
     """Strip leading ``KEY=VALUE`` assignments and an optional ``env`` wrapper.
 
+    The ``env`` wrapper's own options (``-i``, ``-u NAME``, ...) are
+    skipped along with the assignments that follow it.
+
     >>> drop_env_prefix(["A=1", "B=2", "aws", "s3", "ls"])
     ['aws', 's3', 'ls']
     >>> drop_env_prefix(["env", "A=1", "aws"])
+    ['aws']
+    >>> drop_env_prefix(["env", "-i", "-u", "HOME", "A=1", "aws"])
     ['aws']
     """
     i = 0
@@ -76,8 +85,10 @@ def drop_env_prefix(tokens: list[str]) -> list[str]:
         i += 1
     if i < len(tokens) and tokens[i] == "env":
         i += 1
-        while i < len(tokens) and _ENV_ASSIGN_RE.match(tokens[i]):
-            i += 1
+        while i < len(tokens) and (
+            tokens[i].startswith("-") or _ENV_ASSIGN_RE.match(tokens[i])
+        ):
+            i += 2 if tokens[i] in _ENV_VALUE_FLAGS else 1
     return tokens[i:]
 
 
