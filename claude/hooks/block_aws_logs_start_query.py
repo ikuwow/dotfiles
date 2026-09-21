@@ -19,10 +19,12 @@ and subcommand ``start-query``.
 Spec: https://code.claude.com/docs/en/hooks
 """
 import json
+import re
 import shlex
 import sys
 
-from hook_utils import drop_env_prefix, split_outside_quotes
+_SEPARATOR_RE = re.compile(r"&&|\|\||;|\||&|\n")
+_ENV_ASSIGN_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*=")
 
 _AWS_GLOBAL_VALUE_FLAGS = {
     "--profile",
@@ -46,6 +48,71 @@ REASON = (
     "can scan large volumes of log data and are billed by scanned "
     "bytes. If genuinely needed, ask the user to run it directly."
 )
+
+
+def _split_outside_quotes(command: str) -> list[str]:
+    """Split by shell separators, ignoring separators inside quotes.
+
+    Bash line continuation ``\\`` + newline outside quotes is collapsed
+    before splitting so a multi-line ``aws logs start-query \\<NL> ...``
+    still lands in one segment.
+
+    >>> _split_outside_quotes("aws logs start-query | jq .")
+    ['aws logs start-query ', ' jq .']
+    >>> _split_outside_quotes("echo 'aws logs start-query | jq .'")
+    ["echo 'aws logs start-query | jq .'"]
+    >>> _split_outside_quotes("foo && aws logs start-query")
+    ['foo ', ' aws logs start-query']
+    >>> _split_outside_quotes("aws logs start-query \\\\\\n  --foo bar")
+    ['aws logs start-query   --foo bar']
+    """
+    segments: list[str] = []
+    current: list[str] = []
+    in_single = in_double = False
+    i = 0
+    while i < len(command):
+        ch = command[i]
+        if ch == "\\" and not in_single and i + 1 < len(command) and command[i + 1] == "\n":
+            i += 2
+            continue
+        if ch == "\\" and in_double and i + 1 < len(command):
+            current.append(ch)
+            current.append(command[i + 1])
+            i += 2
+            continue
+        if ch == "'" and not in_double:
+            in_single = not in_single
+            current.append(ch)
+            i += 1
+            continue
+        if ch == '"' and not in_single:
+            in_double = not in_double
+            current.append(ch)
+            i += 1
+            continue
+        if not in_single and not in_double:
+            m = _SEPARATOR_RE.match(command, i)
+            if m:
+                segments.append("".join(current))
+                current = []
+                i = m.end()
+                continue
+        current.append(ch)
+        i += 1
+    segments.append("".join(current))
+    return segments
+
+
+def _drop_env_prefix(tokens: list[str]) -> list[str]:
+    """Strip leading ``KEY=VALUE`` assignments and an optional ``env`` wrapper."""
+    i = 0
+    while i < len(tokens) and _ENV_ASSIGN_RE.match(tokens[i]):
+        i += 1
+    if i < len(tokens) and tokens[i] == "env":
+        i += 1
+        while i < len(tokens) and _ENV_ASSIGN_RE.match(tokens[i]):
+            i += 1
+    return tokens[i:]
 
 
 def _is_aws(tok: str) -> bool:
@@ -75,7 +142,7 @@ def _segment_blocks(segment: str) -> bool:
         tokens = shlex.split(segment, comments=False, posix=True)
     except ValueError:
         return False
-    tokens = drop_env_prefix(tokens)
+    tokens = _drop_env_prefix(tokens)
     if not tokens or not _is_aws(tokens[0]):
         return False
     i = _next_positional(tokens, 1)
@@ -160,7 +227,7 @@ def blocks(command: str) -> bool:
     >>> blocks("aws logs help")
     False
     """
-    for segment in split_outside_quotes(command):
+    for segment in _split_outside_quotes(command):
         if _segment_blocks(segment):
             return True
     return False
