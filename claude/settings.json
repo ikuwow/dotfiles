@@ -350,6 +350,10 @@
           },
           {
             "type": "command",
+            "command": "f=~/.claude/hooks/block_ssh.py; if [ -f \"$f\" ] && command -v python3 >/dev/null; then python3 \"$f\"; fi"
+          },
+          {
+            "type": "command",
             "command": "f=~/.claude/hooks/show_pr_edit_diff.py; if [ -f \"$f\" ] && command -v python3 >/dev/null; then python3 \"$f\"; fi"
           }
         ]
