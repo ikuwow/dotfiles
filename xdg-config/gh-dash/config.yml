@@ -21,8 +21,8 @@ prSections:
     filters: is:open -is:draft author:@me review:approved
   - title: Draft
     filters: is:open author:@me is:draft
-  # Everything not yet approved, including changes_requested and PRs in
-  # repos without required reviews, which review:required never matches.
+  # Matches every PR not yet approved, including changes_requested and
+  # PRs in repos without required reviews.
   - title: Waiting on review
     filters: is:open -is:draft author:@me -review:approved
   - title: Assigned
