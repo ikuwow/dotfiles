@@ -19,7 +19,8 @@ EFFORT=$(echo "$INPUT" | jq -r '.effort.level // ""')
 CONTEXT_PCT=$(echo "$INPUT" | jq -r '.context_window.used_percentage // 0')
 LINES_ADDED=$(echo "$INPUT" | jq -r '.cost.total_lines_added // 0')
 LINES_REMOVED=$(echo "$INPUT" | jq -r '.cost.total_lines_removed // 0')
-# used_percentage is a float; round it for the integer comparisons below.
+# used_percentage may be fractional (e.g. 23.5); round it for the -ge
+# comparisons in color_for_pct.
 FIVE_HOUR_PCT=$(echo "$INPUT" | jq -r '.rate_limits.five_hour.used_percentage // empty | round')
 FIVE_HOUR_RESETS_AT=$(echo "$INPUT" | jq -r '.rate_limits.five_hour.resets_at // empty')
 
@@ -52,8 +53,9 @@ if [ -n "$EFFORT" ]; then
   EFFORT_SEG="⚡ ${EFFORT_COLOR}${EFFORT}${RESET}${SEP}"
 fi
 
-# rate_limits is present only for claude.ai subscribers and only after the
-# session's first API response; drop the segment until it arrives.
+# rate_limits.five_hour is present only for claude.ai Pro/Max subscribers,
+# only after the session's first API response, and is dropped once its
+# resets_at passes; omit the segment whenever it is absent.
 RATE_SEG=""
 if [ -n "$FIVE_HOUR_PCT" ]; then
   RATE_COLOR=$(color_for_pct "$FIVE_HOUR_PCT")
