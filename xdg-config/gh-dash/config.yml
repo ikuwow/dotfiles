@@ -10,8 +10,8 @@ repoPaths:
 # repos). Toggle per-section scoping to the current repo with `t`.
 smartFilteringAtLaunch: false
 
-# PR sections follow the categories on https://github.com/pulls/inbox
-# so incoming review requests and merge-ready PRs are visible at a glance.
+# PR sections follow the categories on https://github.com/pulls/inbox,
+# with changes-requested PRs folded into Waiting on review, so incoming review requests and merge-ready PRs are visible at a glance.
 prSections:
   # Drafts are included: code owners are never auto-requested while a PR
   # is a draft, so a request here is one someone added explicitly.
@@ -19,12 +19,13 @@ prSections:
     filters: is:open review-requested:@me
   - title: Ready to merge
     filters: is:open -is:draft author:@me review:approved
-  - title: Returned to you
-    filters: is:open author:@me review:changes_requested
   - title: Draft
     filters: is:open author:@me is:draft
+  # The complement of Ready to merge: every non-draft PR of mine not yet
+  # approved, including changes_requested and repos without required
+  # reviews. Keep the two filters in step so each PR lands in one section.
   - title: Waiting on review
-    filters: is:open -is:draft author:@me review:required
+    filters: is:open -is:draft author:@me -review:approved
   - title: Assigned
     filters: is:open assignee:@me
   - title: Mentioned
