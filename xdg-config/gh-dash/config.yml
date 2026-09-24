@@ -19,12 +19,12 @@ prSections:
     filters: is:open review-requested:@me
   - title: Ready to merge
     filters: is:open -is:draft author:@me review:approved
-  - title: Returned to you
-    filters: is:open author:@me review:changes_requested
   - title: Draft
     filters: is:open author:@me is:draft
+  # Everything not yet approved, including changes_requested and PRs in
+  # repos without required reviews, which review:required never matches.
   - title: Waiting on review
-    filters: is:open -is:draft author:@me review:required
+    filters: is:open -is:draft author:@me -review:approved
   - title: Assigned
     filters: is:open assignee:@me
   - title: Mentioned
