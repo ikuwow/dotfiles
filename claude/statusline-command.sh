@@ -16,10 +16,13 @@ INPUT=$(cat)
 
 MODEL=$(echo "$INPUT" | jq -r '.model.display_name // "Unknown"')
 EFFORT=$(echo "$INPUT" | jq -r '.effort.level // ""')
-THINKING=$(echo "$INPUT" | jq -r '.thinking.enabled // false')
 CONTEXT_PCT=$(echo "$INPUT" | jq -r '.context_window.used_percentage // 0')
 LINES_ADDED=$(echo "$INPUT" | jq -r '.cost.total_lines_added // 0')
 LINES_REMOVED=$(echo "$INPUT" | jq -r '.cost.total_lines_removed // 0')
+# used_percentage may be fractional (e.g. 23.5); round it for the -ge
+# comparisons in color_for_pct.
+FIVE_HOUR_PCT=$(echo "$INPUT" | jq -r '.rate_limits.five_hour.used_percentage // empty | round')
+FIVE_HOUR_RESETS_AT=$(echo "$INPUT" | jq -r '.rate_limits.five_hour.resets_at // empty')
 
 color_for_pct() {
   local pct=$1
@@ -50,12 +53,21 @@ if [ -n "$EFFORT" ]; then
   EFFORT_SEG="⚡ ${EFFORT_COLOR}${EFFORT}${RESET}${SEP}"
 fi
 
-if [ "$THINKING" = "true" ]; then
-  THINKING_SEG="🧠 ${GREEN}on${RESET}${SEP}"
-else
-  THINKING_SEG="🧠 ${GREY}off${RESET}${SEP}"
+# rate_limits.five_hour is present only for claude.ai Pro/Max subscribers,
+# only after the session's first API response, and is dropped once its
+# resets_at passes; omit the segment whenever it is absent.
+RATE_SEG=""
+if [ -n "$FIVE_HOUR_PCT" ]; then
+  RATE_COLOR=$(color_for_pct "$FIVE_HOUR_PCT")
+  RATE_SEG="⏳ ${RATE_COLOR}${FIVE_HOUR_PCT}%${RESET}"
+  if [ -n "$FIVE_HOUR_RESETS_AT" ]; then
+    # BSD date takes -r <epoch>; GNU date takes -d @<epoch>.
+    RESETS_HM=$(date -r "$FIVE_HOUR_RESETS_AT" +%H:%M 2>/dev/null || date -d "@$FIVE_HOUR_RESETS_AT" +%H:%M)
+    RATE_SEG="${RATE_SEG} (→${RESETS_HM})"
+  fi
+  RATE_SEG="${RATE_SEG}${SEP}"
 fi
 
-# Line 1: model, effort, thinking, context, lines changed
+# Line 1: model, effort, context, 5-hour rate limit, lines changed
 CTX_COLOR=$(color_for_pct "$CONTEXT_PCT")
-printf '%b' "🤖 ${MODEL}${SEP}${EFFORT_SEG}${THINKING_SEG}📊 ${CTX_COLOR}${CONTEXT_PCT}%${RESET}${SEP}✏️ +${LINES_ADDED}/-${LINES_REMOVED}${SEP}\n"
+printf '%b' "🤖 ${MODEL}${SEP}${EFFORT_SEG}📊 ${CTX_COLOR}${CONTEXT_PCT}%${RESET}${SEP}${RATE_SEG}✏️ +${LINES_ADDED}/-${LINES_REMOVED}${SEP}\n"
