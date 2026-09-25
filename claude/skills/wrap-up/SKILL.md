@@ -83,7 +83,7 @@ A record goes where a later reader will look for it.
 - A fact about a PR's change goes in that PR's body when it changes what the reviewer decides, and in a comment on the PR otherwise
 - Unfinished work and investigation results not tied to a PR go in a comment on the open issue already tracking that work, or else in a new issue in the repository the work belongs to
   - A defect this session introduced, in a change of its own already merged, is proposed as the fix: a branch, the edit, and a commit, ending there, with the edit and the commit message as the proposal's draft
-    - That proposal's question offers the issue as its other option, so a declined fix still leaves the defect recorded
+    - The selection offers the issue as that proposal's alternative, so a declined fix still leaves the defect recorded
     - An issue carries the defect on its own when the session cannot fix it that way
 - Findings from scratchpad content are written into the issue or PR itself
   - A file path is not a record, because nobody looks in a place they do not remember
@@ -104,11 +104,10 @@ Local git proposals keep to what the session changed.
 When there are no proposals, go to Step 5, where the cleanup Step 2 already ran is reported.
 
 1. Show every proposal in the conversation, numbered, with its draft in full
-1. Ask with AskUserQuestion, multiSelect, with each option labeled by its proposal number
-   - Each question takes 2 to 4 options and each call 1 to 4 questions, so group the proposals 2 to 4 per question (5 as 3 and 2), using further calls past 4 questions
-   - Ask a single proposal as a single-select question with the options run and skip
-1. Treat an unselected proposal as declined
-   - When a free-text answer changes a draft or asks for another operation, show the revised proposals and ask again before Step 4
+1. Ask for the selection at the end of that same message, in plain text that names the proposal numbers (run 1, run 2, run all, run none), and end the turn there
+   - Text sent in the same turn as an AskUserQuestion call can fail to reach the user, so the selection is taken from the user's reply instead
+1. Treat a proposal the reply does not name as declined
+   - When the reply changes a draft or asks for another operation, show the revised proposals and ask again before Step 4
 
 ## Step 4: Execute
 
