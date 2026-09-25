@@ -83,7 +83,7 @@ A record goes where a later reader will look for it.
 - A fact about a PR's change goes in that PR's body when it changes what the reviewer decides, and in a comment on the PR otherwise
 - Unfinished work and investigation results not tied to a PR go in a comment on the open issue already tracking that work, or else in a new issue in the repository the work belongs to
   - A defect this session introduced, in a change of its own already merged, is proposed as the fix: a branch, the edit, and a commit, ending there, with the edit and the commit message as the proposal's draft
-    - The selection offers the issue as that proposal's alternative, so a declined fix still leaves the defect recorded
+    - The issue is shown with its draft as that proposal's alternative, the pair numbered as one-of-two (3a fix, 3b issue, with "run all" taking the fix), so a declined fix can still leave the defect recorded
     - An issue carries the defect on its own when the session cannot fix it that way
 - Findings from scratchpad content are written into the issue or PR itself
   - A file path is not a record, because nobody looks in a place they do not remember
@@ -106,7 +106,8 @@ When there are no proposals, go to Step 5, where the cleanup Step 2 already ran 
 1. Show every proposal in the conversation, numbered, with its draft in full
 1. Ask for the selection at the end of that same message, in plain text that names the proposal numbers (run 1, run 2, run all, run none), and end the turn there
    - Text sent in the same turn as an AskUserQuestion call can fail to reach the user, so the selection is taken from the user's reply instead
-1. Treat a proposal the reply does not name as declined
+1. Run exactly the proposals the reply selects, and treat every other proposal as declined
+   - When the reply neither clearly selects nor clearly declines (an "ok", or a question), ask again rather than guess
    - When the reply changes a draft or asks for another operation, show the revised proposals and ask again before Step 4
 
 ## Step 4: Execute
