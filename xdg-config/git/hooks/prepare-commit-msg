@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# AI-draft a commit message via the Anthropic Messages API. No-op unless
-# GIT_AI_COMMIT_ANTHROPIC_API_KEY is set; any API failure propagates
-# under set -eu so git aborts the commit. See README.md.
+# AI-draft a commit message via `claude -p`, authenticated by the Claude
+# Code login. No-op when the claude CLI is not on PATH; any CLI failure
+# propagates under set -eu so git aborts the commit. See README.md.
 
 set -eu
 
@@ -11,8 +11,8 @@ MSG_SOURCE="${2:-}"
 # Skip non-interactive commits (-m, --amend, merge, squash, template).
 if [ -n "$MSG_SOURCE" ]; then exit 0; fi
 if [ "${GIT_AI_COMMIT_MSG:-1}" = "0" ]; then exit 0; fi
-if [ -z "${GIT_AI_COMMIT_ANTHROPIC_API_KEY:-}" ]; then
-  echo "prepare-commit-msg: GIT_AI_COMMIT_ANTHROPIC_API_KEY not set, skipping AI draft" >&2
+if ! command -v claude >/dev/null 2>&1; then
+  echo "prepare-commit-msg: claude CLI not found, skipping AI draft" >&2
   exit 0
 fi
 
@@ -46,27 +46,42 @@ USER_CONTENT="$PROMPT
 $DIFF
 --- end diff ---"
 
-MODEL="claude-haiku-4-5"
-echo "prepare-commit-msg: drafting commit message via Anthropic API ($MODEL)..." >&2
+MODEL="haiku"
+echo "prepare-commit-msg: drafting commit message via claude -p ($MODEL)..." >&2
 
-REQUEST=$(jq -n \
-  --arg model "$MODEL" \
-  --argjson max_tokens 1024 \
-  --arg system "$SYSTEM_PROMPT" \
-  --arg user "$USER_CONTENT" \
-  '{model:$model, max_tokens:$max_tokens, system:$system, messages:[{role:"user", content:$user}]}')
+# The flags and env vars below strip what a one-shot draft does not
+# need, to cut latency: tools, MCP, plugins, hooks, CLAUDE.md, skills,
+# the session file, background traffic, and extended thinking, which
+# on a commit-sized diff multiplied output tokens about twentyfold.
+# Settings files are skipped as well, since their language setting
+# would override the commit language the prompt asks for.
+# claude -p prints its errors (e.g. an expired login) to stdout, so a
+# failure echoes the captured output before aborting the commit.
+MSG=$(printf '%s' "$USER_CONTENT" | \
+  CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
+  DISABLE_TELEMETRY=1 \
+  DISABLE_ERROR_REPORTING=1 \
+  DISABLE_AUTOUPDATER=1 \
+  CLAUDE_CODE_DISABLE_THINKING=1 \
+  timeout 60 claude -p \
+    --model "$MODEL" \
+    --effort low \
+    --system-prompt "$SYSTEM_PROMPT" \
+    --safe-mode \
+    --setting-sources "" \
+    --tools "" \
+    --strict-mcp-config \
+    --disable-slash-commands \
+    --no-session-persistence \
+    --output-format text) || {
+  printf 'prepare-commit-msg: claude -p failed (exit %s): %s\n' "$?" "$MSG" >&2
+  exit 1
+}
 
-RESP=$(printf '%s' "$REQUEST" | curl --silent --show-error --fail-with-body \
-  --max-time 8 --connect-timeout 3 \
-  -X POST https://api.anthropic.com/v1/messages \
-  -H "x-api-key: $GIT_AI_COMMIT_ANTHROPIC_API_KEY" \
-  -H "anthropic-version: 2023-06-01" \
-  -H "content-type: application/json" \
-  --data-binary @-)
-
-# -er instead of -r: a null/missing field exits non-zero so set -eu kills
-# the hook instead of writing "null" to the commit buffer.
-MSG=$(printf '%s' "$RESP" | jq -er '.content[0].text')
+if [ -z "$MSG" ]; then
+  echo "prepare-commit-msg: claude -p returned an empty message" >&2
+  exit 1
+fi
 
 # Strip a single layer of wrapping quotes/backticks — Haiku occasionally wraps output.
 FIRST=$(printf '%s\n' "$MSG" | head -n 1)
