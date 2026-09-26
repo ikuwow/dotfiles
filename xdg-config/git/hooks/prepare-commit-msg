@@ -49,13 +49,15 @@ $DIFF
 MODEL="haiku"
 echo "prepare-commit-msg: drafting commit message via claude -p ($MODEL)..." >&2
 
-# Every flag and env var below trims startup work or prompt size: no
-# tools, MCP, plugins, hooks, CLAUDE.md, settings files (their language
-# setting would override the repo's commit language), skills, session
-# file, background traffic, or extended thinking (which otherwise spends
-# thousands of output tokens on a short message). Running from TMPDIR keeps the repo's
-# git status out of the system prompt.
-MSG=$(cd "${TMPDIR:-/tmp}" && printf '%s' "$USER_CONTENT" | \
+# The flags and env vars below strip what a one-shot draft does not
+# need, to cut latency: tools, MCP, plugins, hooks, CLAUDE.md, skills,
+# the session file, background traffic, and extended thinking, which
+# on a commit-sized diff multiplied output tokens about twentyfold.
+# Settings files are skipped as well, since their language setting
+# would override the commit language the prompt asks for.
+# claude -p prints its errors (e.g. an expired login) to stdout, so a
+# failure echoes the captured output before aborting the commit.
+MSG=$(printf '%s' "$USER_CONTENT" | \
   CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
   DISABLE_TELEMETRY=1 \
   DISABLE_ERROR_REPORTING=1 \
@@ -71,7 +73,10 @@ MSG=$(cd "${TMPDIR:-/tmp}" && printf '%s' "$USER_CONTENT" | \
     --strict-mcp-config \
     --disable-slash-commands \
     --no-session-persistence \
-    --output-format text)
+    --output-format text) || {
+  printf 'prepare-commit-msg: claude -p failed (exit %s): %s\n' "$?" "$MSG" >&2
+  exit 1
+}
 
 if [ -z "$MSG" ]; then
   echo "prepare-commit-msg: claude -p returned an empty message" >&2
