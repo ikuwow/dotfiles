@@ -278,7 +278,8 @@
       "Read(**/id_rsa)",
       "Read(**/id_ed25519)",
       "Read(**/kubeconfig)",
-      "Read(**/serviceAccount.json)"
+      "Read(**/serviceAccount.json)",
+      "Read(~/.bash_profile.local)"
     ],
     "ask": [
       "Bash(git rebase *)",
