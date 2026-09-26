@@ -98,7 +98,7 @@ dotfiles/
 
 ### AI-Assisted Commit Messages
 
-`xdg-config/git/hooks/prepare-commit-msg` drafts a commit message via the Anthropic Messages API when `git commit` opens the editor. Set `GIT_AI_COMMIT_ANTHROPIC_API_KEY` to enable; the hook is a no-op without it. Per-repo opt-in via `install-aimsg-hook.sh`. Disable per-invocation with `GIT_AI_COMMIT_MSG=0 git commit`. See the hook script for the model and requirements.
+`xdg-config/git/hooks/prepare-commit-msg` drafts a commit message via `claude -p` when `git commit` opens the editor, using the Claude Code login for authentication. The hook is a no-op when the `claude` CLI is not on PATH. Per-repo opt-in via `install-aimsg-hook.sh`. Disable per-invocation with `GIT_AI_COMMIT_MSG=0 git commit`. See the hook script for the model and requirements.
 
 ### Machine-Local Overrides
 
