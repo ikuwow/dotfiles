@@ -20,7 +20,10 @@ Invoke the `retro-note` skill first, so that its record carries the
 branch and PR the session worked on before Step 2's `git cleanup`
 switches branches. retro-note decides which findings exist, their
 severity, and the record it appends. Each `high` finding it lists goes
-into the inventory for Step 2.
+into the inventory for Step 2. When retro-note already appended a
+record in this session, take the `high` findings it listed then instead
+of invoking it again, since a second record would count the same
+findings twice in retro-review.
 
 Collect the other items with read-only commands and from the conversation. Skip a
 source whose precondition is absent: the git checks when the session
@@ -100,8 +103,9 @@ A `high` finding from retro-note is proposed as a fix to the rule,
 skill, or hook that should have prevented it, paired with an issue as
 one-of-two in the same way as a defect above.
 
-- The fix takes its edit text and same-decision enumeration from the `rule-edit` skill in this step, and names its operations through a draft PR: a branch, the edit, a commit, a push, and `gh pr create --draft`
+- The fix takes its edit text, checked against rule-edit's criteria, and its same-decision enumeration from the `rule-edit` skill in this step, and names its operations through a draft PR: a branch, the edit, a commit, a push, and `gh pr create --draft`
   - The file edit and the git and PR commands run in Step 4, for a selected proposal
+  - When the enumeration finds a contradicting statement, the draft names that statement and which of the two it keeps, so the user settles it in Step 3's selection rather than in a question of its own
   - It ends at a draft PR so that the fix is in review before the next session can repeat the failure
 - When rule-edit concludes that no rule, skill, or hook change applies, propose the issue alone
 - The target repository is `ikuwow/dotfiles` for a global rule or skill, and the session's repository for that project's own rule file
