@@ -101,8 +101,8 @@ settle in conversation before any edit is written.
 
 - A session with none says nothing about failures, and a slip the session corrected on its own stays out, since a stretched finding costs the user a read and a decision
 - Describe each one in a few lines: what happened, the risk it carries, and the directions a fix could take
-- Its one proposal is an issue carrying that description, so that a session ended before the conversation still keeps the failure on record
-- The issue goes to `ikuwow/dotfiles` with the `retrospective` label when the fix would land in a global rule or skill, and to the session's repository without a label when it would land in that project's own rule file
+- Its one proposal is an issue whose body is that description, so that a session ended before the conversation still keeps the failure on record
+- The issue goes to the session's repository without a label when every direction lands in that project's own rule file, and to `ikuwow/dotfiles` with the `retrospective` label otherwise
 - Text for `ikuwow/dotfiles`, a public repository, describes the failure by its behavior pattern and leaves out private repository names, their PR and issue numbers, their code, and quoted text from their rule files
 
 Draft issue and PR titles and bodies against the `pr-issue-writing`
@@ -120,12 +120,14 @@ Local git proposals keep to what the session changed.
 
 When there are no proposals, go to Step 5, where the cleanup Step 2 already ran is reported.
 
-1. Show every proposal in the conversation, numbered, with its draft in full, after the description of each serious failure
+1. Show every proposal in the conversation, numbered, with its draft in full
+   - A serious failure's description comes directly before its issue proposal, which shows its title and points to the description as its body, so the user reads the text once
 1. Ask for the selection at the end of that same message, in plain text that names the proposal numbers (run 1, run 2, run all, run none), and end the turn there
    - Text sent in the same turn as an AskUserQuestion call can fail to reach the user, so the selection is taken from the user's reply instead
 1. Run exactly the proposals the reply selects, and treat every other proposal as declined
    - When the reply neither clearly selects nor clearly declines (an "ok", or a question), ask again rather than guess
    - When the reply changes a draft or asks for another operation, show the revised proposals and ask again before Step 4
+   - When the reply takes up the direction of a fix for a serious failure, answer it as conversation, and ask for the selection again once that conversation settles, since the proposals stay open until then
 
 ## Step 4: Execute
 
