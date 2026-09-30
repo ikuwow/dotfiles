@@ -1,6 +1,6 @@
 ---
 name: wrap-up
-description: Take stock of a session before it ends (unfinished work, state that ending the session discards, and findings recorded nowhere), clear the routine cleanup, propose the writes the user decides on, and report whether the session is safe to end. Trigger when the user signals that the session or the task is over ("終わり", "done", "これで完了", "おつかれ"), when they ask what is left before quitting, and when they invoke /wrap-up.
+description: Take stock of a session before it ends (unfinished work, state that ending the session discards, and findings recorded nowhere), log the session's AI mistakes through retro-note and propose a fix for each serious one, clear the routine cleanup, propose the writes the user decides on, and report whether the session is safe to end. Trigger when the user signals that the session or the task is over ("終わり", "done", "これで完了", "おつかれ"), when they ask what is left before quitting, and when they invoke /wrap-up.
 ---
 
 # Wrap Up
@@ -14,7 +14,13 @@ two.
 
 ## Step 1: Inventory
 
-Collect items with read-only commands and from the conversation. Skip a
+Invoke the `retro-note` skill first, so that its record carries the
+branch and PR the session worked on before Step 2's `git cleanup`
+switches branches. retro-note decides which findings exist, their
+severity, and the record it appends. Each `high` finding it lists goes
+into the inventory for Step 2.
+
+Collect the remaining items with read-only commands and from the conversation. Skip a
 source whose precondition is absent: the git checks when the session
 worked in no git repository, the PR checks when it touched no PR, and a
 tool-based listing when this session lacks that tool.
@@ -88,6 +94,17 @@ A record goes where a later reader will look for it.
 - Findings from scratchpad content are written into the issue or PR itself
   - A file path is not a record, because nobody looks in a place they do not remember
 
+A `high` finding from retro-note is proposed as a fix to the rule,
+skill, or hook that should have prevented it, paired with an issue as
+one-of-two in the same way as a defect above.
+
+- The fix invokes the `rule-edit` skill to draft the edit and its same-decision enumeration, and names its operations through a draft PR: a branch, the edit, a commit, a push, and `gh pr create --draft`
+  - It reaches a draft PR, rather than stopping at the commit as a defect fix does, so that the fix is in review before the next session can repeat the failure
+- The target repository is `ikuwow/dotfiles` for a global rule or skill, and the session's repository for that project's own rule file
+- The issue goes to `ikuwow/dotfiles` with the `retrospective` label for a global target, and to the session's repository without a label for a project target
+- Text for `ikuwow/dotfiles`, a public repository, describes the failure by its behavior pattern and leaves out private repository names, their PR and issue numbers, their code, and quoted text from their rule files
+- The retro-note record stays as appended whichever is chosen, since retro-review measures recurrence from it
+
 Draft issue and PR titles and bodies against the `pr-issue-writing`
 skill, and comments, commit message bodies, and other prose longer than
 a sentence with the `technical-writing` skill. This step takes only
@@ -126,6 +143,7 @@ a version the user did not see.
 1. Open with the verdict
    - Safe to end: the routine cleanup and every selected proposal ran
    - Items remain: a cleanup operation failed in Step 2, or a selected proposal failed or was stopped in Step 4
+1. Give the path retro-note appended its record to
 1. List the routine cleanup that ran, one line per operation
 1. For each declined, failed, or stopped item, write one line naming where it now lives: a PR or issue URL, a place that exists only on this machine (uncommitted changes, a stash entry, or an unpushed branch, with its repository), or what ending the session stops or discards
 1. Give the count of items already safe to leave

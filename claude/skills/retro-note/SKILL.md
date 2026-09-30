@@ -1,6 +1,6 @@
 ---
 name: retro-note
-description: Use for a lightweight, shallow log of AI-mistake analysis appended to a per-project jsonl file. TRIGGER automatically, without asking for confirmation, when the user declares the task complete or the session over ("終わり", "done", "これで完了" etc.), or when the user invokes /retro-note directly. Invoke /retrospective explicitly instead when a deep dive is warranted.
+description: Use for a lightweight, shallow log of AI-mistake analysis appended to a per-project jsonl file. TRIGGER when the wrap-up skill invokes it as part of ending a session, or when the user invokes /retro-note directly. Invoke /retrospective explicitly instead when a deep dive is warranted.
 ---
 
 # Retro Note
@@ -155,5 +155,9 @@ Report to the user in one short sentence:
 retro-note recorded N findings to <path>
 ```
 
-Do not use AskUserQuestion. Do not elaborate on individual findings in
-chat — the detail lives in the jsonl record for later batch review.
+Then list each `high` finding on its own line with its `behavior`,
+`root`, and `feedback_target`, so that a serious failure can be acted
+on before the session ends. Keep `medium` and `low` findings out of chat;
+their detail lives in the jsonl record for later batch review.
+
+Do not use AskUserQuestion.
