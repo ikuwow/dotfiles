@@ -69,7 +69,8 @@ doubtful local cleanup runs and appears in the report.
 
 - Local branches whose content the default branch already holds, and the worktrees attached to them, removed by `git home` and then `git cleanup`, run from the root worktree of each repository this session worked in
   - `git cleanup` judges each branch against the local default branch without fetching, so `git home` pulls first; otherwise a branch merged on GitHub since the last pull survives, and the default branch is checked out at its pre-merge commit
-  - Skip both while the working tree has uncommitted changes, since `git home` would carry them onto the default branch
+  - Skip both while the working tree has uncommitted changes, since the switch in `git home` would carry them onto the default branch, and report the skip as a line rather than as a failed cleanup
+  - When `git home` fails (no remote, offline, a diverged default branch), run `git cleanup` anyway and report the failed pull, since branches the local default branch already holds are still safe to remove
   - `git cleanup` decides each branch on its own content, deletes none while the working tree has uncommitted changes, and leaves a worktree it cannot remove without `--force`, so the run needs no per-branch gate from this skill
   - `git home` switches to the default branch, which fails inside a linked worktree and, in the root worktree, moves the session off the branch it was on, so the report names the switch alongside the branches removed
 - A background shell, Monitor, subagent, session cron, or artifact watch this session started whose result the session has already reported

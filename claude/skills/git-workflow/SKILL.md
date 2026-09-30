@@ -242,4 +242,9 @@ After the PR is merged (or the task is fully done):
    `cd <repository root>`
 1. Run `git home`, so that the local default branch holds the merge;
    `git cleanup` judges branches against it without fetching.
+   - Skip this step and the next while the working tree has uncommitted
+     changes, since the switch in `git home` would carry them onto the
+     default branch, and say that cleanup was skipped
+   - When `git home` fails, still run the next step and report the
+     failed pull
 1. Run `git cleanup` once.
