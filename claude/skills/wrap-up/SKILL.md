@@ -6,7 +6,9 @@ description: Take stock of a session before it ends (unfinished work, state that
 # Wrap Up
 
 This skill brings a session to a state where ending it loses nothing the
-user needs. Reading and routine cleanup run on their own. A write the
+user needs. Reading, the retro-note log append, and routine cleanup run
+on their own, the log being a machine-local file that only retro-review
+reads. A write the
 user decides on runs only after they select it, since one wrap-up can
 touch several repositories and PRs and the user approves exactly the
 operations and text they were shown. Step 2 draws the line between the
@@ -20,7 +22,7 @@ switches branches. retro-note decides which findings exist, their
 severity, and the record it appends. Each `high` finding it lists goes
 into the inventory for Step 2.
 
-Collect the remaining items with read-only commands and from the conversation. Skip a
+Collect the other items with read-only commands and from the conversation. Skip a
 source whose precondition is absent: the git checks when the session
 worked in no git repository, the PR checks when it touched no PR, and a
 tool-based listing when this session lacks that tool.
@@ -98,8 +100,10 @@ A `high` finding from retro-note is proposed as a fix to the rule,
 skill, or hook that should have prevented it, paired with an issue as
 one-of-two in the same way as a defect above.
 
-- The fix invokes the `rule-edit` skill to draft the edit and its same-decision enumeration, and names its operations through a draft PR: a branch, the edit, a commit, a push, and `gh pr create --draft`
-  - It reaches a draft PR, rather than stopping at the commit as a defect fix does, so that the fix is in review before the next session can repeat the failure
+- The fix takes its edit text and same-decision enumeration from the `rule-edit` skill in this step, and names its operations through a draft PR: a branch, the edit, a commit, a push, and `gh pr create --draft`
+  - The file edit and the git and PR commands run in Step 4, for a selected proposal
+  - It ends at a draft PR so that the fix is in review before the next session can repeat the failure
+- When rule-edit concludes that no rule, skill, or hook change applies, propose the issue alone
 - The target repository is `ikuwow/dotfiles` for a global rule or skill, and the session's repository for that project's own rule file
 - The issue goes to `ikuwow/dotfiles` with the `retrospective` label for a global target, and to the session's repository without a label for a project target
 - Text for `ikuwow/dotfiles`, a public repository, describes the failure by its behavior pattern and leaves out private repository names, their PR and issue numbers, their code, and quoted text from their rule files
