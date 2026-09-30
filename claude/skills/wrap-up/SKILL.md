@@ -1,12 +1,14 @@
 ---
 name: wrap-up
-description: Take stock of a session before it ends (unfinished work, state that ending the session discards, and findings recorded nowhere), clear the routine cleanup, propose the writes the user decides on, and report whether the session is safe to end. Trigger when the user signals that the session or the task is over ("終わり", "done", "これで完了", "おつかれ"), when they ask what is left before quitting, and when they invoke /wrap-up.
+description: Take stock of a session before it ends (unfinished work, state that ending the session discards, and findings recorded nowhere), log the session through retro-note, propose a fix for each serious failure in how the agent worked, clear the routine cleanup, propose the writes the user decides on, and report whether the session is safe to end. Trigger when the user signals that the session or the task is over ("終わり", "done", "これで完了", "おつかれ"), when they ask what is left before quitting, and when they invoke /wrap-up.
 ---
 
 # Wrap Up
 
 This skill brings a session to a state where ending it loses nothing the
-user needs. Reading and routine cleanup run on their own. A write the
+user needs. Reading, invoking retro-note, and routine cleanup run on
+their own, since retro-note writes to no repository or GitHub, the
+targets Step 2 holds for the user's selection. A write the
 user decides on runs only after they select it, since one wrap-up can
 touch several repositories and PRs and the user approves exactly the
 operations and text they were shown. Step 2 draws the line between the
@@ -14,7 +16,11 @@ two.
 
 ## Step 1: Inventory
 
-Collect items with read-only commands and from the conversation. Skip a
+Invoke the `retro-note` skill first, so that it sees the session before
+this skill changes any local state. Skip it when retro-note already ran in this session, since a
+second run would log the same session twice.
+
+Collect the other items with read-only commands and from the conversation. Skip a
 source whose precondition is absent: the git checks when the session
 worked in no git repository, the PR checks when it touched no PR, and a
 tool-based listing when this session lacks that tool.
@@ -36,6 +42,7 @@ tool-based listing when this session lacks that tool.
   - work the session said it would do and did not start
   - questions put to the user that have no answer yet
   - decisions and investigation results that no repository file, issue, or PR holds
+  - serious failures in how the agent worked this session: a wrong claim, action, or rule break that reached the user or a persisted artifact, and that a change to a rule, skill, or hook could keep the next session from repeating
 - Findings that exist only in scratchpad content
 
 Attribute each uncommitted change and stash entry before listing it, and
@@ -88,6 +95,20 @@ A record goes where a later reader will look for it.
 - Findings from scratchpad content are written into the issue or PR itself
   - A file path is not a record, because nobody looks in a place they do not remember
 
+A serious failure in how the agent worked is proposed as a fix to the
+rule, skill, or hook that should have prevented it, paired with an
+issue as one-of-two, numbered as in the defect pairing above.
+
+- Invoke the `rule-edit` skill in this step for the fix's edit text and its same-decision enumeration
+- The fix names its operations through a draft PR: a branch, the edit, a commit, a push, and `gh pr create --draft`
+  - The file edit and the git and PR commands run in Step 4, for a selected proposal
+  - When the enumeration finds a contradicting statement, the draft names that statement and which of the two it keeps, so the user settles it in Step 3's selection rather than in a question of its own
+  - It ends at a draft PR so that the fix is in review before the next session can repeat the failure
+- When rule-edit concludes that no rule, skill, or hook change applies, propose the issue alone
+- The target repository is `ikuwow/dotfiles` for a global rule or skill, and the session's repository for that project's own rule file
+- The issue goes to `ikuwow/dotfiles` with the `retrospective` label for a global target, and to the session's repository without a label for a project target
+- Text for `ikuwow/dotfiles`, a public repository, describes the failure by its behavior pattern and leaves out private repository names, their PR and issue numbers, their code, and quoted text from their rule files
+
 Draft issue and PR titles and bodies against the `pr-issue-writing`
 skill, and comments, commit message bodies, and other prose longer than
 a sentence with the `technical-writing` skill. This step takes only
@@ -125,7 +146,7 @@ a version the user did not see.
 
 1. Open with the verdict
    - Safe to end: the routine cleanup and every selected proposal ran
-   - Items remain: a cleanup operation failed in Step 2, or a selected proposal failed or was stopped in Step 4
+   - Items remain: the retro-note invocation failed in Step 1, a cleanup operation failed in Step 2, or a selected proposal failed or was stopped in Step 4
 1. List the routine cleanup that ran, one line per operation
 1. For each declined, failed, or stopped item, write one line naming where it now lives: a PR or issue URL, a place that exists only on this machine (uncommitted changes, a stash entry, or an unpushed branch, with its repository), or what ending the session stops or discards
 1. Give the count of items already safe to leave
