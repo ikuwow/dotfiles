@@ -99,6 +99,7 @@ A serious failure in how the agent worked is described to the user and
 left without a drafted fix, since the direction a fix takes is theirs to
 settle in conversation before any edit is written.
 
+- A session with none says nothing about failures, and a slip the session corrected on its own stays out, since a stretched finding costs the user a read and a decision
 - Describe each one in a few lines: what happened, the risk it carries, and the directions a fix could take
 - Its one proposal is an issue carrying that description, so that a session ended before the conversation still keeps the failure on record
 - The issue goes to `ikuwow/dotfiles` with the `retrospective` label when the fix would land in a global rule or skill, and to the session's repository without a label when it would land in that project's own rule file
