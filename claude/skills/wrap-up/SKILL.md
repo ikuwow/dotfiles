@@ -1,6 +1,6 @@
 ---
 name: wrap-up
-description: Take stock of a session before it ends (unfinished work, state that ending the session discards, and findings recorded nowhere), log the session through retro-note, propose a fix for each serious failure in how the agent worked, clear the routine cleanup, propose the writes the user decides on, and report whether the session is safe to end. Trigger when the user signals that the session or the task is over ("終わり", "done", "これで完了", "おつかれ"), when they ask what is left before quitting, and when they invoke /wrap-up.
+description: Take stock of a session before it ends (unfinished work, state that ending the session discards, and findings recorded nowhere), log the session through retro-note, describe each serious failure in how the agent worked with its risk and the directions a fix could take, clear the routine cleanup, propose the writes the user decides on, and report whether the session is safe to end. Trigger when the user signals that the session or the task is over ("終わり", "done", "これで完了", "おつかれ"), when they ask what is left before quitting, and when they invoke /wrap-up.
 ---
 
 # Wrap Up
@@ -95,18 +95,14 @@ A record goes where a later reader will look for it.
 - Findings from scratchpad content are written into the issue or PR itself
   - A file path is not a record, because nobody looks in a place they do not remember
 
-A serious failure in how the agent worked is proposed as a fix to the
-rule, skill, or hook that should have prevented it, paired with an
-issue as one-of-two, numbered as in the defect pairing above.
+A serious failure in how the agent worked is described to the user and
+left without a drafted fix, since the direction a fix takes is theirs to
+settle in conversation before any edit is written.
 
-- Invoke the `rule-edit` skill in this step for the fix's edit text and its same-decision enumeration
-- The fix names its operations through a draft PR: a branch, the edit, a commit, a push, and `gh pr create --draft`
-  - The file edit and the git and PR commands run in Step 4, for a selected proposal
-  - When the enumeration finds a contradicting statement, the draft names that statement and which of the two it keeps, so the user settles it in Step 3's selection rather than in a question of its own
-  - It ends at a draft PR so that the fix is in review before the next session can repeat the failure
-- When rule-edit concludes that no rule, skill, or hook change applies, propose the issue alone
-- The target repository is `ikuwow/dotfiles` for a global rule or skill, and the session's repository for that project's own rule file
-- The issue goes to `ikuwow/dotfiles` with the `retrospective` label for a global target, and to the session's repository without a label for a project target
+- A session with none says nothing about failures, and a slip the session corrected on its own stays out, since a stretched finding costs the user a read and a decision
+- Describe each one in a few lines: what happened, the risk it carries, and the directions a fix could take
+- Its one proposal is an issue whose body is that description, so that a session ended before the conversation still keeps the failure on record
+- The issue goes to the session's repository without a label when every direction lands in that project's own rule file, and to `ikuwow/dotfiles` with the `retrospective` label otherwise
 - Text for `ikuwow/dotfiles`, a public repository, describes the failure by its behavior pattern and leaves out private repository names, their PR and issue numbers, their code, and quoted text from their rule files
 
 Draft issue and PR titles and bodies against the `pr-issue-writing`
@@ -125,11 +121,13 @@ Local git proposals keep to what the session changed.
 When there are no proposals, go to Step 5, where the cleanup Step 2 already ran is reported.
 
 1. Show every proposal in the conversation, numbered, with its draft in full
+   - A serious failure's description comes directly before its issue proposal, which shows its title and points to the description as its body, so the user reads the text once
 1. Ask for the selection at the end of that same message, in plain text that names the proposal numbers (run 1, run 2, run all, run none), and end the turn there
    - Text sent in the same turn as an AskUserQuestion call can fail to reach the user, so the selection is taken from the user's reply instead
 1. Run exactly the proposals the reply selects, and treat every other proposal as declined
    - When the reply neither clearly selects nor clearly declines (an "ok", or a question), ask again rather than guess
    - When the reply changes a draft or asks for another operation, show the revised proposals and ask again before Step 4
+   - When the reply takes up the direction of a fix for a serious failure, answer it as conversation, and ask for the selection again once that conversation settles, since the proposals stay open until then
 
 ## Step 4: Execute
 
