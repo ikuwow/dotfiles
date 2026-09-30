@@ -7,7 +7,8 @@ description: Take stock of a session before it ends (unfinished work, state that
 
 This skill brings a session to a state where ending it loses nothing the
 user needs. Reading, invoking retro-note, and routine cleanup run on
-their own, since retro-note writes only a machine-local log. A write the
+their own, since retro-note writes to no repository or GitHub, the
+targets Step 2 holds for the user's selection. A write the
 user decides on runs only after they select it, since one wrap-up can
 touch several repositories and PRs and the user approves exactly the
 operations and text they were shown. Step 2 draws the line between the
@@ -15,9 +16,8 @@ two.
 
 ## Step 1: Inventory
 
-Invoke the `retro-note` skill first, so that it runs on the branch and
-PR the session worked on before Step 2's `git cleanup` switches
-branches. Skip it when retro-note already ran in this session, since a
+Invoke the `retro-note` skill first, so that it sees the session before
+this skill changes any local state. Skip it when retro-note already ran in this session, since a
 second run would log the same session twice.
 
 Collect the other items with read-only commands and from the conversation. Skip a
@@ -97,9 +97,10 @@ A record goes where a later reader will look for it.
 
 A serious failure in how the agent worked is proposed as a fix to the
 rule, skill, or hook that should have prevented it, paired with an
-issue as one-of-two in the same way as a defect above.
+issue as one-of-two, numbered as in the defect pairing above.
 
-- The fix takes its edit text, checked against rule-edit's criteria, and its same-decision enumeration from the `rule-edit` skill in this step, and names its operations through a draft PR: a branch, the edit, a commit, a push, and `gh pr create --draft`
+- Invoke the `rule-edit` skill in this step for the fix's edit text and its same-decision enumeration
+- The fix names its operations through a draft PR: a branch, the edit, a commit, a push, and `gh pr create --draft`
   - The file edit and the git and PR commands run in Step 4, for a selected proposal
   - When the enumeration finds a contradicting statement, the draft names that statement and which of the two it keeps, so the user settles it in Step 3's selection rather than in a question of its own
   - It ends at a draft PR so that the fix is in review before the next session can repeat the failure
@@ -145,7 +146,7 @@ a version the user did not see.
 
 1. Open with the verdict
    - Safe to end: the routine cleanup and every selected proposal ran
-   - Items remain: a cleanup operation failed in Step 2, or a selected proposal failed or was stopped in Step 4
+   - Items remain: the retro-note invocation failed in Step 1, a cleanup operation failed in Step 2, or a selected proposal failed or was stopped in Step 4
 1. List the routine cleanup that ran, one line per operation
 1. For each declined, failed, or stopped item, write one line naming where it now lives: a PR or issue URL, a place that exists only on this machine (uncommitted changes, a stash entry, or an unpushed branch, with its repository), or what ending the session stops or discards
 1. Give the count of items already safe to leave
