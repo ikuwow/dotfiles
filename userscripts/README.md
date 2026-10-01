@@ -16,13 +16,15 @@ The Userscripts extension keeps its Save Location as a macOS security-scoped boo
 
 1. Install Violentmonkey from the Chrome Web Store
 1. Open `chrome://extensions/`, click Violentmonkey's Details, and enable "Allow User Scripts" (Chrome 138 removed the global developer-mode requirement in favor of this per-extension toggle)
-1. Open each raw URL in Chrome; Violentmonkey detects the userscript metadata block and shows an install prompt: `https://raw.githubusercontent.com/ikuwow/dotfiles/main/userscripts/ime-enter-fixer.user.js` and `https://raw.githubusercontent.com/ikuwow/dotfiles/main/userscripts/youtube-shorts-normalizer.user.js`
-1. Reload any open tabs on the target sites (`claude.ai`, `raidori.com`, `youtube.com`) to pick the scripts up
+1. Open each script's raw URL (`https://raw.githubusercontent.com/ikuwow/dotfiles/main/userscripts/<basename>.user.js`) in Chrome; Violentmonkey detects the userscript metadata block and shows an install prompt
+1. Reload any open tabs on the sites the scripts target to pick them up
 
 ## Scripts
 
-- `ime-enter-fixer.user.js` — stops the IME confirmation Enter from triggering a site's submit handler in Safari, scoped to `*://claude.ai/*`, `*://raidori.com/*`, and `*://*.raidori.com/*`
-- `youtube-shorts-normalizer.user.js` — treats YouTube Shorts as normal videos: Shorts thumbnails stay visible everywhere, but clicking one or navigating to `/shorts/<id>` opens the standard `/watch?v=<id>` player instead of the swipeable feed. Also hides the sidebar Shorts entry, which has no equivalent non-swipe landing. Scoped to `*://*.youtube.com/*`
+Each script's `@include` / `@match` lines are the source of truth for the sites it runs on.
+
+- `ime-enter-fixer.user.js` — stops the IME confirmation Enter from triggering a site's submit handler in Safari
+- `youtube-shorts-normalizer.user.js` — treats YouTube Shorts as normal videos: Shorts thumbnails stay visible everywhere, but clicking one or navigating to `/shorts/<id>` opens the standard `/watch?v=<id>` player instead of the swipeable feed. Also hides the sidebar Shorts entry, which has no equivalent non-swipe landing
 
 ## Adding a new script
 
