@@ -180,10 +180,7 @@ brew "e1s"
 # kubectl and kustomize should be managed by mise
 brew "pipe-cd/tap/pipectl"
 
-# Browsers
 cask "google-chrome"
-cask "firefox"
-
 cask "1password-cli"
 cask "neovide-app"
 cask "vimr"
