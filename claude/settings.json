@@ -385,6 +385,16 @@
             "command": "echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PostToolUse\",\"additionalContext\":\"If this plan involves implementation beyond a trivial edit, dispatch the implementer subagent.\"}}'"
           }
         ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "f=~/.claude/hooks/show_sub_issues.py; if [ -f \"$f\" ] && command -v python3 >/dev/null; then python3 \"$f\"; fi",
+            "if": "Bash(gh issue view *)"
+          }
+        ]
       }
     ],
     "PermissionRequest": [
