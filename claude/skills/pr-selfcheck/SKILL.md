@@ -58,8 +58,8 @@ Perform a self-review of the specified PR to catch issues before a human reviewe
    paragraphs. It is a count, not a judgement, and it does not depend
    on the body's language
 1. Run the opening-sentence pass described below over the body's first
-   sentence and the first sentence of each prose section. It reads each
-   sentence alone, so a read of the whole body cannot stand in for it
+   sentence and the first sentence of each section. It reads each
+   sentence lifted out of its paragraph
 1. Invoke the `technical-writing` skill and read the title and every
    paragraph and top-level list item of the body against it, reporting
    each finding under the `Prose` label
@@ -151,32 +151,38 @@ from this pass.
 
 ## Opening-sentence pass
 
-Decidable asks the body's first sentence to name the change, and the
-`technical-writing` skill asks each section's first sentence to answer
-what its heading names. Apply the procedure below rather than judging
-the opening by eye. Each violation it finds is a Fix.
+Decidable asks the body's first sentence to name the change, and each
+section's first sentence answers the question its heading names. Apply
+the procedure below, which lifts each opening sentence out of its
+paragraph before answering from it. Each violation it finds is a Fix.
 
 Take each opening sentence alone and answer from it. A reader holding
 the whole body already has the conclusion and reports a clean pass on an
 opening that did not deliver it, which is the failure this section
-exists to prevent. Start from the quoted sentence — do not start from
-what the paragraph around it says.
+exists to prevent. Start from the quoted sentence and answer from its
+words alone.
 
-A first sentence is the first sentence of the first prose paragraph,
-skipping headings.
+A prose paragraph is a paragraph outside list items, fenced code
+blocks, GFM tables, HTML comments, and blockquotes. A section is the
+text from one heading, of any level, to the next heading.
 
-1. Quote the body's first sentence verbatim, name its grammatical subject, and answer "what does this PR do?" from that sentence alone
-1. For each section, quote its first sentence verbatim and answer the question its heading names from that sentence alone
+1. Quote the first sentence of the body's first prose paragraph
+   verbatim, wherever in the body it sits, name its grammatical subject,
+   and answer "what does this PR do?" from that sentence alone
+1. For each section that holds a prose paragraph, quote the first
+   sentence of its first prose paragraph verbatim and answer the
+   question its heading names from that sentence alone. Skip the
+   sentence step 1 quoted, so that sentence is judged once, under
+   Decidable
 
 Violations:
 
-- A body first sentence that leaves "what does this PR do?" unanswered, including one whose subject is the current state, the codebase, or another PR or issue, reported under `Decidable`
+- A body first sentence that leaves "what does this PR do?" unanswered, including one whose subject Decidable names as failing it, reported under `Decidable`
 - A section first sentence that leaves the question its heading names unanswered, reported under `Prose`
 
 Excluded from detection:
 
-- A section carrying only list items
-- Fenced code blocks, GFM tables, HTML comments, and blockquotes, which are not prose paragraphs
+- A section with no prose paragraph, such as one carrying only list items
 
 Report each quoted sentence alongside the findings, so a reader can see
 the pass took the openings alone rather than judging the whole body.
