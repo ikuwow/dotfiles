@@ -18,6 +18,11 @@ every edit after it. The `#`-prefixed lines a body carries trigger
 Claude Code's security pre-check when passed via `--body`, which no hook
 can bypass.
 
+Name the target repository with `--repo OWNER/REPO` on every
+`gh pr create` and `gh issue create`, so the destination is on the
+command line rather than resolved from the working directory. A hook
+denies either command without it.
+
 ## Create a PR
 
 The branch exists, carries the commits, and is pushed before this runs.
@@ -31,7 +36,7 @@ The branch exists, carries the commits, and is pushed before this runs.
    yet
    - Follow the repository's PR template when one exists
 1. Create the PR as a draft:
-   `gh pr create --draft --body-file <body file path>`
+   `gh pr create --draft --repo <owner>/<repo> --body-file <body file path>`
 1. Display the PR URL: `gh pr view --json url --jq '.url'`
 
 ## Create an issue
@@ -42,7 +47,7 @@ The branch exists, carries the commits, and is pushed before this runs.
    yet
    - Follow the repository's issue template when one exists
 1. Create the issue:
-   `gh issue create --title '...' --body-file <body file path>`
+   `gh issue create --repo <owner>/<repo> --title '...' --body-file <body file path>`
 1. Display the issue URL, which `gh issue create` prints to stdout
 
 ## Update an existing title or body
