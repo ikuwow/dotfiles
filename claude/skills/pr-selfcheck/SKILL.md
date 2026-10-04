@@ -57,6 +57,9 @@ Perform a self-review of the specified PR to catch issues before a human reviewe
 1. Run the density pass described below over the body's list items and
    paragraphs. It is a count, not a judgement, and it does not depend
    on the body's language
+1. Run the opening-sentence pass described below over the body's first
+   sentence and the first sentence of each prose section. It reads each
+   sentence alone, so a read of the whole body cannot stand in for it
 1. Invoke the `technical-writing` skill and read the title and every
    paragraph and top-level list item of the body against it, reporting
    each finding under the `Prose` label
@@ -71,6 +74,9 @@ Perform a self-review of the specified PR to catch issues before a human reviewe
        right decision
    - The length of a list item belongs to the density pass, so a
      two-sentence item is reported there and not here
+   - Whether a section's first sentence answers its heading belongs to
+     the opening-sentence pass, so a section opening on background is
+     reported there and not here
 1. Output the result in the format described below, reporting a line
    for each of the five properties and for Prose, including those with
    no finding
@@ -142,6 +148,38 @@ The companion rule — a paragraph enumerating three or more parallel
 items of the same kind belongs in a list — takes judgement rather than a
 count, so weigh it against the severity table instead of reporting it
 from this pass.
+
+## Opening-sentence pass
+
+Decidable asks the body's first sentence to name the change, and the
+`technical-writing` skill asks each section's first sentence to answer
+what its heading names. Apply the procedure below rather than judging
+the opening by eye. Each violation it finds is a Fix.
+
+Take each opening sentence alone and answer from it. A reader holding
+the whole body already has the conclusion and reports a clean pass on an
+opening that did not deliver it, which is the failure this section
+exists to prevent. Start from the quoted sentence — do not start from
+what the paragraph around it says.
+
+A first sentence is the first sentence of the first prose paragraph,
+skipping headings.
+
+1. Quote the body's first sentence verbatim, name its grammatical subject, and answer "what does this PR do?" from that sentence alone
+1. For each section, quote its first sentence verbatim and answer the question its heading names from that sentence alone
+
+Violations:
+
+- A body first sentence that leaves "what does this PR do?" unanswered, including one whose subject is the current state, the codebase, or another PR or issue, reported under `Decidable`
+- A section first sentence that leaves the question its heading names unanswered, reported under `Prose`
+
+Excluded from detection:
+
+- A section carrying only list items
+- Fenced code blocks, GFM tables, HTML comments, and blockquotes, which are not prose paragraphs
+
+Report each quoted sentence alongside the findings, so a reader can see
+the pass took the openings alone rather than judging the whole body.
 
 ## Output Format
 
