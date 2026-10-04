@@ -50,6 +50,14 @@ def parse_create(command):
     (False, None)
     >>> parse_create("gh issue create --title 'unterminated")
     (False, None)
+
+    The last ``--repo`` wins, matching gh, and any ``-R`` voids the
+    value since gh could pick it over ``--repo``:
+
+    >>> parse_create("gh issue create --repo a/private --repo b/public")
+    (True, 'b/public')
+    >>> parse_create("gh issue create --repo a/private -R b/public")
+    (True, None)
     """
     try:
         tokens = shlex.split(command)
@@ -58,12 +66,15 @@ def parse_create(command):
     if tokens[:1] != ["gh"] or tokens[1:2] not in (["issue"], ["pr"]) or tokens[2:3] != ["create"]:
         return False, None
     args = tokens[3:]
+    repo = None
     for i, tok in enumerate(args):
+        if tok.startswith("-R"):
+            return True, None
         if tok.startswith("--repo="):
-            return True, tok[len("--repo="):]
-        if tok == "--repo" and i + 1 < len(args):
-            return True, args[i + 1]
-    return True, None
+            repo = tok[len("--repo="):]
+        elif tok == "--repo" and i + 1 < len(args):
+            repo = args[i + 1]
+    return True, repo
 
 
 def visibility(repo, cwd):
