@@ -72,9 +72,9 @@ rather than the full before-and-after.
 
 ## Review a draft against its sources
 
-Check a drafted body claim by claim before the create or edit command
-sends it. A claim the writer does not register as a claim reaches the
-reader unchecked, and the reader acts on it.
+Check a drafted body claim by claim before `gh issue create` or an
+edit command sends it. A claim the writer does not register as a claim
+reaches the reader unchecked, and the reader acts on it.
 
 - List each factual claim in the draft, including those inside
   parentheticals, glosses, and asides, and confirm that the place it
@@ -83,10 +83,11 @@ reader unchecked, and the reader acts on it.
   - A tool or service named in a step the reader is meant to follow
     (verification, rollout, rollback, monitoring) is a claim that the
     project uses it
-- For each claim marked unverified, run the check when a source within
-  reach settles it (a local clone, a file, a command), and write the
-  result in place of the label
-  - A label left where a few commands would settle the claim passes the
-    work to every reader
+- For each claim the draft marks as unverified or to be confirmed, run
+  the check when a source within reach settles it (a local clone, a
+  file, a command), and write the result in place of the label
+  - A label left where such a source settles the claim passes the check
+    to every reader
 - Drop a claim that no source holds, or rewrite it to what the sources
-  support
+  support, such as a hypothesis stated with the evidence that points to
+  it
