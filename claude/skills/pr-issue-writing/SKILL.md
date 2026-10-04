@@ -1,6 +1,6 @@
 ---
 name: pr-issue-writing
-description: Write or edit the title and body of a pull request or an issue, and create either. Carries the five properties a PR body is judged against (Decidable, Grounded, Necessary, Scoped, Conformant), the criteria an issue body is judged against, the PR body template, and the commands for creating a draft PR or an issue and for editing a title or body safely. Invoke before writing a PR or issue title or body, before editing one, and when bringing an existing PR into conformance.
+description: Write or edit the title and body of a pull request or an issue, and create either. Carries the five properties a PR body is judged against (Decidable, Grounded, Necessary, Scoped, Conformant), the criteria an issue body is judged against, the PR body template, the review a draft body passes against its sources, and the commands for creating a draft PR or an issue and for editing a title or body safely. Invoke before writing a PR or issue title or body, before editing one, and when bringing an existing PR into conformance.
 ---
 
 # Write a Pull Request or Issue
@@ -41,6 +41,8 @@ The branch exists, carries the commits, and is pushed before this runs.
    generate a temp filename, and do not Read a file that does not exist
    yet
    - Follow the repository's issue template when one exists
+1. Review the draft under "Review a draft against its sources" below,
+   writing any revision to a fresh file
 1. Create the issue:
    `gh issue create --title '...' --body-file <body file path>`
 1. Display the issue URL, which `gh issue create` prints to stdout
@@ -61,7 +63,30 @@ rather than the full before-and-after.
      directory using the Write tool, a new filename per revision. Do
      not generate a temp filename, and do not Read a file that does not
      exist yet
+  1. Review the draft under "Review a draft against its sources" below,
+     writing any revision to a fresh file
   1. Execute the edit:
      `gh pr edit <number> --body-file <body file path>`
      (`gh issue edit <number> --body-file <body file path>` for an
      issue)
+
+## Review a draft against its sources
+
+Check a drafted body claim by claim before the create or edit command
+sends it. A claim the writer does not register as a claim reaches the
+reader unchecked, and the reader acts on it.
+
+- List each factual claim in the draft, including those inside
+  parentheticals, glosses, and asides, and confirm that the place it
+  came from (an issue, a PR, a file, a command's output, a log query,
+  the user's own statement) holds it
+  - A tool or service named in a step the reader is meant to follow
+    (verification, rollout, rollback, monitoring) is a claim that the
+    project uses it
+- For each claim marked unverified, run the check when a source within
+  reach settles it (a local clone, a file, a command), and write the
+  result in place of the label
+  - A label left where a few commands would settle the claim passes the
+    work to every reader
+- Drop a claim that no source holds, or rewrite it to what the sources
+  support
