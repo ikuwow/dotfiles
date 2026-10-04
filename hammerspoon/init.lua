@@ -97,3 +97,76 @@ end)
 hhkbUsbWatcher:start()
 
 applyHHKBKeyMapping()
+
+-- Internet connectivity indicator: a menu bar item appears only while offline,
+-- and a notification fires on each transition. The probe fetches Apple's
+-- captive portal page, so a Wi-Fi link whose upstream is down or behind a
+-- portal counts as offline. Reachability changes and wake trigger an
+-- immediate probe on top of the periodic one.
+
+local ONLINE_CHECK_URL = "http://captive.apple.com/hotspot-detect.html"
+local ONLINE_CHECK_INTERVAL = 15
+-- Two consecutive failures keep a single dropped request from flapping the state.
+local FAILURES_BEFORE_OFFLINE = 2
+
+local isOnline = true
+local consecutiveFailures = 0
+local probeInFlight = false
+
+offlineMenubar = hs.menubar.new(false, "online-check")
+offlineMenubar:setTitle("⚠︎ Offline")
+offlineMenubar:setTooltip("No internet connection")
+
+local function setOnline(online)
+  if online == isOnline then
+    return
+  end
+  isOnline = online
+  if online then
+    offlineMenubar:removeFromMenuBar()
+    hs.notify.new({ title = "Back online" }):send()
+  else
+    offlineMenubar:returnToMenuBar()
+    hs.notify.new({ title = "Offline", informativeText = "No internet connection" }):send()
+  end
+end
+
+local function probeConnectivity()
+  if probeInFlight then
+    return
+  end
+  probeInFlight = true
+  hs.http.asyncGet(ONLINE_CHECK_URL, nil, function(status, body)
+    probeInFlight = false
+    if status == 200 and body and body:find("Success", 1, true) then
+      consecutiveFailures = 0
+      setOnline(true)
+    else
+      consecutiveFailures = consecutiveFailures + 1
+      if consecutiveFailures >= FAILURES_BEFORE_OFFLINE then
+        setOnline(false)
+      end
+    end
+  end)
+end
+
+offlineMenubar:setMenu({
+  { title = "Check now", fn = probeConnectivity },
+})
+
+onlineCheckTimer = hs.timer.doEvery(ONLINE_CHECK_INTERVAL, probeConnectivity)
+
+onlineReachability = hs.network.reachability.internet()
+onlineReachability:setCallback(function()
+  probeConnectivity()
+end)
+onlineReachability:start()
+
+onlineCheckWakeWatcher = hs.caffeinate.watcher.new(function(eventType)
+  if eventType == hs.caffeinate.watcher.systemDidWake then
+    probeConnectivity()
+  end
+end)
+onlineCheckWakeWatcher:start()
+
+probeConnectivity()
