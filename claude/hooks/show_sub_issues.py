@@ -54,8 +54,6 @@ def _gh_json(args):
 
 def main():
     data = json.load(sys.stdin)
-    if data.get("tool_response", {}).get("exit_code", 0) != 0:
-        return
     args = _parse_view_args(data.get("tool_input", {}).get("command", ""))
     view = args and _gh_json(["issue", "view", *args, "--json", "subIssues"])
     nodes = (view or {}).get("subIssues", {}).get("nodes") or []
