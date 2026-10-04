@@ -73,21 +73,32 @@ rather than the full before-and-after.
 ## Review a draft against its sources
 
 Check a drafted body claim by claim before `gh issue create` or an
-edit command sends it. A claim the writer does not register as a claim
+edit command sends it, asking of each claim whether a source states it
+or the writer inferred it. An inference written as a sourced fact
 reaches the reader unchecked, and the reader acts on it.
 
 On an edit, review only the claims the draft adds or changes relative
 to the fetched current body, so the cost of a review follows the size
 of the edit.
 
-- List each factual claim under review, including those inside
-  parentheticals, glosses, and asides, and confirm that the place it
-  came from (an issue, a PR, a file, a command's output, a log query,
-  the user's own statement) holds it, matching against what the session
-  has already read
+- For each claim under review, including those inside parentheticals,
+  glosses, and asides, find the place it came from (an issue, a PR, a
+  file, a command's output, a log query, the user's own statement)
+  among what the session has already read, and check that the place
+  states the claim itself
+  - A date in a title states a date, and reading it as a deadline is an
+    inference
+  - Classifying an item states the writer's view, and reading a
+    decision into it is an inference
   - A tool or service named in a step the reader is meant to follow
     (verification, rollout, rollback, monitoring) is a claim that the
     project uses it
+- Keep a claim the reader would act on (a deadline, a status, a
+  decision and who made it, an owner, a cause) as a fact only when a
+  source states it, since these claims steer how the work is
+  prioritized
+- Write a claim no source states as the writer's inference with the
+  evidence that points to it, or drop it
 - For each claim the draft marks as unverified or to be confirmed, run
   the check when a source at hand settles it (a clone already on disk, a
   file, a command that runs without setup), and write the result in
@@ -96,6 +107,3 @@ of the edit.
     to every reader
   - A check that needs a new clone, authentication, or a long-running
     query is out of reach, so the label stays
-- Drop a claim that no source holds, or rewrite it to what the sources
-  support, such as a hypothesis stated with the evidence that points to
-  it
