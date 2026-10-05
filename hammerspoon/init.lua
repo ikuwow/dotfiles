@@ -101,12 +101,14 @@ applyHHKBKeyMapping()
 -- Internet connectivity indicator: a menu bar item appears only while offline,
 -- and a notification fires on each transition. The probe fetches Apple's
 -- captive portal page, so a Wi-Fi link whose upstream is down or behind a
--- portal counts as offline. Reachability changes and wake trigger an
--- immediate probe on top of the periodic one.
+-- portal counts as offline. Reachability changes, wake and "Check now" probe
+-- immediately, but only to clear the offline state: right after wake or a
+-- network switch they fail in quick succession while the link comes up, so
+-- only the periodic probe counts toward going offline.
 
 local ONLINE_CHECK_URL = "http://captive.apple.com/hotspot-detect.html"
 local ONLINE_CHECK_INTERVAL = 15
--- Two consecutive failures keep a single dropped request from flapping the state.
+-- Requiring consecutive failures keeps a single dropped request from flapping the state.
 local FAILURES_BEFORE_OFFLINE = 2
 local PROBE_TIMEOUT = 5
 
@@ -134,11 +136,11 @@ local function setOnline(online)
   end
 end
 
-local function recordProbeResult(success)
+local function recordProbeResult(success, countsFailure)
   if success then
     consecutiveFailures = 0
     setOnline(true)
-  else
+  elseif countsFailure then
     consecutiveFailures = consecutiveFailures + 1
     if consecutiveFailures >= FAILURES_BEFORE_OFFLINE then
       setOnline(false)
@@ -146,7 +148,7 @@ local function recordProbeResult(success)
   end
 end
 
-local function probeConnectivity()
+local function probeConnectivity(countsFailure)
   if currentProbe then
     return
   end
@@ -157,12 +159,12 @@ local function probeConnectivity()
       return
     end
     currentProbe = nil
-    probe.timer:stop()
-    recordProbeResult(success)
+    probeTimeoutTimer:stop()
+    recordProbeResult(success, countsFailure)
   end
   -- hs.http fixes the request timeout at 60 seconds, which would hold off
   -- every later probe while an upstream link silently drops packets.
-  probe.timer = hs.timer.doAfter(PROBE_TIMEOUT, function()
+  probeTimeoutTimer = hs.timer.doAfter(PROBE_TIMEOUT, function()
     finish(false)
   end)
   -- The probe page is served with a one-year max-age, so the default cache
@@ -172,23 +174,30 @@ local function probeConnectivity()
   end, "ignoreLocalCache")
 end
 
+local function probeToClearOffline()
+  probeConnectivity(false)
+end
+
 offlineMenubar:setMenu({
-  { title = "Check now", fn = probeConnectivity },
+  { title = "Check now", fn = probeToClearOffline },
 })
 
-onlineCheckTimer = hs.timer.doEvery(ONLINE_CHECK_INTERVAL, probeConnectivity)
+-- continueOnError keeps one failing callback from stopping the periodic probe
+-- for good.
+onlineCheckTimer = hs.timer.new(ONLINE_CHECK_INTERVAL, function()
+  probeConnectivity(true)
+end, true)
+onlineCheckTimer:start()
 
 onlineReachability = hs.network.reachability.internet()
-onlineReachability:setCallback(function()
-  probeConnectivity()
-end)
+onlineReachability:setCallback(probeToClearOffline)
 onlineReachability:start()
 
 onlineCheckWakeWatcher = hs.caffeinate.watcher.new(function(eventType)
   if eventType == hs.caffeinate.watcher.systemDidWake then
-    probeConnectivity()
+    probeToClearOffline()
   end
 end)
 onlineCheckWakeWatcher:start()
 
-probeConnectivity()
+probeConnectivity(true)
