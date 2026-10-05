@@ -25,10 +25,15 @@ are symlinks pointing to files in this repository.
 - Always create a branch before making changes. When the user explicitly requests direct work on main, proceed after the default-branch guard hook's first deny — its retry is sanctioned for the rest of the session
 - Do NOT create git worktrees — branch only, no worktree
 - The working tree may be shared by multiple concurrent Claude Code
-  sessions: claude/settings.json's model field commonly shows as a
-  spurious uncommitted diff from another session's /model command.
-  This is expected drift, not real work — stash-and-restore it
-  around branch switches instead of investigating or reconciling it
+  sessions, and claude/settings.json often carries an uncommitted diff
+  that another session's /model or /effort wrote. Before switching
+  branches, read that diff:
+  - When it only changes `model` or `modelSettings` values or reorders
+    keys, discard it (the user switches model and effort per session
+    only, so a saved value is unintended)
+  - When any other line changes, stash it, since it may be another
+    session's work in progress, and name the stash to the user when
+    the task ends so it does not pile up unnoticed
 
 ## Language
 
