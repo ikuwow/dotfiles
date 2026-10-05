@@ -28,12 +28,14 @@ are symlinks pointing to files in this repository.
   sessions, and claude/settings.json often carries an uncommitted diff
   that another session's /model or /effort wrote. Before switching
   branches, read that diff:
-  - When it only changes `model` or `modelSettings` values or reorders
-    keys, discard it (the user switches model and effort per session
+  - When it only adds, changes, or removes `model` or `modelSettings`
+    entries, along with the commas and key order that follow from
+    that, discard it (the user switches model and effort per session
     only, so a saved value is unintended)
-  - When any other line changes, stash it, since it may be another
-    session's work in progress, and name the stash to the user when
-    the task ends so it does not pile up unnoticed
+  - When any other line changes, stash it around the switch and pop it
+    back afterwards, since it may be another session's work in
+    progress. When the pop conflicts, leave the stash and name it to
+    the user when the task ends so it does not pile up unnoticed
 
 ## Language
 
