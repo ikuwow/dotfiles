@@ -136,9 +136,11 @@ local function probeConnectivity()
     return
   end
   probeInFlight = true
-  hs.http.asyncGet(ONLINE_CHECK_URL, nil, function(status, body)
+  -- The probe page is served with a one-year max-age, so the default cache
+  -- policy could answer from the local cache while offline.
+  hs.http.doAsyncRequest(ONLINE_CHECK_URL, "GET", nil, nil, function(status, body)
     probeInFlight = false
-    if status == 200 and body and body:find("Success", 1, true) then
+    if status == 200 and type(body) == "string" and body:find("Success", 1, true) then
       consecutiveFailures = 0
       setOnline(true)
     else
@@ -147,7 +149,7 @@ local function probeConnectivity()
         setOnline(false)
       end
     end
-  end)
+  end, "ignoreLocalCache")
 end
 
 offlineMenubar:setMenu({
