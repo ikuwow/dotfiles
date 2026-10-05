@@ -108,10 +108,13 @@ local ONLINE_CHECK_URL = "http://captive.apple.com/hotspot-detect.html"
 local ONLINE_CHECK_INTERVAL = 15
 -- Two consecutive failures keep a single dropped request from flapping the state.
 local FAILURES_BEFORE_OFFLINE = 2
+local PROBE_TIMEOUT = 5
 
 local isOnline = true
 local consecutiveFailures = 0
-local probeInFlight = false
+-- The pending probe, or nil. A response arriving after its probe timed out
+-- finds another value here and is dropped.
+local currentProbe = nil
 
 offlineMenubar = hs.menubar.new(false, "online-check")
 offlineMenubar:setTitle("⚠︎ Offline")
@@ -131,24 +134,41 @@ local function setOnline(online)
   end
 end
 
+local function recordProbeResult(success)
+  if success then
+    consecutiveFailures = 0
+    setOnline(true)
+  else
+    consecutiveFailures = consecutiveFailures + 1
+    if consecutiveFailures >= FAILURES_BEFORE_OFFLINE then
+      setOnline(false)
+    end
+  end
+end
+
 local function probeConnectivity()
-  if probeInFlight then
+  if currentProbe then
     return
   end
-  probeInFlight = true
+  local probe = {}
+  currentProbe = probe
+  local function finish(success)
+    if currentProbe ~= probe then
+      return
+    end
+    currentProbe = nil
+    probe.timer:stop()
+    recordProbeResult(success)
+  end
+  -- hs.http fixes the request timeout at 60 seconds, which would hold off
+  -- every later probe while an upstream link silently drops packets.
+  probe.timer = hs.timer.doAfter(PROBE_TIMEOUT, function()
+    finish(false)
+  end)
   -- The probe page is served with a one-year max-age, so the default cache
   -- policy could answer from the local cache while offline.
   hs.http.doAsyncRequest(ONLINE_CHECK_URL, "GET", nil, nil, function(status, body)
-    probeInFlight = false
-    if status == 200 and type(body) == "string" and body:find("Success", 1, true) then
-      consecutiveFailures = 0
-      setOnline(true)
-    else
-      consecutiveFailures = consecutiveFailures + 1
-      if consecutiveFailures >= FAILURES_BEFORE_OFFLINE then
-        setOnline(false)
-      end
-    end
+    finish(status == 200 and type(body) == "string" and body:find("Success", 1, true) ~= nil)
   end, "ignoreLocalCache")
 end
 
