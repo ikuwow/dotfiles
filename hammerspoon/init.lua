@@ -103,8 +103,8 @@ applyHHKBKeyMapping()
 -- captive portal page, so a Wi-Fi link whose upstream is down or behind a
 -- portal counts as offline. Reachability changes, wake and "Check now" probe
 -- immediately, but only to clear the offline state: right after wake or a
--- network switch they fail in quick succession while the link comes up, so
--- only the periodic probe counts toward going offline.
+-- network switch they can fail in quick succession while the link comes up,
+-- so only the periodic probe counts toward going offline.
 
 local ONLINE_CHECK_URL = "http://captive.apple.com/hotspot-detect.html"
 local ONLINE_CHECK_INTERVAL = 15
