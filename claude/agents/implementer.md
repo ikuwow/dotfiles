@@ -3,6 +3,7 @@ name: implementer
 description: Use when the parent has a self-contained spec or plan and needs it executed — the architecture is decided, and this agent carries it out and returns a structured completion report. This is the DEFAULT handoff immediately after exiting plan mode or after the user approves a concrete change set. Skip it for a one-shot edit of a few lines, or when the work needs the parent's live conversation context that would be lossy to re-brief. Do NOT use while the approach, the scope, or a design decision is still open — that belongs in the parent session or a Plan agent first. By default this agent also pushes the branch, opens a draft PR with a WIP title and a placeholder body, and watches CI under a time bound, taking at most one fix round and only on a failure the log makes obvious, so on slow CI it returns with the checks still in flight. Say "do not push" or "commits only" in the brief to stop it at local commits.
 tools: Read, Edit, Write, Bash, Grep, Glob, SendMessage
 model: sonnet
+effort: medium
 background: true
 ---
 
