@@ -316,7 +316,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo '{\"hookSpecificOutput\":{\"hookEventName\":\"SubagentStart\",\"additionalContext\":\"Advisor policy: do not call the advisor tool in this subagent unless your agent definition or task brief explicitly permits it. When blocked or genuinely uncertain, return early and report to the parent instead — the parent holds the advisor and the wider context needed to resolve it.\"}}'"
+            "command": "echo '{\"hookSpecificOutput\":{\"hookEventName\":\"SubagentStart\",\"additionalContext\":\"Advisor policy: do not call the advisor tool in this subagent unless your agent definition or task brief explicitly permits it. Because the parent session already made the decisions the advisor would review, this policy takes precedence over the advisor tool description, which tells every agent holding the tool to consult it before substantive work and before finishing. When blocked or genuinely uncertain, return early and report to the parent instead — the parent holds the advisor and the wider context needed to resolve it.\"}}'"
           }
         ]
       }
