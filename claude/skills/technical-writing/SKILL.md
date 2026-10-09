@@ -44,11 +44,9 @@ reader can follow the reasoning paragraph by paragraph.
 - Introduce a new term by naming what it applies to, then what it does
   or what it changes, and give the definition after that. A definition
   offered first has nothing for the reader to attach it to
-- Run the argument in one direction. State the conclusion once, after
-  the objections it rests on are handled, so the reader never meets it
-  twice with different support
-  - Where the document's own guidelines put the conclusion first, it
-    goes first and is not restated once the objections are handled
+- Run the argument in one direction. State the conclusion once, first,
+  and handle the objections it rests on after it without restating it,
+  so the reader never meets it twice with different support
 - Where the text rejects a reading or an alternative, give the reason it
   fails in the same place, and put the rejected design in the
   conditional. An unbuilt alternative in the present tense reads as a
@@ -194,3 +192,6 @@ claim's scope, or a hedge on a judgment or a prediction.
 - Keep a section inside what its heading names. Material the heading does
   not reach belongs under its own heading, since a reader who trusts the
   heading stops reading at its edge
+- Make a section's first sentence answer what its heading names. A
+  section that opens on background, prerequisites, or the current state
+  leaves the reader working toward what the heading already promised

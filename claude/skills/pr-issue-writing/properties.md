@@ -38,11 +38,16 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
 
 ## Decidable
 
-- Name the change in one sentence, and add what prompted it now where
-  the diff does not show it — the incident, the investigation that
-  could not conclude, the request, the obligation that came due
+- Name the change in the body's first sentence, and add what prompted
+  it now where the diff does not show it — the incident, the
+  investigation that could not conclude, the request, the obligation
+  that came due
   - The changed lines are the diff's to show, so the body names the
     change rather than describing it
+  - A first sentence whose subject is the current state, the codebase,
+    or another PR or issue does not name the change, however plainly
+    the paragraph around it does, since a reviewer who stops there
+    learns the setting and not the change
 - Where a design decision was weighed, the body carries its shape: the
   approach taken against the approaches rejected, and risks or things a
   reviewer should watch out for
@@ -349,8 +354,9 @@ Sources and issue links are inlined only when applicable.
 ```
 ## Purpose
 
-<1-3 sentences on why the change is being made — problem it solves,
-what prompted it, intended outcome. Not a paraphrase of the diff.>
+<1-3 sentences: the first names the change, and the rest say why it is
+being made — problem it solves, what prompted it, intended outcome. Not
+a paraphrase of the diff.>
 
 ## Key changes
 
