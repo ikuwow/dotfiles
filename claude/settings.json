@@ -285,6 +285,8 @@
       "Bash(git branch * -D *)",
       "Bash(git config *)",
       "Bash(gh pr merge *)",
+      "Bash(aws logs start-query *)",
+      "Bash(aws * logs start-query *)",
       "mcp__jetbrains__run_configuration",
       "mcp__jetbrains__execute_terminal_command",
       "mcp__jetbrains__replace_file_text_by_path",
@@ -341,10 +343,6 @@
           {
             "type": "command",
             "command": "f=~/.claude/hooks/block_raw_github_fetch.py; if [ -f \"$f\" ] && command -v python3 >/dev/null; then python3 \"$f\"; fi"
-          },
-          {
-            "type": "command",
-            "command": "f=~/.claude/hooks/block_aws_logs_start_query.py; if [ -f \"$f\" ] && command -v python3 >/dev/null; then python3 \"$f\"; fi"
           },
           {
             "type": "command",
