@@ -13,6 +13,10 @@ the point where the answer is yes.
 - When the branch needs newer default-branch commits, the parent
   merges them and re-dispatches, since the subagent is barred from
   merging the default branch mid-run
+- When the dispatch will open the PR, invoke the `pr-issue-writing`
+  skill and run its preflight before dispatching, since the implementer
+  opens the PR without it and the target's visibility and any duplicate
+  matter before the PR exists
 
 ## Writing the brief
 

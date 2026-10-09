@@ -53,7 +53,8 @@ body carries the content below in the order listed.
 - The title is a one-line summary of the problem or request, and issue
   references and other detail go in the body
 - The language follows the target repository's own rule when it states
-  one, otherwise its existing issues
+  one, otherwise English for an open-source repository, otherwise its
+  existing issues
 - Write each paragraph and each list item as a single line, with a
   blank line between paragraphs, since GitHub renders a line break
   inside an issue body as a visible break

@@ -21,7 +21,7 @@ NOT restate the detailed procedures from the skill.
   (`git-worktree-create <branch>`, or `git checkout -b` where
   project rules prohibit worktrees)
 - Step 2: implement, commit, push
-- Step 3: create a draft PR (`gh pr create --draft --body-file`)
+- Step 3: create a draft PR
 - Step 4: CI wait and review (Phases 1-5)
 - Step 5: cleanup after merge (`git cleanup`)
 
@@ -42,8 +42,13 @@ NOT restate the detailed procedures from the skill.
   update-branch <N>`, merge the default branch into the feature
   branch, or a fresh commit on top.
 
-## PR / issue body edits
+## PR / issue creation and edits
 
-- Invoke `Skill(pr-issue-writing)` before writing or editing a PR or
-  issue title or body, including a `gh pr edit` / `gh issue edit` run
-  outside the git workflow
+- Invoke `Skill(pr-issue-writing)` before creating a PR or an issue
+  and before writing or editing a title or body, including a draft
+  shown in chat and a `gh pr edit` / `gh issue edit` run outside the
+  git workflow, since the checks before creating a PR or issue or
+  rewriting a body run only through it
+  - The `implementer` subagent's placeholder PR is exempt, as the
+    parent runs the skill's preflight before dispatching it and later
+    replaces its title and body
