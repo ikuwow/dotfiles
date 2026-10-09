@@ -248,13 +248,15 @@ After the PR is merged (or the task is fully done):
    - When `git home` fails, still run the next step and report the
      failed pull
 1. Run `git cleanup` once.
-1. When the merged PR addresses an issue, close that issue once the
-   merged change settles every item the issue lists as closing it
-   (the body's request when it lists none):
-   `gh issue close <N> --reason completed --comment '<what settled each item, with the PR link>'`
+1. When the merged PR addresses an issue, close that issue once every
+   item it lists as closing it (the body's request when it lists none)
+   is settled by the merged change or a check run in this session, or
+   once the user said it is not needed or a duplicate
+   - Settled items:
+     `gh issue close <N> --reason completed --comment '<what settled each item, with the PR link>'`
+   - Not needed: `--reason "not planned"`, and a duplicate of `<M>`:
+     `--duplicate-of <M>`, each with a comment quoting what the user
+     said
    - Keep the comment to a few lines
-   - Close with `--reason "not planned"` only when the user said the
-     issue is not needed, and with `--duplicate-of <M>` only when the
-     user named it a duplicate of `<M>`, and say which in the comment
    - Leave the issue open while an item remains unsettled, and name
      that item in the final report
