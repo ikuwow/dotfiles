@@ -1,18 +1,21 @@
 #!/usr/bin/env python3
 """Deny ``git commit --amend`` when HEAD is already pushed.
 
-Force push is denied in settings.json, so amending a pushed commit
-leaves a branch that has diverged from its remote and cannot be pushed.
-This PreToolUse hook denies that amend before it runs and points at a
-fresh commit instead. An amend of a commit that no remote-tracking ref
-contains stays local and passes.
+Force push flags are denied in settings.json, so amending a pushed
+commit leaves a branch that has diverged from its remote and cannot be
+pushed. This PreToolUse hook denies that amend before it runs and
+points at a fresh commit instead. An amend of a commit that no
+remote-tracking ref contains stays local and passes.
 
-The pushed check reads local remote-tracking refs, so a commit pushed
-from elsewhere and not yet fetched counts as unpushed.
+The pushed check runs in the repository a ``git -C <dir>`` names,
+resolved against the hook's ``cwd``, and otherwise in ``cwd`` itself.
+It reads local remote-tracking refs, so a commit pushed from elsewhere
+and not yet fetched counts as unpushed.
 
 Spec: https://code.claude.com/docs/en/hooks
 """
 import json
+import os
 import shlex
 import subprocess
 import sys
@@ -22,50 +25,94 @@ REASON = (
     "push, which is blocked. Make a new commit with the change instead."
 )
 
+_SEPARATORS = {";", "&", "&&", "|", "||", "(", ")"}
 
-def is_amend_commit(command: str) -> bool:
-    """Return True if a ``git`` token is followed by ``commit`` and ``--amend``.
 
-    >>> is_amend_commit("git commit --amend")
-    True
-    >>> is_amend_commit("git commit --amend --no-edit")
-    True
-    >>> is_amend_commit("git commit -a --amend -m 'fix'")
-    True
-    >>> is_amend_commit("git -C repo commit --amend")
-    True
+def _command_tokens(command: str) -> list:
+    """Return shell tokens up to the first heredoc or unbalanced quote.
 
-    A message that mentions the flag is a single token and passes:
+    The lexer reads lazily, so a heredoc body is never tokenized and a
+    quote it carries cannot hide the command line before it.
 
-    >>> is_amend_commit("git commit -m 'Allow --amend before push'")
-    False
-    >>> is_amend_commit("git commit -m 'fix'")
-    False
-    >>> is_amend_commit("git log --amend")
-    False
-
-    Unbalanced quotes cannot be tokenized and pass:
-
-    >>> is_amend_commit("git commit --amend -m 'oops")
-    False
+    >>> _command_tokens("git commit --amend -F - <<'EOF'\\nDon't\\nEOF")
+    ['git', 'commit', '--amend', '-F', '-']
+    >>> _command_tokens("git log | grep -- --amend;")
+    ['git', 'log', '|', 'grep', '--', '--amend', ';']
     """
+    lexer = shlex.shlex(command, posix=True, punctuation_chars=True)
+    lexer.whitespace_split = True
+    tokens = []
     try:
-        tokens = shlex.split(command)
+        for token in lexer:
+            if token.startswith("<<"):
+                break
+            tokens.append(token)
     except ValueError:
-        return False
-    if "git" not in tokens:
-        return False
-    rest = tokens[tokens.index("git") + 1:]
-    if "commit" not in rest:
-        return False
-    return "--amend" in rest[rest.index("commit") + 1:]
+        pass
+    return tokens
 
 
-def remote_refs_containing_head(cwd: str) -> list:
-    """Return the remote-tracking refs that contain HEAD in ``cwd``."""
+def amend_target(command: str):
+    """Return the ``-C`` directory of a ``git commit --amend``, if any.
+
+    Returns ``"."`` for an amend without ``-C``, and None when the
+    command carries no amend.
+
+    >>> amend_target("git commit --amend")
+    '.'
+    >>> amend_target("git commit -a --amend -m 'fix'")
+    '.'
+    >>> amend_target("git -C repo commit --amend --no-edit")
+    'repo'
+    >>> amend_target("git -C a -C b commit --amend")
+    'a/b'
+    >>> amend_target("git add f && git commit --amend --no-edit")
+    '.'
+    >>> amend_target("git commit --amend -F - <<'EOF'\\nDon't block\\nEOF")
+    '.'
+
+    A flag inside a message or a heredoc body, or after another
+    subcommand, is not an amend:
+
+    >>> amend_target("git commit -m 'Allow --amend before push'")
+    >>> amend_target("git commit -F - <<'EOF'\\nAllow --amend\\nEOF")
+    >>> amend_target("git log | grep -- --amend")
+    >>> amend_target("git log --amend")
+    """
+    segment = []
+    for token in _command_tokens(command) + [";"]:
+        if token not in _SEPARATORS:
+            segment.append(token)
+            continue
+        if segment and segment[0] == "git":
+            target = "."
+            i = 1
+            while i < len(segment) and segment[i].startswith("-"):
+                if segment[i] in ("-C", "-c") and i + 1 < len(segment):
+                    if segment[i] == "-C":
+                        target = os.path.normpath(
+                            os.path.join(target, segment[i + 1]))
+                    i += 2
+                else:
+                    i += 1
+            if (i < len(segment) and segment[i] == "commit"
+                    and "--amend" in segment[i + 1:]):
+                return target
+        segment = []
+    return None
+
+
+def remote_refs_containing_head(repo: str) -> list:
+    """Return the remote-tracking refs that contain HEAD in ``repo``.
+
+    Symbolic refs such as ``origin/HEAD`` are left out. A git failure
+    (not a repository, unborn HEAD) returns an empty list, which lets
+    the amend through.
+    """
     result = subprocess.run(
-        ["git", "-C", cwd, "for-each-ref", "--contains", "HEAD",
-         "--format=%(refname:short)", "refs/remotes"],
+        ["git", "-C", repo, "for-each-ref", "--contains", "HEAD",
+         "--format=%(if)%(symref)%(then)%(else)%(refname:short)%(end)",
+         "refs/remotes"],
         capture_output=True, text=True, check=False,
     )
     if result.returncode != 0:
@@ -82,9 +129,11 @@ if __name__ == "__main__":
 
     tool_name = data.get("tool_name", "")
     command = data.get("tool_input", {}).get("command", "")
+    target = amend_target(command) if tool_name == "Bash" else None
 
-    if tool_name == "Bash" and is_amend_commit(command):
-        refs = remote_refs_containing_head(data.get("cwd", "."))
+    if target is not None:
+        repo = os.path.join(data.get("cwd", "."), target)
+        refs = remote_refs_containing_head(repo)
         if refs:
             print(json.dumps({
                 "hookSpecificOutput": {
