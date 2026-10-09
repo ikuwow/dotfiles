@@ -214,10 +214,6 @@
       "Bash(pr-monitor *)"
     ],
     "deny": [
-      "Bash(git commit --amend)",
-      "Bash(git commit --amend *)",
-      "Bash(git commit * --amend)",
-      "Bash(git commit * --amend *)",
       "Bash(git push --force *)",
       "Bash(git push -f *)",
       "Bash(git push * --force *)",
@@ -282,7 +278,6 @@
     ],
     "ask": [
       "Bash(git rebase *)",
-      "Bash(git reset *)",
       "Bash(git clean *)",
       "Bash(git stash drop *)",
       "Bash(git stash clear *)",
