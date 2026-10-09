@@ -19,6 +19,9 @@ are symlinks pointing to files in this repository.
   `cat ~/.claude/CLAUDE.md`. Deploy targets under `$HOME` (`~/.claude/`,
   `~/.codex/`, etc.) generally require a permission prompt
 - Check `scripts/deploy.sh` for the full list of symlink mappings
+- After a merge that adds, removes, or renames a file `scripts/deploy.sh` links, run it on the default branch after `git home` without asking
+  - It only relinks the managed symlinks and deletes broken ones, and edits to an already-linked file take effect through the symlink with no run
+  - A run on a feature branch links files that disappear on the next checkout
 
 ## Git Workflow
 
