@@ -138,7 +138,7 @@ Procedure:
 1. Otherwise open a draft PR with a placeholder body. Write the body to
    a file under the session scratchpad and pass `--body-file`. `--body`
    is never an option, whatever the body contains:
-   `gh pr create --draft --title 'WIP: <one-line summary>' --body-file <path>`
+   `gh pr create --draft --repo <owner>/<repo> --title 'WIP: <one-line summary>' --body-file <path>`
    Body content is exactly:
    `WIP: body to be written by the parent agent.`
    Do not write rationale, background, a change list, or a verification

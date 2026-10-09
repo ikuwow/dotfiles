@@ -21,7 +21,7 @@ NOT restate the detailed procedures from the skill.
   (`git-worktree-create <branch>`, or `git checkout -b` where
   project rules prohibit worktrees)
 - Step 2: implement, commit, push
-- Step 3: create a draft PR (`gh pr create --draft --body-file`)
+- Step 3: create a draft PR (`gh pr create --draft --repo <owner>/<repo> --body-file`)
 - Step 4: CI wait and review (Phases 1-5)
 - Step 5: cleanup after merge (`git cleanup`)
 
