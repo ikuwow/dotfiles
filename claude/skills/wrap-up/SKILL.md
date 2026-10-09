@@ -101,15 +101,17 @@ A record goes where a later reader will look for it.
   - A file path is not a record, because nobody looks in a place they do not remember
 
 A serious failure in how the agent worked is described to the user and
-left without a drafted fix, since the direction a fix takes is theirs to
-settle in conversation before any edit is written.
+left without a drafted fix to the rule, skill, hook, or permission
+behind it, since the direction a fix takes is theirs to settle in
+conversation before any edit is written. A defect it left in a
+deliverable still gets the fix proposal above.
 
 A failure is serious when all three of the following hold. A failure
 that misses one costs the user a read and a decision at the end of the
 session without changing what they would do: they catch it on the spot
 next time, or no edit can keep it from recurring.
 
-- Harm: had it shipped, it would have done one of the following, judged by that impact even when a checkpoint (plan review, PR review, a hook) caught it first
+- Harm: left uncaught, it would have done one of the following, judged by that impact even when a checkpoint (plan review, PR review, a hook) caught it first
   - changed the direction of the work through a misjudgment
   - left the user to redo work by hand
   - introduced an error into a deliverable
@@ -117,9 +119,9 @@ next time, or no edit can keep it from recurring.
 - Cause: a specific instruction text or a missing gate accounts for it, so an edit to a rule, skill, hook, or permission can keep the next session from repeating it
 - Exposure: its next occurrence would go unnoticed by the user, or would cause harm that cannot be undone or that leaves the machine
 
-Two adjustments apply to those conditions.
+Two cases adjust those conditions.
 
-- A failure the agent corrected on its own, before the user pointed it out, stays out even when it repeated within the session
+- A failure the agent corrected on its own, before the user pointed it out, is not serious, even when it repeated within the session
 - A failure matching an issue with the `retrospective` label in `ikuwow/dotfiles` is serious when two of the three conditions hold, since its recurrence across sessions shows that leaving it alone did not settle it
   - Find matches with `gh issue list --repo ikuwow/dotfiles --label retrospective --state all --limit 200 --json number,title,state`, reading the body of a candidate whose title alone does not settle the match
   - A closed issue counts, since a recurrence after its fix landed shows the fix did not hold
@@ -131,7 +133,7 @@ Each serious failure is presented as follows.
 - A direction is a structural change: an edit to a named instruction text, a new gate (hook, permission, check), or a removal
   - "Be more careful", "follow the rule more closely", recording it in memory, and restating an existing rule are not directions, since each depends on the model's attention or recall improving
 - Its one proposal is an issue whose body is that description, so that a session ended before the conversation still keeps the failure on record
-  - When the matching issue is open, the proposal is a comment on that issue carrying the description instead
+  - When the matching issue is open, the proposal is a comment on that issue carrying the description, in place of the new issue the next bullet would place
 - The issue goes to the session's repository without a label when every direction lands in that project's own rule file, and to `ikuwow/dotfiles` with the `retrospective` label otherwise
 - Text for `ikuwow/dotfiles`, a public repository, describes the failure by its behavior pattern and leaves out private repository names, their PR and issue numbers, their code, and quoted text from their rule files
 
