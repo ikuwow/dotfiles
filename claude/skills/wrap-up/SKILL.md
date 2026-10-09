@@ -119,6 +119,7 @@ next time, or no edit can keep it from recurring.
   - misled the user with a confidently wrong assertion
   - spent the user's turns on a stop or confirmation the task did not need, such as asking approval for an action the user already said to take without asking
 - Cause: a specific instruction text or a missing gate accounts for it, so an edit to a rule, skill, hook, or permission can keep the next session from repeating it
+  - "The agent did not follow the rule" and "the agent misread it" describe the failure rather than its cause, so look for the cause in that rule's wording, where it loads, or the gate it lacks
 - Exposure: its next occurrence would go unnoticed by the user, or would cause harm that cannot be undone or that leaves the machine
 
 Two cases adjust those conditions.
