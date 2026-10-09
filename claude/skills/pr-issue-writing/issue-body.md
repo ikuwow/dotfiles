@@ -48,6 +48,25 @@ body carries the content below in the order listed.
   document) under its link, in the shortest form that survives the link
   going dead
 
+## Claim review
+
+Run this on the draft after it is written and before it is posted or
+shown in chat. A claim the writer added as a gloss or a parenthetical
+reads to the writer as framing rather than as a claim, and passes
+Grounding unchecked unless each claim is listed.
+
+1. List in the assistant message every factual claim the draft makes,
+   including those inside parentheticals, glosses, table cells, and
+   checklist items, each paired with the place it came from: an issue
+   or PR number, a file path, a command and its output, or the user's
+   own statement
+1. For a claim marked unverified, check whether a source within reach
+   settles it, such as a local clone or a CLI, and verify it instead of
+   keeping the label when one does
+1. Rewrite a claim with no source as a hypothesis carrying the evidence
+   that points to it, or drop it
+1. Update the draft file with the result, as a new revision
+
 ## Form
 
 - The title is a one-line summary of the problem or request, and issue
