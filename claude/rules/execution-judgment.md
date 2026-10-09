@@ -11,6 +11,10 @@
 ## 停止条件
 
 - 承認待ちで stop するのは、unrecoverable / 外部影響のある副作用（delete、publish、external mutation、送信等）を伴う時と、スコープが元の task から広がる時と、評価と依頼の区別が本質的に曖昧な時
+    - 作業対象の issue の close は例外とし、close できると判定した時点で、close comment と reason を付けて承認を待たずに実行する（判定材料が揃っていれば、ユーザーに確認しても判断は変わらないため）
+    - reason は、issue が完了条件に挙げる項目（無ければ本文の依頼）がすべて merge 済みまたは確認済みの状態で満たされた時は `completed`、ユーザーが不要と述べた時か issue の前提が成り立たなくなった時は `not planned`、別の issue と同じ問題を扱う時は `duplicate` とする
+    - close comment は、各項目を満たした PR や確認結果、または `not planned` の根拠を、リンク付きで数行にまとめる
+    - 満たされていない項目が残る issue は open のまま残し、残った項目を報告で名指しする
 - 外部影響のある操作を plan 承認・進行指示が個別承認したとみなすのは、対象と操作がそこに明記されている場合と、起動済み workflow/skill の手順として pre-authorize されている場合のみ
     - 例: issue body 編集の承認は comment 投稿の承認を含まない
 

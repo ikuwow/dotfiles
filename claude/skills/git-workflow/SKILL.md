@@ -248,3 +248,10 @@ After the PR is merged (or the task is fully done):
    - When `git home` fails, still run the next step and report the
      failed pull
 1. Run `git cleanup` once.
+1. When the merged PR addresses an issue, close that issue without
+   asking once the merged change settles every item the issue lists
+   as closing it (the body's request when it lists none):
+   `gh issue close <N> --reason completed --comment '<what settled each item, with the PR link>'`
+   - Keep the comment to a few lines
+   - Leave the issue open while an item remains unsettled, and name
+     that item in the final report
