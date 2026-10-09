@@ -7,8 +7,9 @@ description: Take stock of a session before it ends (unfinished work, state that
 
 This skill brings a session to a state where ending it loses nothing the
 user needs. Reading and routine cleanup run on their own, since
-neither writes to a repository or GitHub, the targets Step 2 holds for
-the user's selection, apart from closing a settled issue. A write the
+routine cleanup removes only local state whose content exists elsewhere,
+and its one GitHub write, closing a settled issue, is undone by
+reopening it. A write the
 user decides on runs only after they select it, since one wrap-up can
 touch several repositories and PRs and the user approves exactly the
 operations and text they were shown. Step 2 draws the line between the
@@ -111,7 +112,7 @@ that misses one costs the user a read and a decision at the end of the
 session without changing what they would do: they catch it on the spot
 next time, or no edit can keep it from recurring.
 
-- Harm: left uncaught, it would have done one of the following, judged by that impact even when a checkpoint (plan review, PR review, a hook) caught it first
+- Harm: it would have done one of the following had no checkpoint (plan review, PR review, a hook, the user) caught it
   - changed the direction of the work through a misjudgment
   - left the user to redo work by hand
   - introduced an error into a deliverable
