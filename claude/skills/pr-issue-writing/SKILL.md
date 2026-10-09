@@ -78,6 +78,7 @@ rather than the full before-and-after.
      directory using the Write tool, a new filename per revision. Do
      not generate a temp filename, and do not Read a file that does not
      exist yet
+     - Follow the template the preflight found, when it ran
   1. Review the draft under "Review a draft against its sources" below,
      writing any revision to a fresh file
   1. Execute the edit:

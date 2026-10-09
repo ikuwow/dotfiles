@@ -47,6 +47,8 @@ NOT restate the detailed procedures from the skill.
 - Invoke `Skill(pr-issue-writing)` before creating a PR or an issue
   and before writing or editing a title or body, including a draft
   shown in chat and a `gh pr edit` / `gh issue edit` run outside the
-  git workflow, since the checks before posting run only through it
+  git workflow, since the checks before creating a PR or issue or
+  rewriting a body run only through it
   - The `implementer` subagent's placeholder PR is exempt, as the
-    parent runs the skill before dispatching it and replaces the body
+    parent runs the skill's preflight before dispatching it and later
+    replaces its title and body
