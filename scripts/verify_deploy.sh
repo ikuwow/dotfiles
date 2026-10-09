@@ -111,7 +111,6 @@ check_dir "$HOME/.claude/hooks"
 check_dir "$HOME/.claude/agents"
 check_dir "$HOME/.claude/rules"
 # Auto-discovered skills, hooks, agents, and rules
-check_symlink "$HOME/.claude/skills/retrospective"
 check_symlink "$HOME/.claude/hooks/approve_git_gh_commands.py"
 check_symlink "$HOME/.claude/hooks/hook_utils.py"
 check_symlink "$HOME/.claude/agents/investigator.md"
