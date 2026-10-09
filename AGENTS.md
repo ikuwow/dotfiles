@@ -20,7 +20,7 @@ are symlinks pointing to files in this repository.
   `~/.codex/`, etc.) generally require a permission prompt
 - Check `scripts/deploy.sh` for the full list of symlink mappings
 - After a merge, run `scripts/deploy.sh` without asking once `git home` has succeeded, and report the deploy as pending when `git home` was skipped or failed
-  - It replaces each link target with a symlink into this repository and prunes broken symlinks in the directories it auto-discovers, and on a deployed machine those targets already are such symlinks
+  - It replaces each link target with a symlink into this repository and deletes no other file than broken symlinks, and on a deployed machine those targets already are such symlinks
   - A run on a feature branch links files that disappear on the next checkout
 
 ## Git Workflow
