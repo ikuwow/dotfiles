@@ -123,7 +123,7 @@ next time, or no edit can keep it from recurring.
 Two cases adjust those conditions.
 
 - A failure the agent corrected on its own, before the user pointed it out, is not serious, even when it repeated within the session
-- A failure matching an issue with the `retrospective` label in `ikuwow/dotfiles` is serious when two of the three conditions hold, since its recurrence across sessions shows that leaving it alone did not settle it
+- Any other failure matching an issue with the `retrospective` label in `ikuwow/dotfiles` is serious when two of the three conditions hold, since its recurrence across sessions shows that leaving it alone did not settle it
   - Find matches with `gh issue list --repo ikuwow/dotfiles --label retrospective --state all --limit 200 --json number,title,state`, reading the body of a candidate whose title alone does not settle the match
   - A closed issue counts, since a recurrence after its fix landed shows the fix did not hold
 
