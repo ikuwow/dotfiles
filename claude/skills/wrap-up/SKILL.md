@@ -1,15 +1,15 @@
 ---
 name: wrap-up
-description: Take stock of a session before it ends (unfinished work, state that ending the session discards, and findings recorded nowhere), log the session through retro-note, describe each serious failure in how the agent worked with its risk and the directions a fix could take, clear the routine cleanup, propose the writes the user decides on, and report whether the session is safe to end. Trigger when the user signals that the session or the task is over ("終わり", "done", "これで完了", "おつかれ"), when they ask what is left before quitting, and when they invoke /wrap-up.
+description: Take stock of a session before it ends (unfinished work, state that ending the session discards, and findings recorded nowhere), describe each serious failure in how the agent worked with its risk and the directions a fix could take, clear the routine cleanup, propose the writes the user decides on, and report whether the session is safe to end. Trigger when the user signals that the session or the task is over ("終わり", "done", "これで完了", "おつかれ"), when they ask what is left before quitting, and when they invoke /wrap-up.
 ---
 
 # Wrap Up
 
 This skill brings a session to a state where ending it loses nothing the
-user needs. Reading, invoking retro-note, and routine cleanup run on
-their own, since retro-note writes to no repository or GitHub, the
-targets Step 2 holds for the user's selection apart from closing a
-settled issue. A write the
+user needs. Reading and routine cleanup run on their own, since
+routine cleanup removes only local state whose content exists elsewhere,
+and its one GitHub write, closing a settled issue, is undone by
+reopening it. A write the
 user decides on runs only after they select it, since one wrap-up can
 touch several repositories and PRs and the user approves exactly the
 operations and text they were shown. Step 2 draws the line between the
@@ -17,11 +17,7 @@ two.
 
 ## Step 1: Inventory
 
-Invoke the `retro-note` skill first, so that it sees the session before
-this skill changes any local state. Skip it when retro-note already ran in this session, since a
-second run would log the same session twice.
-
-Collect the other items with read-only commands and from the conversation. Skip a
+Collect the items with read-only commands and from the conversation. Skip a
 source whose precondition is absent: the git checks when the session
 worked in no git repository, the PR checks when it touched no PR, and a
 tool-based listing when this session lacks that tool.
@@ -44,7 +40,7 @@ tool-based listing when this session lacks that tool.
   - work the session said it would do and did not start
   - questions put to the user that have no answer yet
   - decisions and investigation results that no repository file, issue, or PR holds
-  - serious failures in how the agent worked this session: a wrong claim, action, or rule break that reached the user or a persisted artifact, and that a change to a rule, skill, or hook could keep the next session from repeating
+  - serious failures in how the agent worked this session, judged by the criterion in Step 2
 - Findings that exist only in scratchpad content
 
 Attribute each uncommitted change and stash entry before listing it, and
@@ -106,12 +102,41 @@ A record goes where a later reader will look for it.
   - A file path is not a record, because nobody looks in a place they do not remember
 
 A serious failure in how the agent worked is described to the user and
-left without a drafted fix, since the direction a fix takes is theirs to
-settle in conversation before any edit is written.
+left without a drafted fix to the rule, skill, hook, or permission
+behind it, since the direction a fix takes is theirs to settle in
+conversation before any edit is written. A defect it left in a
+deliverable still gets the fix proposal above.
 
-- A session with none says nothing about failures, and a slip the session corrected on its own stays out, since a stretched finding costs the user a read and a decision
-- Describe each one in a few lines: what happened, the risk it carries, and the directions a fix could take
+A failure is serious when all three of the following hold. A failure
+that misses one costs the user a read and a decision at the end of the
+session without changing what they would do: they catch it on the spot
+next time, or no edit can keep it from recurring.
+
+- Harm: it would have done one of the following had no checkpoint (plan review, PR review, a hook, the user) caught it
+  - changed the direction of the work through a misjudgment
+  - left the user to redo work by hand
+  - introduced an error into a deliverable
+  - misled the user with a confidently wrong assertion
+  - spent the user's turns on a stop or confirmation the task did not need, such as asking approval for an action the user already said to take without asking
+- Cause: a specific instruction text or a missing gate accounts for it, so an edit to a rule, skill, hook, or permission can keep the next session from repeating it
+  - "The agent did not follow the rule" and "the agent misread it" describe the failure rather than its cause, so look for the cause in that rule's wording, where it loads, or the gate it lacks
+- Exposure: its next occurrence would go unnoticed by the user, or would cause harm that cannot be undone or that leaves the machine
+
+Two cases adjust those conditions.
+
+- A failure the agent corrected on its own, before the user pointed it out, is not serious, even when it repeated within the session
+- Any other failure matching an issue with the `retrospective` label in `ikuwow/dotfiles` is serious when two of the three conditions hold, since its recurrence across sessions shows that leaving it alone did not settle it
+  - Find matches with `gh issue list --repo ikuwow/dotfiles --label retrospective --state all --limit 200 --json number,title,state`, reading the body of a candidate whose title alone does not settle the match
+  - A closed issue counts, since a recurrence after its fix landed shows the fix did not hold
+
+Each serious failure is presented as follows.
+
+- A session with none says nothing about failures
+- Describe each one in a few lines: what happened, how it meets each condition, the risk it carries, the directions a fix could take, and the matching issue when one exists
+- A direction is a structural change: an edit to a named instruction text, a new gate (hook, permission, check), or a removal
+  - "Be more careful", "follow the rule more closely", recording it in memory, and restating an existing rule are not directions, since each depends on the model's attention or recall improving
 - Its one proposal is an issue whose body is that description, so that a session ended before the conversation still keeps the failure on record
+  - When the matching issue is open, the proposal is a comment on that issue carrying the description, in place of the new issue the next bullet would place
 - The issue goes to the session's repository without a label when every direction lands in that project's own rule file, and to `ikuwow/dotfiles` with the `retrospective` label otherwise
 - Text for `ikuwow/dotfiles`, a public repository, describes the failure by its behavior pattern and leaves out private repository names, their PR and issue numbers, their code, and quoted text from their rule files
 
@@ -135,7 +160,7 @@ Local git proposals keep to what the session changed.
 When there are no proposals, go to Step 5, where the cleanup Step 2 already ran is reported.
 
 1. Show every proposal in the conversation, numbered, with its draft in full
-   - A serious failure's description comes directly before its issue proposal, which shows its title and points to the description as its body, so the user reads the text once
+   - A serious failure's description comes directly before its proposal, which shows the issue title or the target issue and points to the description as its text, so the user reads the text once
 1. Ask for the selection at the end of that same message, in plain text that names the proposal numbers (run 1, run 2, run all, run none), and end the turn there
    - Text sent in the same turn as an AskUserQuestion call can fail to reach the user, so the selection is taken from the user's reply instead
 1. Run exactly the proposals the reply selects, and treat every other proposal as declined
@@ -158,7 +183,7 @@ a version the user did not see.
 
 1. Open with the verdict
    - Safe to end: the routine cleanup and every selected proposal ran
-   - Items remain: the retro-note invocation failed in Step 1, a cleanup operation failed in Step 2, or a selected proposal failed or was stopped in Step 4
+   - Items remain: a cleanup operation failed in Step 2, or a selected proposal failed or was stopped in Step 4
 1. List the routine cleanup that ran, one line per operation
 1. For each declined, failed, or stopped item, write one line naming where it now lives: a PR or issue URL, a place that exists only on this machine (uncommitted changes, a stash entry, or an unpushed branch, with its repository), or what ending the session stops or discards
 1. Give the count of items already safe to leave

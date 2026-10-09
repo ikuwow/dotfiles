@@ -8,8 +8,8 @@ The model knows the rule but slips. A literal substring match cannot
 disambiguate legitimate uses (名詞 like 「正直者」), so this hook does
 not try. It does exclude one legitimate case: text inside backtick
 code spans (inline `...` or fenced ``` blocks) is a *mention*, not a
-*use*, of the phrase (e.g. quoting it in a retrospective Problem
-line), so it is stripped before matching. Other legitimate uses
+*use*, of the phrase (e.g. quoting it in an issue draft shown in
+chat), so it is stripped before matching. Other legitimate uses
 remain accepted false positives, pinned below. It blocks at most once
 per Stop chain: the second invocation arrives with
 stop_hook_active=true and is allowed through, preventing infinite
@@ -55,7 +55,7 @@ REASON = (
     "「本当のところ」「ぶっちゃけ」 carry the same structural harm.\n\n"
     "Judge your own usage and rewrite if it was 断り書き.\n\n"
     "When you need to mention (not use) a banned phrase — e.g. quoting "
-    "it in a retrospective Problem line — wrap it in backticks so this "
+    "it in an issue draft shown in chat — wrap it in backticks so this "
     "hook can tell mention from use."
 )
 
@@ -111,9 +111,9 @@ def strip_code_spans(text):
     """Remove fenced code blocks and inline backtick spans from text.
 
     Code spans are a *mention*, not a *use*, of a phrase — quoting a
-    banned phrase in backticks to talk about it (e.g. a retrospective
-    Problem line) should not trip the hook the way actually using it
-    as 断り書き would.
+    banned phrase in backticks to talk about it (e.g. in an issue draft
+    shown in chat) should not trip the hook the way actually using it as
+    断り書き would.
 
     Banned phrase inside an inline backtick span is removed, the rest
     of the line is kept:

@@ -156,8 +156,6 @@
       "Read(//var/folders/**)",
       "Edit(//private/var/folders/**)",
       "Read(//private/var/folders/**)",
-      "Edit(~/.local/share/claude/retrospective/**)",
-      "Read(~/.local/share/claude/retrospective/**)",
       "Bash(mdfind:*)",
       "Bash(mise list *)",
       "Bash(mise ls *)",
