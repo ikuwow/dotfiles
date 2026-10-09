@@ -21,7 +21,7 @@ NOT restate the detailed procedures from the skill.
   (`git-worktree-create <branch>`, or `git checkout -b` where
   project rules prohibit worktrees)
 - Step 2: implement, commit, push
-- Step 3: create a draft PR through `pr-issue-writing`
+- Step 3: create a draft PR through `Skill(pr-issue-writing)`
 - Step 4: CI wait and review (Phases 1-5)
 - Step 5: cleanup after merge (`git cleanup`)
 
@@ -48,3 +48,6 @@ NOT restate the detailed procedures from the skill.
   and before writing or editing a title or body, including a draft
   shown in chat and a `gh pr edit` / `gh issue edit` run outside the
   git workflow
+  - The skill checks the target repository, its template, and existing
+    duplicates before anything is posted, which a command typed
+    directly skips

@@ -1,23 +1,25 @@
 # Before creating a PR or an issue
 
 These steps run before the body of a new PR or issue is written, and
-before an existing PR's placeholder body is replaced. Each step reads
-the target repository, which differs from the working directory
-whenever the PR or issue goes to another repository, and the target's
-own `CLAUDE.md` is then not loaded.
+before the implementer's placeholder body on a PR is replaced. Each
+step reads the target repository, which differs from the working
+directory whenever the PR or issue goes to another repository, and the
+target's own `CLAUDE.md` is then not loaded.
 
 ## 1. Resolve the target and its visibility
 
 - Take `owner/repo` from `-R` / `--repo`, otherwise from the working
-  directory, and read its visibility:
+  directory, and read the visibility of both the target and the
+  repository the content comes from:
   `gh repo view [<owner>/<repo>] --json nameWithOwner,visibility`
-- When the target is `PUBLIC` and the content originates in a private
-  or internal repository, stop and confirm with the user before
-  writing
+- When the target's visibility is wider than the source's (`PRIVATE`
+  to `INTERNAL` or `PUBLIC`, `INTERNAL` to `PUBLIC`), stop and confirm
+  with the user before writing
   - Content of that kind includes the source repository's `owner/repo`,
     its issue and PR numbers, and code or comments quoted from it
-  - A public issue or PR notifies watchers by mail as it is created,
-    and deleting it afterwards does not recall the mail
+  - Everyone the target's visibility admits can read the content from
+    the moment it is created, and removing it later does not undo what
+    was already read
 
 ## 2. Read the target's rules
 
@@ -32,10 +34,16 @@ own `CLAUDE.md` is then not loaded.
     Discussions, and when the request fits one, ask the user whether to
     use it instead
 - In a repository other than the working directory, read a local clone
-  when `ghq list -p <owner>/<repo>` finds one, otherwise
-  `gh api repos/<owner>/<repo>/contents/<path> -H 'Accept: application/vnd.github.raw'`
+  when `ghq list -p <owner>/<repo>` finds one, after
+  `git -C <clone> fetch origin`, through
+  `git -C <clone> show origin/HEAD:<path>`, since the clone's working
+  tree may be stale or on another branch
+  - Without a clone, read
+    `gh api repos/<owner>/<repo>/contents/<path> -H 'Accept: application/vnd.github.raw'`
 
 ## 3. Find the template
+
+Match file names case-insensitively in each place below.
 
 - PR: `pull_request_template.md` at the root, in `docs/`, or in
   `.github/`, and the files in a `PULL_REQUEST_TEMPLATE/` directory in
@@ -45,7 +53,6 @@ own `CLAUDE.md` is then not loaded.
 - When the target has none of its own, look in the same places in the
   owner's `.github` repository, which GitHub serves as the default
   ([default community health files](https://docs.github.com/en/communities/setting-up-your-project-for-healthy-contributions/creating-a-default-community-health-file))
-- A Markdown template sets the body's sections and their order
 - An issue form (`.yml`) cannot be filled through `--body-file`, so its
   field labels become the body's section headings, with every field the
   form marks required filled

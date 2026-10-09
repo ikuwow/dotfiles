@@ -297,7 +297,8 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
 - Language follows the target repository, not the language of the chat
   with the user
   - Honor any explicit rule in the repo's `CLAUDE.md` / `AGENTS.md`
-    first, otherwise match the existing PR / commit history
+    first, otherwise write English for an open-source repository,
+    otherwise match the existing PR / commit history
 - Do NOT use auto-close keywords (`Closes`, `Fixes`, `Resolves`)
 - Checkbox syntax (`- [ ]` / `- [x]`) is reserved for verification
   items
@@ -340,7 +341,7 @@ the edits carrying it out, and the reviewer reads those in the diff.
 
 ## PR Body Template (fallback)
 
-Use this scaffold when the target repository has no `pull_request_template.md`.
+Use this scaffold when the preflight finds no PR template.
 Repository templates always win — do not overlay this on top of one.
 Section names stay English; body language follows the repo (see
 Conformant above). Purpose / Key changes / Verification is the minimum.
