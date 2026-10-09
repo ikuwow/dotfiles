@@ -25,31 +25,28 @@ can bypass.
 
 ## Create a PR
 
-The branch exists, carries the commits, and is pushed before this runs.
+The branch exists, carries the commits, and is pushed before the steps
+below run.
 
-1. Check whether the branch already has a PR:
-   `gh pr view --json number,url,body`
-1. If it has one whose body is the implementer's placeholder
-   (`WIP: body to be written by the parent agent.`), run the steps in
-   [preflight.md](preflight.md), with this PR itself excluded from the
-   duplicate search. Then replace its title and body using the update
-   procedure below, display the PR URL, and stop here
-1. If it has any other PR, skip creation, bring its title and body
-   into conformance using the update procedure below, display the PR
-   URL, and stop here
+When the PR will be opened by the `implementer` subagent, the parent
+runs only [preflight.md](preflight.md), before dispatching it. The
+implementer opens the PR without this skill, and the parent later
+replaces the placeholder body through step 1 below.
+
+1. If the branch already has a PR (`gh pr view --json number,url`),
+   skip creation, bring its title and body into conformance using the
+   update procedure below, display the PR URL, and stop here
 1. Run the steps in [preflight.md](preflight.md)
 1. Write the body to a fresh file under the session scratchpad
    directory using the Write tool, a new filename per revision. Do not
    generate a temp filename, and do not Read a file that does not exist
    yet
    - Follow the template the preflight found
+1. Review the draft under "Review a draft against its sources" below,
+   writing any revision to a fresh file
 1. Create the PR as a draft:
    `gh pr create --draft --title '...' --body-file <body file path>`
 1. Display the PR URL: `gh pr view --json url --jq '.url'`
-
-`/pr-selfcheck`, which the git workflow runs on a new PR, judges the
-body against the five properties, so a new PR body skips the review
-below unless it is first shown in chat.
 
 ## Create an issue
 
@@ -107,8 +104,8 @@ of the edit.
    statement) among what the session has already read
    - Mark each claim `sourced` when that place states the claim itself,
      and `inferred` otherwise
-   - A date in a title states a date, and reading it as a deadline is
-     an inference
+   - A date in a source's title (an issue, a ticket) states a date, and
+     reading it as a deadline is an inference
    - Classifying an item states the writer's view, and reading a
      decision into it is an inference
    - A tool or service named in a step the reader is meant to follow

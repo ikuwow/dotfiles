@@ -341,7 +341,8 @@ the edits carrying it out, and the reviewer reads those in the diff.
 
 ## PR Body Template (fallback)
 
-Use this scaffold when the preflight finds no PR template.
+Use this scaffold when the target repository has no PR template in any
+of the places `preflight.md` step 3 lists.
 Repository templates always win — do not overlay this on top of one.
 Section names stay English; body language follows the repo (see
 Conformant above). Purpose / Key changes / Verification is the minimum.

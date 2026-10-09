@@ -110,9 +110,11 @@ settle in conversation before any edit is written.
 
 Draft issue and PR titles and bodies against the `pr-issue-writing`
 skill, and comments, commit message bodies, and other prose longer than
-a sentence with the `technical-writing` skill. This step takes only
-their writing criteria: the commands that create or edit an issue or PR
-run in Step 4, for a selected proposal.
+a sentence with the `technical-writing` skill. This step takes their
+writing criteria, and from `pr-issue-writing` also its preflight and
+its review of a draft against its sources, since Step 4 runs the draft
+as shown: the commands that create or edit an issue or PR run in Step
+4, for a selected proposal.
 
 Local git proposals keep to what the session changed.
 
