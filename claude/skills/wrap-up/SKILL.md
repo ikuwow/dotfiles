@@ -8,7 +8,8 @@ description: Take stock of a session before it ends (unfinished work, state that
 This skill brings a session to a state where ending it loses nothing the
 user needs. Reading, invoking retro-note, and routine cleanup run on
 their own, since retro-note writes to no repository or GitHub, the
-targets Step 2 holds for the user's selection. A write the
+targets Step 2 holds for the user's selection apart from closing a
+settled issue. A write the
 user decides on runs only after they select it, since one wrap-up can
 touch several repositories and PRs and the user approves exactly the
 operations and text they were shown. Step 2 draws the line between the
@@ -34,6 +35,7 @@ tool-based listing when this session lacks that tool.
 - PRs this session created or updated
   - `gh pr view <number> --repo <owner>/<repo> --json state,isDraft,statusCheckRollup,reviewDecision`
   - unresolved review threads, listed by `gh pr-review review view -R <owner>/<repo> <number> --unresolved --not_outdated`
+- Open issues that those PRs address or that the user named as the work target, read with `gh issue view <number> --repo <owner>/<repo>`
 - Work that runs only while this session is open
   - background shells, Monitors, and subagents this session started, identified from its own `run_in_background`, Monitor, and Agent calls
   - session crons, listed by `CronList`
@@ -74,6 +76,11 @@ doubtful local cleanup runs and appears in the report.
   - `git cleanup` decides each branch on its own content, deletes none while the working tree has uncommitted changes, and leaves a worktree it cannot remove without `--force`, so the run needs no per-branch gate from this skill
   - `git home` switches to the default branch, which fails inside a linked worktree and, in the root worktree, moves the session off the branch it was on, so the report names the switch alongside the branches removed
 - A background shell, Monitor, subagent, session cron, or artifact watch this session started whose result the session has already reported
+- An open issue from Step 1, closed with `gh issue close` once every item it lists as closing it (the body's request when it lists none) is settled by a merged change or a check run in this session, or once the user said it is not needed or a duplicate
+  - Settled items: `--reason completed`, with a comment of a few lines naming what settled each item and linking the PR
+  - Not needed: `--reason "not planned"`, and a duplicate of `<M>`: `--duplicate-of <M>`, each with a comment quoting what the user said
+  - An issue with an unsettled item stays open, and the report names that item
+  - This is the one GitHub write in this class, and it belongs here because reopening the issue undoes it and the comment keeps its basis on record
 
 Everything else is a proposal: a write to a repository or to GitHub, a
 removal of content held nowhere else (uncommitted changes, a stash
