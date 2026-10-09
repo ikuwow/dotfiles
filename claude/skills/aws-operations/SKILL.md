@@ -1,6 +1,6 @@
 ---
 name: aws-operations
-description: Operating rules for running AWS CLI commands and proposing AWS operations - the AWS_PROFILE prefix form, the profile confirmation, and what that confirmation shows for a billed or writing operation under a production profile (cost estimate, write destination), including Athena scan estimation. ALWAYS invoke before running or proposing any `aws` command, including ones that look read-only such as an Athena SELECT, a CloudWatch Logs Insights query, or an S3 listing, and when an AWS call under a read-only profile returns AccessDenied and another profile is being considered.
+description: Operating rules for running AWS CLI commands and proposing AWS operations - the AWS_PROFILE prefix form, the profile confirmation, and what that confirmation shows for a billed or writing operation under a production profile (cost estimate, write destination), including Athena scan estimation, and the scan estimate shown before every CloudWatch Logs Insights `start-query`. ALWAYS invoke before running or proposing any `aws` command, including ones that look read-only such as an Athena SELECT, a CloudWatch Logs Insights query, or an S3 listing, and when an AWS call under a read-only profile returns AccessDenied and another profile is being considered.
 ---
 
 # AWS Operations
@@ -36,6 +36,17 @@ description: Operating rules for running AWS CLI commands and proposing AWS oper
     - キャンセルや失敗で終わったクエリも、それまでの部分的な結果をこの出力先に残すことがある
 - CTAS、`INSERT INTO`、`UNLOAD` は文が指定する場所（`external_location`、挿入先テーブルのlocation、`UNLOAD` の `TO`）に書き込むので、その場所も示す
 
+## CloudWatch Logs Insights
+
+- `aws logs start-query` は、profileによらず、スキャン量と費用の見積もりを示してから実行する
+    - Logs Insightsはスキャンしたデータ量で課金され、クエリの期間と対象のlog groupの数で費用が桁で変わるため
+- スキャン量の目安を、対象log groupごとの `IncomingBytes`（非圧縮の取り込み量）をクエリの期間で合計して見積もる
+    - 例: `aws cloudwatch get-metric-statistics --namespace AWS/Logs --metric-name IncomingBytes --dimensions Name=LogGroupName,Value=<log group> --start-time <start> --end-time <end> --period 86400 --statistics Sum`
+    - Logs Insightsは非圧縮のログデータのスキャン量で課金されるので、非圧縮の取り込み量を目安に使える
+    - field indexを使うクエリは、この目安より少なくスキャンすることがある
+- 費用はスキャン量に、料金ページにあるリージョンのGBあたり単価を掛けて出す
+- 調べたいことを変えずに期間か対象log groupを絞れる時は、絞った場合の見積もりも併せて示す
+
 ## read-only profileで権限が足りない時
 
 - read-only profileがAccessDeniedを返し、書き込み権限のあるprofileを代わりに提案する時は、その操作が何をどこに書き込むかを同じメッセージで示す
@@ -45,3 +56,6 @@ description: Operating rules for running AWS CLI commands and proposing AWS oper
 
 - https://aws.amazon.com/athena/pricing/
 - https://docs.aws.amazon.com/athena/latest/ug/querying.html
+- https://aws.amazon.com/cloudwatch/pricing/
+- https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/AnalyzingLogData.html
+- https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/CloudWatch-Logs-Monitoring-CloudWatch-Metrics.html

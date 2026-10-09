@@ -1,18 +1,20 @@
 #!/usr/bin/env python3
-"""Deny ``aws logs start-query`` invocations regardless of profile or option shape.
+"""Ask before ``aws logs start-query`` runs, regardless of profile or option shape.
 
 CloudWatch Logs Insights ``start-query`` can scan large volumes of log
-data. Block it at the permission layer so no allow rule (e.g. the
-``AWS_PROFILE=*-ro aws *`` read-only bundles) can implicitly authorize
-it, and so the block is not bypassed by option-position tricks that a
-glob-based ``permissions.deny`` entry would miss.
+data. Return ``ask`` at the permission layer so no allow rule (e.g. the
+``AWS_PROFILE=*-ro aws *`` read-only bundles) and no auto mode
+classifier can approve it silently, leaving the user to approve each
+query against the scan estimate shown beforehand, and so the prompt is
+not bypassed by option-position tricks that a glob-based
+``permissions.ask`` entry would miss.
 
 The hook splits the command into shell segments (respecting quotes and
 collapsing ``\\`` + newline line continuations), strips leading
 environment-variable assignments and an optional ``env ...`` wrapper
 from each segment, walks past aws global options — including known
 value-taking flags like ``--profile`` in either ``--profile stg-ro`` or
-``--profile=stg-ro`` form — and denies the segment when the resolved
+``--profile=stg-ro`` form — and matches the segment when the resolved
 command is ``aws`` (or a path ending in ``/aws``) with service ``logs``
 and subcommand ``start-query``.
 
@@ -44,9 +46,9 @@ _AWS_GLOBAL_VALUE_FLAGS = {
 }
 
 REASON = (
-    "aws logs start-query is denied. CloudWatch Logs Insights queries "
-    "can scan large volumes of log data and are billed by scanned "
-    "bytes. If genuinely needed, ask the user to run it directly."
+    "CloudWatch Logs Insights start-query is billed by scanned bytes. "
+    "Approve only after checking the scan estimate shown in the "
+    "conversation."
 )
 
 
@@ -246,7 +248,7 @@ if __name__ == "__main__":
         print(json.dumps({
             "hookSpecificOutput": {
                 "hookEventName": "PreToolUse",
-                "permissionDecision": "deny",
+                "permissionDecision": "ask",
                 "permissionDecisionReason": REASON,
             },
         }))
