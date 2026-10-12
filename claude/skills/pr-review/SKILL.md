@@ -50,7 +50,7 @@ gh search prs --reviewed-by=@me --state=open --json repository,number,title,auth
 gh search prs --mentions=@me --state=open --json repository,number,title,author,createdAt,updatedAt,isDraft,url
 ```
 
-- `--reviewed-by` を足すのは、レビューを一度投稿すると GitHub がレビュー依頼を外し、議論中の PR が `--review-requested` から消えるため
+- `--reviewed-by` を足すのは、レビューを投稿した PR からはレビュー依頼が外れることがあり、議論中の PR が `--review-requested` から消えるため
 - 組織を絞る時は `--owner <org>` を付ける
 - 優先順位の判断に要るレビュー状態と変更量は、PR ごとに取る
 
