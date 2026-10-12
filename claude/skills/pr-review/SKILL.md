@@ -1,6 +1,6 @@
 ---
 name: pr-review
-description: The user's own policy and procedure for reviewing pull requests written by other people together with the user - working through the queue of PRs that request the user's review, prioritizing it, sizing review depth to risk, judging the overall design before line-level comments, and splitting who replies to which comments. Use whenever the user asks to review someone else's PR, to go through review requests or the review queue, or to decide which PR to review next, even when they only paste a PR URL and say "レビューして". Not for the user's own PRs, which pr-selfcheck and the git-workflow review phases cover.
+description: The user's own policy and procedure for reviewing pull requests written by other people together with the user - working through the queue of PRs that request the user's review, prioritizing it, sizing review depth to risk, judging the overall design before line-level comments, and leaving every post on the PR to the user. Use whenever the user asks to review someone else's PR, to go through review requests or the review queue, or to decide which PR to review next, even when they only paste a PR URL and say "レビューして". Not for the user's own PRs, which pr-selfcheck and the git-workflow review phases cover.
 ---
 
 # PR Review
@@ -22,12 +22,9 @@ description: The user's own policy and procedure for reviewing pull requests wri
     - 同じ種類の指摘を人間のレビューで繰り返さずに済むため
 - design doc と実装が食い違っていたら、doc を直すか実装を直すかの2択として示す
     - どちらが正しいかは作者とチームが決めることのため
-- コメントへの返信の分担は作者の種別で決める
-    - 人間が書いたコメントには、ユーザー本人が返信する
-    - bot や AI agent が書いたコメントには、AI が返信してよい
-    - 作者の種別は REST の `user.type` で判定し、login 名からは推測しない
-        - インラインのコメントは `gh api repos/<owner>/<repo>/pulls/<number>/comments`、レビューは `.../pulls/<number>/reviews`、PR へのコメントは `.../issues/<number>/comments` で読む（`gh pr-review` と `gh pr view` の出力は login しか持たないため）
-        - `user.type` が `User` のアカウントで投稿する AI agent は、人間として扱う
+- 他人の PR へのコメント、返信、レビューの投稿はユーザーが行う
+    - 投稿はユーザーのアカウントで他人の PR に書き込むことになるため
+    - 相手が bot や AI agent のコメントでも同じで、AI が投稿した方がよいと判断した時は、投稿する前にユーザーに尋ねる
 
 ## キューの優先順位
 
