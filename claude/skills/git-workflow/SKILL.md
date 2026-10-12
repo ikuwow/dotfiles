@@ -47,10 +47,12 @@ with `bin/wait-for-change` (Phases 4 and 5).
   with replies and no push.
 - Never end a turn that claims ongoing waiting (delegated fix push,
   CI run, CI rerun, external state change) without an armed event
-  source — a background shell (`run_in_background: true`) running the
-  Phase 5 PR watch or `gh pr checks --watch --fail-fast`.
-  After every `gh run rerun` or other re-kick, re-arm the watch before
-  yielding. State what is being awaited in the final message before
+  source — a background shell (`run_in_background: true`) running
+  `gh pr checks --watch --fail-fast` for a CI run or rerun, or the
+  Phase 5 PR watch for review activity and PR state. The PR watch
+  prints nothing when a check turns green, so it never ends a CI wait.
+  After every `gh run rerun` or other re-kick, re-arm
+  `gh pr checks --watch --fail-fast` before yielding. State what is being awaited in the final message before
   going idle.
   - A PR watch that reached its idle bound (Phase 5) ends the waiting:
     report the stop instead of re-arming, and claim no ongoing wait
@@ -205,10 +207,15 @@ workflow at this phase.
 
 1. On each wake, re-arm the watch first, unless the output or exit
    status meets an exit condition below, and only then re-fetch and
-   react. The re-armed
-   watch takes the PR's state at arm time as its baseline, so what
-   lands after the re-arm wakes it again and what landed before shows
-   in the re-fetch.
+   react. The re-armed watch takes the PR's state at arm time as its
+   baseline, so what lands after the re-arm wakes it again and what
+   landed before shows in the re-fetch.
+   - Every arm, including one after a failed poll and a resumed watch,
+     is followed by that re-fetch, since only the re-fetch shows what
+     landed while no watch ran
+   - A re-fetched `state` of `MERGED` or `CLOSED` meets the matching
+     exit condition: `TaskStop` the watch, since its baseline already
+     holds that state and it would stay silent
 
 1. Each printed line is `<EVENT>` or `<EVENT>: <details>`, carrying
    GitHub's own field values. The steps below cover the events with a
