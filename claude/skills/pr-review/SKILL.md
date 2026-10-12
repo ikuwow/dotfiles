@@ -59,7 +59,7 @@ gh pr view <number> -R <owner>/<repo> --json reviewDecision,reviews,additions,de
 ```
 
 - レビューの履歴は `reviews` で取る
-    - `latestReviews` にはユーザー自身のコメントだけのレビューが出ないことがあり、議論中かどうかを判断できないため
+    - `latestReviews` には出ないレビューがあり、ユーザーが議論に加わっているかを判断できないことがあるため
 
 1件のレビューが終わるごとに一覧を取り直して並べ直す。レビュー中にも新しい依頼や状態の変化が入るため。
 
@@ -67,22 +67,24 @@ gh pr view <number> -R <owner>/<repo> --json reviewDecision,reviews,additions,de
 
 1. PR の URL を最初に出す
     - ユーザーが並行して PR を開いて読み始められるため
+1. PR の作者がユーザー自身でないことを、`author.login` と `gh api user --jq .login` の比較で確認する
+    - ユーザー自身の PR なら、この skill の手順ではなく pr-selfcheck を使う
 1. 本文、レビューの状態、議論の経緯を取得して要約する
     - 本文とメタデータ: `gh pr view <number> -R <owner>/<repo> --json title,body,baseRefName,url,reviewDecision,comments`
     - レビューとインラインのスレッド: `gh pr-review review view -R <owner>/<repo> <number>`
     - `baseRefName` が default branch でなければ chain PR なので、依存先の PR の状態も確認する
 1. 対応する issue を読み、ブロッカーや外部への依存が書かれていないか確認する
 1. 大枠を評価して、approve できそうかと主な論点を出す
-    - 要件：issue の受け入れ条件と照合し、機能要件と非機能要件の分類が正しいかを見る
-    - 設計：アーキテクチャ上の位置づけ、関連 PR との依存関係とデプロイ順序、既存システムへの影響範囲を見る
-    - 検証：テストの範囲、検証環境と本番での確認計画、監視とアラートの有無を見る
+    - 要件：issue の受け入れ条件と照合する
+    - 設計：関連 PR との依存関係とデプロイ順序、既存システムへの影響範囲を見る
+    - 検証：検証環境と本番での確認計画、監視とアラートの有無を見る
     - design doc の PR では、文書の位置づけ（設計書か実装計画書か）が目的に合っているかを見る
 1. design doc がある時は、実装との食い違いを探す
     - 途中で変わった設計判断が doc に反映されているか
     - リトライ回数、タイムアウト、バッチサイズ等の数値が一致しているか
 1. diff を読み、気になる箇所を挙げる
     - 行番号はソースファイル上の行番号で示す（diff 出力上の行番号はユーザーがエディタで辿れないため）
-    - PR ブランチのファイル全体を読む時は、ローカルの clone で `git fetch origin pull/<number>/head` の後に `git show FETCH_HEAD:<path>` で読む
+    - PR ブランチのファイル全体を読む時は、`ghq list -p -e <owner>/<repo>` で見つけたローカルの clone で `git fetch origin pull/<number>/head` の後に `git show FETCH_HEAD:<path>` で読む
 1. Revert の Revert（再適用）の PR では、元の PR の diff と比べる
     - 差分があれば（feature flag の除去など）、その差分を論点にする
 1. ユーザーがコメントや approve を投稿したら、その内容を読み、指摘の網羅度、良かった点、改善できる点をフィードバックする
