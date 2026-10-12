@@ -194,7 +194,8 @@ The PR watch is a background shell that ends, and so wakes the
 session, only when the PR gains something to act on. Arm it with the
 Bash tool, `run_in_background: true`, and the tool's maximum `timeout`
 (an unattended session otherwise stops a background shell after 30
-minutes; a local interactive session has no limit):
+minutes, and at 2 hours at most; a local interactive session has no
+limit):
 
 ```bash
 timeout 24h wait-for-change 60 pr-snapshot <PR number>
@@ -249,16 +250,17 @@ workflow at this phase.
 1. Exit conditions:
    - `STATE: MERGED` → execute step 5 (Cleanup).
    - `STATE: CLOSED` without merge → skip cleanup.
-   - Exit status 124 (24 hours without a new line) → report once that
-     the watch stopped and that running the command above resumes it.
+   - Exit status 124 (24 hours without a new line), or the Bash tool's
+     notice that the shell "was stopped after reaching its background
+     time limit" (an unattended session such as `-p` caps it at 2
+     hours) → report once that the watch stopped and that running the
+     command above resumes it. Re-arming after the time-limit stop
+     would restart the 24-hour bound every 2 hours, so it never ends.
    - A non-zero exit other than 124 means a `pr-snapshot` call failed,
      and the output carries its error. Re-arm once, and on a second
      failure in a row, report the error and stop, since a broken token
      or outage would otherwise wake the session on every poll.
    - Session ends → the watch ends with the session.
-
-   A stop at the background time limit of an unattended session (cloud,
-   `-p`) is not an exit condition: re-arm without a status message.
 
 1. Conflict handling:
    - Manual user push during the watch: acknowledge on the next event,
