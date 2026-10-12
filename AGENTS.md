@@ -91,19 +91,22 @@ recommendations you judge over-engineered.
 ## PR Verification Depth
 
 Hold each PR to the precision its merge needs, so merging and what
-follows it stay light. A behavior found wrong later costs one small
-follow-up PR in this personal repository, and checking how an agent
-acts on a document costs far more before merge than it returns.
+follows it stay light. In this personal repository a behavior found
+wrong later costs one small follow-up PR.
 
-- Verify a claim whose result is deterministic by running it before
-  merge: what a script, hook, command, or setting does, including a
+- Verify by running before merge every result that no model produces:
+  what a script or hook does and its exit status, a command's output,
+  and a setting or frontmatter field the harness enforces, including a
   command that an agent-facing document names
-- Leave how an agent interprets and acts on a rule, skill, or agent
-  definition to the user's use over later sessions, with fixes in
-  later PRs
-  - The PR body's Verification section ends at the deterministic
-    claims, and neither the PR nor the session's wrap-up carries a
-    post-merge check of agent behavior
-  - The same wording can drive different behavior from one situation
-    to the next, so a check before merge covers a small part of real
-    use at the cost of building an eval
+- Leave each result a model produces to the user's use over later
+  sessions, with fixes in later PRs: how an agent acts under the
+  wording of a rule, skill, or agent definition, or under a prompt
+  inside a hook
+  - The same wording drives different behavior from one situation to
+    the next, so a check before merge covers little of real use for
+    the cost of an eval
+  - The PR body's Verification section lists no item about it, and
+    neither the PR nor the session's wrap-up carries a post-merge
+    check of it
+  - An item of that kind in a tracking issue counts as settled by the
+    merge
