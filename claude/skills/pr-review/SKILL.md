@@ -55,7 +55,7 @@ gh search prs --mentions=@me --state=open --sort updated --limit 100 --json repo
 
 - `--reviewed-by` を足すのは、レビューを投稿した PR からはレビュー依頼が外れることがあり、議論中の PR が `--review-requested` から消えるため
 - `-author:@me` でユーザー自身の PR を除く
-    - 自分の PR のスレッドへの返信もレビューとして記録され、`--reviewed-by` に当てはまるため
+    - ユーザー自身の PR にもユーザーの COMMENTED のレビューが付くことがあり、`--reviewed-by` に当てはまるため
 - 結果が `--limit` の件数に届いた時は、取りこぼしがありうることをユーザーに伝える
 - 組織を絞る時は `--owner <org>` を付ける
 - 優先順位の判定に要る値は、PR ごとに取る
