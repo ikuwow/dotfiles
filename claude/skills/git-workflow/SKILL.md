@@ -190,7 +190,9 @@ verification with `curl`, `aws logs tail`, etc.).
 
 The PR watch is a background shell that ends, and so wakes the
 session, only when the PR gains something to act on. Arm it with the
-Bash tool and `run_in_background: true`:
+Bash tool, `run_in_background: true`, and the tool's maximum `timeout`
+(an unattended session otherwise stops a background shell after 30
+minutes; a local interactive session has no limit):
 
 ```bash
 timeout 24h wait-for-change 60 pr-snapshot <PR number>
@@ -201,8 +203,9 @@ timeout 24h wait-for-change 60 pr-snapshot <PR number>
 appeared since the previous run. Arm it here when the run entered the
 workflow at this phase.
 
-1. On each wake, re-arm the watch first, unless the output is an exit
-   condition below, and only then re-fetch and react. The re-armed
+1. On each wake, re-arm the watch first, unless the output or exit
+   status meets an exit condition below, and only then re-fetch and
+   react. The re-armed
    watch takes the PR's state at arm time as its baseline, so what
    lands after the re-arm wakes it again and what landed before shows
    in the re-fetch.
@@ -236,7 +239,7 @@ workflow at this phase.
    failed steps, which a conclusion like `cancelled` or `timed_out` does
    not have. Fix and push under the same pre-push checks.
 
-1. Exit conditions, each ending the watch without a re-arm:
+1. Exit conditions:
    - `STATE: MERGED` → execute step 5 (Cleanup).
    - `STATE: CLOSED` without merge → skip cleanup.
    - Exit status 124 (24 hours without a new line) → report once that
