@@ -1,0 +1,98 @@
+#!/usr/bin/env bash
+
+# Print the actionable state of a GitHub PR, one fact per line, and exit.
+# Holds no state between runs: `wait-for-change` diffs two snapshots and
+# reports the lines that appeared. See the git-workflow skill
+# (claude/skills/git-workflow/SKILL.md) Phase 5 for how the lines are
+# consumed.
+#
+# Usage: pr-snapshot <pr-number>
+#
+# Lines. Field values are GitHub's own, passed through rather than
+# classified here:
+#
+#   STATE: <state>
+#   READY_FOR_REVIEW
+#   REVIEW: <reviewDecision>
+#   CHECK: <check name> (<conclusion or state>) <head sha>
+#   NEW_COMMENT: [BOT|USER] <author> <path>:<line> <id>
+#   NEW_TOP_COMMENT: [BOT|USER] <author> <id>
+#   NEW_REVIEW: [BOT|USER] <author> <state> <id>
+#
+# READY_FOR_REVIEW is printed while the PR is not a draft. CHECK covers
+# every check on the head commit, Actions or not, settled on anything
+# but success. NEW_COMMENT covers unresolved, non-outdated review-thread
+# comments; NEW_REVIEW covers reviews with a body.
+#
+# Exits non-zero when any GitHub call fails, so a broken poll is never
+# read as a quiet one.
+
+set -euo pipefail
+
+if [ $# -ne 1 ] || ! [[ "$1" =~ ^[1-9][0-9]*$ ]]; then
+  echo "Usage: pr-snapshot <pr-number>" >&2
+  exit 2
+fi
+pr="$1"
+
+owner_repo="$(gh repo view --json nameWithOwner --jq .nameWithOwner)"
+
+# `__typename` on each author is the authoritative Bot/User signal per
+# `pr-reaction.md`; it becomes the `[BOT]` / `[USER]` tag so a reaction
+# turn can classify without re-fetching.
+# shellcheck disable=SC2016 # GraphQL query: $vars are query variables
+query='query($owner:String!,$repo:String!,$num:Int!){
+  repository(owner:$owner,name:$repo){
+    pullRequest(number:$num){
+      reviewThreads(first:100){
+        nodes{
+          isResolved
+          isOutdated
+          comments(first:100){ nodes{ id author{login __typename} path line } }
+        }
+      }
+      reviews(first:100){
+        nodes{ id state body author{login __typename} }
+      }
+      comments(first:100){
+        nodes{ id author{login __typename} }
+      }
+    }
+  }
+}'
+
+pr_json="$(gh pr view "$pr" --json state,isDraft,reviewDecision,statusCheckRollup,headRefOid)"
+gql_json="$(gh api graphql -f owner="${owner_repo%/*}" -f repo="${owner_repo#*/}" -F num="$pr" -f query="$query")"
+
+# The head sha rides on each CHECK line so a check that fails again on a
+# new head is a new line, not the same one.
+echo "$pr_json" | jq -r '
+  if (.state // "") == "" or (.statusCheckRollup | type) != "array"
+  then error("incomplete gh pr view response") else . end
+  | "STATE: \(.state)",
+    (if .isDraft == false then "READY_FOR_REVIEW" else empty end),
+    (if (.reviewDecision // "") != "" then "REVIEW: \(.reviewDecision)" else empty end),
+    (.headRefOid[0:7] as $sha
+     | .statusCheckRollup[]
+     | (.name // .context // "?") as $n
+     | (if (.status // "COMPLETED") == "COMPLETED"
+        then (.conclusion // .state // "") else .status end) as $c
+     | select($c | IN("SUCCESS","NEUTRAL","SKIPPED","PENDING","EXPECTED","QUEUED","WAITING","REQUESTED","IN_PROGRESS") | not)
+     | "CHECK: \($n) (\($c)) \($sha)")'
+
+# GraphQL answers an error with exit 0 and a parseable body, so the
+# field is tested rather than the exit status. Empty-body reviews are
+# left out: an empty APPROVED / CHANGES_REQUESTED already shows as
+# REVIEW, and an empty COMMENTED has nothing to read.
+echo "$gql_json" | jq -r '
+  def tag: if .author.__typename == "Bot" then "[BOT]" else "[USER]" end;
+  (.data.repository.pullRequest // error("incomplete GraphQL response"))
+  | (.reviewThreads.nodes[]
+     | select(.isResolved == false and .isOutdated == false)
+     | .comments.nodes[]
+     | "NEW_COMMENT: \(tag) \(.author.login) \(.path // "?"):\(.line // "?") \(.id)"),
+    (.comments.nodes[]
+     | "NEW_TOP_COMMENT: \(tag) \(.author.login) \(.id)"),
+    (.reviews.nodes[]
+     | select(.state != "PENDING" and (.body // "") != "")
+     | "NEW_REVIEW: \(tag) \(.author.login) \(.state) \(.id)")'
