@@ -87,3 +87,26 @@ calibrated for production code and will recommend defensive handlers
 and test coverage that are over-engineering for personal-dotfiles
 scope. This governs how you weigh their findings: decline
 recommendations you judge over-engineered.
+
+## PR Verification Depth
+
+Hold each PR to the precision its merge needs, so merging and what
+follows it stay light. In this personal repository a behavior found
+wrong later costs one small follow-up PR.
+
+- Verify by running before merge every result that no model produces:
+  what a script or hook does and its exit status, a command's output,
+  and a setting or frontmatter field the harness enforces, including a
+  command that an agent-facing document names
+- Leave each result a model produces to the user's use over later
+  sessions, with fixes in later PRs: how an agent acts under the
+  wording of a rule, skill, or agent definition, or under a prompt
+  inside a hook
+  - The same wording drives different behavior from one situation to
+    the next, so a check before merge covers little of real use for
+    the cost of an eval
+  - The PR body's Verification section lists no item about it, and
+    neither the PR nor the session's wrap-up carries a post-merge
+    check of it
+  - An item of that kind in a tracking issue counts as settled by the
+    merge
