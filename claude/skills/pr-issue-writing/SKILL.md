@@ -9,15 +9,12 @@ Creating a PR or an issue, and writing or editing its title or body,
 runs through here, including a draft shown in chat, since approving it
 leads straight to posting it.
 
-The criteria a body is judged against are in
-[properties.md](properties.md) for a PR, with its fallback template,
-and in [issue-body.md](issue-body.md) for an issue. When this skill is
-invoked only to judge a body, reading that file is the whole of it.
-Invoke the `technical-writing` skill for how the prose is built.
-
 ## Procedure
 
-1. Read the criteria file for the PR or the issue
+1. Read [properties.md](properties.md) for a PR, or
+   [issue-body.md](issue-body.md) for an issue
+   - To only judge a body, this step is the whole of it
+1. Invoke the `technical-writing` skill
 1. For a new PR, check `gh pr view --json number,url`, and when the
    branch already has one, continue as an edit of it; for an edit,
    fetch the current body with `gh pr view <number> --json body --jq .body`
@@ -25,8 +22,8 @@ Invoke the `technical-writing` skill for how the prose is built.
 1. Run the preflight below
 1. Write the body to a fresh file under the session scratchpad
    directory with the Write tool, a new filename per revision, in the
-   language the preflight settled and the template step 3 found when it
-   ran
+   language the preflight settled and the template its step 3 found when
+   it ran
    - Do not generate a temp filename, and do not Read a file that does
      not exist yet
 1. Review the draft under "Review a draft" below, writing any revision
@@ -37,10 +34,6 @@ Invoke the `technical-writing` skill for how the prose is built.
 The target's own rules decide the language and format of the title and
 body, over the language of the chat, the user's global rules, and the
 rules of a working directory that is another repository.
-
-When the `implementer` subagent will open the PR, the parent runs the
-preflight before dispatching it, and later replaces the placeholder
-body through this procedure as an edit.
 
 ## Preflight
 
