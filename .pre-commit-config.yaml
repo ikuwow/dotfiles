@@ -1,5 +1,9 @@
 # See https://pre-commit.com for more information
 # See https://pre-commit.com/hooks.html for more hooks
+default_install_hook_types: [pre-commit, post-merge]
+# Limit hooks without their own stages to pre-commit; post-merge passes no
+# files, so they would only print Skipped lines there
+default_stages: [pre-commit]
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v3.2.0
@@ -29,3 +33,12 @@ repos:
         entry: scripts/check_userscript_version.sh
         language: script
         files: ^userscripts/.*\.user\.js$
+      # Main only: a deploy on a feature branch links files that disappear
+      # on the next checkout
+      - id: post-merge-deploy
+        name: Deploy symlinks after a merge on main
+        entry: bash -c 'if [ "$(git symbolic-ref --short -q HEAD)" = main ]; then scripts/deploy.sh; fi'
+        language: system
+        pass_filenames: false
+        always_run: true
+        stages: [post-merge]

@@ -66,6 +66,9 @@ fi
 brew bundle
 echo
 
+pre-commit install
+echo
+
 gh extension install agynio/gh-pr-review
 gh extension install dlvhdr/gh-dash
 (cd gh-extensions/gh-sub-issue && gh extension install .)
