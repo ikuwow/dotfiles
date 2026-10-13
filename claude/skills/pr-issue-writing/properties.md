@@ -294,8 +294,12 @@ qualify it. `/pr-selfcheck` evaluates the properties one at a time.
   - Any content that doesn't fit on one line — including issue
     references (`#123`, `org/repo#123`) — belongs in the body, not the
     title
-- Language is the one the target profile in `SKILL.md` names, whatever
-  the language of the chat with the user
+- Language follows the target repository, not the language of the chat
+  with the user
+  - Honor any explicit rule in the repo's `CLAUDE.md` / `AGENTS.md` /
+    `CONTRIBUTING.md` first, otherwise write English for an open-source
+    repository,
+    otherwise match the existing PR / commit history
 - Do NOT use auto-close keywords (`Closes`, `Fixes`, `Resolves`)
 - Checkbox syntax (`- [ ]` / `- [x]`) is reserved for verification
   items

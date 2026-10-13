@@ -19,9 +19,9 @@ the prose itself is built.
 
 Every create and every edit writes for one target repository, and the
 target's own rules decide the language and format of its title and
-body. The language of the chat, the rules loaded from the user's global
-configuration, and the working directory's `CLAUDE.md` and `AGENTS.md`
-do not decide them when the target is another repository.
+body, over the language of the chat, the rules loaded from the user's
+global configuration, and the rules of a working directory that is
+another repository.
 
 Before writing a title or body, post the target profile in the
 assistant message:
@@ -29,22 +29,19 @@ assistant message:
 - Repository: the `owner/repo` the PR or issue goes to
 - Visibility: the target's, and the source repository's when the body
   carries content from it
-- Language: the language, with the file that decides it
-  - The target's own `CLAUDE.md`, `AGENTS.md`, or `CONTRIBUTING.md`
-    decides when it states one, otherwise English for an open-source
-    repository, otherwise the language of the target's existing PRs,
-    commits, or issues
+- Language: the language, with the file or the fallback that decides it
+  under the language rule in the criteria file
 - Template: the path found, or the paths searched when none exists
   (create only)
-- Duplicates: the queries run and the hits for each (create only)
+- Duplicates: the queries run and the number of hits for each (create
+  only)
 
 The steps in [preflight.md](preflight.md) fill the profile: steps 1
 and 2 for every create and edit, steps 3 and 4 for a create only.
 
 Build the profile again whenever the target differs from the one the
 session's last profile named, since what one repository's rules decide
-does not carry over to another. A profile built under an earlier
-invocation of this skill covers only its own target.
+does not carry over to another.
 
 When this skill is invoked to judge a body rather than to write one,
 reading the criteria file is the whole of it, and the procedures below
@@ -110,6 +107,7 @@ removed, or reworded rather than the full before-and-after.
 
 - Update a title: `gh pr edit <number> --title '...'`
   (`gh issue edit <number> --title '...'` for an issue)
+  - Write the title in the language the profile names
 - Update a body:
   1. Fetch the current one:
      `gh pr view <number> --json body --jq .body`
@@ -169,5 +167,6 @@ of the edit.
      check to every reader
    - A check that needs a new clone, authentication, or a long-running
      query is out of reach, so the label stays
-1. Check that the title and the body are written in the language the
-   target profile names, and rewrite them in it when they are not
+1. Check that the title and the whole body, on an edit as well, are
+   written in the language the target profile names, and rewrite them
+   in it when they are not

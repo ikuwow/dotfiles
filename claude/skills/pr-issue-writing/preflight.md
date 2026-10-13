@@ -1,4 +1,4 @@
-# Before creating a PR or an issue
+# Before writing a PR or an issue
 
 These steps fill the target profile that `SKILL.md` requires. Steps 1
 and 2 run before any title or body is written or edited, and steps 3
@@ -65,8 +65,8 @@ Match file names case-insensitively in each place below.
 - An issue form (`.yml`) cannot be filled through `--body-file`, so its
   field labels become the body's section headings, with every field the
   form marks required filled
-- When no template exists, name the paths searched in the message to
-  the user, so the absence can be checked
+- When no template exists, name the paths searched in the target
+  profile, so the absence can be checked
 
 ## 4. Search for duplicates
 
@@ -83,4 +83,5 @@ Match file names case-insensitively in each place below.
 - When a duplicate turns up, stop before creating and ask the user to
   choose: comment on the existing one, create a new one linked to it,
   or drop it
-- Report the queries run and the number of hits for each
+- Record the queries run and the number of hits for each in the target
+  profile
