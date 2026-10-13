@@ -1,8 +1,10 @@
 # Before creating a PR or an issue
 
-These steps run before the body of a new PR or issue is written, and
-before an `implementer` subagent that will open a PR is dispatched.
-Each step reads the target repository (step 1 also the source), which
+These steps fill the target profile that `SKILL.md` requires. Steps 1
+and 2 run before any title or body is written or edited, and steps 3
+and 4 only before a new PR or issue. All four run before an
+`implementer` subagent that will open a PR is dispatched. Each step
+reads the target repository (step 1 also the source), which
 differs from the working directory whenever the PR or issue goes to
 another repository, and the target's own `CLAUDE.md` is then not
 loaded.
