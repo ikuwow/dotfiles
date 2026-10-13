@@ -1,130 +1,163 @@
 ---
 name: pr-issue-writing
-description: Write or edit the title and body of a pull request or an issue, and create either. Carries the checks that run before creating one (target repository and its visibility, the repository's own rules, its template, a duplicate search), the five properties a PR body is judged against (Decidable, Grounded, Necessary, Scoped, Conformant), the criteria an issue body is judged against, the PR body template, the review a draft body passes against its sources, and the commands for creating a draft PR or an issue and for editing a title or body safely. Invoke before creating a PR or an issue, before writing a PR or issue title or body, including a draft shown in chat for the user to review, before editing one, and when bringing an existing PR into conformance.
+description: Write or edit the title and body of a pull request or an issue, and create either. Carries the preflight that runs before writing one (target repository and its visibility, the repository's own rules and language, its template, a duplicate search), the five properties a PR body is judged against (Decidable, Grounded, Necessary, Scoped, Conformant), the criteria an issue body is judged against, the PR body template, the review a draft body passes against its sources, and the commands for creating a draft PR or an issue and for editing a title or body safely. Invoke before creating a PR or an issue, before writing a PR or issue title or body, including a draft shown in chat for the user to review, before editing one, and when bringing an existing PR into conformance. Invoke it again whenever the target repository differs from the one it last ran for.
 ---
 
 # Write a Pull Request or Issue
 
 Creating a PR or an issue, and writing or editing its title or body,
-runs through here. So does a draft shown in chat for the user to
-review, since approving that draft leads straight to posting it.
+runs through this workflow, including a draft shown in chat, since
+approving it leads straight to posting it.
 
-For a PR, read [properties.md](properties.md) for the five properties
-its body is judged against and the template to write into. For an
-issue, read [issue-body.md](issue-body.md) instead. Invoke the
-`technical-writing` skill for how the prose itself is built.
+## Workflow
 
-When this skill is invoked to judge a body rather than to write one,
-reading the criteria file is the whole of it, and the procedures below
-do not run.
+Copy this checklist into the assistant message and check off each step
+as it completes:
 
-Pass a body through `--body-file` and never `--body`, on creation and on
-every edit after it. The `#`-prefixed lines a body carries trigger
-Claude Code's security pre-check when passed via `--body`, which no hook
-can bypass.
+```
+- [ ] Step 1: Load the criteria
+- [ ] Step 2: Preflight
+- [ ] Step 3: Write
+- [ ] Step 4: Review
+- [ ] Step 5: Send
+```
 
-## Create a PR
+The target's own rules decide the language and format of the title and
+body, over the language of the chat, the user's global rules, and the
+rules of a working directory that is another repository.
 
-The branch exists, carries the commits, and is pushed before the steps
-below run.
+## Step 1: Load the criteria
 
-When the PR will be opened by the `implementer` subagent, the parent
-runs only [preflight.md](preflight.md), before dispatching it. The
-implementer opens the PR without this skill, and the parent later
-replaces the placeholder body through step 1 below.
+1. Read [properties.md](properties.md) for a PR, or
+   [issue-body.md](issue-body.md) for an issue
+   - To only judge a body, judge it against that file and stop here
+1. For a new PR, check `gh pr view --json number,url`, and when the
+   branch already has one, continue as an edit of it
+1. Invoke the `technical-writing` skill
 
-1. If the branch already has a PR (`gh pr view --json number,url`),
-   skip creation, bring its title and body into conformance using the
-   update procedure below, display the PR URL, and stop here
-1. Run the steps in [preflight.md](preflight.md)
+## Step 2: Preflight
+
+Target and Rules carry over from an earlier preflight in the session
+for the same target and run again for any other target, since what one
+target's rules decide does not carry over to another. Template and
+Duplicates run for a create only. The target's own `CLAUDE.md` is not
+loaded when it is another repository than the working directory's.
+
+- Target: take `owner/repo` from `-R` / `--repo`, otherwise from the
+  working directory, and read the visibility of the target and of the
+  repository the content comes from with
+  `gh repo view [<owner>/<repo>] --json nameWithOwner,visibility`
+  - When the target's visibility is wider (`PRIVATE` to `INTERNAL` or
+    `PUBLIC`, `INTERNAL` to `PUBLIC`) and the body will carry anything
+    from the source (its `owner/repo`, issue and PR numbers, quoted
+    code, comments, or rule text), confirm with the user before
+    writing, since everyone the target admits can read it from the
+    moment it is created
+- Rules: read `CONTRIBUTING.md` at the target's root, in `.github/`, or
+  in `docs/`, and when the target is another repository than the
+  working directory's, also its root `CLAUDE.md` and `AGENTS.md`
+  - Follow what they state about language, title format, labels, and
+    linking over this skill's defaults
+  - With no language rule there, the criteria file's language rule
+    decides
+- Template: match file names case-insensitively
+  - PR: `pull_request_template.md` at the root, in `docs/`, or in
+    `.github/`, and the files in a `PULL_REQUEST_TEMPLATE/` directory
+    in any of those three
+  - Issue: the `.md` and `.yml` files in `.github/ISSUE_TEMPLATE/`
+    other than `config.yml`, taking the one whose purpose matches
+    - An issue form (`.yml`) cannot be filled through `--body-file`, so
+      its field labels become the section headings, with every
+      required field filled
+    - In `config.yml`, `blank_issues_enabled: false` means every issue
+      starts from a template, and when the request fits a channel in
+      `contact_links`, ask the user whether to use it instead
+- Duplicates: run
+  `gh search issues --repo <owner>/<repo> --include-prs <keywords>`
+  with at least two keyword sets, such as the component's name and the
+  symptom, leaving `--state` unset so a closed one declined earlier
+  surfaces too
+  - A duplicate is another issue or PR covering the same problem, or
+    for a PR another PR making the same change (the issue a PR
+    addresses is its parent)
+  - When one turns up, stop and ask the user whether to comment on it,
+    create a new one linked to it, or drop it
+
+When the target has no `CONTRIBUTING.md`, `config.yml`, or template of
+its own, read the one in the owner's public `.github` repository, which
+GitHub serves as the default
+([default community health files](https://docs.github.com/en/communities/setting-up-your-project-for-healthy-contributions/creating-a-default-community-health-file)).
+Read a file of another repository from a local clone when
+`ghq list -p -e <owner>/<repo>` finds one, through
+`git -C <clone> fetch origin` and
+`git -C <clone> show origin/HEAD:<path>`, since its working tree may be
+stale; otherwise, or when `origin/HEAD` does not resolve, through
+`gh api repos/<owner>/<repo>/contents/<path> -H 'Accept: application/vnd.github.raw'`.
+
+Close a preflight that ran by posting in the assistant message the target,
+both visibilities, and the language with the file or fallback that
+decided it, and, for a create, the template path or the paths searched
+and each duplicate query with its hit count, so an absence can be
+checked.
+
+## Step 3: Write
+
+1. For an edit, fetch the current body with
+   `gh pr view <number> --json body --jq .body` (`gh issue view` for an
+   issue)
 1. Write the body to a fresh file under the session scratchpad
-   directory using the Write tool, a new filename per revision. Do not
-   generate a temp filename, and do not Read a file that does not exist
-   yet
-   - Follow the template the preflight found
-1. Review the draft under "Review a draft against its sources" below,
-   writing any revision to a fresh file
-1. Create the PR as a draft:
-   `gh pr create --draft --title '...' --body-file <body file path>`
-1. Display the PR URL: `gh pr view --json url --jq '.url'`
+   directory with the Write tool, a new filename per revision, in the
+   language the preflight settled and, for a create, the template it
+   found
+   - Do not generate a temp filename, and do not Read a file that does
+     not exist yet
 
-## Create an issue
+## Step 4: Review
 
-1. Run the steps in [preflight.md](preflight.md)
-1. Write the body to a fresh file under the session scratchpad
-   directory using the Write tool, a new filename per revision. Do not
-   generate a temp filename, and do not Read a file that does not exist
-   yet
-   - Follow the template the preflight found
-1. Review the draft under "Review a draft against its sources" below,
-   writing any revision to a fresh file
-1. Create the issue:
-   `gh issue create --title '...' --body-file <body file path>`
-1. Display the issue URL, which `gh issue create` prints to stdout
+Check the drafted title and body claim by claim before they are sent or
+shown in chat, since an inference written as a sourced fact reaches the
+reader unchecked. On an edit, review only the claims the draft adds or
+changes.
 
-## Update an existing title or body
-
-Summarize the change in the assistant message body before either edit
-below, as a short list of what is being added, removed, or reworded
-rather than the full before-and-after.
-
-- Update a title: `gh pr edit <number> --title '...'`
-  (`gh issue edit <number> --title '...'` for an issue)
-- Update a body:
-  1. Fetch the current one:
-     `gh pr view <number> --json body --jq .body`
-     (`gh issue view <number> --json body --jq .body` for an issue)
-  1. Write the new body to a fresh file under the session scratchpad
-     directory using the Write tool, a new filename per revision. Do
-     not generate a temp filename, and do not Read a file that does not
-     exist yet
-     - Follow the template the preflight found, when it ran
-  1. Review the draft under "Review a draft against its sources" below,
-     writing any revision to a fresh file
-  1. Execute the edit:
-     `gh pr edit <number> --body-file <body file path>`
-     (`gh issue edit <number> --body-file <body file path>` for an
-     issue)
-
-## Review a draft against its sources
-
-Check a drafted body claim by claim before a create or edit command
-sends it, and before a draft is shown in chat, asking of each claim
-whether a source states it or the writer inferred it. An inference
-written as a sourced fact reaches the reader unchecked, and the reader
-acts on it.
-
-On an edit, review only the claims the draft adds or changes relative
-to the fetched current body, so the cost of a review follows the size
-of the edit.
-
-1. List in the assistant message each claim under review, including
-   those inside parentheticals, glosses, asides, table cells, and
-   checklist items, and pair each with the place it came from (an
-   issue, a PR, a file, a command's output, a log query, the user's own
-   statement) among what the session has already read
-   - Mark each claim `sourced` when that place states the claim itself,
-     and `inferred` otherwise
-   - A date in a source's title (an issue, a ticket) states a date, and
-     reading it as a deadline is an inference
+1. List each claim in the assistant message, including those in
+   parentheticals, glosses, table cells, and checklist items, which a
+   writer reads as framing rather than claims, with the place it came
+   from among what the session has read (an issue, a PR, a file, a
+   command's output, the user's statement), marked `sourced` when that
+   place states it and `inferred` otherwise
+   - A date in a source's title is a date, and reading it as a deadline
+     is an inference
    - Classifying an item states the writer's view, and reading a
      decision into it is an inference
-   - A tool or service named in a step the reader is meant to follow
+   - A tool named in a step the reader is meant to follow
      (verification, rollout, rollback, monitoring) is a claim that the
      project uses it
-   - The writer reads a gloss or a parenthetical as framing rather
-     than as a claim, so listing every claim is what brings those under
-     the check
 1. Keep a claim the reader would act on (a deadline, a status, a
    decision and who made it, an owner, a cause) as a fact only when it
-   is `sourced`, since these claims steer how the work is prioritized
-1. Write an `inferred` claim as the writer's inference with the
-   evidence that points to it, or drop it
-1. For each claim the draft marks as unverified or to be confirmed, run
-   the check when a source at hand settles it (a clone already on disk,
-   a file, a command that runs without setup), and write the result in
-   place of the label
-   - A label left where such a source settles the claim passes the
-     check to every reader
-   - A check that needs a new clone, authentication, or a long-running
-     query is out of reach, so the label stays
+   is `sourced`, since these steer how the work is prioritized, and
+   write an `inferred` one as the writer's inference with its evidence,
+   or drop it
+1. For each claim marked unverified, run the check when a source at
+   hand settles it (a clone on disk, a file, a command that needs no
+   setup) and write the result in place of the label; a check needing a
+   new clone, authentication, or a long query leaves the label
+1. Check that the title and the whole body are in the language the
+   preflight settled
+
+## Step 5: Send
+
+Pass a body through `--body-file` and never `--body`, since the
+`#`-prefixed lines a body carries trigger Claude Code's security
+pre-check under `--body`, which no hook can bypass. Add
+`-R <owner>/<repo>` to each command when the target is another
+repository than the working directory's.
+
+- Create a PR, once the branch is pushed:
+  `gh pr create --draft --title '...' --body-file <file>`, then display
+  the URL from `gh pr view --json url --jq '.url'`
+- Create an issue: `gh issue create --title '...' --body-file <file>`,
+  and display the URL it prints
+- Edit: summarize in the assistant message what is added, removed, or
+  reworded, then send the title with `gh pr edit <number> --title '...'`
+  and the body with `gh pr edit <number> --body-file <file>`
+  (`gh issue edit` for an issue)
