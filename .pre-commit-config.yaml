@@ -1,7 +1,8 @@
 # See https://pre-commit.com for more information
 # See https://pre-commit.com/hooks.html for more hooks
 default_install_hook_types: [pre-commit, post-merge]
-# Keep the file-based hooks out of post-merge, which passes them no files
+# Limit hooks without their own stages to pre-commit; post-merge passes no
+# files, so they would only print Skipped lines there
 default_stages: [pre-commit]
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
