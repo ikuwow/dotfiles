@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+# Run a command every <interval> seconds and exit once its output gains a
+# line the previous run did not print, printing those lines. Meant to run
+# as a background shell that wakes its caller only when something new
+# appears; wrap it in `timeout` to bound an idle wait.
+#
+# Usage: wait-for-change <interval-seconds> <command> [args...]
+#
+# Only added lines count, since a line that disappears (a resolved
+# thread, a check that went green) is not something to act on. A failing
+# run of the command ends the wait with the command's exit status, so a
+# broken poll surfaces instead of passing for a quiet one.
+
+set -euo pipefail
+
+if [ $# -lt 2 ] || ! [[ "$1" =~ ^[1-9][0-9]*$ ]]; then
+  echo "Usage: wait-for-change <interval-seconds> <command> [args...]" >&2
+  exit 2
+fi
+interval="$1"
+shift
+
+prev="$("$@")"
+while true; do
+  sleep "$interval"
+  cur="$("$@")"
+  added="$(comm -13 <(sort <<<"$prev") <(sort <<<"$cur"))"
+  if [ -n "$added" ]; then
+    echo "$added"
+    exit 0
+  fi
+  prev="$cur"
+done
