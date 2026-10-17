@@ -4,16 +4,9 @@
 
 # shellcheck source=/dev/null
 
-ARCH="$(arch)"
-if [ "$ARCH" = "arm64" ]; then
-  BREW_PREFIX="/opt/homebrew"
-elif [ "$ARCH" = "i386" ]; then
-  BREW_PREFIX="/usr/local"
-fi
-
 # Homebrew setup (only when installed)
-if [ -n "${BREW_PREFIX:-}" ] && [ -x "$BREW_PREFIX/bin/brew" ]; then
-  export BREW_PREFIX
+if [ -x /opt/homebrew/bin/brew ]; then
+  export BREW_PREFIX="/opt/homebrew"
 
   # It sets envvars below
   # - HOMEBREW_PREFIX

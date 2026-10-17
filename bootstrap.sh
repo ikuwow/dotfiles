@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# This script must be called on each arch.
 # Shebang must be !/bin/bash, not !/usr/bin/env bash.
 
 set -eu
