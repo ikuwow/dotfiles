@@ -45,14 +45,6 @@ curl -L https://raw.githubusercontent.com/ikuwow/dotfiles/main/bootstrap.sh | ba
 ### Set login shell after bootstrapping
 
 ```bash
-# Intel
-LOGIN_SHELL="/usr/local/bin/bash"
-sudo sh -c "echo $LOGIN_SHELL >> /etc/shells"
-chsh -s "$LOGIN_SHELL"
-```
-
-```bash
-# Apple Silicon
 LOGIN_SHELL="/opt/homebrew/bin/bash"
 sudo sh -c "echo $LOGIN_SHELL >> /etc/shells"
 chsh -s "$LOGIN_SHELL"
@@ -124,7 +116,7 @@ See each script for its exact steps.
 
 ### Platform Support
 
-- macOS (Intel and Apple Silicon): Full support (Homebrew, system defaults, GUI apps)
+- macOS (Apple Silicon): Full support (Homebrew, system defaults, GUI apps)
 - Linux: Symlink deployment only
 
 On Linux, the bootstrap process deploys symlinks and exits. Homebrew is not used on Linux in this project; shell configuration (`.bash_profile`, `.bashrc`) detects whether Homebrew is installed and skips all Homebrew-dependent setup when it is absent.
