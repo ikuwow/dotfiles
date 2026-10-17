@@ -14,7 +14,7 @@ set nocompatible " do not use vi compatible mode
 " When launched from Finder/Dock on macOS (e.g. Neovide.app, gvim cask),
 " the login shell init files do not run, so $PATH stays at the bare
 " /usr/bin:/bin:/usr/sbin:/sbin and Homebrew tools become invisible.
-" Prepend the brew prefix so executable('brew') works.
+" Prepend Homebrew's bin directory so executable('brew') works.
 " See ikuwow/dotfiles#73.
 if has('mac') || has('macunix')
     let s:brew_path = '/opt/homebrew/bin'
