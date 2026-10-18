@@ -4,44 +4,48 @@
 
 # shellcheck source=/dev/null
 
-# Homebrew setup (only when installed)
-if [ -x /opt/homebrew/bin/brew ]; then
-  export BREW_PREFIX="/opt/homebrew"
+# Homebrew setup (only when installed at its default prefix on macOS or Linux)
+for brew_bin in /opt/homebrew/bin/brew /home/linuxbrew/.linuxbrew/bin/brew; do
+  if [ -x "$brew_bin" ]; then
+    # It sets envvars below
+    # - HOMEBREW_PREFIX
+    # - HOMEBREW_CELLAR
+    # - HOMEBREW_REPOSITORY
+    # - PATH
+    # - MANPAHT
+    # - INFOPATH
+    # ref: https://github.com/Homebrew/brew/blob/master/Library/Homebrew/cmd/shellenv.sh
+    eval "$("$brew_bin" shellenv bash)"
+    break
+  fi
+done
+unset brew_bin
 
-  # It sets envvars below
-  # - HOMEBREW_PREFIX
-  # - HOMEBREW_CELLAR
-  # - HOMEBREW_REPOSITORY
-  # - PATH
-  # - MANPAHT
-  # - INFOPATH
-  # ref: https://github.com/Homebrew/brew/blob/master/Library/Homebrew/cmd/shellenv.sh
-  eval "$("$BREW_PREFIX/bin/brew" shellenv)"
+if [ -n "${HOMEBREW_PREFIX:-}" ]; then
+  PATH="$HOMEBREW_PREFIX/opt/ruby/bin:$PATH"
+  PATH="$HOMEBREW_PREFIX/opt/coreutils/libexec/gnubin:$PATH"
+  PATH="$HOMEBREW_PREFIX/opt/binutils/bin:$PATH"
+  PATH="$HOMEBREW_PREFIX/opt/findutils/libexec/gnubin:$PATH"
+  PATH="$HOMEBREW_PREFIX/opt/gnu-sed/libexec/gnubin:$PATH"
+  PATH="$HOMEBREW_PREFIX/opt/gnu-which/libexec/gnubin:$PATH"
+  PATH="$HOMEBREW_PREFIX/opt/grep/libexec/gnubin:$PATH"
+  PATH="$HOMEBREW_PREFIX/opt/openssl/bin:$PATH"
+  PATH="$HOMEBREW_PREFIX/opt/mysql-client/bin:$PATH"
 
-  PATH="$BREW_PREFIX/opt/ruby/bin:$PATH"
-  PATH="$BREW_PREFIX/opt/coreutils/libexec/gnubin:$PATH"
-  PATH="$BREW_PREFIX/opt/binutils/bin:$PATH"
-  PATH="$BREW_PREFIX/opt/findutils/libexec/gnubin:$PATH"
-  PATH="$BREW_PREFIX/opt/gnu-sed/libexec/gnubin:$PATH"
-  PATH="$BREW_PREFIX/opt/gnu-which/libexec/gnubin:$PATH"
-  PATH="$BREW_PREFIX/opt/grep/libexec/gnubin:$PATH"
-  PATH="$BREW_PREFIX/opt/openssl/bin:$PATH"
-  PATH="$BREW_PREFIX/opt/mysql-client/bin:$PATH"
+  export LDFLAGS="-L$HOMEBREW_PREFIX/opt/openssl/lib"
+  export CPPFLAGS="-I$HOMEBREW_PREFIX/opt/openssl/include"
 
-  export LDFLAGS="-L$BREW_PREFIX/opt/openssl/lib"
-  export CPPFLAGS="-I$BREW_PREFIX/opt/openssl/include"
-
-  MANPATH="$BREW_PREFIX/opt/coreutils/libexec/gnuman:$MANPATH"
-  MANPATH="$BREW_PREFIX/opt/binutils/share/man:$MANPATH"
-  MANPATH="$BREW_PREFIX/opt/findutils/libexec/gnuman:$MANPATH"
-  MANPATH="$BREW_PREFIX/opt/gnu-sed/libexec/gnuman:$MANPATH"
-  MANPATH="$BREW_PREFIX/opt/gnu-which/libexec/gnuman:$MANPATH"
-  MANPATH="$BREW_PREFIX/opt/grep/libexec/gnuman:$MANPATH"
+  MANPATH="$HOMEBREW_PREFIX/opt/coreutils/libexec/gnuman:$MANPATH"
+  MANPATH="$HOMEBREW_PREFIX/opt/binutils/share/man:$MANPATH"
+  MANPATH="$HOMEBREW_PREFIX/opt/findutils/libexec/gnuman:$MANPATH"
+  MANPATH="$HOMEBREW_PREFIX/opt/gnu-sed/libexec/gnuman:$MANPATH"
+  MANPATH="$HOMEBREW_PREFIX/opt/gnu-which/libexec/gnuman:$MANPATH"
+  MANPATH="$HOMEBREW_PREFIX/opt/grep/libexec/gnuman:$MANPATH"
   export MANPATH
 
   export HOMEBREW_NO_ENV_HINTS=true
-  export CLOUDSDK_PYTHON="$BREW_PREFIX/bin/python3" # for gcloud
-  [[ -f "$BREW_PREFIX/share/google-cloud-sdk/path.bash.inc" ]] && . "$BREW_PREFIX/share/google-cloud-sdk/path.bash.inc"
+  export CLOUDSDK_PYTHON="$HOMEBREW_PREFIX/bin/python3" # for gcloud
+  [[ -f "$HOMEBREW_PREFIX/share/google-cloud-sdk/path.bash.inc" ]] && . "$HOMEBREW_PREFIX/share/google-cloud-sdk/path.bash.inc"
 fi
 
 # Universal PATH
