@@ -30,8 +30,6 @@ fi
 scripts/configure.sh
 echo
 
-softwareupdate --install-rosetta --agree-to-license
-
 if ! command -v /opt/homebrew/bin/brew > /dev/null 2>&1; then
   # Install homebrew: https://brew.sh/
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
