@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# This script must be called on each arch.
 # Shebang must be !/bin/bash, not !/usr/bin/env bash.
 
 set -eu
@@ -12,9 +11,6 @@ if [ "$os" != 'Darwin' ] && [ "$os" != 'Linux' ]; then
   exit 1
 fi
 echo "OS detected: $os"
-
-archname="$(arch)"
-echo "Arch detected: ${archname}"
 
 scripts/deploy.sh
 
@@ -34,29 +30,13 @@ fi
 scripts/configure.sh
 echo
 
-# Install Rosetta 2 when ARM
-if [ "${archname}" = "arm64" ]; then
-  softwareupdate --install-rosetta --agree-to-license
+if ! command -v /opt/homebrew/bin/brew > /dev/null 2>&1; then
+  # Install homebrew: https://brew.sh/
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+else
+  echo "Homebrew is already installed."
 fi
-
-# Install homebrew for Intel
-if [ "${archname}" = "i386" ]; then
-  if ! command -v /usr/local/bin/brew > /dev/null 2>&1; then
-    # Install homebrew: https://brew.sh/
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
-  else
-    echo "Homebrew is already installed."
-  fi
-  export PATH="/usr/local/bin:$PATH"
-elif [ "${archname}" = "arm64" ]; then
-  if ! command -v /opt/homebrew/bin/brew > /dev/null 2>&1; then
-    # Install homebrew: https://brew.sh/
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
-  else
-    echo "Homebrew is already installed."
-  fi
-  export PATH="/opt/homebrew/bin:$PATH"
-fi
+export PATH="/opt/homebrew/bin:$PATH"
 
 if [ -n "${CI+x}" ]; then
   echo "Warning: You are on CI. Skip some setup like 'brew bundle'."
