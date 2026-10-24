@@ -1,10 +1,10 @@
 // ==UserScript==
-// @name         X Sidebar Hider
+// @name         X Declutter
 // @namespace    https://github.com/ikuwow/dotfiles
-// @version      0.1.1
-// @downloadURL  https://raw.githubusercontent.com/ikuwow/dotfiles/main/userscripts/x-sidebar-hider.user.js
-// @updateURL    https://raw.githubusercontent.com/ikuwow/dotfiles/main/userscripts/x-sidebar-hider.user.js
-// @description  Hide the news, trends, and who-to-follow boxes in X's right sidebar
+// @version      0.2.0
+// @downloadURL  https://raw.githubusercontent.com/ikuwow/dotfiles/main/userscripts/x-declutter.user.js
+// @updateURL    https://raw.githubusercontent.com/ikuwow/dotfiles/main/userscripts/x-declutter.user.js
+// @description  Hide distracting parts of X: the right sidebar's news, trends, and who-to-follow boxes, and the Grok and Calls entries in the left navigation
 // @run-at       document-start
 // @include      *://x.com/*
 // ==/UserScript==
@@ -13,7 +13,9 @@
 // document.head may not exist yet at document-start, so the style is appended
 // to documentElement, which is always available.
 // X's class names are generated, and aria-labels follow the UI language, so
-// every box is matched by data-testid or link target.
+// every element is matched by data-testid or link target.
+//
+// Right sidebar:
 // Who-to-follow is matched by its "Show more" link to /i/connect_people,
 // since a post page's Relevant people box is the same aside of UserCells
 // without that link.
@@ -26,11 +28,16 @@
 // news rule hides the news box in every case.
 // Scoped to sidebarColumn, since the Explore page lists trends with the same
 // data-testid in its main column.
+//
+// Left navigation:
+// The Grok entry has no data-testid, so it is matched by its link target.
 var style = document.createElement('style');
 style.textContent = [
     '[data-testid="sidebarColumn"] div:has(> [data-testid="news_sidebar"]):not(:has([data-testid="SearchBox_Search_Input"])) { display: none !important; }',
     '[data-testid="sidebarColumn"] [data-testid="news_sidebar"] { display: none !important; }',
     '[data-testid="sidebarColumn"] div:has(> section [data-testid="trend"]) { display: none !important; }',
-    '[data-testid="sidebarColumn"] div:has(> div > aside > a[href^="/i/connect_people"]) { display: none !important; }'
+    '[data-testid="sidebarColumn"] div:has(> div > aside > a[href^="/i/connect_people"]) { display: none !important; }',
+    'nav[role="navigation"] > a[href="/i/grok"] { display: none !important; }',
+    'nav[role="navigation"] > a[data-testid="AppTabBar_Calls_Link"] { display: none !important; }'
 ].join('\n');
 document.documentElement.append(style);
