@@ -211,7 +211,6 @@ mas "Kindle", id: 302584613
 mas "LINE", id: 539883307
 mas "Speedtest", id: 1153157709
 mas "Focus", id: 777233759
-mas "Control Panel for Twitter", id: 1668516167
 mas "one sec", id: 1532875441
 mas "Xcode", id: 497799835
 mas "Apple Configurator", id: 1037126344
