@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         X Declutter
 // @namespace    https://github.com/ikuwow/dotfiles
-// @version      0.3.1
+// @version      0.3.2
 // @downloadURL  https://raw.githubusercontent.com/ikuwow/dotfiles/main/userscripts/x-declutter.user.js
 // @updateURL    https://raw.githubusercontent.com/ikuwow/dotfiles/main/userscripts/x-declutter.user.js
 // @description  Hide distracting parts of X: the right sidebar's news, trends, and who-to-follow boxes, the Grok and Calls entries in the left navigation, and the Discover more posts under a post's replies
@@ -47,10 +47,9 @@ document.documentElement.append(style);
 // A post page's conversation timeline appends recommended posts under a
 // heading cell, the only cell in that timeline holding an h2. The timeline is
 // virtualized: cells are absolutely positioned and unmount once scrolled far
-// enough away, so a sibling rule after the heading stops matching when the
-// heading unmounts. Instead the timeline is clipped at the heading's offset,
-// which also removes the blank space the hidden cells would leave and keeps
-// the page from scrolling into them, so the heading stays mounted.
+// enough away. The timeline is clipped at the heading's offset, which removes
+// the blank space the hidden cells would leave and keeps the page from
+// scrolling into them, so the heading stays mounted.
 // The clip applies only on /status/ paths, which also cover the photo viewer,
 // so a heading cell in another timeline, such as a who-to-follow module on
 // home, cannot clip that timeline.
