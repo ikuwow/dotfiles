@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         X Declutter
 // @namespace    https://github.com/ikuwow/dotfiles
-// @version      0.3.0
+// @version      0.3.1
 // @downloadURL  https://raw.githubusercontent.com/ikuwow/dotfiles/main/userscripts/x-declutter.user.js
 // @updateURL    https://raw.githubusercontent.com/ikuwow/dotfiles/main/userscripts/x-declutter.user.js
 // @description  Hide distracting parts of X: the right sidebar's news, trends, and who-to-follow boxes, the Grok and Calls entries in the left navigation, and the Discover more posts under a post's replies
@@ -51,8 +51,9 @@ document.documentElement.append(style);
 // heading unmounts. Instead the timeline is clipped at the heading's offset,
 // which also removes the blank space the hidden cells would leave and keeps
 // the page from scrolling into them, so the heading stays mounted.
-// Home and profile timelines can hold h2 cells such as who-to-follow, so the
-// clip applies only on /status/ paths, which also cover the photo viewer.
+// The clip applies only on /status/ paths, which also cover the photo viewer,
+// so a heading cell in another timeline, such as a who-to-follow module on
+// home, cannot clip that timeline.
 // The observer keeps no state of its own: clipped timelines are found again
 // by their data attribute, and at most one measurement is pending per frame.
 var CLIP_ATTR = 'data-x-declutter-clip';
