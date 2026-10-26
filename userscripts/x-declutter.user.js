@@ -1,19 +1,20 @@
 // ==UserScript==
 // @name         X Declutter
 // @namespace    https://github.com/ikuwow/dotfiles
-// @version      0.2.0
+// @version      0.3.0
 // @downloadURL  https://raw.githubusercontent.com/ikuwow/dotfiles/main/userscripts/x-declutter.user.js
 // @updateURL    https://raw.githubusercontent.com/ikuwow/dotfiles/main/userscripts/x-declutter.user.js
-// @description  Hide distracting parts of X: the right sidebar's news, trends, and who-to-follow boxes, and the Grok and Calls entries in the left navigation
+// @description  Hide distracting parts of X: the right sidebar's news, trends, and who-to-follow boxes, the Grok and Calls entries in the left navigation, and the Discover more posts under a post's replies
 // @run-at       document-start
 // @include      *://x.com/*
 // ==/UserScript==
-// Pure CSS with no observer or timer, so the script holds nothing that grows
-// over a long-lived SPA session. :has() keeps applying as X re-renders.
+// The sidebar and navigation rules are CSS, and :has() keeps applying as X
+// re-renders. Discover more needs a measured offset, so it uses one observer,
+// which holds nothing that grows over a long-lived SPA session.
 // document.head may not exist yet at document-start, so the style is appended
 // to documentElement, which is always available.
 // X's class names are generated, and aria-labels follow the UI language, so
-// every element is matched by data-testid or link target.
+// every element is matched by data-testid, link target, or tag.
 //
 // Right sidebar:
 // Who-to-follow is matched by its "Show more" link to /i/connect_people,
@@ -41,3 +42,56 @@ style.textContent = [
     'nav[role="navigation"] > a[data-testid="AppTabBar_Calls_Link"] { display: none !important; }'
 ].join('\n');
 document.documentElement.append(style);
+
+// Discover more:
+// A post page's conversation timeline appends recommended posts under a
+// heading cell, the only cell in that timeline holding an h2. The timeline is
+// virtualized: cells are absolutely positioned and unmount once scrolled far
+// enough away, so a sibling rule after the heading stops matching when the
+// heading unmounts. Instead the timeline is clipped at the heading's offset,
+// which also removes the blank space the hidden cells would leave and keeps
+// the page from scrolling into them, so the heading stays mounted.
+// Home and profile timelines can hold h2 cells such as who-to-follow, so the
+// clip applies only on /status/ paths, which also cover the photo viewer.
+// The observer keeps no state of its own: clipped timelines are found again
+// by their data attribute, and at most one measurement is pending per frame.
+var CLIP_ATTR = 'data-x-declutter-clip';
+var pending = false;
+
+function clipDiscoverMore() {
+    pending = false;
+    var headings = /\/status\/\d+/.test(location.pathname)
+        ? document.querySelectorAll('[data-testid="cellInnerDiv"]:has(h2)')
+        : [];
+    var clipped = new Set();
+    headings.forEach(function (cell) {
+        var list = cell.parentElement;
+        var timeline = list.parentElement;
+        var offset = cell.getBoundingClientRect().top - list.getBoundingClientRect().top;
+        // A cell not yet measured sits at offset 0; clipping there would hide the whole timeline.
+        if (offset <= 0) {
+            return;
+        }
+        var maxHeight = offset + 'px';
+        if (timeline.style.maxHeight !== maxHeight) {
+            timeline.style.maxHeight = maxHeight;
+            timeline.style.overflow = 'hidden';
+            timeline.setAttribute(CLIP_ATTR, '');
+        }
+        clipped.add(timeline);
+    });
+    document.querySelectorAll('[' + CLIP_ATTR + ']').forEach(function (timeline) {
+        if (!clipped.has(timeline)) {
+            timeline.style.maxHeight = '';
+            timeline.style.overflow = '';
+            timeline.removeAttribute(CLIP_ATTR);
+        }
+    });
+}
+
+new MutationObserver(function () {
+    if (!pending) {
+        pending = true;
+        requestAnimationFrame(clipDiscoverMore);
+    }
+}).observe(document.documentElement, { childList: true, subtree: true, attributes: true, attributeFilter: ['style'] });

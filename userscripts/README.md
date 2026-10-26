@@ -25,7 +25,7 @@ Each script's `@include` / `@match` lines are the source of truth for the sites 
 
 - `ime-enter-fixer.user.js` — stops the IME confirmation Enter from triggering a site's submit handler in Safari
 - `youtube-shorts-normalizer.user.js` — treats YouTube Shorts as normal videos: Shorts thumbnails stay visible everywhere, but clicking one or navigating to `/shorts/<id>` opens the standard `/watch?v=<id>` player instead of the swipeable feed. Also hides the sidebar Shorts entry, which has no equivalent non-swipe landing
-- `x-declutter.user.js` — hides distracting parts of X with CSS alone: the news, trends, and who-to-follow boxes in the right sidebar (the search box and the footer stay), and the Grok and Calls entries in the left navigation
+- `x-declutter.user.js` — hides distracting parts of X: the news, trends, and who-to-follow boxes in the right sidebar (the search box and the footer stay), the Grok and Calls entries in the left navigation, and the Discover more posts under a post's replies
 
 ## Adding a new script
 
