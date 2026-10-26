@@ -1,19 +1,20 @@
 // ==UserScript==
 // @name         X Declutter
 // @namespace    https://github.com/ikuwow/dotfiles
-// @version      0.2.0
+// @version      0.3.3
 // @downloadURL  https://raw.githubusercontent.com/ikuwow/dotfiles/main/userscripts/x-declutter.user.js
 // @updateURL    https://raw.githubusercontent.com/ikuwow/dotfiles/main/userscripts/x-declutter.user.js
-// @description  Hide distracting parts of X: the right sidebar's news, trends, and who-to-follow boxes, and the Grok and Calls entries in the left navigation
+// @description  Hide distracting parts of X: the right sidebar's news, trends, and who-to-follow boxes, the Grok and Calls entries in the left navigation, and the Discover more posts under a post's replies
 // @run-at       document-start
 // @include      *://x.com/*
 // ==/UserScript==
-// Pure CSS with no observer or timer, so the script holds nothing that grows
-// over a long-lived SPA session. :has() keeps applying as X re-renders.
+// The sidebar and navigation rules are CSS, and :has() keeps applying as X
+// re-renders. Discover more needs a measured offset, so it uses one observer,
+// which holds nothing that grows over a long-lived SPA session.
 // document.head may not exist yet at document-start, so the style is appended
 // to documentElement, which is always available.
 // X's class names are generated, and aria-labels follow the UI language, so
-// every element is matched by data-testid or link target.
+// every element is matched by data-testid, link target, or tag.
 //
 // Right sidebar:
 // Who-to-follow is matched by its "Show more" link to /i/connect_people,
@@ -41,3 +42,74 @@ style.textContent = [
     'nav[role="navigation"] > a[data-testid="AppTabBar_Calls_Link"] { display: none !important; }'
 ].join('\n');
 document.documentElement.append(style);
+
+// Discover more:
+// A post page's conversation timeline appends recommended posts under a
+// heading cell holding an h2. The timeline is virtualized: a list element
+// reserves the height of every cell and positions each one absolutely, and
+// cells unmount once scrolled far enough away. The list's parent is clipped at
+// the first heading's offset, cutting off the heading and the cells below it
+// together with the height reserved for them. While the heading is unmounted
+// the clip is lifted, and it returns once the heading mounts again.
+// The clip applies only on /status/ paths, so a heading cell on another page,
+// such as a who-to-follow module on home, cannot clip its timeline. The photo
+// and video viewers keep a /status/ path while the timeline they opened from
+// stays mounted behind them, so on their paths only the viewer's dialog is
+// searched.
+// Clipped timelines are found again by their data attribute, so no element
+// reference outlives a pass.
+var CLIP_ATTR = 'data-x-declutter-clip';
+var pending = false;
+
+function findHeadings() {
+    var path = location.pathname;
+    if (!/\/status\/\d+/.test(path)) {
+        return [];
+    }
+    var scope = /\/status\/\d+\/(photo|video)\//.test(path) ? '[role="dialog"] ' : '';
+    return document.querySelectorAll(scope + '[data-testid="cellInnerDiv"]:has(h2)');
+}
+
+function clipDiscoverMore() {
+    pending = false;
+    // Each timeline is written once, at its first heading, since a write per
+    // heading would alternate values and retrigger the style observer every frame.
+    var offsets = new Map();
+    findHeadings().forEach(function (cell) {
+        var list = cell.parentElement;
+        var timeline = list.parentElement;
+        var offset = Math.round(cell.getBoundingClientRect().top - list.getBoundingClientRect().top);
+        // A cell not yet measured sits at offset 0; clipping there would hide the whole timeline.
+        if (offset <= 0) {
+            return;
+        }
+        if (!offsets.has(timeline) || offset < offsets.get(timeline)) {
+            offsets.set(timeline, offset);
+        }
+    });
+    offsets.forEach(function (offset, timeline) {
+        var maxHeight = offset + 'px';
+        // Writing only on change keeps the style observer from retriggering itself.
+        if (timeline.style.maxHeight !== maxHeight) {
+            timeline.style.maxHeight = maxHeight;
+            timeline.style.overflow = 'hidden';
+            timeline.setAttribute(CLIP_ATTR, '');
+        }
+    });
+    document.querySelectorAll('[' + CLIP_ATTR + ']').forEach(function (timeline) {
+        if (!offsets.has(timeline)) {
+            timeline.style.maxHeight = '';
+            timeline.style.overflow = '';
+            timeline.removeAttribute(CLIP_ATTR);
+        }
+    });
+}
+
+// Cells move by style changes once measured, so style attributes are observed
+// alongside childList.
+new MutationObserver(function () {
+    if (!pending) {
+        pending = true;
+        requestAnimationFrame(clipDiscoverMore);
+    }
+}).observe(document.documentElement, { childList: true, subtree: true, attributes: true, attributeFilter: ['style'] });
