@@ -87,6 +87,7 @@ RAW=$(CLAUDE_UNKEPT_PROMISE_CHECK=1 claude -p "$PROMPT" \
   --model haiku \
   --output-format text \
   --safe-mode \
+  --no-session-persistence \
   --disallowedTools Bash Edit Write Read Glob Grep WebFetch WebSearch Task \
   2>/dev/null) || RAW=
 
