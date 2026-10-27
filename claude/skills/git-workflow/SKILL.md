@@ -35,10 +35,10 @@ threads), the `pr-review-toolkit` plugin (Phase 2), and `bin/pr-monitor`
     scope are signals for weighing a finding within a phase; whether
     the phase runs is not a judgment they reach
   - Flipping the PR from draft to ready for review is the user's
-    action, unless a loaded rule assigns it to the agent for the PR's
-    repository or organization (marking a PR ready can request
-    reviewers such as code owners at once, so the draft stop gives the
-    user the first look)
+    action, since marking a PR ready can request reviewers such as code
+    owners at once, and a PR left in draft gives the user the first look
+    - A loaded rule that assigns the flip to the agent for this PR
+      hands it to the agent
 - Never create or edit files on the default branch. Always move into the
   worktree (or feature branch) first. Creating files before branching
   leads to redundant copy-and-delete work.
@@ -179,8 +179,11 @@ Bring the PR into a state where a human reviewer can act on it:
    observe it.
 1. In the same turn as the arm, hand the PR to review:
    - When a loaded rule assigns the ready flip to the agent for this
-     PR's repository or organization, run `gh pr ready <PR number>`
-     right after arming the Monitor, then continue into Phase 5
+     PR, run `gh pr ready <PR number>` in a tool call after the arm,
+     then continue into Phase 5
+     - The Monitor's first poll can record the PR as already ready
+       without reporting it, so `READY_FOR_REVIEW` may not arrive,
+       while the reviews that follow do
    - Otherwise surface Phase 4 completion, before handing control back,
      so the user can decide whether to mark the PR ready for review,
      and run `gh pr ready` only when the user asks for it
