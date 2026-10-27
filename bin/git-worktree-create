@@ -10,8 +10,26 @@
 
 set -eu
 
+usage="Usage: git-worktree-create <branch-name> [base]"
+
+# git worktree add would parse a leading-dash argument as its own option
+# (a base of --lock silently creates a locked worktree from HEAD), so reject them.
+for arg in "$@"; do
+  case "$arg" in
+    -h | --help)
+      echo "$usage"
+      exit 0
+      ;;
+    -*)
+      echo "Error: unknown option: $arg" >&2
+      echo "$usage" >&2
+      exit 1
+      ;;
+  esac
+done
+
 if [ $# -lt 1 ] || [ $# -gt 2 ]; then
-  echo "Usage: git-worktree-create <branch-name> [base]" >&2
+  echo "$usage" >&2
   exit 1
 fi
 
