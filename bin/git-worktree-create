@@ -10,8 +10,25 @@
 
 set -eu
 
+usage="Usage: git-worktree-create <branch-name> [base]"
+
+# Options are not supported; reject them so that e.g. --help never becomes a branch name.
+for arg in "$@"; do
+  case "$arg" in
+    -h | --help)
+      echo "$usage"
+      exit 0
+      ;;
+    -*)
+      echo "Error: unknown option: $arg" >&2
+      echo "$usage" >&2
+      exit 1
+      ;;
+  esac
+done
+
 if [ $# -lt 1 ] || [ $# -gt 2 ]; then
-  echo "Usage: git-worktree-create <branch-name> [base]" >&2
+  echo "$usage" >&2
   exit 1
 fi
 
