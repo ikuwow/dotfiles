@@ -419,7 +419,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "f=~/.claude/hooks/notify.sh; if [ -f \"$f\" ]; then bash \"$f\"; fi"
+            "command": "f=~/.claude/hooks/notify.sh; if [ -f \"$f\" ]; then bash \"$f\"; fi",
+            "async": true
           }
         ]
       }
