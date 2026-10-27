@@ -34,8 +34,11 @@ threads), the `pr-review-toolkit` plugin (Phase 2), and `bin/pr-monitor`
   - A small diff, a documentation-only change, and personal-project
     scope are signals for weighing a finding within a phase; whether
     the phase runs is not a judgment they reach
-  - Flipping the PR from draft to ready for review is the one action
-    the user takes
+  - Flipping the PR from draft to ready for review is the user's
+    action, unless a loaded rule assigns it to the agent for the PR's
+    repository or organization (marking a PR ready can request
+    reviewers such as code owners at once, so the draft stop gives the
+    user the first look)
 - Never create or edit files on the default branch. Always move into the
   worktree (or feature branch) first. Creating files before branching
   leads to redundant copy-and-delete work.
@@ -170,14 +173,17 @@ Bring the PR into a state where a human reviewer can act on it:
 1. Confirm acceptance criteria are met. Cross-check the PR body and
    any linked issue against the actual change. If something is unmet,
    either address it or call it out as out-of-scope / follow-up.
-1. Surface Phase 4 completion so the user can decide whether to mark
-   the PR ready for review. `gh pr ready` is the user's call — do
-   not run it unless explicitly instructed.
-1. Arm the persistent `Monitor` running `pr-monitor <PR number>` in
-   that same turn, before handing control back to the user and before
-   they flip the PR to ready. `READY_FOR_REVIEW` is itself a monitored
+1. Arm the persistent `Monitor` running `pr-monitor <PR number>`
+   before the PR leaves draft. `READY_FOR_REVIEW` is itself a monitored
    event, so an arm deferred until after the ready flip can never
    observe it.
+1. In the same turn as the arm, hand the PR to review:
+   - When a loaded rule assigns the ready flip to the agent for this
+     PR's repository or organization, run `gh pr ready <PR number>`
+     right after arming the Monitor, then continue into Phase 5
+   - Otherwise surface Phase 4 completion, before handing control back,
+     so the user can decide whether to mark the PR ready for review,
+     and run `gh pr ready` only when the user asks for it
 
 Update incrementally as conditions are confirmed (e.g., after Phase 1
 CI passes, after apply / deploy succeeds, after post-deploy
