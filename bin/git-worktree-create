@@ -12,7 +12,8 @@ set -eu
 
 usage="Usage: git-worktree-create <branch-name> [base]"
 
-# Options are not supported; reject them so that e.g. --help never becomes a branch name.
+# git worktree add would parse a leading-dash argument as its own option
+# (a base of --lock silently creates a locked worktree from HEAD), so reject them.
 for arg in "$@"; do
   case "$arg" in
     -h | --help)
