@@ -60,7 +60,7 @@ summarize_last_message() {
   if [ -z "$text" ]; then
     return 0
   fi
-  if [ "${#text}" -le 50 ]; then
+  if [ "${#text}" -le 30 ]; then
     printf '%s\n' "$text"
     return 0
   fi
@@ -78,7 +78,7 @@ summarize_last_message() {
       timeout 20 claude -p \
       --model haiku \
       --effort low \
-      --system-prompt "You condense the last message an AI coding assistant showed its user into a desktop notification. Write one Japanese sentence of at most 50 characters saying what the assistant is asking the user, or what it finished when it asks nothing. Output the sentence only, with no quotes, markdown, or preamble." \
+      --system-prompt "You turn the last message an AI coding assistant showed its user into the body of a desktop notification, which shows about 30 characters. Write a terse Japanese phrase of at most 30 characters, ending in a noun or a bare verb stem, saying what the user is asked to do or decide, or what was finished when nothing is asked. Do not describe the message itself, and drop subjects, politeness, and detail. Output the phrase only, with no quotes, markdown, or preamble. Examples: GAS の件、3案から選択待ち / PR #499 作成、CI 待ち / 片付け完了" \
       --safe-mode \
       --setting-sources "" \
       --tools "" \
