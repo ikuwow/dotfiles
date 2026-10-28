@@ -18,8 +18,10 @@
 #
 # `monitor` runs one `pr-monitor` per listed PR and prints each of its
 # lines prefixed with `<owner>/<repo>#<number> `. A PR whose pr-monitor
-# exits stays out until it is removed and added again, so a merged PR does
-# not restart; an exit other than 0 is reported as WATCH_ERROR.
+# exits stays out until `pr-watch add` names it again, so a merged PR does
+# not restart; an exit other than 0 is reported as WATCH_ERROR. Each add
+# appends a line even for a listed PR, and the watcher restarts a PR whose
+# line count grew since its pr-monitor exited.
 
 set -eu
 
@@ -65,12 +67,12 @@ monitor() {
         echo "$entry WATCH_ERROR: pr-monitor exited with status $status"
       fi
       unset "child[$entry]"
-      finished[$entry]=1
+      finished[$entry]="${wanted[$entry]:-0}"
     done
     wanted=()
     while IFS= read -r entry; do
       if [ -n "$entry" ]; then
-        wanted[$entry]=1
+        wanted[$entry]=$(( ${wanted[$entry]:-0} + 1 ))
       fi
     done < "$list"
     for entry in "${!child[@]}"; do
@@ -85,7 +87,7 @@ monitor() {
       fi
     done
     for entry in "${!wanted[@]}"; do
-      if [ -z "${child[$entry]:-}" ] && [ -z "${finished[$entry]:-}" ]; then
+      if [ -z "${child[$entry]:-}" ] && [ "${wanted[$entry]}" -gt "${finished[$entry]:-0}" ]; then
         # The prefixer runs in a process substitution, so $! is
         # pr-monitor itself and a kill reaches it.
         GH_REPO="${entry%#*}" pr-monitor "${entry##*#}" \
@@ -105,9 +107,7 @@ case "${1:-}" in
     fi
     entry="$(entry_for "$2")"
     if [ "$1" = add ]; then
-      if ! grep -qxF "$entry" "$list"; then
-        echo "$entry" >> "$list"
-      fi
+      echo "$entry" >> "$list"
       echo "watching $entry"
     else
       grep -vxF "$entry" "$list" > "$list.tmp" || true
