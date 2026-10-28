@@ -1,0 +1,7 @@
+[
+  {
+    "name": "pr-watch",
+    "command": "\"$HOME/bin/pr-watch\" monitor",
+    "description": "Events on the PRs registered with pr-watch"
+  }
+]
