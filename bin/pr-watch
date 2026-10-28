@@ -1,14 +1,13 @@
 #!/usr/bin/env bash
 
-# Register the PRs a Claude Code session watches, and run the watcher that
-# reports their events. Requires bash 4+ (associative arrays).
+# Register the PRs a Claude Code session watches. `pr-watch-monitor`, run
+# by the pr-watch plugin for the whole session, reports their events.
 #
 # Usage:
-#   pr-watch add <pr-number>      watch a PR of the current repository
+#   pr-watch add <pr-number>      watch a PR of GH_REPO (OWNER/REPO) when
+#                                 set, otherwise of the current repository
 #   pr-watch remove <pr-number>   stop watching it
-#   pr-watch list                 print this session's watch list
-#   pr-watch monitor              run the watcher (the pr-watch plugin's
-#                                 monitor runs this for the whole session)
+#   pr-watch list                 print this session's watched PRs
 #
 # The watch list is one file per session, keyed by CLAUDE_CODE_SESSION_ID,
 # so concurrent sessions in one working tree each wake only for their own
@@ -16,17 +15,14 @@
 # keeps the ID it started with, PRs added after a `/clear` go to a list it
 # does not read until the session restarts.
 #
-# `monitor` runs one `pr-monitor` per listed PR and prints each of its
-# lines prefixed with `<owner>/<repo>#<number> `. A PR whose pr-monitor
-# exits stays out until `pr-watch add` names it again, so a merged PR does
-# not restart; an exit other than 0 is reported as WATCH_ERROR. Each add
-# appends a line even for a listed PR, and the watcher restarts a PR whose
-# line count grew since its pr-monitor exited.
+# Each add appends `<owner>/<repo>#<number><TAB><token>` with a fresh
+# token, and the watcher starts a PR whose latest token it has not started
+# yet, so an add restarts a watch that stopped.
 
 set -eu
 
 usage() {
-  echo "Usage: pr-watch add|remove <pr-number> | list | monitor" >&2
+  echo "Usage: pr-watch add|remove <pr-number> | list" >&2
 }
 
 if [ -z "${CLAUDE_CODE_SESSION_ID:-}" ]; then
@@ -42,62 +38,15 @@ entry_for() {
     echo "pr-watch: <pr-number> must be a positive integer, got: $1" >&2
     exit 2
   fi
-  echo "${GH_REPO:-$(gh repo view --json nameWithOwner --jq .nameWithOwner)}#$1"
-}
-
-monitor() {
-  declare -A child=() finished=() wanted=()
-  local entry pid status
-  # pr-monitor also exits on its own once this process is gone, which
-  # covers a kill this trap cannot catch.
-  export PR_WATCH_PARENT=$$
-  echo $$ > "$list.pid"
-  trap 'kill "${child[@]}" 2>/dev/null || true' EXIT
-  trap 'exit 143' TERM HUP INT
-  while true; do
-    # Retire every finished child before reading the list, so a removed
-    # and re-added PR starts fresh.
-    for entry in "${!child[@]}"; do
-      pid="${child[$entry]}"
-      if kill -0 "$pid" 2>/dev/null; then
-        continue
-      fi
-      status=0
-      wait "$pid" || status=$?
-      if [ "$status" -ne 0 ]; then
-        echo "$entry WATCH_ERROR: pr-monitor exited with status $status"
-      fi
-      unset "child[$entry]"
-      finished[$entry]="${wanted[$entry]:-0}"
-    done
-    wanted=()
-    while IFS= read -r entry; do
-      if [ -n "$entry" ]; then
-        wanted[$entry]=$(( ${wanted[$entry]:-0} + 1 ))
-      fi
-    done < "$list"
-    for entry in "${!child[@]}"; do
-      if [ -z "${wanted[$entry]:-}" ]; then
-        kill "${child[$entry]}" 2>/dev/null || true
-        unset "child[$entry]"
-      fi
-    done
-    for entry in "${!finished[@]}"; do
-      if [ -z "${wanted[$entry]:-}" ]; then
-        unset "finished[$entry]"
-      fi
-    done
-    for entry in "${!wanted[@]}"; do
-      if [ -z "${child[$entry]:-}" ] && [ "${wanted[$entry]}" -gt "${finished[$entry]:-0}" ]; then
-        # The prefixer runs in a process substitution, so $! is
-        # pr-monitor itself and a kill reaches it.
-        GH_REPO="${entry%#*}" pr-monitor "${entry##*#}" \
-          > >(awk -v tag="$entry" '{ print tag " " $0; fflush() }') &
-        child[$entry]=$!
-      fi
-    done
-    sleep 10
-  done
+  local repo
+  # Checked here because a failed substitution inside echo's arguments
+  # would leave the status 0 and the entry `#<number>`.
+  repo="${GH_REPO:-$(gh repo view --json nameWithOwner --jq .nameWithOwner)}" || exit 1
+  if [ -z "$repo" ]; then
+    echo "pr-watch: could not resolve the repository of $PWD" >&2
+    exit 1
+  fi
+  echo "$repo#$1"
 }
 
 case "${1:-}" in
@@ -108,25 +57,34 @@ case "${1:-}" in
     fi
     entry="$(entry_for "$2")"
     if [ "$1" = add ]; then
-      echo "$entry" >> "$list"
+      printf '%s\t%s-%s\n' "$entry" "$(date +%s)" "$$" >> "$list"
       # Without a running watcher the entry would wait in the list and no
-      # event would ever arrive, so the add fails loudly instead.
-      if ! kill -0 "$(cat "$list.pid" 2>/dev/null)" 2>/dev/null; then
-        echo "pr-watch: listed $entry, but no watcher runs for this session; is the pr-watch plugin installed and the session interactive?" >&2
+      # event would ever arrive, so the add fails loudly instead. Matching
+      # the command line keeps a reused PID from passing for the watcher.
+      pid="$(cat "$list.pid" 2>/dev/null || true)"
+      if [ -z "$pid" ] || ! ps -p "$pid" -o command= | grep -q 'pr-watch-monitor'; then
+        echo "pr-watch: listed $entry, but no watcher runs for this session ID; the pr-watch plugin may be missing, the session non-interactive, or the ID changed by a /clear" >&2
         exit 1
       fi
       echo "watching $entry"
     else
-      grep -vxF "$entry" "$list" > "$list.tmp" || true
+      # An entry missing here may sit in another session ID's list (after
+      # a `/clear`), where it would keep being watched.
+      if ! cut -f1 "$list" | grep -qxF "$entry"; then
+        echo "pr-watch: $entry is not in this session's watch list" >&2
+        exit 1
+      fi
+      status=0
+      awk -F'\t' -v e="$entry" '$1 != e' "$list" > "$list.tmp" || status=$?
+      if [ "$status" -ne 0 ]; then
+        exit "$status"
+      fi
       mv "$list.tmp" "$list"
       echo "stopped watching $entry"
     fi
     ;;
   list)
-    cat "$list"
-    ;;
-  monitor)
-    monitor
+    cut -f1 "$list" | sort -u
     ;;
   *)
     usage

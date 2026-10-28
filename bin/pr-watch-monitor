@@ -1,0 +1,87 @@
+#!/usr/bin/env bash
+
+# Report events on the PRs this Claude Code session registered with
+# `pr-watch add`, for the whole session. The pr-watch plugin's monitor
+# runs it, so each stdout line reaches the session as a notification.
+# Requires bash 4+ (associative arrays).
+#
+# Runs one `pr-monitor` per listed PR and prints each of its lines
+# prefixed with `<owner>/<repo>#<number> `. A pr-monitor that exits other
+# than 0 is reported as WATCH_ERROR, and this watcher's own exit as a
+# WATCH_ERROR line without the prefix. A PR whose pr-monitor exited is
+# recorded in `<list>.done` with its token and stays stopped, across a
+# watcher restart too, until `pr-watch add` writes a newer token.
+
+set -eu
+
+if [ -z "${CLAUDE_CODE_SESSION_ID:-}" ]; then
+  echo "pr-watch-monitor: CLAUDE_CODE_SESSION_ID is not set" >&2
+  exit 2
+fi
+list="${XDG_STATE_HOME:-$HOME/.local/state}/pr-watch/$CLAUDE_CODE_SESSION_ID"
+mkdir -p "${list%/*}"
+touch "$list" "$list.done"
+
+# A second start in one session (a plugin reload may start one) would
+# report every event twice, so it leaves the first one in charge.
+pid="$(cat "$list.pid" 2>/dev/null || true)"
+if [ -n "$pid" ] && ps -p "$pid" -o command= | grep -q 'pr-watch-monitor'; then
+  exit 0
+fi
+echo $$ > "$list.pid"
+
+declare -A child=() started=() wanted=()
+while IFS=$'\t' read -r entry token; do
+  started[$entry]="$token"
+done < "$list.done"
+
+# pr-monitor also exits on its own once this process is gone, which
+# covers a kill this trap cannot catch. The kill comes first because the
+# echo fails once the session has closed this script's stdout.
+export PR_WATCH_PARENT=$$
+trap 'status=$?; kill "${child[@]}" 2>/dev/null || true; echo "WATCH_ERROR: pr-watch-monitor exited with status $status" || true' EXIT
+trap 'exit 143' TERM HUP INT
+
+while true; do
+  for entry in "${!child[@]}"; do
+    pid="${child[$entry]}"
+    if kill -0 "$pid" 2>/dev/null; then
+      continue
+    fi
+    status=0
+    wait "$pid" || status=$?
+    if [ "$status" -ne 0 ]; then
+      echo "$entry WATCH_ERROR: pr-monitor exited with status $status"
+    fi
+    unset "child[$entry]"
+    printf '%s\t%s\n' "$entry" "${started[$entry]}" >> "$list.done"
+  done
+  # The last line of an entry carries its latest token.
+  wanted=()
+  while IFS=$'\t' read -r entry token; do
+    if [ -n "$entry" ]; then
+      wanted[$entry]="$token"
+    fi
+  done < "$list"
+  for entry in "${!child[@]}"; do
+    if [ -z "${wanted[$entry]:-}" ]; then
+      kill "${child[$entry]}" 2>/dev/null || true
+      unset "child[$entry]"
+    fi
+  done
+  for entry in "${!wanted[@]}"; do
+    if [ -n "${child[$entry]:-}" ]; then
+      # An add while the watch runs needs no restart.
+      started[$entry]="${wanted[$entry]}"
+    elif [ "${wanted[$entry]}" != "${started[$entry]:-}" ]; then
+      # The prefixer runs in a process substitution, so $! is pr-monitor
+      # itself and a kill reaches it. Its stderr joins the stream so the
+      # cause of a WATCH_ERROR reaches the session.
+      GH_REPO="${entry%#*}" "${BASH_SOURCE[0]%/*}/pr-monitor" "${entry##*#}" \
+        > >(awk -v tag="$entry" '{ print tag " " $0; fflush() }') 2>&1 &
+      child[$entry]=$!
+      started[$entry]="${wanted[$entry]}"
+    fi
+  done
+  sleep 10
+done
