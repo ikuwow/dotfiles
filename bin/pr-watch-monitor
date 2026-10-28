@@ -7,8 +7,9 @@
 #
 # Runs one `pr-monitor` per listed PR and prints each of its lines
 # prefixed with `<owner>/<repo>#<number> `. A pr-monitor that exits other
-# than 0 is reported as WATCH_ERROR, and this watcher's own exit as a
-# WATCH_ERROR line without the prefix. A PR whose pr-monitor exited is
+# than 0 is reported as WATCH_ERROR, and this watcher's own exit, once it
+# holds the list, as a WATCH_ERROR line without the prefix. It exits once
+# the process that started it is gone. A PR whose pr-monitor exited is
 # recorded in `<list>.done` with its token and stays stopped, across a
 # watcher restart too, until `pr-watch add` writes a newer token.
 
@@ -25,7 +26,7 @@ touch "$list" "$list.done"
 # A second start in one session (a plugin reload may start one) would
 # report every event twice, so it leaves the first one in charge.
 pid="$(cat "$list.pid" 2>/dev/null || true)"
-if [ -n "$pid" ] && ps -p "$pid" -o command= | grep -q 'pr-watch-monitor'; then
+if [ -n "$pid" ] && [ "$pid" != $$ ] && ps -p "$pid" -o command= | grep -q 'pr-watch-monitor'; then
   exit 0
 fi
 echo $$ > "$list.pid"
@@ -35,14 +36,20 @@ while IFS=$'\t' read -r entry token; do
   started[$entry]="$token"
 done < "$list.done"
 
-# pr-monitor also exits on its own once this process is gone, which
-# covers a kill this trap cannot catch. The kill comes first because the
-# echo fails once the session has closed this script's stdout.
+# pr-monitor also exits on its own at its next poll once this process is
+# gone, which covers a kill this trap cannot catch. The kill comes first
+# because the echo fails once the session has closed this script's stdout.
 export PR_WATCH_PARENT=$$
 trap 'status=$?; kill "${child[@]}" 2>/dev/null || true; echo "WATCH_ERROR: pr-watch-monitor exited with status $status" || true' EXIT
 trap 'exit 143' TERM HUP INT
 
 while true; do
+  # The harness killing only its wrapper would otherwise leave this loop
+  # holding the list, with its output going nowhere. $PPID keeps the
+  # value it had at start.
+  if ! kill -0 "$PPID" 2>/dev/null; then
+    exit 0
+  fi
   for entry in "${!child[@]}"; do
     pid="${child[$entry]}"
     if kill -0 "$pid" 2>/dev/null; then
@@ -75,13 +82,15 @@ while true; do
       started[$entry]="${wanted[$entry]}"
     elif [ "${wanted[$entry]}" != "${started[$entry]:-}" ]; then
       # The prefixer runs in a process substitution, so $! is pr-monitor
-      # itself and a kill reaches it. Its stderr joins the stream so the
-      # cause of a WATCH_ERROR reaches the session.
+      # itself and a kill reaches it. pr-monitor's stderr joins the stream
+      # so the cause of a WATCH_ERROR reaches the session.
       GH_REPO="${entry%#*}" "${BASH_SOURCE[0]%/*}/pr-monitor" "${entry##*#}" \
         > >(awk -v tag="$entry" '{ print tag " " $0; fflush() }') 2>&1 &
       child[$entry]=$!
       started[$entry]="${wanted[$entry]}"
     fi
   done
-  sleep 10
+  # Waiting on a background sleep lets a TERM run its trap at once.
+  sleep 10 &
+  wait $!
 done

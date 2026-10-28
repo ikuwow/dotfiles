@@ -77,11 +77,12 @@ seen_top_comments="$(mktemp)"
 seen_reviews="$(mktemp)"
 trap 'rm -f "$seen_comments" "$seen_top_comments" "$seen_reviews"' EXIT
 
-# First-poll seeding: do not emit events for state that already held at
-# arm time. Only transitions during this monitor's lifetime should wake
+# First-poll seeding: do not emit events for state that already held when
+# this process started. Only transitions during its lifetime should wake
 # the operator. The flag is flipped after the first successful poll.
-# `CHECK` is the exception — a check already red when the monitor is
-# armed is the reader's problem now, so it reports rather than seeds.
+# `CHECK` and a terminal `STATE` are the exceptions — a check already red
+# is the reader's problem now, and a PR already merged or closed ends this
+# process at the end of the first poll, so both report rather than seed.
 first_poll=1
 
 # One line per outage, not per poll: an unauthorized token or an outage
@@ -187,8 +188,6 @@ while true; do
   head_sha="$(echo "$pr_json" | jq -r '.headRefOid // ""')"
 
   if [ "$state" != "$prev_state" ]; then
-    # A PR already merged or closed on the first poll ends the watch right
-    # here, so its state is reported rather than seeded.
     if [ "$first_poll" -eq 0 ] || [ "$state" = MERGED ] || [ "$state" = CLOSED ]; then
       echo "STATE: $state"
     fi

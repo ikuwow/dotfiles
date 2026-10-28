@@ -49,6 +49,7 @@ claude plugin install claude-code-setup@claude-plugins-official
 claude plugin install hookify@claude-plugins-official
 claude plugin install security-guidance@claude-plugins-official
 # This repository's own marketplace. Added from a local path, its plugins
-# load in place, so an edit here takes effect at the next session start.
+# load in place from claude-plugins/, so an edit there takes effect at the
+# next session start or /reload-plugins.
 claude plugin marketplace add "$HOME/dotfiles/claude-plugins"
 claude plugin install pr-watch@ikuwow-dotfiles

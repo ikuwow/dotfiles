@@ -7,7 +7,8 @@
 #   pr-watch add <pr-number>      watch a PR of GH_REPO (OWNER/REPO) when
 #                                 set, otherwise of the current repository
 #   pr-watch remove <pr-number>   stop watching it
-#   pr-watch list                 print this session's watched PRs
+#   pr-watch list                 print this session's PRs whose watch has
+#                                 not finished
 #
 # The watch list is one file per session, keyed by CLAUDE_CODE_SESSION_ID,
 # so concurrent sessions in one working tree each wake only for their own
@@ -39,8 +40,8 @@ entry_for() {
     exit 2
   fi
   local repo
-  # Checked here because a failed substitution inside echo's arguments
-  # would leave the status 0 and the entry `#<number>`.
+  # set -e is off inside the `$(entry_for ...)` call, so a failed lookup
+  # exits here explicitly.
   repo="${GH_REPO:-$(gh repo view --json nameWithOwner --jq .nameWithOwner)}" || exit 1
   if [ -z "$repo" ]; then
     echo "pr-watch: could not resolve the repository of $PWD" >&2
@@ -57,15 +58,15 @@ case "${1:-}" in
     fi
     entry="$(entry_for "$2")"
     if [ "$1" = add ]; then
-      printf '%s\t%s-%s\n' "$entry" "$(date +%s)" "$$" >> "$list"
-      # Without a running watcher the entry would wait in the list and no
-      # event would ever arrive, so the add fails loudly instead. Matching
-      # the command line keeps a reused PID from passing for the watcher.
+      # Without a running watcher no event would arrive for the entry, so
+      # the add fails before listing it. Matching the command line keeps a
+      # reused PID from passing for the watcher.
       pid="$(cat "$list.pid" 2>/dev/null || true)"
       if [ -z "$pid" ] || ! ps -p "$pid" -o command= | grep -q 'pr-watch-monitor'; then
-        echo "pr-watch: listed $entry, but no watcher runs for this session ID; the pr-watch plugin may be missing, the session non-interactive, or the ID changed by a /clear" >&2
+        echo "pr-watch: not watching $entry: no watcher runs for this session ID; the pr-watch plugin may be missing, the session non-interactive, the watcher stopped, or the ID changed by a /clear" >&2
         exit 1
       fi
+      printf '%s\t%s-%s\n' "$entry" "$(date +%s)" "$$" >> "$list"
       echo "watching $entry"
     else
       # An entry missing here may sit in another session ID's list (after
@@ -74,17 +75,19 @@ case "${1:-}" in
         echo "pr-watch: $entry is not in this session's watch list" >&2
         exit 1
       fi
-      status=0
-      awk -F'\t' -v e="$entry" '$1 != e' "$list" > "$list.tmp" || status=$?
-      if [ "$status" -ne 0 ]; then
-        exit "$status"
-      fi
-      mv "$list.tmp" "$list"
+      tmp="$(mktemp "$list.XXXXXX")"
+      awk -F'\t' -v e="$entry" '$1 != e' "$list" > "$tmp"
+      mv "$tmp" "$list"
       echo "stopped watching $entry"
     fi
     ;;
   list)
-    cut -f1 "$list" | sort -u
+    # An entry is finished when the watcher recorded its latest token.
+    touch "$list.done"
+    # FILENAME rather than NR == FNR, which an empty .done file would fool.
+    awk -F'\t' 'FILENAME == ARGV[1] { done[$1 "\t" $2] = 1; next } { latest[$1] = $2 }
+      END { for (e in latest) if (!((e "\t" latest[e]) in done)) print e }' \
+      "$list.done" "$list" | sort
     ;;
   *)
     usage
