@@ -10,6 +10,9 @@
 #
 # Usage: pr-monitor <pr-number> [interval-seconds]
 #
+# The PR is looked up in GH_REPO (OWNER/REPO) when set, otherwise in the
+# repository of the working directory.
+#
 # Events, one per stdout line. Field values are GitHub's own, passed
 # through rather than classified here:
 #
@@ -56,7 +59,9 @@ if ! [[ "$interval" =~ ^[1-9][0-9]*$ ]]; then
   exit 2
 fi
 
-owner_repo="$(gh repo view --json nameWithOwner --jq .nameWithOwner)"
+# `gh pr view` honors GH_REPO but `gh repo view` does not, so GH_REPO is
+# read here to keep both calls on the same repository.
+owner_repo="${GH_REPO:-$(gh repo view --json nameWithOwner --jq .nameWithOwner)}"
 owner="${owner_repo%/*}"
 repo="${owner_repo#*/}"
 
@@ -279,6 +284,12 @@ while true; do
   case "$state" in
     MERGED|CLOSED) exit 0 ;;
   esac
+
+  # Under `pr-watch monitor`, a watcher killed without running its trap
+  # would otherwise leave this loop polling GitHub until the PR closes.
+  if [ -n "${PR_WATCH_PARENT:-}" ] && ! kill -0 "$PR_WATCH_PARENT" 2>/dev/null; then
+    exit 0
+  fi
 
   first_poll=0
   sleep "$interval"

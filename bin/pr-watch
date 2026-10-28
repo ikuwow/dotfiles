@@ -1,0 +1,128 @@
+#!/usr/bin/env bash
+
+# Register the PRs a Claude Code session watches, and run the watcher that
+# reports their events. Requires bash 4+ (associative arrays).
+#
+# Usage:
+#   pr-watch add <pr-number>      watch a PR of the current repository
+#   pr-watch remove <pr-number>   stop watching it
+#   pr-watch list                 print this session's watch list
+#   pr-watch monitor              run the watcher (the pr-watch plugin's
+#                                 monitor runs this for the whole session)
+#
+# The watch list is one file per session, keyed by CLAUDE_CODE_SESSION_ID,
+# so concurrent sessions in one working tree each wake only for their own
+# PRs. `/clear` gives Bash a new session ID while the running watcher keeps
+# the old one, so PRs added after a `/clear` are not watched until the
+# session restarts.
+#
+# `monitor` runs one `pr-monitor` per listed PR and prints each of its
+# lines prefixed with `<owner>/<repo>#<number> `. A PR whose pr-monitor
+# exits stays out until it is removed and added again, so a merged PR does
+# not restart; an exit other than 0 is reported as WATCH_ERROR.
+
+set -eu
+
+usage() {
+  echo "Usage: pr-watch add|remove <pr-number> | list | monitor" >&2
+}
+
+if [ -z "${CLAUDE_CODE_SESSION_ID:-}" ]; then
+  echo "pr-watch: CLAUDE_CODE_SESSION_ID is not set; run it from a Claude Code session" >&2
+  exit 2
+fi
+list="${XDG_STATE_HOME:-$HOME/.local/state}/pr-watch/$CLAUDE_CODE_SESSION_ID"
+mkdir -p "${list%/*}"
+touch "$list"
+
+entry_for() {
+  if ! [[ "$1" =~ ^[1-9][0-9]*$ ]]; then
+    echo "pr-watch: <pr-number> must be a positive integer, got: $1" >&2
+    exit 2
+  fi
+  echo "${GH_REPO:-$(gh repo view --json nameWithOwner --jq .nameWithOwner)}#$1"
+}
+
+monitor() {
+  declare -A child=() finished=() wanted=()
+  local entry pid status
+  # pr-monitor also exits on its own once this process is gone, which
+  # covers a kill this trap cannot catch.
+  export PR_WATCH_PARENT=$$
+  trap 'kill "${child[@]}" 2>/dev/null || true' EXIT
+  trap 'exit 143' TERM HUP INT
+  while true; do
+    # Retire every finished child before reading the list, so a removed
+    # and re-added PR starts fresh.
+    for entry in "${!child[@]}"; do
+      pid="${child[$entry]}"
+      if kill -0 "$pid" 2>/dev/null; then
+        continue
+      fi
+      status=0
+      wait "$pid" || status=$?
+      if [ "$status" -ne 0 ]; then
+        echo "$entry WATCH_ERROR: pr-monitor exited with status $status"
+      fi
+      unset "child[$entry]"
+      finished[$entry]=1
+    done
+    wanted=()
+    while IFS= read -r entry; do
+      if [ -n "$entry" ]; then
+        wanted[$entry]=1
+      fi
+    done < "$list"
+    for entry in "${!child[@]}"; do
+      if [ -z "${wanted[$entry]:-}" ]; then
+        kill "${child[$entry]}" 2>/dev/null || true
+        unset "child[$entry]"
+      fi
+    done
+    for entry in "${!finished[@]}"; do
+      if [ -z "${wanted[$entry]:-}" ]; then
+        unset "finished[$entry]"
+      fi
+    done
+    for entry in "${!wanted[@]}"; do
+      if [ -z "${child[$entry]:-}" ] && [ -z "${finished[$entry]:-}" ]; then
+        # The prefixer runs in a process substitution, so $! is
+        # pr-monitor itself and a kill reaches it.
+        GH_REPO="${entry%#*}" pr-monitor "${entry##*#}" \
+          > >(awk -v tag="$entry" '{ print tag " " $0; fflush() }') &
+        child[$entry]=$!
+      fi
+    done
+    sleep 10
+  done
+}
+
+case "${1:-}" in
+  add|remove)
+    if [ $# -ne 2 ]; then
+      usage
+      exit 2
+    fi
+    entry="$(entry_for "$2")"
+    if [ "$1" = add ]; then
+      if ! grep -qxF "$entry" "$list"; then
+        echo "$entry" >> "$list"
+      fi
+      echo "watching $entry"
+    else
+      grep -vxF "$entry" "$list" > "$list.tmp" || true
+      mv "$list.tmp" "$list"
+      echo "stopped watching $entry"
+    fi
+    ;;
+  list)
+    cat "$list"
+    ;;
+  monitor)
+    monitor
+    ;;
+  *)
+    usage
+    exit 2
+    ;;
+esac
