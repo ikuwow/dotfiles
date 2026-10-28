@@ -12,9 +12,9 @@
 #
 # The watch list is one file per session, keyed by CLAUDE_CODE_SESSION_ID,
 # so concurrent sessions in one working tree each wake only for their own
-# PRs. `/clear` gives Bash a new session ID while the running watcher keeps
-# the old one, so PRs added after a `/clear` are not watched until the
-# session restarts.
+# PRs. `/clear` gives Bash a new session ID, so if the running watcher
+# keeps the ID it started with, PRs added after a `/clear` go to a list it
+# does not read until the session restarts.
 #
 # `monitor` runs one `pr-monitor` per listed PR and prints each of its
 # lines prefixed with `<owner>/<repo>#<number> `. A PR whose pr-monitor
