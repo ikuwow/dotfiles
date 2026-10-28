@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         RaenonX Popup Dismisser
 // @namespace    https://github.com/ikuwow/dotfiles
-// @version      0.1.1
+// @version      0.1.2
 // @downloadURL  https://raw.githubusercontent.com/ikuwow/dotfiles/main/userscripts/raenonx-popup-dismisser.user.js
 // @updateURL    https://raw.githubusercontent.com/ikuwow/dotfiles/main/userscripts/raenonx-popup-dismisser.user.js
 // @description  Dismiss the subscription popup that RaenonX shows every 30 minutes (7 with an ad blocker)
@@ -9,8 +9,10 @@
 // @include      *://pks.raenonx.cc/*
 // ==/UserScript==
 // The popup is a Base UI dialog whose open state lives only in React, so it
-// is closed through its own close button. Hiding it alone would leave the
-// page scroll-locked and its other elements inert.
+// is closed through its own close button, the dialog's first button. Hiding
+// it alone would leave the page scroll-locked and its other elements inert.
+// Only a dialog with data-open is matched, so one playing its close
+// transition is not clicked again.
 // The popup's text follows the UI language and it carries no stable id or
 // class of its own, so it is matched by the utm_source of its plan link.
 // The close button stays disabled for the first moments after the popup
