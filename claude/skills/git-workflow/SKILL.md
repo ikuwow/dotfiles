@@ -10,8 +10,8 @@ Follow each step in order. Skip a step only when its precondition is
 structurally absent (e.g., no PR exists yet).
 
 Prerequisites: the `agynio/gh-pr-review` gh extension (Phase 5 review
-threads), the `pr-review-toolkit` plugin (Phase 2), and `bin/pr-monitor`
-(Phases 4 and 5).
+threads), the `pr-review-toolkit` plugin (Phase 2), and `bin/pr-watch`
+with the `pr-watch` plugin that runs it (Phases 4 and 5).
 
 ## Supporting files
 
@@ -30,7 +30,7 @@ threads), the `pr-review-toolkit` plugin (Phase 2), and `bin/pr-monitor`
   report results at the end
   - Pause only when blocked by an error or ambiguity, or when the user
     named a stopping point ("stop after creating the draft PR", "skip
-    Phase 2 for this PR", "no Monitor")
+    Phase 2 for this PR", "no PR watch")
   - A small diff, a documentation-only change, and personal-project
     scope are signals for weighing a finding within a phase; whether
     the phase runs is not a judgment they reach
@@ -50,7 +50,7 @@ threads), the `pr-review-toolkit` plugin (Phase 2), and `bin/pr-monitor`
   with replies and no push.
 - Never end a turn that claims ongoing waiting (delegated fix push,
   CI run, CI rerun, external state change) without an armed event
-  source — a Monitor on the branch head, or
+  source — the PR registered with `pr-watch add`, or
   `gh pr checks --watch --fail-fast` with `run_in_background: true`.
   After every `gh run rerun` or other re-kick, re-arm the watch before
   yielding. State what is being awaited in the final message before
@@ -173,15 +173,17 @@ Bring the PR into a state where a human reviewer can act on it:
 1. Confirm acceptance criteria are met. Cross-check the PR body and
    any linked issue against the actual change. If something is unmet,
    either address it or call it out as out-of-scope / follow-up.
-1. Arm the persistent `Monitor` running `pr-monitor <PR number>`
-   before the PR leaves draft. `READY_FOR_REVIEW` is itself a monitored
-   event, so an arm deferred until after the ready flip can never
-   observe it.
-1. In the same turn as the arm, hand the PR to review:
+1. Register the PR for the Phase 5 watch with `pr-watch add <PR number>`
+   before the PR leaves draft. `READY_FOR_REVIEW` is itself a watched
+   event, so a registration deferred until after the ready flip can
+   never observe it.
+   - A failing `pr-watch add` means no watch runs in this session:
+     report that the PR is unwatched, and claim no ongoing wait on it
+1. In the same turn as the registration, hand the PR to review:
    - When a loaded rule assigns the ready flip to the agent for this
-     PR, run `gh pr ready <PR number>` in a tool call after the arm,
-     then continue into Phase 5
-     - The Monitor's first poll can record the PR as already ready
+     PR, run `gh pr ready <PR number>` in a tool call after the
+     registration, then continue into Phase 5
+     - The watch's first poll can record the PR as already ready
        without reporting it, so `READY_FOR_REVIEW` may not arrive,
        while the reviews that follow do
    - Otherwise surface Phase 4 completion, before handing control back,
@@ -195,14 +197,18 @@ verification with `curl`, `aws logs tail`, etc.).
 
 ### Phase 5: Watch PR activity until merge
 
-The Monitor armed in Phase 4 polls every 60s and emits one stdout line
-per actionable change; quiet periods stay silent. Arm it here when the
+The `pr-watch` plugin's monitor runs for the whole session and polls
+each PR registered in Phase 4 every 60s, emitting one line per
+actionable change; quiet periods stay silent, and the watch needs no
+re-arming. Register the PR here with `pr-watch add <PR number>` when the
 run entered the workflow at this phase.
 
-1. Each event line is `<EVENT>` or `<EVENT>: <details>`, carrying
-   GitHub's own field values. The steps below cover the events with a
-   fixed procedure; read any other line and judge from what it says.
-   `pr-monitor`'s header documents the full set.
+1. Each event line is `<owner>/<repo>#<number> <EVENT>` or
+   `<owner>/<repo>#<number> <EVENT>: <details>`, carrying GitHub's own
+   field values. The steps below cover the events with a fixed
+   procedure; read any other line and judge from what it says.
+   `pr-monitor`'s header documents the full set of events, and
+   `pr-watch`'s header the `WATCH_ERROR` line it adds.
 
 1. Re-fetch detail on each event with:
    - `gh pr view <number> --json state,isDraft,reviewDecision,latestReviews,statusCheckRollup,comments,updatedAt,mergedAt,headRefName`
@@ -231,13 +237,16 @@ run entered the workflow at this phase.
 1. Exit conditions:
    - `STATE: MERGED` → execute step 5 (Cleanup).
    - `STATE: CLOSED` without merge → skip cleanup.
-   - Session ends → Monitor terminates with the session (best-effort).
+   - The watch stops on its own after either line.
+   - `WATCH_ERROR` → the watch on that PR stopped; report the line, and
+     `pr-watch add <PR number>` restarts it.
+   - Session ends → the watch ends with the session.
 
 1. Conflict handling:
-   - Manual user push during monitor: acknowledge on the next event,
+   - Manual user push during the watch: acknowledge on the next event,
      keep watching. Do not revert or duplicate.
-   - New user instruction superseding the watch: `TaskStop` the
-     monitor, prioritize the user request.
+   - New user instruction superseding the watch:
+     `pr-watch remove <PR number>`, prioritize the user request.
 
 `PushNotification` only for events that change what the user would do
 next (merge, or "needs human attention" after the fix cap). Skip
