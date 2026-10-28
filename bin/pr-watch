@@ -51,6 +51,7 @@ monitor() {
   # pr-monitor also exits on its own once this process is gone, which
   # covers a kill this trap cannot catch.
   export PR_WATCH_PARENT=$$
+  echo $$ > "$list.pid"
   trap 'kill "${child[@]}" 2>/dev/null || true' EXIT
   trap 'exit 143' TERM HUP INT
   while true; do
@@ -108,6 +109,12 @@ case "${1:-}" in
     entry="$(entry_for "$2")"
     if [ "$1" = add ]; then
       echo "$entry" >> "$list"
+      # Without a running watcher the entry would wait in the list and no
+      # event would ever arrive, so the add fails loudly instead.
+      if ! kill -0 "$(cat "$list.pid" 2>/dev/null)" 2>/dev/null; then
+        echo "pr-watch: listed $entry, but no watcher runs for this session; is the pr-watch plugin installed and the session interactive?" >&2
+        exit 1
+      fi
       echo "watching $entry"
     else
       grep -vxF "$entry" "$list" > "$list.tmp" || true
