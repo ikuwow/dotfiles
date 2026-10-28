@@ -4,8 +4,9 @@
 # Requires bash 4+ (associative arrays). The shebang is /usr/bin/env bash
 # so the brew-installed bash on PATH is picked up on macOS, where the
 # default /bin/bash is 3.2.
-# Designed to be armed as a Claude Code persistent Monitor; the silence
-# between events is the entire point. See the git-workflow skill
+# Run per PR by `pr-watch-monitor`, whose output a Claude Code session
+# receives as notifications; the silence between events is the entire
+# point. See the git-workflow skill
 # (claude/skills/git-workflow/SKILL.md) Phase 5 for the reaction protocol.
 #
 # Usage: pr-monitor <pr-number> [interval-seconds]
@@ -163,6 +164,13 @@ emit_new() {
 }
 
 while true; do
+  # Under `pr-watch-monitor`, a watcher killed without running its trap
+  # would otherwise leave this loop polling GitHub until the PR closes.
+  # Checked before the poll so a failing poll does not skip it.
+  if [ -n "${PR_WATCH_PARENT:-}" ] && ! kill -0 "$PR_WATCH_PARENT" 2>/dev/null; then
+    exit 0
+  fi
+
   pr_json="$(gh pr view "$pr" --json state,isDraft,reviewDecision,statusCheckRollup,headRefOid 2>/dev/null || true)"
   # Requiring `.state` rather than mere parseability: `{}` parses, and an
   # empty `state` reaches the comparison below while an empty `headRefOid`
@@ -179,7 +187,9 @@ while true; do
   head_sha="$(echo "$pr_json" | jq -r '.headRefOid // ""')"
 
   if [ "$state" != "$prev_state" ]; then
-    if [ "$first_poll" -eq 0 ]; then
+    # A PR already merged or closed on the first poll ends the watch right
+    # here, so its state is reported rather than seeded.
+    if [ "$first_poll" -eq 0 ] || [ "$state" = MERGED ] || [ "$state" = CLOSED ]; then
       echo "STATE: $state"
     fi
     prev_state="$state"
@@ -284,12 +294,6 @@ while true; do
   case "$state" in
     MERGED|CLOSED) exit 0 ;;
   esac
-
-  # Under `pr-watch monitor`, a watcher killed without running its trap
-  # would otherwise leave this loop polling GitHub until the PR closes.
-  if [ -n "${PR_WATCH_PARENT:-}" ] && ! kill -0 "$PR_WATCH_PARENT" 2>/dev/null; then
-    exit 0
-  fi
 
   first_poll=0
   sleep "$interval"
