@@ -199,8 +199,8 @@ verification with `curl`, `aws logs tail`, etc.).
 
 The `pr-watch` plugin's monitor runs for the whole session and polls
 each PR registered in Phase 4 every 60s, emitting one line per
-actionable change; quiet periods stay silent, and the watch needs no
-re-arming. Register the PR here with `pr-watch add <PR number>` when the
+actionable change; quiet periods stay silent, and the watch keeps
+running across turns until the session ends. Register the PR here with `pr-watch add <PR number>` when the
 run entered the workflow at this phase.
 
 1. Each event line is `<owner>/<repo>#<number> <EVENT>` or
