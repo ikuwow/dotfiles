@@ -11,7 +11,8 @@ structurally absent (e.g., no PR exists yet).
 
 Prerequisites: the `agynio/gh-pr-review` gh extension (Phase 5 review
 threads), the `pr-review-toolkit` plugin (Phase 2), and `bin/pr-watch`
-with the `pr-watch` plugin that runs it (Phases 4 and 5).
+with the `pr-watch` plugin, whose monitor runs `bin/pr-watch-monitor`
+(Phases 4 and 5).
 
 ## Supporting files
 
@@ -185,9 +186,10 @@ Bring the PR into a state where a human reviewer can act on it:
    - When a loaded rule assigns the ready flip to the agent for this
      PR, run `gh pr ready <PR number>` in a tool call after the
      registration, then continue into Phase 5
-     - The watch's first poll can record the PR as already ready
-       without reporting it, so `READY_FOR_REVIEW` may not arrive,
-       while the reviews that follow do
+     - The watch's first poll starts up to 10s after the registration
+       and records a PR already ready without reporting it, so
+       `READY_FOR_REVIEW` may not arrive, while the reviews that follow
+       do
    - Otherwise surface Phase 4 completion, before handing control back,
      so the user can decide whether to mark the PR ready for review,
      and run `gh pr ready` only when the user asks for it
@@ -201,10 +203,10 @@ verification with `curl`, `aws logs tail`, etc.).
 
 The `pr-watch` plugin's monitor runs for the whole session and polls
 each PR registered in Phase 4 every 60s, emitting one line per
-actionable change; quiet periods stay silent, and the watch keeps
-running across turns until the session ends. Register the PR here with
-`pr-watch add <PR number>` when the run entered the workflow at this
-phase.
+actionable change; quiet periods stay silent, and each PR's watch keeps
+running across turns until that PR merges or closes. Register the PR
+here with `pr-watch add <PR number>` when the run entered the workflow
+at this phase.
 
 1. Each event line is `<owner>/<repo>#<number> <EVENT>` or
    `<owner>/<repo>#<number> <EVENT>: <details>`, carrying GitHub's own
@@ -241,11 +243,13 @@ phase.
    - `STATE: MERGED` → execute step 5 (Cleanup).
    - `STATE: CLOSED` without merge → skip cleanup.
    - The watch stops on its own after either line.
-   - `WATCH_ERROR` → the watch on that PR, or on every PR when the line
-     carries no `<owner>/<repo>#<number>`, stopped; report the line, and
-     `pr-watch add <PR number>` restarts a single PR's watch. Re-fetch
-     after the restart, since the new watch takes what already happened
-     as seen.
+   - `<owner>/<repo>#<number> WATCH_ERROR` → the watch on that PR
+     stopped; report the line, restart it with
+     `GH_REPO=<owner>/<repo> pr-watch add <number>`, and re-fetch, since
+     the new watch takes what already happened as seen.
+   - `WATCH_ERROR` with no `<owner>/<repo>#<number>` → every PR's watch
+     stopped until the session restarts; report the line, and claim no
+     ongoing wait on any PR.
    - Session ends → the watch ends with the session.
 
 1. Conflict handling:
