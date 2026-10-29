@@ -58,22 +58,27 @@ plugin (Phases 4 and 5).
     body's description of the approach untrue
   - A fix that changes none of these, such as an in-place bug fix or a
     reword that keeps the meaning, is a local fix
-    - In a rule, skill, or agent definition, a reword that brings the
-      text in line with the behavior the PR body already describes is a
-      local fix, even though it changes what an agent does
-  - The round: push the fix, update the PR title and body to the new
-    design, then run Phase 1, Phase 2, and Phase 3 on the new head
-  - A round entered before Phase 5 continues into Phase 4, skipping the
-    watch start and the ready handoff when they already ran
-  - A round entered from Phase 5 ends with the Phase 4 steps that update
-    Verification and check acceptance criteria, then returns to the
-    watch, which keeps running throughout
+  - In a rule, skill, or agent definition, a fix that adds or rewords
+    handling within the approach the PR body describes is a local fix,
+    even though it changes what an agent does; a fix whose description
+    would need a new sentence about the approach in the PR body is a
+    design change
+  - The round: push the committed fixes, update the PR title and body to
+    the new design, then run Phase 1, Phase 2, and Phase 3 on the new
+    head
+    - When the user skipped Phase 2 for this PR, the round skips it too
+  - A round started while the PR watch is not running continues into
+    Phase 4
+  - A round started while the PR watch is running, nested rounds
+    included, ends with the Phase 4 steps that update Verification and
+    check acceptance criteria, then returns to the watch
     - Events arriving during the round wait until it ends, and Phase 5's
       pre-push checks apply to its pushes
     - A `STATE` event ends the round at once and goes to Phase 5's exit
       conditions
-  - When the fix-push cap stops a round midway, the round ends there and
-    the cap's own handling takes over, including for held events
+  - When a round needs a push the fix-push cap forbids, the round ends
+    there and the cap's own handling takes over, including for held
+    events
   - Each round starts with a push, so the fix-push cap also bounds how
     many rounds run
 - Never end a turn that claims ongoing waiting (delegated fix push,
@@ -259,8 +264,9 @@ itself, such as `WATCH_ERROR`; this phase reacts to the PR's events.
 1. `CHECK`: `gh pr checks` links the failing check. For an Actions job,
    `gh run view --log-failed <databaseId>` from `gh run list` reaches the
    failed steps, which a conclusion like `cancelled` or `timed_out` does
-   not have. Fix and push under the same pre-push checks, and start the
-   design-change round from Principles when the fix is a design change.
+   not have. Fix and push under the same pre-push checks. When the fix
+   is a design change, that push opens the design-change round from
+   Principles.
 
 1. Exit conditions:
    - `STATE: MERGED` → execute step 5 (Cleanup).
