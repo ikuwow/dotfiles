@@ -178,8 +178,8 @@ Bring the PR into a state where a human reviewer can act on it:
 1. Start the Phase 5 PR watch through the `pr-watch:watch` skill
    before the PR leaves draft. `READY_FOR_REVIEW` is itself a watched
    event, so a watch started after the ready flip can never observe it.
-   - When the skill reports the PR as unwatched, carry that into the
-     Phase 4 report and claim no ongoing wait on the PR
+   - When the watch fails to start, carry that into the Phase 4 report
+     and claim no ongoing wait on the PR
 1. In the same turn as the watch start, hand the PR to review:
    - When a loaded rule assigns the ready flip to the agent for this
      PR, run `gh pr ready <PR number>` in a tool call after the watch
@@ -209,7 +209,8 @@ itself, such as `WATCH_ERROR`; this phase reacts to the PR's events.
    procedure; read any other line and judge from what it says. The
    `pr-watch:watch` skill says where the full set is documented.
 
-1. Re-fetch detail on each event with:
+1. Re-fetch detail on each event, adding `-R <owner>/<repo>` from the
+   line when the PR is in another repository, with:
    - `gh pr view <number> --json state,isDraft,reviewDecision,latestReviews,statusCheckRollup,comments,updatedAt,mergedAt,headRefName`
    - `gh run list --branch <headRefName> --json databaseId,name,status,conclusion,createdAt,headSha,workflowName --limit 20`
    - review threads: the listing in `pr-reaction.md`'s Step 1, which
@@ -224,7 +225,7 @@ itself, such as `WATCH_ERROR`; this phase reacts to the PR's events.
    - Skip the push if either check fails; surface the conflict to the
      user.
 
-1. Read [pr-reaction.md](pr-reaction.md) on the first monitor event,
+1. Read [pr-reaction.md](pr-reaction.md) on the first watch event,
    before any reply, resolve, or push, and react under it — it governs
    what the `[BOT|USER]` label settles for each event type
 
@@ -236,10 +237,10 @@ itself, such as `WATCH_ERROR`; this phase reacts to the PR's events.
 1. Exit conditions:
    - `STATE: MERGED` → execute step 5 (Cleanup).
    - `STATE: CLOSED` without merge → skip cleanup.
-   - The watch stops on its own after either line.
    - A watch the `pr-watch:watch` skill reports as stopped and not
      restarted → claim no ongoing wait on that PR.
-   - Session ends → the watch ends with the session.
+   - Session ends → the watch stops with it; the `pr-watch:watch` skill
+     covers what a resumed session reports.
 
 1. Conflict handling:
    - Manual user push during the watch: acknowledge on the next event,
