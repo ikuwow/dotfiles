@@ -28,11 +28,14 @@
 #   POLL_ERROR: <call that failed>
 #
 # WATCHING prints once, when every source has had its first successful
-# poll; every change after it reports, and anything before it was taken
-# as already seen. CHECK covers every check on the head commit, Actions or
-# not, settling on anything but success. POLL_ERROR prints when a call
-# first fails, and neither its later failures nor its recovery print a
-# line; a failing `gh pr view` skips the rest of that poll.
+# poll, and every change after it reports. Before it, a source takes what
+# it finds on its own first success as already seen, while CHECK lines and
+# a merged or closed STATE print from the first poll; a PR already merged
+# or closed ends this process without a WATCHING line. CHECK covers every
+# check on the head commit, Actions or not, settling on anything but
+# success, neutral, or skipped. POLL_ERROR prints when a call first fails,
+# and neither its later failures nor its recovery print a line; a failing
+# `gh pr view` skips the rest of that poll.
 #
 # Comment and review events carry every author, the one `gh`
 # authenticates as included. The event names and the `[BOT|USER]` tag are
@@ -112,9 +115,10 @@ poll_ok() {
 
 # `__typename` on each author is the authoritative Bot/User signal. It
 # flows into the event line as a `[BOT]` or `[USER]` prefix on the author
-# label so a reaction turn can classify without re-fetching. For review-thread comments this is a per-comment
-# hint only — the rule still requires walking every comment in the
-# thread before mutating it.
+# label so a reaction turn can classify without re-fetching. For
+# review-thread comments this is a per-comment hint only — pr-reaction.md's
+# targeting policy still requires walking every comment in the thread
+# before mutating it.
 
 # shellcheck disable=SC2016 # GraphQL query: $vars are query variables
 threads_query='query($owner:String!,$repo:String!,$num:Int!){

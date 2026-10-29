@@ -58,7 +58,9 @@ while true; do
   fi
   for entry in "${!child[@]}"; do
     pid="${child[$entry]}"
-    if kill -0 "$pid" 2>/dev/null; then
+    # A child still running is this shell's child, which a PID reused by
+    # another process after the child exited is not.
+    if [ "$(ps -o ppid= -p "$pid" 2>/dev/null | tr -d ' ')" = "$$" ]; then
       continue
     fi
     status=0

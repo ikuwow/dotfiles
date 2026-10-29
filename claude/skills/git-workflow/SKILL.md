@@ -182,8 +182,8 @@ Bring the PR into a state where a human reviewer can act on it:
    - When a loaded rule assigns the ready flip to the agent for this
      PR, run `gh pr ready <PR number>` in a tool call after the watch
      start, then continue into Phase 5
-     - A flip before the watch's `WATCHING` line does not report as
-       `READY_FOR_REVIEW`, while the reviews that follow do
+     - A flip before the watch's `WATCHING` line may not report as
+       `READY_FOR_REVIEW`, and the re-fetch on that line shows it
    - Otherwise surface Phase 4 completion, before handing control back,
      so the user can decide whether to mark the PR ready for review,
      and run `gh pr ready` only when the user asks for it
