@@ -74,7 +74,8 @@ gh search prs --mentions=@me --state=open --sort updated --limit 100 --json repo
 1. レビューの状態と議論の経緯を要約する
     - レビューとインラインのスレッド: `gh pr-review review view -R <owner>/<repo> <number>`
     - `gh pr list -R <owner>/<repo> --head <baseRefName>` で base branch を head にする open な PR があれば chain PR なので、依存先の PR の状態も確認する
-1. 対応する issue（`closingIssuesReferences`）を読み、ブロッカーや外部への依存が書かれていないか確認する
+1. 対応する issue（`closingIssuesReferences`）と、その sub-issue 全件の本文を読み、ブロッカーや外部への依存が書かれていないか確認する
+    - テストケースやリリース計画は sub-issue 側に分かれて書かれることがあり、タイトルだけでは受け入れ条件と照合できないため
 1. 大枠を評価して、approve できそうかと主な論点を出す
     - 要件：issue の受け入れ条件と照合する
     - 設計：関連 PR との依存関係とデプロイ順序、既存システムへの影響範囲を見る

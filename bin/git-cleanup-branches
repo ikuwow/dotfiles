@@ -22,10 +22,12 @@ if [ -n "$(git status --porcelain)" ]; then
   exit 1
 fi
 
-default_branch=main
-if [ ! "$(git rev-parse --verify "$default_branch" 2>/dev/null)" ]; then
-  default_branch=master
+# Resolve the default branch the same way the `git home` alias does.
+if ! default_ref=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null); then
+  git remote set-head origin -a
+  default_ref=$(git symbolic-ref refs/remotes/origin/HEAD)
 fi
+default_branch=${default_ref#refs/remotes/origin/}
 
 git checkout -q "$default_branch"
 
