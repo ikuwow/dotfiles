@@ -18,7 +18,7 @@ Run `add` and `remove` one at a time rather than in parallel tool calls, since a
 
 ## Read the lines
 
-- An event line is `<owner>/<repo>#<number> <EVENT>` or `<owner>/<repo>#<number> <EVENT>: <details>`, carrying GitHub's own field values; the header of `${CLAUDE_PLUGIN_ROOT}/bin/pr-monitor` documents every event
+- An event line is `<owner>/<repo>#<number> <EVENT>` or `<owner>/<repo>#<number> <EVENT>: <details>`, carrying GitHub's own field values; `${CLAUDE_PLUGIN_ROOT}/README.md` documents every event and what the watch leaves unreported
 - `<owner>/<repo>#<number> WATCHING` means every change from now on reports: re-fetch the PR when it arrives
   - Before it, comments, reviews, and state changes the watch found on its first polls were taken as already seen, so the re-fetch on it covers the time before the watch began
   - It follows a start of a watch, whether by an add, a restart after `WATCH_ERROR`, or a resumed session, unless the PR is already merged or closed, which prints `STATE:` instead, or its first `gh pr view` keeps failing, which prints `POLL_ERROR`
