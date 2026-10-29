@@ -43,7 +43,7 @@ plugin (Phases 4 and 5).
   worktree (or feature branch) first. Creating files before branching
   leads to redundant copy-and-delete work.
 - Never modify commits that have already been pushed
-- Stop autonomous fix pushes after 3 for this PR in this session,
+- Stop autonomous fix pushes after 5 for this PR in this session,
   counting the pushes made in every phase, since past that the fixes
   are no longer converging on their own. Surface the state and wait for
   a user instruction — in Phase 5 that means answering further events
