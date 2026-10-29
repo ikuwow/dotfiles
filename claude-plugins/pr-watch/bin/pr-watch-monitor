@@ -41,16 +41,19 @@ done < "$list.done"
 
 # pr-monitor also exits on its own at its next poll once this process is
 # gone, which covers a kill this trap cannot catch. The kill comes first
-# because the echo fails once the session has closed this script's stdout.
+# because the echo can end this shell once the session has closed its
+# stdout.
 export PR_WATCH_PARENT=$$
 trap 'status=$?; kill "${child[@]}" 2>/dev/null || true; echo "WATCH_ERROR: pr-watch-monitor exited with status $status" || true' EXIT
 trap 'exit 143' TERM HUP INT
 
 while true; do
-  # The harness killing only its wrapper would otherwise leave this loop
-  # in `<list>.pid`, where `pr-watch add` keeps accepting PRs whose events
-  # go nowhere. $PPID keeps the value it had at start.
-  if ! kill -0 "$PPID" 2>/dev/null; then
+  # The harness killing only the shell it runs the monitor command in
+  # would otherwise leave this process recorded in `<list>.pid`, where
+  # `pr-watch add` keeps accepting PRs whose events go nowhere. $PPID
+  # keeps its value from the start, so a parent that changed means the
+  # original one is gone, whether or not its PID was reused.
+  if [ "$(ps -o ppid= -p $$ | tr -d ' ')" != "$PPID" ]; then
     exit 0
   fi
   for entry in "${!child[@]}"; do
@@ -81,7 +84,10 @@ while true; do
   done
   for entry in "${!wanted[@]}"; do
     if [ -n "${child[$entry]:-}" ]; then
-      # An add while the watch runs needs no restart.
+      # An add while the watch runs needs no restart. Advancing the token
+      # makes the `.done` record this watch writes when it ends match the
+      # latest add, so `pr-watch list` and the next watcher treat it as
+      # finished.
       started[$entry]="${wanted[$entry]}"
     elif [ "${wanted[$entry]}" != "${started[$entry]:-}" ]; then
       # The prefixer runs in a process substitution, so $! is pr-monitor

@@ -17,17 +17,22 @@
 # Events, one per stdout line. Field values are GitHub's own, passed
 # through rather than classified here:
 #
+#   WATCHING
 #   STATE: <state>
 #   REVIEW: <reviewDecision>
 #   READY_FOR_REVIEW
 #   NEW_COMMENT: [BOT|USER] <author> <path>:<line>
 #   NEW_TOP_COMMENT: [BOT|USER] <author>
 #   NEW_REVIEW: [BOT|USER] <author> <state>
-#   CHECK: <check name> (<conclusion or state>)
+#   CHECK: <check name> (<conclusion or state>) @<head sha, 7 chars>
 #   POLL_ERROR: <call that failed>
 #
-# CHECK covers every check on the head commit, Actions or not, settling
-# on anything but success.
+# WATCHING prints once, when every source has had its first successful
+# poll; every change after it reports, and anything before it was taken
+# as already seen. CHECK covers every check on the head commit, Actions or
+# not, settling on anything but success. POLL_ERROR prints when a call
+# first fails, and neither its later failures nor its recovery print a
+# line; a failing `gh pr view` skips the rest of that poll.
 #
 # Comment and review events carry every author, the one `gh`
 # authenticates as included. The event names and the `[BOT|USER]` tag are
@@ -89,6 +94,7 @@ trap 'rm -f "$seen_comments" "$seen_top_comments" "$seen_reviews"' EXIT
 first_poll=1
 seed_threads=1
 seed_reviews=1
+announced=0
 
 # One line per outage, not per poll: an unauthorized token or an outage
 # persists for many intervals, and a line each time would drown the
@@ -104,10 +110,9 @@ poll_ok() {
   unset "poll_failed[$1]"
 }
 
-# `__typename` on each author is the authoritative Bot/User signal per
-# claude/skills/git-workflow/pr-reaction.md. It flows into the event line as a `[BOT]` or
-# `[USER]` prefix on the author label so a reaction turn can classify
-# without re-fetching. For review-thread comments this is a per-comment
+# `__typename` on each author is the authoritative Bot/User signal. It
+# flows into the event line as a `[BOT]` or `[USER]` prefix on the author
+# label so a reaction turn can classify without re-fetching. For review-thread comments this is a per-comment
 # hint only — the rule still requires walking every comment in the
 # thread before mutating it.
 
@@ -246,7 +251,9 @@ while true; do
     if [ "$check_state" != "${prev_check[$check_name]-unseen}" ]; then
       case "$check_state" in
         SUCCESS|NEUTRAL|SKIPPED|PENDING|EXPECTED|QUEUED|WAITING|REQUESTED|IN_PROGRESS) ;;
-        *) echo "CHECK: $check_name ($check_state)" ;;
+        # The head sha tells a failure reported again after a restart
+        # from a new one.
+        *) echo "CHECK: $check_name ($check_state) @${head_sha:0:7}" ;;
       esac
       prev_check[$check_name]="$check_state"
     fi
@@ -304,6 +311,11 @@ while true; do
   case "$state" in
     MERGED|CLOSED) exit 0 ;;
   esac
+
+  if [ "$announced" -eq 0 ] && [ "$seed_threads" -eq 0 ] && [ "$seed_reviews" -eq 0 ]; then
+    echo "WATCHING"
+    announced=1
+  fi
 
   first_poll=0
   sleep "$interval"

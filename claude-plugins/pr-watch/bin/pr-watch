@@ -4,12 +4,15 @@
 # by the pr-watch plugin for the whole session, reports their events.
 #
 # Usage:
-#   pr-watch add <pr-number>      watch a PR of GH_REPO (OWNER/REPO) when
-#                                 set, otherwise of the current repository
-#   pr-watch remove <pr-number>   stop watching it
+#   pr-watch add <pr>             watch a PR
+#   pr-watch remove <pr>          stop watching it
 #   pr-watch list                 print this session's registered PRs not
-#                                 recorded as finished, and exit 1 when no
-#                                 watcher runs to watch them
+#                                 recorded as finished; exits 1 whenever no
+#                                 watcher runs
+#
+# <pr> is `<owner>/<repo>#<number>`, the form `list` prints, or a bare
+# number in GH_REPO (OWNER/REPO) when set, otherwise in the current
+# repository.
 #
 # The watch list is one file per session, keyed by CLAUDE_CODE_SESSION_ID,
 # so concurrent sessions in one working tree each wake only for their own
@@ -25,7 +28,7 @@
 set -eu
 
 usage() {
-  echo "Usage: pr-watch add|remove <pr-number> | list" >&2
+  echo "Usage: pr-watch add|remove <owner>/<repo>#<number>|<number> | list" >&2
 }
 
 if [ -z "${CLAUDE_CODE_SESSION_ID:-}" ]; then
@@ -37,8 +40,12 @@ mkdir -p "${list%/*}"
 touch "$list"
 
 entry_for() {
+  if [[ "$1" =~ ^[^/#[:space:]]+/[^/#[:space:]]+#[1-9][0-9]*$ ]]; then
+    echo "$1"
+    return
+  fi
   if ! [[ "$1" =~ ^[1-9][0-9]*$ ]]; then
-    echo "pr-watch: <pr-number> must be a positive integer, got: $1" >&2
+    echo "pr-watch: <pr> must be <owner>/<repo>#<number> or a positive integer, got: $1" >&2
     exit 2
   fi
   local repo
@@ -83,7 +90,7 @@ case "${1:-}" in
       echo "watching $entry"
     else
       if ! cut -f1 "$list" | grep -qxF "$entry"; then
-        echo "pr-watch: $entry is not in this session ID's watch list; after a /clear it may sit in the earlier ID's list and keep being watched" >&2
+        echo "pr-watch: $entry is not in this session ID's watch list; pass the <owner>/<repo>#<number> that 'pr-watch list' prints, and note that after a /clear the PR may sit in the earlier ID's list" >&2
         exit 1
       fi
       tmp="$(mktemp "$list.XXXXXX")"
