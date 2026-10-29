@@ -48,24 +48,32 @@ plugin (Phases 4 and 5).
   fixes are no longer converging on their own. Surface the state and
   wait for a user instruction — in Phase 5 that means answering further
   events with replies and no push.
-- Run a design-change round whenever a fix made after the Phase 2 code
-  review is a design change, in any phase and whatever finding, event,
-  or failure it answers, since no code review has judged the new design
+- Run a design-change round whenever a design change is made in a fix
+  that no upcoming Phase 2 code review will cover, in any phase and
+  whatever finding, event, or failure the fix answers, since no code
+  review has judged the new design
   - A fix is a design change when it changes an interface or contract,
     the data flow, the split of responsibilities between files or
-    components, or the mechanism chosen, or when it leaves the PR
+    components, or the mechanism the PR chose, or when it leaves the PR
     body's description of the approach untrue
-    - In a rule, skill, or agent definition, rewording that changes
-      what an agent does changes its contract
   - A fix that changes none of these, such as an in-place bug fix or a
     reword that keeps the meaning, is a local fix
-  - The round: push the fix, update the PR body to the new design, then
-    run Phase 1, Phase 2, and Phase 3 on the new head
+    - In a rule, skill, or agent definition, a reword that brings the
+      text in line with the behavior the PR body already describes is a
+      local fix, even though it changes what an agent does
+  - The round: push the fix, update the PR title and body to the new
+    design, then run Phase 1, Phase 2, and Phase 3 on the new head
+  - A round entered before Phase 5 continues into Phase 4, skipping the
+    watch start and the ready handoff when they already ran
   - A round entered from Phase 5 ends with the Phase 4 steps that update
     Verification and check acceptance criteria, then returns to the
     watch, which keeps running throughout
-    - Events arriving during the round wait until it ends, except
-      `STATE` events, and Phase 5's pre-push checks apply to its pushes
+    - Events arriving during the round wait until it ends, and Phase 5's
+      pre-push checks apply to its pushes
+    - A `STATE` event ends the round at once and goes to Phase 5's exit
+      conditions
+  - When the fix-push cap stops a round midway, the round ends there and
+    the cap's own handling takes over, including for held events
   - Each round starts with a push, so the fix-push cap also bounds how
     many rounds run
 - Never end a turn that claims ongoing waiting (delegated fix push,
@@ -179,8 +187,8 @@ Once the review finishes, review the results:
    PR is still consistent and CI passes.
 
 The code review runs again only in a design-change round. After local
-fixes, the narrative sweep and `/pr-selfcheck` in the last two steps
-catch the inconsistencies those fixes introduced.
+fixes, the narrative-sweep re-run and the push step that re-runs
+`/pr-selfcheck` catch the inconsistencies those fixes introduced.
 
 ### Phase 4: Finalize PR for review readiness
 
@@ -251,7 +259,8 @@ itself, such as `WATCH_ERROR`; this phase reacts to the PR's events.
 1. `CHECK`: `gh pr checks` links the failing check. For an Actions job,
    `gh run view --log-failed <databaseId>` from `gh run list` reaches the
    failed steps, which a conclusion like `cancelled` or `timed_out` does
-   not have. Fix and push under the same pre-push checks.
+   not have. Fix and push under the same pre-push checks, and start the
+   design-change round from Principles when the fix is a design change.
 
 1. Exit conditions:
    - `STATE: MERGED` → execute step 5 (Cleanup).
@@ -268,7 +277,7 @@ itself, such as `WATCH_ERROR`; this phase reacts to the PR's events.
      `pr-watch:watch` skill, prioritize the user request.
 
 `PushNotification` only for events that change what the user would do
-next (merge, or "needs human attention" after the fix cap). Skip
+next (merge, or "needs human attention" after the fix-push cap). Skip
 routine CI / comment events.
 
 ## 5. Cleanup After Task Completion

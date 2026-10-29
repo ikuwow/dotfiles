@@ -58,7 +58,9 @@ kind, `NEW_COMMENT` is pre-filtered to unresolved / non-outdated).
 
 - Clear fix request (`CHANGES_REQUESTED`, or a `NEW_COMMENT` /
   `NEW_TOP_COMMENT` / `NEW_REVIEW` asking for a change): modify code
-  and push, subject to Phase 5's pre-push checks and the fix-push cap.
+  and push, subject to Phase 5's pre-push checks and the fix-push cap,
+  and start the design-change round from the git-workflow Principles
+  when the fix is a design change.
   For a `NEW_COMMENT` whose thread is now `is_resolved` / `is_outdated`
   on re-fetch, skip it. For a `NEW_REVIEW`, re-fetch the body first.
 - Question / nit / ambiguous intent — reply, do not push. Bot author
