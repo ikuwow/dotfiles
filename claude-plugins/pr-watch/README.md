@@ -74,7 +74,7 @@ Concurrency:
 
 Lifecycle and install:
 
-- State lives under `${XDG_STATE_HOME:-~/.local/state}/pr-watch/`, three files per session ID, and each watcher start deletes the files no add, remove, or finished watch has written to for 30 days; a session resumed after that starts with no watches
+- State lives under `${XDG_STATE_HOME:-~/.local/state}/pr-watch/`, three files per session ID, and each watcher start deletes the files no add, remove, or finished watch has written to for 30 days; a session resumed after that starts with no watches, and a session running that long without a write loses its `.pid` file, so its adds fail until it restarts
 - A SIGKILL of the watcher prints no `WATCH_ERROR`, and a `pr-monitor` killed with SIGKILL leaves its three temporary files in `$TMPDIR`; a SIGTERM removes them
 - A change to `monitors.json` or to `bin/pr-watch-monitor` reaches a session at its next start; `/reload-plugins` did not start the watcher again in a session where the monitor's command had changed
 - An add lists the PR without its host, so `pr-monitor` polls it on `gh`'s default host

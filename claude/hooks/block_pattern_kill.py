@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
-"""Deny running a script file that contains ``pkill`` or ``killall``.
+"""Deny running ``pkill`` or ``killall`` by path, or a script containing them.
 
 A pattern-based kill signals every process of the user whose name or
 command line matches, so a short pattern reaches unrelated apps. The
-deny rules in settings.json stop ``pkill`` and ``killall`` typed in the
-command itself, compound commands included, but a permission rule does
-not read a script file the command runs. This PreToolUse hook reads
-that file and denies the call when it contains either word, so a stop
-by PID is the remaining route.
+deny rules in settings.json stop ``pkill`` and ``killall`` typed by
+name, compound commands included, but a permission rule neither matches
+the program invoked by path (``/usr/bin/pkill``) nor reads a script file
+the command runs. This PreToolUse hook denies a simple command whose
+program is named ``pkill`` or ``killall`` at any path, and a call that
+runs a script file containing either word, so a stop by PID is the
+remaining route.
 
 A script is found where the command runs it: as the first operand of a
 shell or another interpreter (``bash x.sh``, ``python3 x.py``), of
@@ -17,7 +19,12 @@ shell or another interpreter (``bash x.sh``, ``python3 x.py``), of
 ``command``, ``builtin``, and ``exec`` are skipped first. A ``cd``
 earlier in the same command moves the directory a relative path
 resolves against. Scripts that the found script itself runs are not
-read.
+read, a path reached through a variable (``bash "$DIR/x.sh"``) is not
+resolved, and a file containing a NUL byte is taken for a binary and
+passes, so ``/opt/homebrew/bin/gh`` is not matched on its string table.
+
+The predicate asks only for either word anywhere in the file, so a
+script that names ``pkill`` in a comment or a message is denied too.
 
 Spec: https://code.claude.com/docs/en/hooks
 """
@@ -27,7 +34,8 @@ import re
 import shlex
 import sys
 
-_PATTERN_KILL_RE = re.compile(r"\b(pkill|killall)\b")
+_PATTERN_KILL_RE = re.compile(rb"\b(pkill|killall)\b")
+_PATTERN_KILLERS = {"pkill", "killall"}
 _SEPARATORS = {"&&", "||", ";", ";;", "|", "|&", "&", "(", ")"}
 _INTERPRETER_RE = re.compile(r"(ba|z|da|k)?sh|python[0-9.]*|perl|ruby|node")
 _SOURCERS = {"source", "."}
@@ -38,11 +46,15 @@ _INLINE_CODE_OPTIONS = {"-c", "-e", "-E", "-m"}
 _ASSIGNMENT_RE = re.compile(r"[A-Za-z_][A-Za-z0-9_]*=")
 _MAX_READ = 1024 * 1024
 
-REASON = (
-    "{path} contains pkill or killall, which signal every process whose "
-    "name or command line matches the pattern, unrelated user apps "
-    "included. Stop only processes you started, by PID (kill <pid>), "
-    "and edit the script to do the same before running it."
+_WHY = (
+    "pkill and killall signal every process whose name or command line "
+    "matches the pattern, unrelated user apps included. Stop only "
+    "processes you started, by PID (kill <pid>)"
+)
+DIRECT_REASON = "{word} is a pattern-based kill. " + _WHY + "."
+SCRIPT_REASON = (
+    "{path} contains pkill or killall. " + _WHY
+    + ", and edit the script to do the same before running it."
 )
 
 
@@ -146,15 +158,36 @@ def script_paths(command: str, cwd: str) -> list[str]:
     return paths
 
 
+def direct_pattern_kill(command: str) -> str:
+    """Return the program word of a simple command that is pkill or killall, or "".
+
+    >>> direct_pattern_kill("sleep 1 && /usr/bin/pkill -f x")
+    '/usr/bin/pkill'
+    >>> direct_pattern_kill("timeout 5 killall Finder")
+    'killall'
+    >>> direct_pattern_kill("git commit -m 'deny pkill'")
+    ''
+    """
+    try:
+        segments = _segments(command)
+    except ValueError:
+        return ""
+    for words in segments:
+        words = _strip_prefixes(words)
+        if words and os.path.basename(words[0]) in _PATTERN_KILLERS:
+            return words[0]
+    return ""
+
+
 def pattern_kill_script(command: str, cwd: str) -> str:
     """Return the first script the command runs that contains pkill or killall, or ""."""
     for path in script_paths(command, cwd):
         try:
-            with open(path, encoding="utf-8", errors="replace") as f:
-                text = f.read(_MAX_READ)
+            with open(path, "rb") as f:
+                data = f.read(_MAX_READ)
         except OSError:
             continue
-        if _PATTERN_KILL_RE.search(text):
+        if b"\x00" not in data and _PATTERN_KILL_RE.search(data):
             return path
     return ""
 
@@ -171,13 +204,20 @@ if __name__ == "__main__":
     command = data.get("tool_input", {}).get("command", "")
     cwd = data.get("cwd") or os.getcwd()
 
-    path = pattern_kill_script(command, cwd)
-    if path:
+    reason = ""
+    word = direct_pattern_kill(command)
+    if word:
+        reason = DIRECT_REASON.format(word=word)
+    else:
+        path = pattern_kill_script(command, cwd)
+        if path:
+            reason = SCRIPT_REASON.format(path=path)
+    if reason:
         print(json.dumps({
             "hookSpecificOutput": {
                 "hookEventName": "PreToolUse",
                 "permissionDecision": "deny",
-                "permissionDecisionReason": REASON.format(path=path),
+                "permissionDecisionReason": reason,
             },
         }))
 
