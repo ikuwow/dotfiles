@@ -7,14 +7,16 @@
 #   pr-watch add <pr-number>      watch a PR of GH_REPO (OWNER/REPO) when
 #                                 set, otherwise of the current repository
 #   pr-watch remove <pr-number>   stop watching it
-#   pr-watch list                 print this session's PRs whose watch has
-#                                 not finished
+#   pr-watch list                 print this session's registered PRs not
+#                                 recorded as finished, and exit 1 when no
+#                                 watcher runs to watch them
 #
 # The watch list is one file per session, keyed by CLAUDE_CODE_SESSION_ID,
 # so concurrent sessions in one working tree each wake only for their own
 # PRs. `/clear` gives Bash a new session ID, so if the running watcher
-# keeps the ID it started with, PRs added after a `/clear` go to a list it
-# does not read until the session restarts.
+# keeps the ID it started with, an add after a `/clear` fails, since no
+# watcher runs under the new ID, while PRs added before it stay watched
+# under the old one.
 #
 # Each add appends `<owner>/<repo>#<number><TAB><token>` with a fresh
 # token, and the watcher starts a PR whose latest token it has not started
@@ -50,6 +52,19 @@ entry_for() {
   echo "$repo#$1"
 }
 
+# Matching the command line keeps a reused PID from passing for the
+# watcher.
+watcher_running() {
+  local pid
+  pid="$(cat "$list.pid" 2>/dev/null || true)"
+  if [ -z "$pid" ]; then
+    return 1
+  fi
+  ps -p "$pid" -o command= | grep -q 'pr-watch-monitor'
+}
+
+no_watcher="no watcher runs for this session ID; the pr-watch plugin may be missing, the session non-interactive, the watcher stopped, or the ID changed by a /clear"
+
 case "${1:-}" in
   add|remove)
     if [ $# -ne 2 ]; then
@@ -59,20 +74,16 @@ case "${1:-}" in
     entry="$(entry_for "$2")"
     if [ "$1" = add ]; then
       # Without a running watcher no event would arrive for the entry, so
-      # the add fails before listing it. Matching the command line keeps a
-      # reused PID from passing for the watcher.
-      pid="$(cat "$list.pid" 2>/dev/null || true)"
-      if [ -z "$pid" ] || ! ps -p "$pid" -o command= | grep -q 'pr-watch-monitor'; then
-        echo "pr-watch: not watching $entry: no watcher runs for this session ID; the pr-watch plugin may be missing, the session non-interactive, the watcher stopped, or the ID changed by a /clear" >&2
+      # the add fails before listing it.
+      if ! watcher_running; then
+        echo "pr-watch: not watching $entry: $no_watcher" >&2
         exit 1
       fi
       printf '%s\t%s-%s\n' "$entry" "$(date +%s)" "$$" >> "$list"
       echo "watching $entry"
     else
-      # An entry missing here may sit in another session ID's list (after
-      # a `/clear`), where it would keep being watched.
       if ! cut -f1 "$list" | grep -qxF "$entry"; then
-        echo "pr-watch: $entry is not in this session's watch list" >&2
+        echo "pr-watch: $entry is not in this session ID's watch list; after a /clear it may sit in the earlier ID's list and keep being watched" >&2
         exit 1
       fi
       tmp="$(mktemp "$list.XXXXXX")"
@@ -88,6 +99,10 @@ case "${1:-}" in
     awk -F'\t' 'FILENAME == ARGV[1] { done[$1 "\t" $2] = 1; next } { latest[$1] = $2 }
       END { for (e in latest) if (!((e "\t" latest[e]) in done)) print e }' \
       "$list.done" "$list" | sort
+    if ! watcher_running; then
+      echo "pr-watch: none of these is watched: $no_watcher" >&2
+      exit 1
+    fi
     ;;
   *)
     usage

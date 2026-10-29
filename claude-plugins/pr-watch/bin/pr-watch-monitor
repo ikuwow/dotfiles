@@ -7,11 +7,14 @@
 #
 # Runs one `pr-monitor` per listed PR and prints each of its lines
 # prefixed with `<owner>/<repo>#<number> `. A pr-monitor that exits other
-# than 0 is reported as WATCH_ERROR, and this watcher's own exit, once it
-# holds the list, as a WATCH_ERROR line without the prefix. It exits once
-# the process that started it is gone. A PR whose pr-monitor exited is
-# recorded in `<list>.done` with its token and stays stopped, across a
-# watcher restart too, until `pr-watch add` writes a newer token.
+# than 0 is reported as WATCH_ERROR, and this watcher's own exit, once its
+# PID is in `<list>.pid`, as a WATCH_ERROR line without the prefix. It
+# exits once the process that started it is gone. A PR whose pr-monitor
+# exited is recorded in `<list>.done` with its token and stays stopped,
+# across a watcher restart too, until `pr-watch add` writes a newer token.
+# A watch still running when this watcher exits is not recorded, so the
+# next watcher for the same session ID, such as one in a resumed session,
+# starts it again.
 
 set -eu
 
@@ -45,8 +48,8 @@ trap 'exit 143' TERM HUP INT
 
 while true; do
   # The harness killing only its wrapper would otherwise leave this loop
-  # holding the list, with its output going nowhere. $PPID keeps the
-  # value it had at start.
+  # in `<list>.pid`, where `pr-watch add` keeps accepting PRs whose events
+  # go nowhere. $PPID keeps the value it had at start.
   if ! kill -0 "$PPID" 2>/dev/null; then
     exit 0
   fi
