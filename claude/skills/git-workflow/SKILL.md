@@ -10,8 +10,8 @@ Follow each step in order. Skip a step only when its precondition is
 structurally absent (e.g., no PR exists yet).
 
 Prerequisites: the `agynio/gh-pr-review` gh extension (Phase 5 review
-threads), the `pr-review-toolkit` plugin (Phase 2), and `bin/pr-monitor`
-(Phases 4 and 5).
+threads), the `pr-review-toolkit` plugin (Phase 2), and the `pr-watch`
+plugin (Phases 4 and 5).
 
 ## Supporting files
 
@@ -30,7 +30,7 @@ threads), the `pr-review-toolkit` plugin (Phase 2), and `bin/pr-monitor`
   report results at the end
   - Pause only when blocked by an error or ambiguity, or when the user
     named a stopping point ("stop after creating the draft PR", "skip
-    Phase 2 for this PR", "no Monitor")
+    Phase 2 for this PR", "no PR watch")
   - A small diff, a documentation-only change, and personal-project
     scope are signals for weighing a finding within a phase; whether
     the phase runs is not a judgment they reach
@@ -50,11 +50,12 @@ threads), the `pr-review-toolkit` plugin (Phase 2), and `bin/pr-monitor`
   with replies and no push.
 - Never end a turn that claims ongoing waiting (delegated fix push,
   CI run, CI rerun, external state change) without an armed event
-  source — a Monitor on the branch head, or
-  `gh pr checks --watch --fail-fast` with `run_in_background: true`.
-  After every `gh run rerun` or other re-kick, re-arm the watch before
-  yielding. State what is being awaited in the final message before
-  going idle.
+  source — the completion notice of the background subagent for a
+  delegated fix push, `gh pr checks --watch --fail-fast` with
+  `run_in_background: true` for a CI run or rerun, and the Phase 5 PR
+  watch for review activity and PR state. After every `gh run rerun` or
+  other re-kick, re-arm `gh pr checks` before yielding. State what is
+  being awaited in the final message before going idle.
 
 ## 1. Start Work
 
@@ -173,17 +174,16 @@ Bring the PR into a state where a human reviewer can act on it:
 1. Confirm acceptance criteria are met. Cross-check the PR body and
    any linked issue against the actual change. If something is unmet,
    either address it or call it out as out-of-scope / follow-up.
-1. Arm the persistent `Monitor` running `pr-monitor <PR number>`
-   before the PR leaves draft. `READY_FOR_REVIEW` is itself a monitored
-   event, so an arm deferred until after the ready flip can never
-   observe it.
-1. In the same turn as the arm, hand the PR to review:
+1. Start the Phase 5 PR watch through the `pr-watch:watch` skill
+   before the PR leaves draft. `READY_FOR_REVIEW` is itself a watched
+   event, so a watch started after the ready flip can never observe it.
+   - When the watch fails to start, carry that into the Phase 4 report
+1. In the same turn as the watch start, hand the PR to review:
    - When a loaded rule assigns the ready flip to the agent for this
-     PR, run `gh pr ready <PR number>` in a tool call after the arm,
-     then continue into Phase 5
-     - The Monitor's first poll can record the PR as already ready
-       without reporting it, so `READY_FOR_REVIEW` may not arrive,
-       while the reviews that follow do
+     PR, run `gh pr ready <PR number>` in a tool call after the watch
+     start, then continue into Phase 5
+     - A flip before the watch's `WATCHING` line may not report as
+       `READY_FOR_REVIEW`, and the re-fetch on that line shows it
    - Otherwise surface Phase 4 completion, before handing control back,
      so the user can decide whether to mark the PR ready for review,
      and run `gh pr ready` only when the user asks for it
@@ -195,16 +195,19 @@ verification with `curl`, `aws logs tail`, etc.).
 
 ### Phase 5: Watch PR activity until merge
 
-The Monitor armed in Phase 4 polls every 60s and emits one stdout line
-per actionable change; quiet periods stay silent. Arm it here when the
-run entered the workflow at this phase.
+The PR watch started in Phase 4 delivers one notification line per
+actionable change and stays silent in between, across turns. Start it
+here through the `pr-watch:watch` skill when the run entered the
+workflow at this phase. The skill governs the lines about the watch
+itself, such as `WATCH_ERROR`; this phase reacts to the PR's events.
 
-1. Each event line is `<EVENT>` or `<EVENT>: <details>`, carrying
-   GitHub's own field values. The steps below cover the events with a
-   fixed procedure; read any other line and judge from what it says.
-   `pr-monitor`'s header documents the full set.
+1. Each event line names the PR and carries an `<EVENT>` with GitHub's
+   own field values. The steps below cover the events with a fixed
+   procedure; read any other line and judge from what it says. The
+   `pr-watch:watch` skill says where the full set is documented.
 
-1. Re-fetch detail on each event with:
+1. Re-fetch detail on each event, adding `-R <owner>/<repo>` from the
+   line when the PR is in another repository, with:
    - `gh pr view <number> --json state,isDraft,reviewDecision,latestReviews,statusCheckRollup,comments,updatedAt,mergedAt,headRefName`
    - `gh run list --branch <headRefName> --json databaseId,name,status,conclusion,createdAt,headSha,workflowName --limit 20`
    - review threads: the listing in `pr-reaction.md`'s Step 1, which
@@ -219,7 +222,7 @@ run entered the workflow at this phase.
    - Skip the push if either check fails; surface the conflict to the
      user.
 
-1. Read [pr-reaction.md](pr-reaction.md) on the first monitor event,
+1. Read [pr-reaction.md](pr-reaction.md) on the first watch event,
    before any reply, resolve, or push, and react under it — it governs
    what the `[BOT|USER]` label settles for each event type
 
@@ -231,13 +234,16 @@ run entered the workflow at this phase.
 1. Exit conditions:
    - `STATE: MERGED` → execute step 5 (Cleanup).
    - `STATE: CLOSED` without merge → skip cleanup.
-   - Session ends → Monitor terminates with the session (best-effort).
+   - A watch the `pr-watch:watch` skill reports as stopped and not
+     restarted → claim no ongoing wait on that PR.
+   - Session ends → the watch stops with it; the `pr-watch:watch` skill
+     covers what a resumed session reports.
 
 1. Conflict handling:
-   - Manual user push during monitor: acknowledge on the next event,
+   - Manual user push during the watch: acknowledge on the next event,
      keep watching. Do not revert or duplicate.
-   - New user instruction superseding the watch: `TaskStop` the
-     monitor, prioritize the user request.
+   - New user instruction superseding the watch: stop it through the
+     `pr-watch:watch` skill, prioritize the user request.
 
 `PushNotification` only for events that change what the user would do
 next (merge, or "needs human attention" after the fix cap). Skip

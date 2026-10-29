@@ -82,6 +82,7 @@ dotfiles/
 ├── bin/            # Custom executable scripts → ~/bin/
 ├── xdg-config/     # XDG config files → ~/.config/
 ├── claude/         # Claude Code settings → ~/.claude/
+├── claude-plugins/ # Claude Code plugin marketplace, installed by scripts/claude-code-setup.sh
 ├── codex/          # Codex CLI rules → ~/.codex/
 ├── hammerspoon/    # Hammerspoon config → ~/.hammerspoon/
 ├── userscripts/    # Safari userscripts loaded by the Userscripts extension

@@ -209,7 +209,9 @@
       "Skill(codex:setup *)",
       "Skill(pr-review-toolkit:review-pr)",
       "Skill(pr-review-toolkit:review-pr *)",
-      "Bash(pr-monitor *)"
+      "Bash(pr-watch add *)",
+      "Bash(pr-watch remove *)",
+      "Bash(pr-watch list)"
     ],
     "deny": [
       "Bash(git push --force *)",
@@ -457,7 +459,8 @@
     "skill-creator@claude-plugins-official": true,
     "claude-code-setup@claude-plugins-official": true,
     "hookify@claude-plugins-official": true,
-    "security-guidance@claude-plugins-official": true
+    "security-guidance@claude-plugins-official": true,
+    "pr-watch@ikuwow-dotfiles": true
   },
   "extraKnownMarketplaces": {
     "openai-codex": {
@@ -471,8 +474,15 @@
         "source": "github",
         "repo": "anthropics/claude-plugins-official"
       }
+    },
+    "ikuwow-dotfiles": {
+      "source": {
+        "source": "directory",
+        "path": "/Users/ikuwow/dotfiles/claude-plugins"
+      }
     }
   },
+  "language": "japanese",
   "sandbox": {
     "enabled": false,
     "network": {
@@ -506,21 +516,6 @@
       ]
     }
   },
-  "language": "japanese",
-  "advisorModel": "fable",
-  "autoUpdatesChannel": "stable",
-  "tui": "fullscreen",
-  "autoMemoryEnabled": false,
-  "skipWorkflowUsageWarning": true,
-  "theme": "auto",
-  "remoteControlAtStartup": true,
-  "preferredNotifChannel": "notifications_disabled",
-  "inputNeededNotifEnabled": true,
-  "agentPushNotifEnabled": true,
-  "skipAutoPermissionPrompt": true,
-  "voice": {
-    "enabled": true
-  },
   "modelSettings": {
     "claude-opus-5-5": {
       "effortLevel": "high"
@@ -528,5 +523,19 @@
     "claude-fable-5-1": {
       "effortLevel": "high"
     }
-  }
+  },
+  "advisorModel": "fable",
+  "autoUpdatesChannel": "stable",
+  "tui": "fullscreen",
+  "voice": {
+    "enabled": true
+  },
+  "autoMemoryEnabled": false,
+  "skipWorkflowUsageWarning": true,
+  "theme": "auto",
+  "preferredNotifChannel": "notifications_disabled",
+  "remoteControlAtStartup": true,
+  "inputNeededNotifEnabled": true,
+  "agentPushNotifEnabled": true,
+  "skipAutoPermissionPrompt": true
 }

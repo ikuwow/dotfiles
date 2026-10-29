@@ -1,0 +1,118 @@
+#!/usr/bin/env bash
+
+# Register the PRs a Claude Code session watches. `pr-watch-monitor`, run
+# by the pr-watch plugin for the whole session, reports their events.
+#
+# Usage:
+#   pr-watch add <pr>             watch a PR
+#   pr-watch remove <pr>          stop watching it
+#   pr-watch list                 print this session's registered PRs not
+#                                 recorded as finished; exits 1 whenever no
+#                                 watcher runs
+#
+# <pr> is `<owner>/<repo>#<number>`, the form `list` prints, or a bare
+# number in GH_REPO (OWNER/REPO) when set, otherwise in the current
+# repository.
+#
+# The watch list is one file per session, keyed by CLAUDE_CODE_SESSION_ID,
+# so concurrent sessions in one working tree each wake only for their own
+# PRs. `/clear` gives Bash a new session ID, so if the running watcher
+# keeps the ID it started with, an add after a `/clear` fails, since no
+# watcher runs under the new ID, while PRs added before it stay watched
+# under the old one.
+#
+# Each add appends `<owner>/<repo>#<number><TAB><token>` with a fresh
+# token, and the watcher starts a PR whose latest token it has not started
+# yet, so an add restarts a watch that stopped.
+
+set -eu
+
+usage() {
+  echo "Usage: pr-watch add|remove <owner>/<repo>#<number>|<number> | list" >&2
+}
+
+if [ -z "${CLAUDE_CODE_SESSION_ID:-}" ]; then
+  echo "pr-watch: CLAUDE_CODE_SESSION_ID is not set; run it from a Claude Code session" >&2
+  exit 2
+fi
+list="${XDG_STATE_HOME:-$HOME/.local/state}/pr-watch/$CLAUDE_CODE_SESSION_ID"
+mkdir -p "${list%/*}"
+touch "$list"
+
+entry_for() {
+  if [[ "$1" =~ ^[^/#[:space:]]+/[^/#[:space:]]+#[1-9][0-9]*$ ]]; then
+    echo "$1"
+    return
+  fi
+  if ! [[ "$1" =~ ^[1-9][0-9]*$ ]]; then
+    echo "pr-watch: <pr> must be <owner>/<repo>#<number> or a positive integer, got: $1" >&2
+    exit 2
+  fi
+  local repo
+  # set -e is off inside the `$(entry_for ...)` call, so a failed lookup
+  # exits here explicitly.
+  repo="${GH_REPO:-$(gh repo view --json nameWithOwner --jq .nameWithOwner)}" || exit 1
+  if [ -z "$repo" ]; then
+    echo "pr-watch: could not resolve the repository of $PWD" >&2
+    exit 1
+  fi
+  echo "$repo#$1"
+}
+
+# Matching the command line keeps a reused PID from passing for the
+# watcher.
+watcher_running() {
+  local pid
+  pid="$(cat "$list.pid" 2>/dev/null || true)"
+  if [ -z "$pid" ]; then
+    return 1
+  fi
+  ps -p "$pid" -o command= | grep -q 'pr-watch-monitor'
+}
+
+no_watcher="no watcher runs for this session ID; the pr-watch plugin may be missing, the session non-interactive, the watcher stopped, or the ID changed by a /clear"
+
+case "${1:-}" in
+  add|remove)
+    if [ $# -ne 2 ]; then
+      usage
+      exit 2
+    fi
+    entry="$(entry_for "$2")"
+    if [ "$1" = add ]; then
+      # Without a running watcher no event would arrive for the entry, so
+      # the add fails before listing it.
+      if ! watcher_running; then
+        echo "pr-watch: not watching $entry: $no_watcher" >&2
+        exit 1
+      fi
+      printf '%s\t%s-%s\n' "$entry" "$(date +%s)" "$$" >> "$list"
+      echo "watching $entry"
+    else
+      if ! cut -f1 "$list" | grep -qxF "$entry"; then
+        echo "pr-watch: $entry is not in this session ID's watch list; pass the <owner>/<repo>#<number> that 'pr-watch list' prints, and note that after a /clear the PR may sit in the earlier ID's list" >&2
+        exit 1
+      fi
+      tmp="$(mktemp "$list.XXXXXX")"
+      awk -F'\t' -v e="$entry" '$1 != e' "$list" > "$tmp"
+      mv "$tmp" "$list"
+      echo "stopped watching $entry"
+    fi
+    ;;
+  list)
+    # An entry is finished when the watcher recorded its latest token.
+    touch "$list.done"
+    # FILENAME rather than NR == FNR, which an empty .done file would fool.
+    awk -F'\t' 'FILENAME == ARGV[1] { done[$1 "\t" $2] = 1; next } { latest[$1] = $2 }
+      END { for (e in latest) if (!((e "\t" latest[e]) in done)) print e }' \
+      "$list.done" "$list" | sort
+    if ! watcher_running; then
+      echo "pr-watch: none of these is watched: $no_watcher" >&2
+      exit 1
+    fi
+    ;;
+  *)
+    usage
+    exit 2
+    ;;
+esac

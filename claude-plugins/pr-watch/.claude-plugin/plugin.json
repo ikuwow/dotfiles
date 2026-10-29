@@ -1,0 +1,4 @@
+{
+  "name": "pr-watch",
+  "description": "Reports events on the PRs a session registers with pr-watch"
+}

@@ -1,0 +1,13 @@
+{
+  "name": "ikuwow-dotfiles",
+  "owner": {
+    "name": "ikuwow"
+  },
+  "plugins": [
+    {
+      "name": "pr-watch",
+      "source": "./pr-watch",
+      "description": "Reports events on the PRs a session registers with pr-watch"
+    }
+  ]
+}

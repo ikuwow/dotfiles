@@ -6,6 +6,8 @@
 
 set -eu
 
+DOTPATH="$HOME/dotfiles"
+
 if ! command -v claude >/dev/null 2>&1; then
   echo "Error: claude CLI is not installed" >&2
   exit 1
@@ -48,3 +50,8 @@ claude plugin install skill-creator@claude-plugins-official
 claude plugin install claude-code-setup@claude-plugins-official
 claude plugin install hookify@claude-plugins-official
 claude plugin install security-guidance@claude-plugins-official
+# This repository's own marketplace. Added from a local path, its plugins
+# load in place from claude-plugins/, so an edit there takes effect at the
+# next session start.
+claude plugin marketplace add "$DOTPATH/claude-plugins"
+claude plugin install pr-watch@ikuwow-dotfiles

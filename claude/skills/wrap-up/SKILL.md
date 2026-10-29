@@ -34,6 +34,7 @@ tool-based listing when this session lacks that tool.
 - Open issues that those PRs address or that the user named as the work target, read with `gh issue view <number> --repo <owner>/<repo>`
 - Work that runs only while this session is open
   - background shells, Monitors, and subagents this session started, identified from its own `run_in_background`, Monitor, and Agent calls
+  - PR watches, listed by `pr-watch list` (the `pr-watch:watch` skill)
   - session crons, listed by `CronList`
   - artifact watches, listed by the `Artifact` tool's `status` action
 - The conversation
@@ -72,6 +73,7 @@ doubtful local cleanup runs and appears in the report.
   - `git cleanup` decides each branch on its own content, deletes none while the working tree has uncommitted changes, and leaves a worktree it cannot remove without `--force`, so the run needs no per-branch gate from this skill
   - `git home` switches to the default branch, which fails inside a linked worktree and, in the root worktree, moves the session off the branch it was on, so the report names the switch alongside the branches removed
 - A background shell, Monitor, subagent, session cron, or artifact watch this session started whose result the session has already reported
+- A PR watch on a PR whose outcome the session has already reported, stopped through the `pr-watch:watch` skill, since a resumed session would otherwise start it again
 - An open issue from Step 1, closed with `gh issue close` once every item it lists as closing it (the body's request when it lists none) is settled by a merged change or a check run in this session, or once the user said it is not needed or a duplicate
   - Settled items: `--reason completed`, with a comment of a few lines naming what settled each item and linking the PR
   - Not needed: `--reason "not planned"`, and a duplicate of `<M>`: `--duplicate-of <M>`, each with a comment quoting what the user said

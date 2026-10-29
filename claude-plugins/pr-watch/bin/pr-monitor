@@ -4,29 +4,42 @@
 # Requires bash 4+ (associative arrays). The shebang is /usr/bin/env bash
 # so the brew-installed bash on PATH is picked up on macOS, where the
 # default /bin/bash is 3.2.
-# Designed to be armed as a Claude Code persistent Monitor; the silence
-# between events is the entire point. See the git-workflow skill
+# Run per PR by `pr-watch-monitor`, whose output a Claude Code session
+# receives as notifications; the silence between events is the entire
+# point. See the git-workflow skill
 # (claude/skills/git-workflow/SKILL.md) Phase 5 for the reaction protocol.
 #
 # Usage: pr-monitor <pr-number> [interval-seconds]
 #
+# The PR is looked up in GH_REPO (OWNER/REPO) when set, otherwise in the
+# repository of the working directory.
+#
 # Events, one per stdout line. Field values are GitHub's own, passed
 # through rather than classified here:
 #
+#   WATCHING
 #   STATE: <state>
 #   REVIEW: <reviewDecision>
 #   READY_FOR_REVIEW
 #   NEW_COMMENT: [BOT|USER] <author> <path>:<line>
 #   NEW_TOP_COMMENT: [BOT|USER] <author>
 #   NEW_REVIEW: [BOT|USER] <author> <state>
-#   CHECK: <check name> (<conclusion or state>)
+#   CHECK: <check name> (<conclusion or state>) @<head sha, 7 chars>
 #   POLL_ERROR: <call that failed>
 #
-# CHECK covers every check on the head commit, Actions or not, settling
-# on anything but success.
+# WATCHING prints once, when every source has had its first successful
+# poll, and every change after it reports. Before it, a source takes what
+# it finds on its own first success as already seen, while CHECK lines and
+# a merged or closed STATE print from the first poll; a PR already merged
+# or closed ends this process without a WATCHING line. CHECK covers every
+# check on the head commit, Actions or not, settling on anything but
+# success, neutral, or skipped. POLL_ERROR prints when a call first fails,
+# and neither its later failures nor its recovery print a line; a failing
+# `gh pr view` skips the rest of that poll.
 #
 # Comment and review events carry every author, the one `gh`
-# authenticates as included.
+# authenticates as included. The event names and the `[BOT|USER]` tag are
+# what claude/skills/git-workflow/pr-reaction.md reacts by.
 
 set -eu
 
@@ -56,7 +69,9 @@ if ! [[ "$interval" =~ ^[1-9][0-9]*$ ]]; then
   exit 2
 fi
 
-owner_repo="$(gh repo view --json nameWithOwner --jq .nameWithOwner)"
+# `gh pr view` honors GH_REPO but `gh repo view` does not, so GH_REPO is
+# read here to keep both calls on the same repository.
+owner_repo="${GH_REPO:-$(gh repo view --json nameWithOwner --jq .nameWithOwner)}"
 owner="${owner_repo%/*}"
 repo="${owner_repo#*/}"
 
@@ -71,12 +86,18 @@ seen_top_comments="$(mktemp)"
 seen_reviews="$(mktemp)"
 trap 'rm -f "$seen_comments" "$seen_top_comments" "$seen_reviews"' EXIT
 
-# First-poll seeding: do not emit events for state that already held at
-# arm time. Only transitions during this monitor's lifetime should wake
-# the operator. The flag is flipped after the first successful poll.
-# `CHECK` is the exception — a check already red when the monitor is
-# armed is the reader's problem now, so it reports rather than seeds.
+# First-poll seeding: do not emit events for state that already held when
+# this process started. Only transitions during its lifetime should wake
+# the operator. `first_poll` flips after the first successful `gh pr view`,
+# and each GraphQL source seeds on its own first success, so a source that
+# failed at first does not report everything it held once it recovers.
+# `CHECK` and a terminal `STATE` are the exceptions — a check already red
+# is the reader's problem now, and a PR already merged or closed ends this
+# process at the end of the first poll, so both report rather than seed.
 first_poll=1
+seed_threads=1
+seed_reviews=1
+announced=0
 
 # One line per outage, not per poll: an unauthorized token or an outage
 # persists for many intervals, and a line each time would drown the
@@ -92,12 +113,12 @@ poll_ok() {
   unset "poll_failed[$1]"
 }
 
-# `__typename` on each author is the authoritative Bot/User signal per
-# `pr-reaction.md`. It flows into the event line as a `[BOT]` or
-# `[USER]` prefix on the author label so a reaction turn can classify
-# without re-fetching. For review-thread comments this is a per-comment
-# hint only — the rule still requires walking every comment in the
-# thread before mutating it.
+# `__typename` on each author is the authoritative Bot/User signal. It
+# flows into the event line as a `[BOT]` or `[USER]` prefix on the author
+# label so a reaction turn can classify without re-fetching. For
+# review-thread comments this is a per-comment hint only — pr-reaction.md's
+# targeting policy still requires walking every comment in the thread
+# before mutating it.
 
 # shellcheck disable=SC2016 # GraphQL query: $vars are query variables
 threads_query='query($owner:String!,$repo:String!,$num:Int!){
@@ -135,16 +156,17 @@ reviews_query='query($owner:String!,$repo:String!,$num:Int!){
 # Emit one line per not-yet-seen comment ID. `fresh` is tab-separated
 # "id<TAB>author[<TAB>extra]" lines; the optional extra field (e.g.
 # "path:line") is appended to the label when present. Seen IDs persist in
-# seen_file across polls so each comment fires exactly once.
+# seen_file across polls so each comment fires exactly once. With
+# `seeding` at 1 the IDs are recorded and nothing is emitted.
 emit_new() {
-  local fresh="$1" seen_file="$2" label="$3"
+  local fresh="$1" seen_file="$2" label="$3" seeding="$4"
   [ -z "$fresh" ] && return 0
   local sorted_fresh sorted_seen new
   sorted_fresh="$(echo "$fresh" | cut -f1 | sort -u)"
   sorted_seen="$(sort -u "$seen_file")"
   new="$(comm -23 <(echo "$sorted_fresh") <(echo "$sorted_seen") || true)"
   [ -z "$new" ] && return 0
-  if [ "$first_poll" -eq 0 ]; then
+  if [ "$seeding" -eq 0 ]; then
     # Two inputs to awk: `$fresh` on stdin supplies the records to scan;
     # `$new` (the IDs to emit) goes via the environment, not `awk -v`,
     # because BWK awk (the macOS default) rejects a literal newline in a
@@ -158,7 +180,16 @@ emit_new() {
 }
 
 while true; do
-  pr_json="$(gh pr view "$pr" --json state,isDraft,reviewDecision,statusCheckRollup,headRefOid 2>/dev/null || true)"
+  # Under `pr-watch-monitor`, a watcher killed without running its trap
+  # would otherwise leave this loop polling GitHub until the PR closes.
+  # Checked before the poll so a failing poll does not skip it.
+  if [ -n "${PR_WATCH_PARENT:-}" ] && ! kill -0 "$PR_WATCH_PARENT" 2>/dev/null; then
+    exit 0
+  fi
+
+  # `timeout` turns a call that hangs into a failed poll, which reports,
+  # rather than a stalled loop, which stays silent.
+  pr_json="$(timeout 60 gh pr view "$pr" --json state,isDraft,reviewDecision,statusCheckRollup,headRefOid 2>/dev/null || true)"
   # Requiring `.state` rather than mere parseability: `{}` parses, and an
   # empty `state` reaches the comparison below while an empty `headRefOid`
   # resets `prev_check` twice over, replaying every failing check.
@@ -169,12 +200,13 @@ while true; do
   fi
   poll_ok "gh pr view"
   state="$(echo "$pr_json" | jq -r '.state // ""')"
-  isdraft="$(echo "$pr_json" | jq -r '.isDraft // ""')"
+  # `//` would treat false as missing and turn a ready PR into "".
+  isdraft="$(echo "$pr_json" | jq -r 'if .isDraft == null then "" else (.isDraft | tostring) end')"
   decision="$(echo "$pr_json" | jq -r '.reviewDecision // ""')"
   head_sha="$(echo "$pr_json" | jq -r '.headRefOid // ""')"
 
   if [ "$state" != "$prev_state" ]; then
-    if [ "$first_poll" -eq 0 ]; then
+    if [ "$first_poll" -eq 0 ] || [ "$state" = MERGED ] || [ "$state" = CLOSED ]; then
       echo "STATE: $state"
     fi
     prev_state="$state"
@@ -223,7 +255,9 @@ while true; do
     if [ "$check_state" != "${prev_check[$check_name]-unseen}" ]; then
       case "$check_state" in
         SUCCESS|NEUTRAL|SKIPPED|PENDING|EXPECTED|QUEUED|WAITING|REQUESTED|IN_PROGRESS) ;;
-        *) echo "CHECK: $check_name ($check_state)" ;;
+        # The head sha tells a failure reported again after a restart
+        # from a new one.
+        *) echo "CHECK: $check_name ($check_state) @${head_sha:0:7}" ;;
       esac
       prev_check[$check_name]="$check_state"
     fi
@@ -234,7 +268,7 @@ while true; do
        then (.conclusion // .state // "") else .status end) as $c
     | "\($n)\t\($c)"' || true)
 
-  threads_json="$(gh api graphql -f owner="$owner" -f repo="$repo" -F num="$pr" -f query="$threads_query" 2>/dev/null || true)"
+  threads_json="$(timeout 60 gh api graphql -f owner="$owner" -f repo="$repo" -F num="$pr" -f query="$threads_query" 2>/dev/null || true)"
   # Testing the field rather than the string: GraphQL answers an error
   # with a parseable body on stdout, which a non-empty test would read as
   # a healthy poll and, worse, clear a running outage's suppression.
@@ -242,14 +276,15 @@ while true; do
     poll_error "gh api graphql (threads)"
   else
     poll_ok "gh api graphql (threads)"
+    fresh_comments="$(echo "$threads_json" | jq -r '
+      .data.repository.pullRequest.reviewThreads.nodes[]
+      | select(.isResolved == false and .isOutdated == false)
+      | .comments.nodes[]
+      | "\(.id)\t\(if .author.__typename == "Bot" then "[BOT]" else "[USER]" end) \(.author.login)\t\(.path // "?"):\(.line // "?")"' \
+      2>/dev/null || true)"
+    emit_new "$fresh_comments" "$seen_comments" "NEW_COMMENT" "$seed_threads"
+    seed_threads=0
   fi
-  fresh_comments="$(echo "$threads_json" | jq -r '
-    .data.repository.pullRequest.reviewThreads.nodes[]
-    | select(.isResolved == false and .isOutdated == false)
-    | .comments.nodes[]
-    | "\(.id)\t\(if .author.__typename == "Bot" then "[BOT]" else "[USER]" end) \(.author.login)\t\(.path // "?"):\(.line // "?")"' \
-    2>/dev/null || true)"
-  emit_new "$fresh_comments" "$seen_comments" "NEW_COMMENT"
 
   # Reviews API surfaces `state=COMMENTED` reviews (e.g. Devin Review, or a
   # human submitting "Comment") that neither change `reviewDecision` nor
@@ -257,28 +292,34 @@ while true; do
   # filtered out: empty APPROVED / CHANGES_REQUESTED are already covered
   # by the `REVIEW:` decision event, and an empty COMMENTED has nothing
   # to read.
-  reviews_json="$(gh api graphql -f owner="$owner" -f repo="$repo" -F num="$pr" -f query="$reviews_query" 2>/dev/null || true)"
+  reviews_json="$(timeout 60 gh api graphql -f owner="$owner" -f repo="$repo" -F num="$pr" -f query="$reviews_query" 2>/dev/null || true)"
   if ! echo "$reviews_json" | jq -e '.data.repository.pullRequest.reviews' >/dev/null 2>&1; then
     poll_error "gh api graphql (reviews)"
   else
     poll_ok "gh api graphql (reviews)"
-  fi
-  fresh_top="$(echo "$reviews_json" | jq -r '
-    .data.repository.pullRequest.comments.nodes[]
-    | "\(.id)\t\(if .author.__typename == "Bot" then "[BOT]" else "[USER]" end) \(.author.login)"' \
-    2>/dev/null || true)"
-  emit_new "$fresh_top" "$seen_top_comments" "NEW_TOP_COMMENT"
+    fresh_top="$(echo "$reviews_json" | jq -r '
+      .data.repository.pullRequest.comments.nodes[]
+      | "\(.id)\t\(if .author.__typename == "Bot" then "[BOT]" else "[USER]" end) \(.author.login)"' \
+      2>/dev/null || true)"
+    emit_new "$fresh_top" "$seen_top_comments" "NEW_TOP_COMMENT" "$seed_reviews"
 
-  fresh_reviews="$(echo "$reviews_json" | jq -r '
-    .data.repository.pullRequest.reviews.nodes[]
-    | select(.state != "PENDING" and (.body // "") != "")
-    | "\(.id)\t\(if .author.__typename == "Bot" then "[BOT]" else "[USER]" end) \(.author.login)\t\(.state)"' \
-    2>/dev/null || true)"
-  emit_new "$fresh_reviews" "$seen_reviews" "NEW_REVIEW"
+    fresh_reviews="$(echo "$reviews_json" | jq -r '
+      .data.repository.pullRequest.reviews.nodes[]
+      | select(.state != "PENDING" and (.body // "") != "")
+      | "\(.id)\t\(if .author.__typename == "Bot" then "[BOT]" else "[USER]" end) \(.author.login)\t\(.state)"' \
+      2>/dev/null || true)"
+    emit_new "$fresh_reviews" "$seen_reviews" "NEW_REVIEW" "$seed_reviews"
+    seed_reviews=0
+  fi
 
   case "$state" in
     MERGED|CLOSED) exit 0 ;;
   esac
+
+  if [ "$announced" -eq 0 ] && [ "$seed_threads" -eq 0 ] && [ "$seed_reviews" -eq 0 ]; then
+    echo "WATCHING"
+    announced=1
+  fi
 
   first_poll=0
   sleep "$interval"
