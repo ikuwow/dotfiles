@@ -11,7 +11,7 @@ jobs:
         run: shellcheck --version
       - name: shellcheck
         run: |
-          shellcheck -- **/*.sh
+          git ls-files -z '*.sh' | xargs -0 shellcheck --
           find claude/hooks/ -name '*.sh' -exec shellcheck {} +
           find bin/ -type f ! -name '*.md' -exec shellcheck {} +
           find claude-plugins/ -path '*/bin/*' -type f -exec shellcheck {} +

@@ -1,13 +1,9 @@
 # Git Essentials
 
-Core git/GitHub rules for all projects.
-
 Every plan produced by EnterPlanMode's Phase 4 (Final Plan) MUST
 include the workflow checklist below as an explicit section, from
 branch setup through cleanup. State scope-specific deviations
-explicitly (e.g., "stop after Step 3, skip CI wait"). (Truly
-trivial fixes that don't warrant Plan Mode at all are a separate
-judgment call — see EnterPlanMode's own criteria.)
+explicitly (e.g., "stop after Step 3, skip CI wait").
 
 The full procedure (worktree setup, CI phases,
 monitoring, cleanup) lives in the git-workflow skill. Plans MUST
@@ -23,7 +19,7 @@ NOT restate the detailed procedures from the skill.
 - Step 2: implement, commit, push
 - Step 3: create a draft PR
 - Step 4: CI wait and review (Phases 1-5)
-- Step 5: cleanup after merge (`git cleanup`)
+- Step 5: cleanup after merge
 
 ## Commit
 

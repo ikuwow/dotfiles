@@ -45,7 +45,7 @@ the point where the answer is yes.
 ## When it returns
 
 - Always read the completion report and commit list (`git log --stat`)
-- Read the final diff once (`git diff main...`) by default
+- Read the final diff once (`git diff origin/HEAD...`) by default
 - Deep manual re-review only when the report flags deviations or
   ambiguities, verification results are weak, or the change touches
   risky areas
