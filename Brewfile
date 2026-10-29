@@ -50,7 +50,7 @@ cask "claude-code@latest"
 brew "gemini-cli"
 brew "junie"
 cask "anthropics/tap/ant"
-brew "poppler" # Claude Code's Read tool renders PDF pages with pdftoppm
+brew "poppler" # Claude Code renders PDF pages with pdftoppm
 
 # required by vim
 brew "python"
