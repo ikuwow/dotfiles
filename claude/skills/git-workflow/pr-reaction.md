@@ -66,7 +66,7 @@ kind, `NEW_COMMENT` is pre-filtered to unresolved / non-outdated).
   - `NEW_COMMENT` (thread): `gh pr-review comments reply --thread-id
     <id> --body <text> -R <owner>/<repo> <number>`.
   - `NEW_TOP_COMMENT` / `NEW_REVIEW` (top-level):
-    `gh pr comment <number> --body <text>`.
+    `gh pr comment <number> -R <owner>/<repo> --body <text>`.
 - `READY_FOR_REVIEW`: no action; register that review activity is now
   expected.
 - Informational (`APPROVED`, or CI `PENDING` / `IN_PROGRESS` /

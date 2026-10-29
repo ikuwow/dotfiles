@@ -50,13 +50,12 @@ plugin (Phases 4 and 5).
   with replies and no push.
 - Never end a turn that claims ongoing waiting (delegated fix push,
   CI run, CI rerun, external state change) without an armed event
-  source — `gh pr checks --watch --fail-fast` with
-  `run_in_background: true` for a CI run or rerun, or the Phase 5 PR
-  watch for review activity and PR state, since the PR watch reports no
-  check that turns green. After every
-  `gh run rerun` or other re-kick, re-arm `gh pr checks` before
-  yielding. State what is being awaited in the final message before
-  going idle.
+  source — the completion notice of the background subagent for a
+  delegated fix push, `gh pr checks --watch --fail-fast` with
+  `run_in_background: true` for a CI run or rerun, and the Phase 5 PR
+  watch for review activity and PR state. After every `gh run rerun` or
+  other re-kick, re-arm `gh pr checks` before yielding. State what is
+  being awaited in the final message before going idle.
 
 ## 1. Start Work
 
@@ -179,14 +178,12 @@ Bring the PR into a state where a human reviewer can act on it:
    before the PR leaves draft. `READY_FOR_REVIEW` is itself a watched
    event, so a watch started after the ready flip can never observe it.
    - When the watch fails to start, carry that into the Phase 4 report
-     and claim no ongoing wait on the PR
 1. In the same turn as the watch start, hand the PR to review:
    - When a loaded rule assigns the ready flip to the agent for this
      PR, run `gh pr ready <PR number>` in a tool call after the watch
      start, then continue into Phase 5
-     - The watch can record a PR flipped right after its start as
-       already ready, so `READY_FOR_REVIEW` may not arrive, while the
-       reviews that follow do
+     - A flip before the watch's `WATCHING` line does not report as
+       `READY_FOR_REVIEW`, while the reviews that follow do
    - Otherwise surface Phase 4 completion, before handing control back,
      so the user can decide whether to mark the PR ready for review,
      and run `gh pr ready` only when the user asks for it
