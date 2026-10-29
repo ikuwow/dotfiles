@@ -31,9 +31,12 @@ if [ $# -eq 0 ]; then
 fi
 list="${XDG_STATE_HOME:-$HOME/.local/state}/pr-watch/$CLAUDE_CODE_SESSION_ID"
 mkdir -p "${list%/*}"
-# State that no add, remove, or finished watch has written to for 30 days
-# goes, so the directory does not grow by three files per session.
-find "${list%/*}" -type f -mtime +30 -delete
+# State untouched for 30 days goes, so the directory does not grow by
+# three files per session; a running watcher touches its own each loop,
+# so only the state of sessions no longer running ages out. The sweep is
+# housekeeping, so a failure in it, such as another session's watcher
+# deleting the same file first, does not stop this watcher.
+find "${list%/*}" -type f -mtime +30 -delete || true
 touch "$list" "$list.done"
 
 # A second start in one session (a plugin reload may start one) would
@@ -66,6 +69,7 @@ while true; do
   if [ "$(ps -o ppid= -p $$ | tr -d ' ')" != "$PPID" ]; then
     exit 0
   fi
+  touch "$list" "$list.done" "$list.pid"
   for entry in "${!child[@]}"; do
     pid="${child[$entry]}"
     # A child still running is this shell's child, which a PID reused by

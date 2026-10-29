@@ -28,7 +28,7 @@ Run `add` and `remove` one at a time rather than in parallel tool calls, since a
 - `POLL_ERROR: <call>` prints when that call first fails, and neither its later failures nor its recovery print a line
   - Events from that call are delayed until it recovers, and a failing `gh pr view` holds back the whole watch
   - Re-fetch the PR to see where it stands
-- A PR's watch ends on its own after its `STATE: MERGED` or `STATE: CLOSED` line
+- A PR's watch ends on its own with the poll that printed its `STATE: MERGED` or `STATE: CLOSED` line, so lines from that poll can follow it
 
 ## When a watch stops
 

@@ -61,8 +61,9 @@ entry_for() {
 }
 
 # gh answers with the PR's URL, which carries the repository's own letter
-# case and no HOST/ prefix, and fails for a number that is no PR there, so
-# an add lists one spelling per PR and only a PR that exists.
+# case, and fails for a number that is no PR there; the entry is that URL
+# with its scheme and host stripped, so an add lists one spelling per PR
+# and only a PR that exists.
 add_entry_for() {
   local repo="" num url
   if [[ "$1" =~ ^([^#[:space:]]+)#([1-9][0-9]*)$ ]]; then
