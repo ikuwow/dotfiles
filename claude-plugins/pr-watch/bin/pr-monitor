@@ -16,8 +16,8 @@
 #
 # The events it prints, one per stdout line, and what each guarantees are
 # the plugin's contract with its callers, documented in the plugin's
-# README.md; a change to an event's name, format, or timing changes that
-# page too. A failing `gh pr view` skips the rest of that poll.
+# skills/watch/SKILL.md; a change to an event's name, format, or timing
+# changes that file too. A failing `gh pr view` skips the rest of that poll.
 
 set -eu
 
