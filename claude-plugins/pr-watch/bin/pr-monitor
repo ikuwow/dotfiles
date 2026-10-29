@@ -183,7 +183,8 @@ while true; do
   fi
   poll_ok "gh pr view"
   state="$(echo "$pr_json" | jq -r '.state // ""')"
-  isdraft="$(echo "$pr_json" | jq -r '.isDraft // ""')"
+  # `//` would treat false as missing and turn a ready PR into "".
+  isdraft="$(echo "$pr_json" | jq -r 'if .isDraft == null then "" else (.isDraft | tostring) end')"
   decision="$(echo "$pr_json" | jq -r '.reviewDecision // ""')"
   head_sha="$(echo "$pr_json" | jq -r '.headRefOid // ""')"
 
