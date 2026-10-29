@@ -168,7 +168,8 @@ Once the review finishes, review the results:
    `/pr-selfcheck` and `gh pr checks --watch --fail-fast` to confirm the
    PR is still consistent and CI passes.
 
-The code review runs again only through step 2. After local fixes,
+The code review runs again only after a design change, through step 2
+here or the Phase 5 step that reacts to review fixes. After local fixes,
 `/pr-selfcheck` and the narrative sweep in steps 3 and 4 catch the
 inconsistencies those fixes introduced.
 
@@ -237,6 +238,11 @@ itself, such as `WATCH_ERROR`; this phase reacts to the PR's events.
 1. Read [pr-reaction.md](pr-reaction.md) on the first watch event,
    before any reply, resolve, or push, and react under it — it governs
    what the `[BOT|USER]` label settles for each event type
+
+1. When a fix push made in reaction to a review event is a design change
+   under Phase 3's step 2, update the PR body to the new design and run
+   Phase 1 through Phase 3 again on the new head while the watch keeps
+   running, since no code review has judged the new design
 
 1. `CHECK`: `gh pr checks` links the failing check. For an Actions job,
    `gh run view --log-failed <databaseId>` from `gh run list` reaches the
