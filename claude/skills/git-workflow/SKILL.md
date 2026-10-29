@@ -148,6 +148,18 @@ Once the review finishes, review the results:
 
 1. Fix issues found by the code review and commit the fixes (the sweep
    reads committed content only)
+1. When the fixes amount to a design change, push them, update the PR
+   body to the new design, and run Phase 1, Phase 2, and this phase
+   again on the new head, skipping the remaining steps below for this
+   pass, since the review judged a design the branch no longer has
+   - A fix is a design change when it changes an interface or contract,
+     the data flow, the split of responsibilities between files or
+     components, or the mechanism chosen, or when it leaves the PR
+     body's description of the approach untrue
+   - An in-place bug fix, an added check, and reworded prose are local
+     fixes, not design changes
+   - The pushes of every pass count toward the fix-push cap, which also
+     bounds how many passes run
 1. Re-run the `narrative-sweeper` agent when the review fixes changed any
    file, so the comments and prose those fixes introduced are covered.
    Skip it when the review produced no code changes — its previous pass
@@ -156,9 +168,9 @@ Once the review finishes, review the results:
    `/pr-selfcheck` and `gh pr checks --watch --fail-fast` to confirm the
    PR is still consistent and CI passes.
 
-The code review is single-pass — do not re-run after fixes.
-`/pr-selfcheck` and the narrative sweep run again in Phase 3 to catch
-inconsistencies introduced by review fix changes.
+The code review runs again only through step 2. After local fixes,
+`/pr-selfcheck` and the narrative sweep in steps 3 and 4 catch the
+inconsistencies those fixes introduced.
 
 ### Phase 4: Finalize PR for review readiness
 
