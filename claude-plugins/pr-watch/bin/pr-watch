@@ -12,7 +12,8 @@
 #
 # <pr> is `<owner>/<repo>#<number>`, the form `list` prints, or a bare
 # number in GH_REPO (OWNER/REPO) when set, otherwise in the current
-# repository.
+# repository. `add` also takes `<host>/<owner>/<repo>#<number>` and any
+# letter case, looks the PR up, and lists it in the form `list` prints.
 #
 # The watch list is one file per session, keyed by CLAUDE_CODE_SESSION_ID,
 # so concurrent sessions in one working tree each wake only for their own
@@ -59,15 +60,35 @@ entry_for() {
   echo "$repo#$1"
 }
 
-# Matching the command line keeps a reused PID from passing for the
-# watcher.
+# gh answers with the PR's URL, which carries the repository's own letter
+# case and no HOST/ prefix, and fails for a number that is no PR there, so
+# an add lists one spelling per PR and only a PR that exists.
+add_entry_for() {
+  local repo="" num url
+  if [[ "$1" =~ ^([^#[:space:]]+)#([1-9][0-9]*)$ ]]; then
+    repo="${BASH_REMATCH[1]}"
+    num="${BASH_REMATCH[2]}"
+  elif [[ "$1" =~ ^[1-9][0-9]*$ ]]; then
+    num="$1"
+  else
+    echo "pr-watch: <pr> must be <owner>/<repo>#<number> or a positive integer, got: $1" >&2
+    exit 2
+  fi
+  url="$(gh pr view "$num" ${repo:+-R "$repo"} --json url --jq .url)" || exit 1
+  url="${url#https://*/}"
+  echo "${url%/pull/*}#${url##*/}"
+}
+
+# Matching the session ID on the watcher's command line keeps a reused PID,
+# including one now held by another session's watcher, from passing for
+# this session's.
 watcher_running() {
   local pid
   pid="$(cat "$list.pid" 2>/dev/null || true)"
   if [ -z "$pid" ]; then
     return 1
   fi
-  ps -p "$pid" -o command= | grep -q 'pr-watch-monitor'
+  ps -ww -p "$pid" -o command= | grep -qF "pr-watch-monitor $CLAUDE_CODE_SESSION_ID"
 }
 
 no_watcher="no watcher runs for this session ID; the pr-watch plugin may be missing, the session non-interactive, the watcher stopped, or the ID changed by a /clear"
@@ -78,8 +99,8 @@ case "${1:-}" in
       usage
       exit 2
     fi
-    entry="$(entry_for "$2")"
     if [ "$1" = add ]; then
+      entry="$(add_entry_for "$2")"
       # Without a running watcher no event would arrive for the entry, so
       # the add fails before listing it.
       if ! watcher_running; then
@@ -89,6 +110,7 @@ case "${1:-}" in
       printf '%s\t%s-%s\n' "$entry" "$(date +%s)" "$$" >> "$list"
       echo "watching $entry"
     else
+      entry="$(entry_for "$2")"
       if ! cut -f1 "$list" | grep -qxF "$entry"; then
         echo "pr-watch: $entry is not in this session ID's watch list; pass the <owner>/<repo>#<number> that 'pr-watch list' prints, and note that after a /clear the PR may sit in the earlier ID's list" >&2
         exit 1

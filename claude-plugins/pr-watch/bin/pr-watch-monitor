@@ -22,14 +22,24 @@ if [ -z "${CLAUDE_CODE_SESSION_ID:-}" ]; then
   echo "pr-watch-monitor: CLAUDE_CODE_SESSION_ID is not set" >&2
   exit 2
 fi
+# The session ID on the command line is what `pr-watch` and a second
+# start match a recorded PID against, so a PID reused by another
+# session's watcher does not pass for this session's. exec keeps the PID
+# and the parent.
+if [ $# -eq 0 ]; then
+  exec "$0" "$CLAUDE_CODE_SESSION_ID"
+fi
 list="${XDG_STATE_HOME:-$HOME/.local/state}/pr-watch/$CLAUDE_CODE_SESSION_ID"
 mkdir -p "${list%/*}"
+# State that no add, remove, or finished watch has written to for 30 days
+# goes, so the directory does not grow by three files per session.
+find "${list%/*}" -type f -mtime +30 -delete
 touch "$list" "$list.done"
 
 # A second start in one session (a plugin reload may start one) would
 # report every event twice, so it leaves the first one in charge.
 pid="$(cat "$list.pid" 2>/dev/null || true)"
-if [ -n "$pid" ] && [ "$pid" != $$ ] && ps -p "$pid" -o command= | grep -q 'pr-watch-monitor'; then
+if [ -n "$pid" ] && [ "$pid" != $$ ] && ps -ww -p "$pid" -o command= | grep -qF "pr-watch-monitor $CLAUDE_CODE_SESSION_ID"; then
   exit 0
 fi
 echo $$ > "$list.pid"
