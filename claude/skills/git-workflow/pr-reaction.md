@@ -1,6 +1,6 @@
 # PR Reaction
 
-How to react to PR events emitted by the `pr-watch` plugin's `pr-monitor`.
+How to react to PR events delivered by the Phase 5 PR watch.
 
 ## Targeting policy
 
@@ -16,7 +16,7 @@ instruction.
   single `User`-type comment flips the thread to the human path — a
   bot can open a thread that a human later joins.
 - Bot `NEW_TOP_COMMENT` / `NEW_REVIEW` = event line tag is `[BOT]`
-  (derived from GraphQL `author.__typename` in `pr-monitor`; on
+  (derived from GraphQL `author.__typename` by the PR watch; on
   conflict with any other signal, the tag wins).
 - Author type is always taken from a live API response
   (`user.type` / `__typename`), never assumed from a login name. The
