@@ -31,12 +31,12 @@ tool-based listing when this session lacks that tool.
 - PRs this session created or updated
   - `gh pr view <number> --repo <owner>/<repo> --json state,isDraft,statusCheckRollup,reviewDecision`
   - unresolved review threads, listed by `gh pr-review review view -R <owner>/<repo> <number> --unresolved --not_outdated`
-- Open issues that those PRs address or that the user named as the work target, read with `gh issue view <number> --repo <owner>/<repo>`
+- Open issues that those PRs address or that the user named as the work target, read with `gh issue view <number> --repo <owner>/<repo> --json title,body,state,comments`
 - Work that runs only while this session is open
   - background shells, Monitors, and subagents this session started, identified from its own `run_in_background`, Monitor, and Agent calls
   - PR watches, listed by `pr-watch list` (the `pr-watch:watch` skill)
   - session crons, listed by `CronList`
-  - artifact watches, listed by the `Artifact` tool's `status` action
+  - artifact watches, listed by the `ArtifactComments` tool's `watch` action with no `url`
 - The conversation
   - work the session said it would do and did not start
   - questions put to the user that have no answer yet
@@ -166,7 +166,7 @@ When there are no proposals, go to Step 5, where the cleanup Step 2 already ran 
 1. Ask for the selection at the end of that same message, in plain text that names the proposal numbers (run 1, run 2, run all, run none), and end the turn there
    - Text sent in the same turn as an AskUserQuestion call can fail to reach the user, so the selection is taken from the user's reply instead
 1. Run exactly the proposals the reply selects, and treat every other proposal as declined
-   - When the reply neither clearly selects nor clearly declines (an "ok", or a question), ask again rather than guess
+   - An "ok" selects the only proposal when there is one, since that proposal names its operation and target; with several, an "ok" or a question neither selects nor declines, so ask again rather than guess
    - When the reply changes a draft or asks for another operation, show the revised proposals and ask again before Step 4
    - When the reply takes up the direction of a fix for a serious failure, answer it as conversation, and ask for the selection again once that conversation settles, since the proposals stay open until then
 

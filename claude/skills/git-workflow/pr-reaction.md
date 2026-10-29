@@ -71,8 +71,7 @@ kind, `NEW_COMMENT` is pre-filtered to unresolved / non-outdated).
     `gh pr comment <number> -R <owner>/<repo> --body <text>`.
 - `READY_FOR_REVIEW`: no action; register that review activity is now
   expected.
-- Informational (`APPROVED`, or CI `PENDING` / `IN_PROGRESS` /
-  `QUEUED`): no action; surface to the user on the next turn.
+- `REVIEW: APPROVED`: no action; surface to the user on the next turn.
 
 `NEW_TOP_COMMENT` carries author + login only — re-fetch body from
 the `comments` field before classifying.

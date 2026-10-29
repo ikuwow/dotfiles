@@ -9,9 +9,10 @@ command runs. This PreToolUse hook reads the script each simple command
 runs and denies the call when the file contains either word.
 
 The script of a simple command is the first operand of ``sh``, ``bash``,
-or ``zsh`` wherever the shell appears in it, so ``timeout 30 bash x.sh``
-counts, of ``source`` or ``.`` as the first word, or the first word
-itself when it contains ``/`` (``./x.sh``). A relative path resolves
+or ``zsh`` when the command starts with the shell, with a wrapper such
+as ``timeout`` (``timeout 30 bash x.sh``), or with a keyword such as
+``then``, of ``source`` or ``.`` as the
+first word, or the first word itself when it contains ``/`` (``./x.sh``). A relative path resolves
 against the session's working directory.
 
 The hook leaves these open:
@@ -44,6 +45,8 @@ _PATTERN_KILL_RE = re.compile(rb"\b(pkill|killall)\b")
 _SEPARATORS = {"&&", "||", ";", ";;", "|", "|&", "&", "(", ")"}
 _SHELLS = {"sh", "bash", "zsh"}
 _SOURCERS = {"source", "."}
+_WRAPPERS = {"timeout", "time", "nice", "nohup", "stdbuf", "env", "command", "exec", "sudo",
+             "then", "do", "else", "!"}
 _ASSIGNMENT_RE = re.compile(r"[A-Za-z_][A-Za-z0-9_]*=")
 _MAX_READ = 1024 * 1024
 
@@ -93,13 +96,19 @@ def _script(words: list[str]) -> str:
     ''
     >>> _script(["git", "commit", "-m", "bash x.sh"])
     ''
+    >>> _script(["grep", "-n", "bash", "settings.json"])
+    ''
+    >>> _script(["then", "bash", "run.sh"])
+    'run.sh'
     """
     while words and _ASSIGNMENT_RE.match(words[0]):
         words = words[1:]
     if not words:
         return ""
+    wrapped = words[0] in _WRAPPERS
     for i, word in enumerate(words):
-        if os.path.basename(word) in _SHELLS or (i == 0 and word in _SOURCERS):
+        if (os.path.basename(word) in _SHELLS and (i == 0 or wrapped)) \
+                or (i == 0 and word in _SOURCERS):
             for arg in words[i + 1:]:
                 if arg == "-c":
                     return ""

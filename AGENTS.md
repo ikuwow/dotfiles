@@ -27,8 +27,10 @@ are symlinks pointing to files in this repository.
 - The working tree may be shared by multiple concurrent Claude Code
   sessions: claude/settings.json's model field commonly shows as a
   spurious uncommitted diff from another session's /model command.
-  This is expected drift, not real work — stash-and-restore it
-  around branch switches instead of investigating or reconciling it
+  This is expected drift, not real work — when it is the only
+  uncommitted change, discard it with `git restore claude/settings.json`
+  before a branch switch or cleanup, instead of investigating or
+  reconciling it
 
 ## Language
 
