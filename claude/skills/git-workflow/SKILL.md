@@ -43,11 +43,31 @@ plugin (Phases 4 and 5).
   worktree (or feature branch) first. Creating files before branching
   leads to redundant copy-and-delete work.
 - Never modify commits that have already been pushed
-- Stop autonomous fix pushes after 5 for this PR in this session,
-  counting the pushes made in every phase, since past that the fixes
-  are no longer converging on their own. Surface the state and wait for
-  a user instruction — in Phase 5 that means answering further events
-  with replies and no push.
+- Fix-push cap: stop autonomous fix pushes after 5 for this PR in this
+  session, counting the pushes made in every phase, since past that the
+  fixes are no longer converging on their own. Surface the state and
+  wait for a user instruction — in Phase 5 that means answering further
+  events with replies and no push.
+- Run a design-change round whenever a fix made after the Phase 2 code
+  review is a design change, in any phase and whatever finding, event,
+  or failure it answers, since no code review has judged the new design
+  - A fix is a design change when it changes an interface or contract,
+    the data flow, the split of responsibilities between files or
+    components, or the mechanism chosen, or when it leaves the PR
+    body's description of the approach untrue
+    - In a rule, skill, or agent definition, rewording that changes
+      what an agent does changes its contract
+  - A fix that changes none of these, such as an in-place bug fix or a
+    reword that keeps the meaning, is a local fix
+  - The round: push the fix, update the PR body to the new design, then
+    run Phase 1, Phase 2, and Phase 3 on the new head
+  - A round entered from Phase 5 ends with the Phase 4 steps that update
+    Verification and check acceptance criteria, then returns to the
+    watch, which keeps running throughout
+    - Events arriving during the round wait until it ends, except
+      `STATE` events, and Phase 5's pre-push checks apply to its pushes
+  - Each round starts with a push, so the fix-push cap also bounds how
+    many rounds run
 - Never end a turn that claims ongoing waiting (delegated fix push,
   CI run, CI rerun, external state change) without an armed event
   source — the completion notice of the background subagent for a
@@ -148,18 +168,8 @@ Once the review finishes, review the results:
 
 1. Fix issues found by the code review and commit the fixes (the sweep
    reads committed content only)
-1. When the fixes amount to a design change, push them, update the PR
-   body to the new design, and run Phase 1, Phase 2, and this phase
-   again on the new head, skipping the remaining steps below for this
-   pass, since the review judged a design the branch no longer has
-   - A fix is a design change when it changes an interface or contract,
-     the data flow, the split of responsibilities between files or
-     components, or the mechanism chosen, or when it leaves the PR
-     body's description of the approach untrue
-   - An in-place bug fix, an added check, and reworded prose are local
-     fixes, not design changes
-   - The pushes of every pass count toward the fix-push cap, which also
-     bounds how many passes run
+1. When any of the fixes is a design change, start the design-change
+   round from Principles and skip the remaining steps below
 1. Re-run the `narrative-sweeper` agent when the review fixes changed any
    file, so the comments and prose those fixes introduced are covered.
    Skip it when the review produced no code changes — its previous pass
@@ -168,10 +178,9 @@ Once the review finishes, review the results:
    `/pr-selfcheck` and `gh pr checks --watch --fail-fast` to confirm the
    PR is still consistent and CI passes.
 
-The code review runs again only after a design change, through step 2
-here or the Phase 5 step that reacts to review fixes. After local fixes,
-`/pr-selfcheck` and the narrative sweep in steps 3 and 4 catch the
-inconsistencies those fixes introduced.
+The code review runs again only in a design-change round. After local
+fixes, the narrative sweep and `/pr-selfcheck` in the last two steps
+catch the inconsistencies those fixes introduced.
 
 ### Phase 4: Finalize PR for review readiness
 
@@ -238,11 +247,6 @@ itself, such as `WATCH_ERROR`; this phase reacts to the PR's events.
 1. Read [pr-reaction.md](pr-reaction.md) on the first watch event,
    before any reply, resolve, or push, and react under it — it governs
    what the `[BOT|USER]` label settles for each event type
-
-1. When a fix push made in reaction to a review event is a design change
-   under Phase 3's step 2, update the PR body to the new design and run
-   Phase 1 through Phase 3 again on the new head while the watch keeps
-   running, since no code review has judged the new design
 
 1. `CHECK`: `gh pr checks` links the failing check. For an Actions job,
    `gh run view --log-failed <databaseId>` from `gh run list` reaches the
