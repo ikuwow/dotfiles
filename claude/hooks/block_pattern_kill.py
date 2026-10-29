@@ -8,12 +8,14 @@ the command, but a permission rule does not read a script file the
 command runs. This PreToolUse hook reads the script each simple command
 runs and denies the call when the file contains either word.
 
-The script of a simple command is the first operand of ``sh``, ``bash``,
-or ``zsh`` when the command starts with the shell, with a wrapper such
-as ``timeout`` (``timeout 30 bash x.sh``), or with a keyword such as
-``then``, of ``source`` or ``.`` as the
-first word, or the first word itself when it contains ``/`` (``./x.sh``). A relative path resolves
-against the session's working directory.
+The script of a simple command is one of these, and a relative path
+resolves against the session's working directory:
+
+- The first operand of ``sh``, ``bash``, or ``zsh`` when the command
+  starts with the shell, with a wrapper such as ``timeout``
+  (``timeout 30 bash x.sh``), or with a keyword such as ``then``
+- The first operand of ``source`` or ``.`` as the first word
+- The first word itself when it contains ``/`` (``./x.sh``)
 
 The hook leaves these open:
 
