@@ -22,6 +22,8 @@ The hook leaves these open:
 - A script run by path behind a wrapper (``timeout 30 ./x.sh``), through
   another interpreter (``python3 x.py``), after a ``cd`` in the same
   command, or through a variable (``bash "$DIR/x.sh"``)
+- A shell behind a command the wrapper list leaves out
+  (``find . -exec bash x.sh {} +``, ``caffeinate bash x.sh``)
 - A shell option that takes a value before the script
   (``bash -o pipefail x.sh``)
 - A script that the found script itself runs
@@ -48,7 +50,7 @@ _SEPARATORS = {"&&", "||", ";", ";;", "|", "|&", "&", "(", ")"}
 _SHELLS = {"sh", "bash", "zsh"}
 _SOURCERS = {"source", "."}
 _WRAPPERS = {"timeout", "time", "nice", "nohup", "stdbuf", "env", "command", "exec", "sudo",
-             "then", "do", "else", "!"}
+             "xargs", "if", "elif", "while", "until", "then", "do", "else", "!", "{"}
 _ASSIGNMENT_RE = re.compile(r"[A-Za-z_][A-Za-z0-9_]*=")
 _MAX_READ = 1024 * 1024
 

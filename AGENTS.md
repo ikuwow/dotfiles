@@ -29,8 +29,8 @@ are symlinks pointing to files in this repository.
   spurious uncommitted diff from another session's /model command.
   This is expected drift, not real work — when it is the only
   uncommitted change, discard it with `git restore claude/settings.json`
-  before a branch switch or cleanup, instead of investigating or
-  reconciling it
+  before a branch switch or cleanup, wrap-up's included, instead of
+  investigating or reconciling it
 
 ## Language
 
