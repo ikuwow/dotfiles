@@ -9,10 +9,11 @@ The pr-watch plugin's monitor runs `pr-watch-monitor` for the whole session. It 
 
 ## Start and stop a watch
 
-- `pr-watch add <pr>` watches a PR, where `<pr>` is `<owner>/<repo>#<number>`, `<host>/<owner>/<repo>#<number>`, or a bare number in `GH_REPO` when set, otherwise in the current repository
+- `pr-watch add <pr>` watches a PR, where `<pr>` is `<owner>/<repo>#<number>` or a bare number in `GH_REPO` when set, otherwise in the current repository
+  - Watch only PRs on `gh`'s default host, since the list keeps no host and the watch polls the default one
   - It looks the PR up with `gh` and lists it as `<owner>/<repo>#<number>` in the letter case GitHub returns, so a number that is no PR fails
   - A failing add means the PR is not watched: report the error it printed, and claim no ongoing wait on that PR
-  - Watch only PRs on `gh`'s default host, since the list keeps no host and the watch polls the default one
+  - An add of a PR whose watch is running keeps that watch, and prints no new `WATCHING`
 - `pr-watch remove <owner>/<repo>#<number>` stops a watch, with the PR written as `pr-watch list` prints it
 - `pr-watch list` prints the registered PRs whose watch has not ended, and exits 1 whenever no watcher runs
 
@@ -21,6 +22,8 @@ Run `add` and `remove` one at a time rather than in parallel tool calls, since a
 ## Read the lines
 
 Every line for a PR starts with `<owner>/<repo>#<number> `. An event line follows it with `<EVENT>` or `<EVENT>: <details>`, where the details are GitHub's own field values, passed through without classification. Any other line with the prefix is `pr-monitor`'s error output.
+
+A re-fetch below reads the PR's state, comments, reviews, review threads, and checks again with `gh`, through the commands the calling workflow names when it names them.
 
 | Event | Printed when |
 | --- | --- |
@@ -36,15 +39,15 @@ Every line for a PR starts with `<owner>/<repo>#<number> `. An event line follow
 | `WATCH_ERROR: pr-monitor exited with status <n>` | That PR's watch stopped on an error |
 
 - `[BOT]` marks an author whose GraphQL `author.__typename` is `Bot`, and `[USER]` every other author
-  - Comment and review events carry every author, the account `gh` authenticates as included, so a comment this session posts comes back as an event
+  - Comment and review events carry every author, the account `gh` authenticates as included, so check on the re-fetch whether a comment or review is a post this session made before acting on it
 - On `WATCHING`, re-fetch the PR
   - Before it, each source took what its first successful poll found as already seen, so comments, reviews, and state changes from before the watch began printed no line, and the re-fetch covers them
-  - It follows every start of a watch, whether by an add, a restart after `WATCH_ERROR`, or a resumed session, unless the PR is already merged or closed, which prints its `STATE:` line instead, or its first `gh pr view` keeps failing, which prints `POLL_ERROR`
+  - It follows each new start of a watch, by an add, a restart after `WATCH_ERROR`, or a resumed session, unless the PR is already merged or closed, which prints its `STATE:` line instead, or a source's first poll keeps failing, which prints that source's `POLL_ERROR`
 - `CHECK` lines and a `STATE: MERGED` or `STATE: CLOSED` line print from the first poll
-  - A failure reported again after a restart carries the same `@<sha>` as before
+  - Treat a `CHECK` line whose name and `@<sha>` match one already handled as a repeat, as after a restart
 - A PR's watch ends on its own with the poll that printed its `STATE: MERGED` or `STATE: CLOSED` line, so lines from that poll can follow it
 - `POLL_ERROR` prints only when a call first fails; neither its later failures, its recovery, nor its cause print a line
-  - Events from that call are delayed until it recovers, and a failing `gh pr view` holds back every event of the PR
+  - Events from that call wait until it recovers, a change that reverts before then prints no line, and a failing `gh pr view` holds back every event of the PR
   - Re-fetch the PR to see where it stands
 
 ## What the watch does not report
@@ -53,7 +56,7 @@ Re-fetch the PR to find these, since no line reports them:
 
 - A check that turns green, so the watch cannot end a wait on CI; `gh pr checks --watch --fail-fast` with `run_in_background: true` covers that
 - A comment in a review thread while the thread is resolved or outdated, such as a reply in a thread a push has made outdated
-  - Once the thread is unresolved, its comments not yet reported print, those from before the watch began included
+  - Once the thread is unresolved and current, its comments not yet reported print, those from before the watch began included
 - A PR turned back into a draft
 - A review thread, comment, or review past the first 100 of its kind
 
@@ -61,8 +64,7 @@ Re-fetch the PR to find these, since no line reports them:
 
 - `<owner>/<repo>#<number> WATCH_ERROR` means that PR's watch stopped
   - Report it together with the lines just before it with the same prefix, which carry `pr-monitor`'s error output
-  - Restart it with `pr-watch add <owner>/<repo>#<number>`, then re-fetch on its `WATCHING` line
+  - Restart it once with `pr-watch add <owner>/<repo>#<number>`, then re-fetch on its `WATCHING` line; on a second `WATCH_ERROR` for the PR, report it and claim no ongoing wait on that PR
 - `WATCH_ERROR: pr-watch-monitor exited with status <n>` with no `<owner>/<repo>#<number>` means the watcher itself stopped, and no PR is watched until a new watcher starts: report it, and claim no ongoing wait on any PR
-  - A session restart starts one, and its watches each print `WATCHING` again
-- When the session ends, its watches stop; resuming the same session starts every unfinished watch again, each with a `WATCHING` line, and a PR that merged or closed in between prints its `STATE:` line instead
-  - That holds when the resumed session keeps its session ID, which `claude --resume <session-id>` does; after any resume, run `pr-watch list`, and when it exits 1, report that no PR is watched and claim no ongoing wait
+- When the session ends, its watches stop; resuming the session under the same session ID (`claude --resume <session-id>`) starts a new watcher, which starts every unfinished watch again, each with a `WATCHING` line, and a PR that merged or closed in between prints its `STATE:` line instead
+- A watcher can also stop without a line, so before saying in a later turn that a PR is still watched, run `pr-watch list`; when it exits 1 or omits the PR, report that the PR is not watched and claim no ongoing wait on it
