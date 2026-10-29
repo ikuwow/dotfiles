@@ -253,6 +253,10 @@
       "Bash(bash -c *)",
       "Bash(sh -c *)",
       "Bash(zsh -c *)",
+      "Bash(pkill *)",
+      "Bash(killall *)",
+      "Bash(kill * -1)",
+      "Bash(kill * -1 *)",
       "WebFetch(domain:localhost)",
       "WebFetch(domain:127.0.0.1)",
       "WebFetch(domain:0.0.0.0)",
@@ -346,6 +350,10 @@
           {
             "type": "command",
             "command": "f=~/.claude/hooks/block_raw_github_fetch.py; if [ -f \"$f\" ] && command -v python3 >/dev/null; then python3 \"$f\"; fi"
+          },
+          {
+            "type": "command",
+            "command": "f=~/.claude/hooks/block_pattern_kill.py; if [ -f \"$f\" ] && command -v python3 >/dev/null; then python3 \"$f\"; fi"
           },
           {
             "type": "command",

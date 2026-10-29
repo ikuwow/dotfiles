@@ -239,7 +239,7 @@ itself, such as `WATCH_ERROR`; this phase reacts to the PR's events.
 1. Each event line names the PR and carries an `<EVENT>` with GitHub's
    own field values. The steps below cover the events with a fixed
    procedure; read any other line and judge from what it says. The
-   `pr-watch:watch` skill says where the full set is documented.
+   `pr-watch:watch` skill documents the full set.
 
 1. Re-fetch detail on each event, adding `-R <owner>/<repo>` from the
    line when the PR is in another repository, with:

@@ -14,32 +14,10 @@
 # The PR is looked up in GH_REPO (OWNER/REPO) when set, otherwise in the
 # repository of the working directory.
 #
-# Events, one per stdout line. Field values are GitHub's own, passed
-# through rather than classified here:
-#
-#   WATCHING
-#   STATE: <state>
-#   REVIEW: <reviewDecision>
-#   READY_FOR_REVIEW
-#   NEW_COMMENT: [BOT|USER] <author> <path>:<line>
-#   NEW_TOP_COMMENT: [BOT|USER] <author>
-#   NEW_REVIEW: [BOT|USER] <author> <state>
-#   CHECK: <check name> (<conclusion or state>) @<head sha, 7 chars>
-#   POLL_ERROR: <call that failed>
-#
-# WATCHING prints once, when every source has had its first successful
-# poll, and every change after it reports. Before it, a source takes what
-# it finds on its own first success as already seen, while CHECK lines and
-# a merged or closed STATE print from the first poll; a PR already merged
-# or closed ends this process without a WATCHING line. CHECK covers every
-# check on the head commit, Actions or not, settling on anything but
-# success, neutral, or skipped. POLL_ERROR prints when a call first fails,
-# and neither its later failures nor its recovery print a line; a failing
-# `gh pr view` skips the rest of that poll.
-#
-# Comment and review events carry every author, the one `gh`
-# authenticates as included. The event names and the `[BOT|USER]` tag are
-# what claude/skills/git-workflow/pr-reaction.md reacts by.
+# The events it prints, one per stdout line, and what each guarantees are
+# the plugin's contract with its callers, documented in the plugin's
+# skills/watch/SKILL.md; a change to an event's name, format, or timing
+# changes that file too. A failing `gh pr view` skips the rest of that poll.
 
 set -eu
 
