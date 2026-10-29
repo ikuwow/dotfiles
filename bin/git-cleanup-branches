@@ -22,8 +22,15 @@ if [ -n "$(git status --porcelain)" ]; then
   exit 1
 fi
 
-default_branch=main
-if [ ! "$(git rev-parse --verify "$default_branch" 2>/dev/null)" ]; then
+# Resolve the default branch the same way the `git home` alias does, and
+# fall back to a local main or master when origin cannot say, so cleanup
+# still runs without a remote or offline after `git home` failed.
+if default_ref=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null) \
+  || { git remote set-head origin -a && default_ref=$(git symbolic-ref refs/remotes/origin/HEAD); }; then
+  default_branch=${default_ref#refs/remotes/origin/}
+elif git rev-parse --verify -q main >/dev/null; then
+  default_branch=main
+else
   default_branch=master
 fi
 

@@ -66,7 +66,9 @@ plugin (Phases 4 and 5).
   - The round: push the committed fixes, update the PR title and body to
     the new design, then run Phase 1, Phase 2, and Phase 3 on the new
     head
-    - When the user skipped Phase 2 for this PR, the round skips it too
+    - When the user skipped Phase 2 for this PR, the round runs Phase 1
+      alone after the title and body update, since Phase 3 without a
+      code review repeats what Phase 1 checks
   - A round started while the PR watch is not running continues into
     Phase 4
   - A round started while the PR watch is running, nested rounds
@@ -208,7 +210,9 @@ Bring the PR into a state where a human reviewer can act on it:
    pending stay as `[ ]` (or noted explicitly as pending).
 1. Confirm acceptance criteria are met. Cross-check the PR body and
    any linked issue against the actual change. If something is unmet,
-   either address it or call it out as out-of-scope / follow-up.
+   either address it or call it out as out-of-scope / follow-up. When
+   addressing it makes a design change, start the design-change round
+   from Principles.
 1. Start the Phase 5 PR watch through the `pr-watch:watch` skill
    before the PR leaves draft. `READY_FOR_REVIEW` is itself a watched
    event, so a watch started after the ready flip can never observe it.

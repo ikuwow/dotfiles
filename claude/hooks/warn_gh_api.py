@@ -36,7 +36,7 @@ _STATE_PREFIX = "gh_api_warned_"
 MESSAGE = (
     "Detected 'gh api'. Prefer high-level gh subcommands first:\n"
     "  gh pr view / gh pr diff / gh pr checks\n"
-    "  gh issue view (with --comments)\n"
+    "  gh issue view (with --json title,body,state,comments)\n"
     "  gh run view\n"
     "  gh pr-review (extension: agynio/gh-pr-review) for PR review threads\n"
     "Fall back to 'gh api' / 'gh api graphql' only when the high-level "
