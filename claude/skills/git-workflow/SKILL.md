@@ -10,9 +10,9 @@ Follow each step in order. Skip a step only when its precondition is
 structurally absent (e.g., no PR exists yet).
 
 Prerequisites: the `agynio/gh-pr-review` gh extension (Phase 5 review
-threads), the `pr-review-toolkit` plugin (Phase 2), and `bin/pr-watch`
-with the `pr-watch` plugin, whose monitor runs `bin/pr-watch-monitor`
-(Phases 4 and 5).
+threads), the `pr-review-toolkit` plugin (Phase 2), and the `pr-watch`
+plugin, which puts `pr-watch` on the Bash PATH and runs its watcher
+for the whole session (Phases 4 and 5).
 
 ## Supporting files
 
