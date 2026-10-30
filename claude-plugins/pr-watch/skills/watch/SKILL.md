@@ -43,7 +43,7 @@ A re-fetch below reads the PR's state, comments, reviews, review threads, and ch
 - `[BOT]` marks an author whose GraphQL `author.__typename` is `Bot`, and `[USER]` every other author
   - Comment and review events carry every author, the account `gh` authenticates as included, so check on the re-fetch whether a comment or review is a post this session made before acting on it
 - `[<TYPE>]` on a review-request line is the reviewer's GraphQL `__typename` in upper case, such as `[USER]`, `[TEAM]`, or `[BOT]`, and a team's `<reviewer>` is `<org>/<team>`
-  - A team request that GitHub hands to its members prints the team's `REVIEW_REQUESTED` and `REVIEW_REQUEST_REMOVED` with a `REVIEW_REQUESTED` for each member chosen
+  - A team with code review auto assignment replaces its own request with requests to some of its members, which prints the team's `REVIEW_REQUESTED` and `REVIEW_REQUEST_REMOVED` and a `REVIEW_REQUESTED` for each member assigned
 - On `WATCHING`, re-fetch the PR
   - Before it, each source took what its first successful poll found as already seen, so comments, reviews, and state changes from before the watch began printed no line, and the re-fetch covers them
   - It follows each new start of a watch, by an add, a restart after `WATCH_ERROR`, or a resumed session, unless the PR is already merged or closed, which prints its `STATE:` line instead, or a source's first poll keeps failing, which prints that source's `POLL_ERROR`
