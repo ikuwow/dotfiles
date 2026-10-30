@@ -23,13 +23,6 @@
     - セキュリティを弱める設定は最終手段
 1. 新ツール・サービスの設定時は公式サンプル実装を先に確認する
 1. バージョンを更新する際は最新版を確認し、現在との差分を把握した上で指定する
-1. GitHubのissue/PRを参照する時は、表示先に合わせて書く
-    - GitHub上に載る文章（issue/PR本文・コメント・commit message）では `#123` 形式で書き、現在のリポジトリと異なるリポジトリのものは `orgname/reponame#123` 形式で書く
-    - 会話応答では `[#123 タイトル](<issue/PRのURL>)` 形式のMarkdownリンクにする（ターミナル上の `#123` はリンクにならず、番号だけでは何のissueか分からないため）
-1. GitHub issueを読む際は以下を確認する
-    - 親issueがある場合はその内容も読む
-    - sub issueの有無を確認し、存在する場合はタイトルとステータスを把握する（詳細まで読む必要はない）
-    - 本文とコメント全件を1コマンドで取得する（`gh issue view <number> --json title,body,state,comments`。`--comments` は出力先が端末でない時にコメントだけを出し本文を落とすため）
 1. 編集 / 簡素化 / 整理タスクで、依頼されたスコープに含まれない既存の行・コメント・順序・命名・wordingは基本的に触らない
     - 明らかなtypo修正等で「ついで」が許容される場面もあるが、原則は別PRで提案する
 1. リポジトリへ永続化する出力（コミットメッセージ・PR本文・コード内コメント・docs等）の言語は、OSSはデフォルト英語、それ以外はプロジェクトのルール（`CLAUDE.md` / `AGENTS.md` 等）と既存資産（PR / commit history / docs）の言語に合わせる
@@ -37,15 +30,7 @@
 
 ## ツール選択
 
-- GitHubの操作はコーディングタスクの場合 `gh` コマンドを使う
-    - ghが使えない環境やghで実現できない操作の場合のみ `raw.githubusercontent.com` 等を使ってよい
-- `gh` の中では高レベルサブコマンド（`gh pr view` / `gh pr diff` / `gh pr checks` / `gh issue view` / `gh run view` 等）を優先する
-    - PRレビュー・レビューコメント・レビュースレッドの取得や操作は `gh pr-review` 拡張（`agynio/gh-pr-review`）を使う
-    - sub-issue の list/add/remove は `gh sub-issue` 拡張を使う
-    - `gh api`（特に `gh api graphql -f query=...`）はこれらで実現できない操作に限定する
 - IDE連携のMCPサーバー（コードインデックス・シンボル解決・静的解析等）が接続されている時は、コード検索・ナビゲーション・解析にその読み取り系ツールを優先する（ユーザーの明示は不要）
-- GitHub repositoryの内部詳細（source code・formula・configファイル等）を確認する時は個別ファイルから入らず上位から順に見る: README → 直近release tagとmain差分（`gh api repos/.../releases`）→ 既知issue/PR検索（`gh search issues/prs`）→ source code
-    - CLIの使い方・挙動を `--help`・man page・実機実行で確認する段階では適用不要
 
 ## シェルスクリプト作成
 
