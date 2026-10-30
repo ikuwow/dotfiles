@@ -23,7 +23,7 @@ Run `add` and `remove` one at a time rather than in parallel tool calls, since a
 
 Every line for a PR starts with `<owner>/<repo>#<number> `. An event line follows it with `<EVENT>` or `<EVENT>: <details>`, where the details are GitHub's own field values, passed through without classification. Any other line with the prefix is `pr-monitor`'s error output.
 
-A re-fetch below reads the PR's state, comments, reviews, review threads, and checks again with `gh`, through the commands the calling workflow names when it names them.
+A re-fetch below reads the PR's state, comments, reviews, review threads, requested reviewers, and checks again with `gh`, through the commands the calling workflow names when it names them.
 
 | Event | Printed when |
 | --- | --- |
@@ -42,16 +42,18 @@ A re-fetch below reads the PR's state, comments, reviews, review threads, and ch
 
 - `[BOT]` marks an author whose GraphQL `author.__typename` is `Bot`, and `[USER]` every other author
   - Comment and review events carry every author, the account `gh` authenticates as included, so check on the re-fetch whether a comment or review is a post this session made before acting on it
-- `[<TYPE>]` on a review-request line is the reviewer's GraphQL `__typename` in upper case, such as `[USER]`, `[TEAM]`, or `[BOT]`, and a team's `<reviewer>` is `<org>/<team>`
-  - A team with code review auto assignment replaces its own request with requests to some of its members, which prints the team's `REVIEW_REQUESTED` and `REVIEW_REQUEST_REMOVED` and a `REVIEW_REQUESTED` for each member assigned
+- `[<TYPE>]` on a review-request line is the reviewer's GraphQL `__typename` in upper case, such as `[USER]`, `[TEAM]`, `[BOT]`, or `[MANNEQUIN]`, and a team's `<reviewer>` is `<org>/<team>`
+  - `[<TYPE>]`, `<reviewer>`, or `<actor>` is `?` where GitHub gives none, as for a deleted account
+  - Review-request lines print in timeline order, so the last line for a reviewer is where that reviewer stands; the re-fetch's requested reviewers are the current list
+  - A team whose code review auto assignment removes the team's request can print the team's `REVIEW_REQUESTED` and `REVIEW_REQUEST_REMOVED` with a `REVIEW_REQUESTED` for each member assigned
 - On `WATCHING`, re-fetch the PR
-  - Before it, each source took what its first successful poll found as already seen, so comments, reviews, and state changes from before the watch began printed no line, and the re-fetch covers them
+  - Before it, each source took what its first successful poll found as already seen, so comments, reviews, review requests, and state changes from before the watch began printed no line, and the re-fetch covers them
   - It follows each new start of a watch, by an add, a restart after `WATCH_ERROR`, or a resumed session, unless the PR is already merged or closed, which prints its `STATE:` line instead, or a source's first poll keeps failing, which prints that source's `POLL_ERROR`
 - `CHECK` lines and a `STATE: MERGED` or `STATE: CLOSED` line print from the first poll
   - Treat a `CHECK` line whose name and `@<sha>` match one already handled as a repeat, as after a restart
 - A PR's watch ends on its own with the poll that printed its `STATE: MERGED` or `STATE: CLOSED` line, so lines from that poll can follow it
 - `POLL_ERROR` prints only when a call first fails; neither its later failures, its recovery, nor its cause print a line
-  - Events from that call wait until it recovers, a change that reverts before then prints no line, and a failing `gh pr view` holds back every event of the PR
+  - Events from that call wait until it recovers, a change that reverts before then prints no line except a review request and its removal, which both print, and a failing `gh pr view` holds back every event of the PR
   - Re-fetch the PR to see where it stands
 
 ## What the watch does not report

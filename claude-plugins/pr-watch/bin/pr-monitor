@@ -150,13 +150,16 @@ fragment reviewer on RequestedReviewer{
   ... on Bot{login}
   ... on Mannequin{login}
   ... on Team{combinedSlug}
+  ... on EnterpriseTeam{combinedSlug}
 }'
 
-# Emit one line per not-yet-seen comment ID. `fresh` is tab-separated
-# "id<TAB>author[<TAB>extra]" lines; the optional extra field (e.g.
-# "path:line") is appended to the label when present. Seen IDs persist in
-# seen_file across polls so each comment fires exactly once. With
-# `seeding` at 1 the IDs are recorded and nothing is emitted.
+# Emit one line per not-yet-seen item ID, in the order of `fresh`. `fresh`
+# is tab-separated "id<TAB>subject[<TAB>extra]" lines; the optional extra
+# field (e.g. "path:line") is appended to the subject when present, and an
+# empty `label` leaves the line without a "label: " prefix, for items that
+# carry their own event name in the subject. Seen IDs persist in seen_file
+# across polls so each item fires exactly once. With `seeding` at 1 the
+# IDs are recorded and nothing is emitted.
 emit_new() {
   local fresh="$1" seen_file="$2" label="$3" seeding="$4"
   [ -z "$fresh" ] && return 0
@@ -172,23 +175,10 @@ emit_new() {
     # -v assignment ("awk: newline in string").
     echo "$fresh" | ids_nl="$new" awk -F'\t' -v label="$label" '
       BEGIN { n = split(ENVIRON["ids_nl"], a, "\n"); for (i = 1; i <= n; i++) seen[a[i]] = 1 }
-      ($1 in seen) { print label ": " $2 ($3 != "" ? " " $3 : "") }
+      ($1 in seen) { print (label != "" ? label ": " : "") $2 ($3 != "" ? " " $3 : "") }
     '
   fi
   echo "$sorted_fresh" >> "$seen_file"
-}
-
-# Print the review-request timeline events of one `__typename` from
-# `reviews_json` in `emit_new`'s format. The reviewer's `__typename`
-# becomes the label prefix, since a request can name a team as well as a
-# user or bot.
-review_requests() {
-  echo "$reviews_json" | jq -r --arg t "$1" '
-    .data.repository.pullRequest.timelineItems.nodes[]
-    | select(.__typename == $t)
-    | .requestedReviewer as $r
-    | "\(.id)\t[\(($r.__typename // "?") | ascii_upcase)] \($r.login // $r.combinedSlug // "?")\tby \(.actor.login // "?")"' \
-    2>/dev/null || true
 }
 
 while true; do
@@ -322,10 +312,16 @@ while true; do
       2>/dev/null || true)"
     emit_new "$fresh_reviews" "$seen_reviews" "NEW_REVIEW" "$seed_reviews"
 
-    emit_new "$(review_requests ReviewRequestedEvent)" \
-      "$seen_review_requests" "REVIEW_REQUESTED" "$seed_reviews"
-    emit_new "$(review_requests ReviewRequestRemovedEvent)" \
-      "$seen_review_requests" "REVIEW_REQUEST_REMOVED" "$seed_reviews"
+    # Both event kinds go through one pass in timeline order, so a
+    # reviewer removed and requested again within one interval reads as
+    # requested. The reviewer's `__typename` becomes the bracketed prefix,
+    # since a request can name a team as well as a user or bot.
+    fresh_requests="$(echo "$reviews_json" | jq -r '
+      .data.repository.pullRequest.timelineItems.nodes[]
+      | .requestedReviewer as $r
+      | "\(.id)\t\(if .__typename == "ReviewRequestedEvent" then "REVIEW_REQUESTED" else "REVIEW_REQUEST_REMOVED" end): [\(($r.__typename // "?") | ascii_upcase)] \($r.login // $r.combinedSlug // "?")\tby \(.actor.login // "?")"' \
+      2>/dev/null || true)"
+    emit_new "$fresh_requests" "$seen_review_requests" "" "$seed_reviews"
     seed_reviews=0
   fi
 
