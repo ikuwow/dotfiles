@@ -53,17 +53,13 @@ owner_repo="${GH_REPO:-$(gh repo view --json nameWithOwner --jq .nameWithOwner)}
 owner="${owner_repo%/*}"
 repo="${owner_repo#*/}"
 
-prev_state=""
 prev_decision=""
-prev_isdraft=""
 prev_ci_sha=""
 declare -A prev_check=()
 declare -A poll_failed=()
 seen_comments="$(mktemp)"
-seen_top_comments="$(mktemp)"
-seen_reviews="$(mktemp)"
-seen_review_requests="$(mktemp)"
-trap 'rm -f "$seen_comments" "$seen_top_comments" "$seen_reviews" "$seen_review_requests"' EXIT
+seen_timeline="$(mktemp)"
+trap 'rm -f "$seen_comments" "$seen_timeline"' EXIT
 
 # First-poll seeding: do not emit events for state that already held when
 # this process started. Only transitions during its lifetime should wake
@@ -75,8 +71,12 @@ trap 'rm -f "$seen_comments" "$seen_top_comments" "$seen_reviews" "$seen_review_
 # process at the end of the first poll, so both report rather than seed.
 first_poll=1
 seed_threads=1
-seed_reviews=1
+seed_timeline=1
 announced=0
+# 1 while the last `STATE` line printed is `MERGED` or `CLOSED`, so the
+# end of a PR prints from `gh pr view` only when the timeline has not
+# printed it, as when seeding swallowed it or the timeline poll fails.
+state_reported=0
 
 # One line per outage, not per poll: an unauthorized token or an outage
 # persists for many intervals, and a line each time would drown the
@@ -114,31 +114,37 @@ threads_query='query($owner:String!,$repo:String!,$num:Int!){
   }
 }'
 
-# Top-level PR comments are fetched via GraphQL rather than `gh pr view
-# --json comments` because that `author` object omits `__typename`, and
-# the same Bot/User classification is needed as for review threads and
-# reviews. Piggybacks on `reviews_query` to avoid an extra round-trip.
+# The PR's timeline is the source of the events in `itemTypes`, each of
+# which GitHub records as an item on the conversation: comments, reviews,
+# review requests, draft flips, dismissals, merge, close, and reopen.
+# Each item prints once, by node ID. `last` keeps the newest items in the
+# window however long the PR's history grows. Commits are left out of
+# `itemTypes`, since a burst of them would push the other items out of
+# that window.
 #
-# Review requests are read from the timeline events rather than diffed
-# from `reviewRequests`: a reviewer who submits a review drops out of
+# Three kinds of event stay outside the timeline. A reply in an existing review
+# thread adds no timeline item, so review-thread comments come from
+# `threads_query`, which also carries the resolved and outdated state
+# they are filtered on. Checks and `reviewDecision` are state derived
+# from the head commit and the branch's protection, with no item marking
+# their changes, so they come from `gh pr view`.
+#
+# A review request is reported from its event rather than diffed from
+# `reviewRequests`: a reviewer who submits a review drops out of
 # `reviewRequests` without a ReviewRequestRemovedEvent, so only the
-# events tell a removal from a fulfilled request. `last` keeps the newest
-# events in the window however long the PR's history grows.
+# events tell a removal from a fulfilled request.
 # shellcheck disable=SC2016 # GraphQL query: $vars are query variables
-reviews_query='query($owner:String!,$repo:String!,$num:Int!){
+timeline_query='query($owner:String!,$repo:String!,$num:Int!){
   repository(owner:$owner,name:$repo){
     pullRequest(number:$num){
-      reviews(first:100){
-        nodes{ id state body author{login __typename} }
-      }
-      comments(first:100){
-        nodes{ id author{login __typename} }
-      }
-      timelineItems(last:100,itemTypes:[REVIEW_REQUESTED_EVENT,REVIEW_REQUEST_REMOVED_EVENT]){
+      timelineItems(last:100,itemTypes:[ISSUE_COMMENT,PULL_REQUEST_REVIEW,REVIEW_REQUESTED_EVENT,REVIEW_REQUEST_REMOVED_EVENT,READY_FOR_REVIEW_EVENT,CONVERT_TO_DRAFT_EVENT,REVIEW_DISMISSED_EVENT,MERGED_EVENT,CLOSED_EVENT,REOPENED_EVENT]){
         nodes{
           __typename
-          ... on ReviewRequestedEvent{ id actor{login} requestedReviewer{ ...reviewer } }
-          ... on ReviewRequestRemovedEvent{ id actor{login} requestedReviewer{ ...reviewer } }
+          ... on Node{ id }
+          ... on IssueComment{ author{login __typename} }
+          ... on PullRequestReview{ state body author{login __typename} }
+          ... on ReviewRequestedEvent{ actor{login} requestedReviewer{ ...reviewer } }
+          ... on ReviewRequestRemovedEvent{ actor{login} requestedReviewer{ ...reviewer } }
         }
       }
     }
@@ -191,10 +197,10 @@ while true; do
 
   # `timeout` turns a call that hangs into a failed poll, which reports,
   # rather than a stalled loop, which stays silent.
-  pr_json="$(timeout 60 gh pr view "$pr" --json state,isDraft,reviewDecision,statusCheckRollup,headRefOid 2>/dev/null || true)"
+  pr_json="$(timeout 60 gh pr view "$pr" --json state,reviewDecision,statusCheckRollup,headRefOid 2>/dev/null || true)"
   # Requiring `.state` rather than mere parseability: `{}` parses, and an
-  # empty `state` reaches the comparison below while an empty `headRefOid`
-  # resets `prev_check` twice over, replaying every failing check.
+  # empty `state` reads as an open PR while an empty `headRefOid` resets
+  # `prev_check` twice over, replaying every failing check.
   if ! echo "$pr_json" | jq -e '.state? // empty' >/dev/null 2>&1; then
     poll_error "gh pr view"
     sleep "$interval"
@@ -202,24 +208,8 @@ while true; do
   fi
   poll_ok "gh pr view"
   state="$(echo "$pr_json" | jq -r '.state // ""')"
-  # `//` would treat false as missing and turn a ready PR into "".
-  isdraft="$(echo "$pr_json" | jq -r 'if .isDraft == null then "" else (.isDraft | tostring) end')"
   decision="$(echo "$pr_json" | jq -r '.reviewDecision // ""')"
   head_sha="$(echo "$pr_json" | jq -r '.headRefOid // ""')"
-
-  if [ "$state" != "$prev_state" ]; then
-    if [ "$first_poll" -eq 0 ] || [ "$state" = MERGED ] || [ "$state" = CLOSED ]; then
-      echo "STATE: $state"
-    fi
-    prev_state="$state"
-  fi
-
-  if [ -n "$isdraft" ] && [ "$isdraft" != "$prev_isdraft" ]; then
-    if [ "$first_poll" -eq 0 ] && [ "$isdraft" = "false" ]; then
-      echo "READY_FOR_REVIEW"
-    fi
-    prev_isdraft="$isdraft"
-  fi
 
   # `prev_decision` tracks the empty value too: a dismissal clears
   # `reviewDecision`, and holding the stale one here would then swallow
@@ -288,48 +278,69 @@ while true; do
     seed_threads=0
   fi
 
-  # Reviews API surfaces `state=COMMENTED` reviews (e.g. Devin Review, or a
-  # human submitting "Comment") that neither change `reviewDecision` nor
-  # appear in reviewThreads / issue comments. Empty-body reviews are
-  # filtered out: empty APPROVED / CHANGES_REQUESTED are already covered
-  # by the `REVIEW:` decision event, and an empty COMMENTED has nothing
-  # to read.
-  reviews_json="$(timeout 60 gh api graphql -f owner="$owner" -f repo="$repo" -F num="$pr" -f query="$reviews_query" 2>/dev/null || true)"
-  if ! echo "$reviews_json" | jq -e '.data.repository.pullRequest.reviews' >/dev/null 2>&1; then
-    poll_error "gh api graphql (reviews)"
+  timeline_json="$(timeout 60 gh api graphql -f owner="$owner" -f repo="$repo" -F num="$pr" -f query="$timeline_query" 2>/dev/null || true)"
+  if ! echo "$timeline_json" | jq -e '.data.repository.pullRequest.timelineItems' >/dev/null 2>&1; then
+    poll_error "gh api graphql (timeline)"
   else
-    poll_ok "gh api graphql (reviews)"
-    fresh_top="$(echo "$reviews_json" | jq -r '
-      .data.repository.pullRequest.comments.nodes[]
-      | "\(.id)\t\(if .author.__typename == "Bot" then "[BOT]" else "[USER]" end) \(.author.login)"' \
-      2>/dev/null || true)"
-    emit_new "$fresh_top" "$seen_top_comments" "NEW_TOP_COMMENT" "$seed_reviews"
-
-    fresh_reviews="$(echo "$reviews_json" | jq -r '
-      .data.repository.pullRequest.reviews.nodes[]
-      | select(.state != "PENDING" and (.body // "") != "")
-      | "\(.id)\t\(if .author.__typename == "Bot" then "[BOT]" else "[USER]" end) \(.author.login)\t\(.state)"' \
-      2>/dev/null || true)"
-    emit_new "$fresh_reviews" "$seen_reviews" "NEW_REVIEW" "$seed_reviews"
-
-    # Both event kinds go through one pass in timeline order, so a
+    poll_ok "gh api graphql (timeline)"
+    # Every item kind goes through one pass in timeline order, so a
     # reviewer removed and requested again within one interval reads as
-    # requested. The reviewer's `__typename` becomes the bracketed prefix,
-    # since a request can name a team as well as a user or bot.
-    fresh_requests="$(echo "$reviews_json" | jq -r '
+    # requested. Pending reviews are left out because a review keeps its
+    # ID when submitted, so recording it while pending would mark it seen
+    # before it could print. Empty-body reviews are left out too: an empty
+    # approval or change request moves `REVIEW:`, and an empty comment
+    # review carries only thread comments, which `NEW_COMMENT` reports.
+    # A request's reviewer carries its own
+    # `__typename` as the bracketed prefix, since a request can name a
+    # team as well as a user or bot. An item kind without a line of its
+    # own prints its `__typename`, so it reports rather than vanishes.
+    fresh_timeline="$(echo "$timeline_json" | jq -r '
+      def who: "\(if .__typename == "Bot" then "[BOT]" else "[USER]" end) \(.login // "?")";
+      def reviewer: "[\((.__typename // "?") | ascii_upcase)] \(.login // .combinedSlug // "?")";
       .data.repository.pullRequest.timelineItems.nodes[]
-      | .requestedReviewer as $r
-      | "\(.id)\t\(if .__typename == "ReviewRequestedEvent" then "REVIEW_REQUESTED" else "REVIEW_REQUEST_REMOVED" end): [\(($r.__typename // "?") | ascii_upcase)] \($r.login // $r.combinedSlug // "?")\tby \(.actor.login // "?")"' \
+      | select(.__typename != "PullRequestReview" or (.state != "PENDING" and (.body // "") != ""))
+      | "\(.id)\t" + (
+          if .__typename == "IssueComment" then "NEW_TOP_COMMENT: \(.author | who)"
+          elif .__typename == "PullRequestReview" then "NEW_REVIEW: \(.author | who) \(.state)"
+          elif .__typename == "ReviewRequestedEvent" then "REVIEW_REQUESTED: \(.requestedReviewer | reviewer) by \(.actor.login // "?")"
+          elif .__typename == "ReviewRequestRemovedEvent" then "REVIEW_REQUEST_REMOVED: \(.requestedReviewer | reviewer) by \(.actor.login // "?")"
+          elif .__typename == "ReadyForReviewEvent" then "READY_FOR_REVIEW"
+          elif .__typename == "ConvertToDraftEvent" then "CONVERT_TO_DRAFT"
+          elif .__typename == "ReviewDismissedEvent" then "REVIEW_DISMISSED"
+          elif .__typename == "MergedEvent" then "STATE: MERGED"
+          elif .__typename == "ClosedEvent" then "STATE: CLOSED"
+          elif .__typename == "ReopenedEvent" then "STATE: OPEN"
+          else .__typename end)' \
       2>/dev/null || true)"
-    emit_new "$fresh_requests" "$seen_review_requests" "" "$seed_reviews"
-    seed_reviews=0
+    emitted="$(emit_new "$fresh_timeline" "$seen_timeline" "" "$seed_timeline")"
+    if [ -n "$emitted" ]; then
+      echo "$emitted"
+    fi
+    # The timeline is read after `gh pr view`, so its last `STATE` line is
+    # the newer reading and replaces `state`.
+    last_state_line="$(echo "$emitted" | grep '^STATE: ' | tail -n 1)"
+    if [ -n "$last_state_line" ]; then
+      state="${last_state_line#STATE: }"
+      if [ "$state" = OPEN ]; then
+        state_reported=0
+      else
+        state_reported=1
+      fi
+    fi
+    seed_timeline=0
   fi
 
+  # `gh pr view` decides the end, and prints it when the timeline has not.
   case "$state" in
-    MERGED|CLOSED) exit 0 ;;
+    MERGED|CLOSED)
+      if [ "$state_reported" -eq 0 ]; then
+        echo "STATE: $state"
+      fi
+      exit 0
+      ;;
   esac
 
-  if [ "$announced" -eq 0 ] && [ "$seed_threads" -eq 0 ] && [ "$seed_reviews" -eq 0 ]; then
+  if [ "$announced" -eq 0 ] && [ "$seed_threads" -eq 0 ] && [ "$seed_timeline" -eq 0 ]; then
     echo "WATCHING"
     announced=1
   fi
