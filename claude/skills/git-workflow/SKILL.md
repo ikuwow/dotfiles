@@ -76,7 +76,8 @@ plugin (Phases 4 and 5).
     check acceptance criteria, then returns to the watch
     - Events arriving during the round wait until it ends, and Phase 5's
       pre-push checks apply to its pushes
-    - A `STATE` event ends the round at once and goes to Phase 5's exit
+    - A `STATE: MERGED` or `STATE: CLOSED` event with no `STATE: OPEN`
+      after it ends the round at once and goes to Phase 5's exit
       conditions
   - When a round needs a push the fix-push cap forbids, the round ends
     there and the cap's own handling takes over, including for held
@@ -275,6 +276,8 @@ itself, such as `WATCH_ERROR`; this phase reacts to the PR's events.
 1. Exit conditions:
    - `STATE: MERGED` → execute step 5 (Cleanup).
    - `STATE: CLOSED` without merge → skip cleanup.
+     - A `STATE: OPEN` after it means the PR was reopened and the watch
+       goes on, so keep watching.
    - A watch the `pr-watch:watch` skill reports as stopped and not
      restarted → claim no ongoing wait on that PR.
    - Session ends → the watch stops with it; the `pr-watch:watch` skill

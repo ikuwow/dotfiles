@@ -316,10 +316,17 @@ while true; do
     if [ -n "$emitted" ]; then
       echo "$emitted"
     fi
-    case "$(echo "$emitted" | grep '^STATE: ' | tail -n 1)" in
-      "STATE: OPEN") state_reported=0 ;;
-      STATE:*) state_reported=1 ;;
-    esac
+    # The timeline is read after `gh pr view`, so its last `STATE` line is
+    # the newer reading and replaces `state`.
+    last_state_line="$(echo "$emitted" | grep '^STATE: ' | tail -n 1)"
+    if [ -n "$last_state_line" ]; then
+      state="${last_state_line#STATE: }"
+      if [ "$state" = OPEN ]; then
+        state_reported=0
+      else
+        state_reported=1
+      fi
+    fi
     seed_timeline=0
   fi
 

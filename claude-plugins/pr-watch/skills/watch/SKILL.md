@@ -56,6 +56,7 @@ A re-fetch below reads the PR's state, comments, reviews, review threads, reques
 - `CHECK` lines and a `STATE: MERGED` or `STATE: CLOSED` line print from the first poll
   - Treat a `CHECK` line whose name and `@<sha>` match one already handled as a repeat, as after a restart
 - A PR's watch ends on its own with the first poll that finds the PR merged or closed, printing its `STATE: MERGED` or `STATE: CLOSED` line in that poll unless the timeline has already printed it, so lines from that poll can follow it
+  - A poll whose last `STATE` line is `STATE: OPEN` finds the PR reopened, and the watch goes on
 - `POLL_ERROR` prints only when a call first fails; neither its later failures, its recovery, nor its cause print a line
   - Events from that call wait until it recovers; a timeline item prints even when what it changed has reverted by then, while a check or review decision that reverts, or a review-thread comment whose thread is resolved or outdated by then, prints no line, and a failing `gh pr view` holds back every event of the PR
   - Re-fetch the PR to see where it stands
