@@ -111,12 +111,12 @@ class LineTest(unittest.TestCase):
         cases = [
             (
                 rollup_of(
-                    {"name": "lint", "status": "COMPLETED", "conclusion": "FAILURE"},
-                    {"context": "ci/x", "state": "ERROR"},
-                    {"name": "test", "status": "IN_PROGRESS", "conclusion": None},
-                    {"name": "odd", "status": "COMPLETED", "conclusion": None},
+                    {"id": "1", "name": "lint", "status": "COMPLETED", "conclusion": "FAILURE"},
+                    {"id": "2", "context": "ci/x", "state": "ERROR"},
+                    {"id": "3", "name": "test", "status": "IN_PROGRESS", "conclusion": None},
+                    {"id": "4", "name": "odd", "status": "COMPLETED", "conclusion": None},
                 ),
-                [("lint", "FAILURE"), ("ci/x", "ERROR"), ("test", "IN_PROGRESS"), ("odd", "")],
+                [("1", "lint", "FAILURE"), ("2", "ci/x", "ERROR"), ("3", "test", "IN_PROGRESS"), ("4", "odd", "")],
             ),
             ({"commits": {"nodes": [{"commit": {"statusCheckRollup": None}}]}}, []),
             ({"commits": {"nodes": []}}, []),
@@ -134,7 +134,10 @@ def body(**fields):
 
 def poll(state="OPEN", sha="aaaaaaa", decision=None, checks=(), comments=(), items=()):
     """Return the answers to one poll's three queries, in the order the script asks."""
-    nodes = [{"name": name, "status": "COMPLETED", "conclusion": value} for name, value in checks]
+    nodes = [
+        {"id": str(index), "name": name, "status": "COMPLETED", "conclusion": value}
+        for index, (name, value) in enumerate(checks)
+    ]
     thread = {
         "isResolved": False,
         "isOutdated": False,
@@ -199,14 +202,15 @@ class WatchTest(unittest.TestCase):
             ],
         )
 
-    def test_checks_sharing_a_name_report_each_value_once(self):
+    def test_checks_sharing_a_name_report_on_their_own(self):
         pair = [("lint", "FAILURE"), ("lint", "SUCCESS")]
         lines = watch_lines(
             StubClient(
                 poll(checks=pair),
                 poll(checks=pair),
-                poll(checks=[("lint", "FAILURE"), ("lint", "TIMED_OUT"), ("lint", "FAILURE")]),
-                poll(state="MERGED", checks=pair),
+                poll(checks=[("lint", "FAILURE"), ("lint", "FAILURE")]),
+                poll(checks=[("lint", "FAILURE"), ("lint", "TIMED_OUT")]),
+                poll(state="MERGED", checks=[("lint", "FAILURE"), ("lint", "TIMED_OUT")]),
             )
         )
         self.assertEqual(
@@ -214,6 +218,7 @@ class WatchTest(unittest.TestCase):
             [
                 "CHECK: lint (FAILURE) @aaaaaaa",
                 "WATCHING",
+                "CHECK: lint (FAILURE) @aaaaaaa",
                 "CHECK: lint (TIMED_OUT) @aaaaaaa",
                 "STATE: MERGED",
             ],

@@ -55,7 +55,7 @@ A re-fetch below reads the PR's state, comments, reviews, review threads, reques
   - Each line marks that the item exists, so re-fetch the PR for its content
 - `CHECK` lines and a `STATE: MERGED` or `STATE: CLOSED` line print from the first poll
   - Treat a `CHECK` line whose name and `@<sha>` match one already handled as a repeat, as after a restart
-  - Checks sharing a name are tracked together: on one head commit, a value that any of them held at the last poll listing that name prints no line, and `gh pr view --json statusCheckRollup` lists each of them
+  - Each check reports on its own, so checks sharing a name can print lines that read alike, and `gh pr view --json statusCheckRollup` lists each of them
 - A PR's watch ends on its own with the first poll that finds the PR merged or closed, printing its `STATE: MERGED` or `STATE: CLOSED` line in that poll unless the timeline has already printed it, so lines from that poll can follow it
   - A poll whose last `STATE` line is `STATE: OPEN` finds the PR reopened, and the watch goes on
 - `POLL_ERROR` prints only when a source first fails; neither its later failures, its recovery, nor its cause print a line

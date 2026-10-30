@@ -68,8 +68,8 @@ query($owner:String!,$repo:String!,$num:Int!){
             statusCheckRollup{
               contexts(first:100){
                 nodes{
-                  ... on CheckRun{ name status conclusion }
-                  ... on StatusContext{ context state }
+                  ... on CheckRun{ id name status conclusion }
+                  ... on StatusContext{ id context state }
                 }
               }
             }
@@ -305,7 +305,7 @@ def new_lines(items, seen, seeding):
 
 
 def rollup_checks(pr):
-    """Return (name, value) per check, or None for a rollup of no known shape.
+    """Return (id, name, value) per check, or None for a rollup of no known shape.
 
     A commit with no checks has a null `statusCheckRollup`.
     """
@@ -326,7 +326,7 @@ def rollup_checks(pr):
             value = dig(context, "conclusion") or dig(context, "state") or ""
         else:
             value = status
-        checks.append((name, value))
+        checks.append((dig(context, "id"), name, value))
     return checks
 
 
@@ -407,19 +407,15 @@ def watch(client, interval, parent):
         checks = rollup_checks(pr)
         report("graphql (checks)", checks is not None)
         # Every value is tracked, settled or not, so a rerun passing back
-        # through a running state is a change again on the way out. A name
-        # holds a set, since the rollup can list several checks under one
-        # name, whose values would otherwise overwrite each other and print
-        # again on every poll.
-        polled = {}
-        for name, value in checks or []:
-            values = polled.setdefault(name, set())
-            if value not in values and value not in prev_check.get(name, ()) and value not in QUIET_CHECK_VALUES:
+        # through a running state is a change again on the way out. Values
+        # are keyed by ID, since the rollup can list several checks under one
+        # name.
+        for check_id, name, value in checks or []:
+            if prev_check.get(check_id) != value and value not in QUIET_CHECK_VALUES:
                 # The head sha tells a failure reported again after a
                 # restart from a new one.
                 print(f"CHECK: {name} ({value}) @{head_sha[:7]}")
-            values.add(value)
-        prev_check.update(polled)
+            prev_check[check_id] = value
 
         # Testing the field rather than the response: GraphQL answers an
         # error with a parseable body, which would otherwise read as a
