@@ -10,7 +10,7 @@ The pr-watch plugin's monitor runs `pr-watch-monitor` for the whole session. It 
 ## Start and stop a watch
 
 - `pr-watch add <pr>` watches a PR, where `<pr>` is `<owner>/<repo>#<number>` or a bare number in `GH_REPO` when set, otherwise in the current repository
-  - Watch only PRs on `gh`'s default host, since the list keeps no host and the watch polls the default one
+  - Watch only PRs on github.com, since the list keeps no host and the watch polls github.com
   - It looks the PR up with `gh` and lists it as `<owner>/<repo>#<number>` in the letter case GitHub returns, so a number that is no PR fails
   - A failing add means the PR is not watched: report the error it printed, and claim no ongoing wait on that PR
   - An add of a PR whose watch is running keeps that watch, and prints no new `WATCHING`
@@ -39,7 +39,7 @@ A re-fetch below reads the PR's state, comments, reviews, review threads, reques
 | `REVIEW_REQUESTED: [<TYPE>] <reviewer> by <actor>` | `<actor>` requests a review from `<reviewer>`, including a re-request after that reviewer's review |
 | `REVIEW_REQUEST_REMOVED: [<TYPE>] <reviewer> by <actor>` | `<actor>` removes `<reviewer>` from the requested reviewers; a reviewer leaving the list by submitting a review prints no line |
 | `CHECK: <name> (<conclusion or state>) @<sha>` | A check on the head commit takes a value other than success, neutral, skipped, and the pending, queued, and running states; `<sha>` is the head commit's first 7 characters |
-| `POLL_ERROR: <call>` | A source fails for the first time in a run of failures; `<call>` is `gh pr view`, `gh pr view (rollup)` for a check list that is not an array, `gh api graphql (threads)`, or `gh api graphql (timeline)` |
+| `POLL_ERROR: <source>` | A source fails for the first time in a run of failures; `<source>` is `graphql (pull request)`, `graphql (checks)` for a check list of no known shape, `graphql (threads)`, or `graphql (timeline)` |
 | `WATCH_ERROR: pr-monitor exited with status <n>` | That PR's watch stopped on an error |
 
 - `[BOT]` marks an author whose GraphQL `author.__typename` is `Bot`, and `[USER]` every other author
@@ -57,8 +57,8 @@ A re-fetch below reads the PR's state, comments, reviews, review threads, reques
   - Treat a `CHECK` line whose name and `@<sha>` match one already handled as a repeat, as after a restart
 - A PR's watch ends on its own with the first poll that finds the PR merged or closed, printing its `STATE: MERGED` or `STATE: CLOSED` line in that poll unless the timeline has already printed it, so lines from that poll can follow it
   - A poll whose last `STATE` line is `STATE: OPEN` finds the PR reopened, and the watch goes on
-- `POLL_ERROR` prints only when a call first fails; neither its later failures, its recovery, nor its cause print a line
-  - Events from that call wait until it recovers; a timeline item prints even when what it changed has reverted by then, while a check or review decision that reverts, or a review-thread comment whose thread is resolved or outdated by then, prints no line, and a failing `gh pr view` holds back every event of the PR
+- `POLL_ERROR` prints only when a source first fails; neither its later failures, its recovery, nor its cause print a line
+  - Events from that source wait until it recovers; a timeline item prints even when what it changed has reverted by then, while a check or review decision that reverts, or a review-thread comment whose thread is resolved or outdated by then, prints no line, and a failing `graphql (pull request)` holds back every event of the PR
   - Re-fetch the PR to see where it stands
 
 ## What the watch does not report
@@ -69,6 +69,7 @@ Re-fetch the PR to find these, since no line reports them:
 - A comment in a review thread while the thread is resolved or outdated, such as a reply in a thread a push has made outdated
   - Once the thread is unresolved and current, its comments not yet reported print, those from before the watch began included
 - A review thread, or a comment in one, past the first 100 of its kind
+- A check past the first 100 on the head commit
 - A timeline item pushed out of the newest 100 before a poll reads it, as when more than 100 arrive during a `POLL_ERROR` outage
 
 ## When a watch stops

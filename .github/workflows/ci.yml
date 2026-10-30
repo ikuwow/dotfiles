@@ -14,7 +14,7 @@ jobs:
           git ls-files -z '*.sh' | xargs -0 shellcheck --
           find claude/hooks/ -name '*.sh' -exec shellcheck {} +
           find bin/ -type f ! -name '*.md' -exec shellcheck {} +
-          find claude-plugins/ -path '*/bin/*' -type f -exec shellcheck {} +
+          find claude-plugins/ -path '*/bin/*' -type f ! -name 'pr-monitor' -exec shellcheck {} +
           find xdg-config/git/hooks/ -type f -exec shellcheck {} +
           find gh-extensions/ -type f ! -name '*.md' ! -name 'LICENSE' -exec shellcheck {} +
           shellcheck --exclude SC2148 .bash_profile .bashrc
@@ -28,3 +28,6 @@ jobs:
             echo "Testing $f"
             python3 -m doctest "$f"
           done
+          # doctest reads a file without the .py suffix as text rather than as a module
+          cp claude-plugins/pr-watch/bin/pr-monitor "$RUNNER_TEMP/pr_monitor.py"
+          python3 -m doctest "$RUNNER_TEMP/pr_monitor.py"

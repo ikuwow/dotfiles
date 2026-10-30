@@ -1,106 +1,97 @@
-#!/usr/bin/env bash
+#!/usr/bin/env python3
+"""Watch a GitHub PR and print ONE stdout line per actionable event.
 
-# Watch a GitHub PR and emit ONE stdout line per actionable event.
-# Requires bash 4+ (associative arrays). The shebang is /usr/bin/env bash
-# so the brew-installed bash on PATH is picked up on macOS, where the
-# default /bin/bash is 3.2.
-# Run per PR by `pr-watch-monitor`, whose output a Claude Code session
-# receives as notifications; the silence between events is the entire
-# point. See the git-workflow skill
-# (claude/skills/git-workflow/SKILL.md) Phase 5 for the reaction protocol.
-#
-# Usage: pr-monitor <pr-number> [interval-seconds]
-#
-# The PR is looked up in GH_REPO (OWNER/REPO) when set, otherwise in the
-# repository of the working directory.
-#
-# The events it prints, one per stdout line, and what each guarantees are
-# the plugin's contract with its callers, documented in the plugin's
-# skills/watch/SKILL.md; a change to an event's name, format, or timing
-# changes that file too. A failing `gh pr view` skips the rest of that poll.
+Run per PR by `pr-watch-monitor`, whose output a Claude Code session
+receives as notifications; the silence between events is the entire
+point. See the git-workflow skill
+(claude/skills/git-workflow/SKILL.md) Phase 5 for the reaction protocol.
 
-set -eu
+Usage: GH_REPO=OWNER/REPO pr-monitor <pr-number> [interval-seconds]
 
-usage() {
-  echo "Usage: pr-monitor <pr-number> [interval-seconds]" >&2
+The PR is looked up on github.com, with the token `gh` holds for that host.
+
+The events it prints, one per stdout line, and what each guarantees are
+the plugin's contract with its callers, documented in the plugin's
+skills/watch/SKILL.md; a change to an event's name, format, or timing
+changes that file too. A failing pull request query skips the rest of
+that poll.
+
+Runs on Python 3.9, the version of the macOS `/usr/bin/python3`, with the
+standard library alone.
+"""
+
+import http.client
+import json
+import os
+import re
+import subprocess
+import sys
+import time
+import urllib.error
+import urllib.request
+
+ENDPOINT = "https://api.github.com/graphql"
+# The host is pinned on both sides of the request, since a token `gh` reads
+# for the host in GH_HOST would otherwise be sent to github.com.
+TOKEN_COMMAND = ["gh", "auth", "token", "--hostname", "github.com"]
+# Turns a call that hangs into a failed poll, which reports, rather than a
+# stalled loop, which stays silent.
+TIMEOUT_SECONDS = 60
+
+SOURCE_PR = "graphql (pull request)"
+SOURCE_CHECKS = "graphql (checks)"
+SOURCE_THREADS = "graphql (threads)"
+SOURCE_TIMELINE = "graphql (timeline)"
+
+# The values that never warrant waking anybody are the only ones spelled
+# here, so a value added later reports rather than vanishes.
+QUIET_CHECK_VALUES = {
+    "SUCCESS",
+    "NEUTRAL",
+    "SKIPPED",
+    "PENDING",
+    "EXPECTED",
+    "QUEUED",
+    "WAITING",
+    "REQUESTED",
+    "IN_PROGRESS",
 }
 
-if [ $# -lt 1 ] || [ $# -gt 2 ]; then
-  usage
-  exit 1
-fi
-
-pr="$1"
-interval="${2:-60}"
-
-# Reject anything that isn't a positive integer. Without this, flags like
-# `--help` fall through to `gh pr view --help`, whose non-JSON output makes
-# the poll loop `continue` forever instead of erroring out.
-if ! [[ "$pr" =~ ^[1-9][0-9]*$ ]]; then
-  echo "pr-monitor: <pr-number> must be a positive integer, got: $pr" >&2
-  usage
-  exit 2
-fi
-if ! [[ "$interval" =~ ^[1-9][0-9]*$ ]]; then
-  echo "pr-monitor: [interval-seconds] must be a positive integer, got: $interval" >&2
-  usage
-  exit 2
-fi
-
-# `gh pr view` honors GH_REPO but `gh repo view` does not, so GH_REPO is
-# read here to keep both calls on the same repository.
-owner_repo="${GH_REPO:-$(gh repo view --json nameWithOwner --jq .nameWithOwner)}"
-owner="${owner_repo%/*}"
-repo="${owner_repo#*/}"
-
-prev_decision=""
-prev_ci_sha=""
-declare -A prev_check=()
-declare -A poll_failed=()
-seen_comments="$(mktemp)"
-seen_timeline="$(mktemp)"
-trap 'rm -f "$seen_comments" "$seen_timeline"' EXIT
-
-# First-poll seeding: do not emit events for state that already held when
-# this process started. Only transitions during its lifetime should wake
-# the operator. `first_poll` flips after the first successful `gh pr view`,
-# and each GraphQL source seeds on its own first success, so a source that
-# failed at first does not report everything it held once it recovers.
-# `CHECK` and a terminal `STATE` are the exceptions — a check already red
-# is the reader's problem now, and a PR already merged or closed ends this
-# process at the end of the first poll, so both report rather than seed.
-first_poll=1
-seed_threads=1
-seed_timeline=1
-announced=0
-# 1 while the last `STATE` line printed is `MERGED` or `CLOSED`, so the
-# end of a PR prints from `gh pr view` only when the timeline has not
-# printed it, as when seeding swallowed it or the timeline poll fails.
-state_reported=0
-
-# One line per outage, not per poll: an unauthorized token or an outage
-# persists for many intervals, and a line each time would drown the
-# silence the rest of the script maintains.
-poll_error() {
-  if [ -z "${poll_failed[$1]:-}" ]; then
-    echo "POLL_ERROR: $1"
-    poll_failed[$1]=1
-  fi
+# Checks and `reviewDecision` are state derived from the head commit and the
+# branch's protection, with no item marking their changes, so they come from
+# this query rather than the timeline. The rollup covers every check on the
+# head commit, Actions or not.
+PR_QUERY = """
+query($owner:String!,$repo:String!,$num:Int!){
+  repository(owner:$owner,name:$repo){
+    pullRequest(number:$num){
+      state
+      reviewDecision
+      headRefOid
+      commits(last:1){
+        nodes{
+          commit{
+            statusCheckRollup{
+              contexts(first:100){
+                nodes{
+                  ... on CheckRun{ name status conclusion }
+                  ... on StatusContext{ context state }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 }
+"""
 
-poll_ok() {
-  unset "poll_failed[$1]"
-}
-
-# `__typename` on each author is the authoritative Bot/User signal. It
-# flows into the event line as a `[BOT]` or `[USER]` prefix on the author
-# label so a reaction turn can classify without re-fetching. For
-# review-thread comments this is a per-comment hint only — pr-reaction.md's
-# targeting policy still requires walking every comment in the thread
-# before mutating it.
-
-# shellcheck disable=SC2016 # GraphQL query: $vars are query variables
-threads_query='query($owner:String!,$repo:String!,$num:Int!){
+# A reply in an existing review thread adds no timeline item, so
+# review-thread comments come from this query, which also carries the
+# resolved and outdated state they are filtered on.
+THREADS_QUERY = """
+query($owner:String!,$repo:String!,$num:Int!){
   repository(owner:$owner,name:$repo){
     pullRequest(number:$num){
       reviewThreads(first:100){
@@ -112,7 +103,8 @@ threads_query='query($owner:String!,$repo:String!,$num:Int!){
       }
     }
   }
-}'
+}
+"""
 
 # The PR's timeline is the source of the events in `itemTypes`, each of
 # which GitHub records as an item on the conversation: comments, reviews,
@@ -122,19 +114,12 @@ threads_query='query($owner:String!,$repo:String!,$num:Int!){
 # `itemTypes`, since a burst of them would push the other items out of
 # that window.
 #
-# Three kinds of event stay outside the timeline. A reply in an existing review
-# thread adds no timeline item, so review-thread comments come from
-# `threads_query`, which also carries the resolved and outdated state
-# they are filtered on. Checks and `reviewDecision` are state derived
-# from the head commit and the branch's protection, with no item marking
-# their changes, so they come from `gh pr view`.
-#
 # A review request is reported from its event rather than diffed from
 # `reviewRequests`: a reviewer who submits a review drops out of
 # `reviewRequests` without a ReviewRequestRemovedEvent, so only the
 # events tell a removal from a fulfilled request.
-# shellcheck disable=SC2016 # GraphQL query: $vars are query variables
-timeline_query='query($owner:String!,$repo:String!,$num:Int!){
+TIMELINE_QUERY = """
+query($owner:String!,$repo:String!,$num:Int!){
   repository(owner:$owner,name:$repo){
     pullRequest(number:$num){
       timelineItems(last:100,itemTypes:[ISSUE_COMMENT,PULL_REQUEST_REVIEW,REVIEW_REQUESTED_EVENT,REVIEW_REQUEST_REMOVED_EVENT,READY_FOR_REVIEW_EVENT,CONVERT_TO_DRAFT_EVENT,REVIEW_DISMISSED_EVENT,MERGED_EVENT,CLOSED_EVENT,REOPENED_EVENT]){
@@ -157,194 +142,443 @@ fragment reviewer on RequestedReviewer{
   ... on Mannequin{login}
   ... on Team{combinedSlug}
   ... on EnterpriseTeam{combinedSlug}
-}'
+}
+"""
 
-# Emit one line per not-yet-seen item ID, in the order of `fresh`. `fresh`
-# is tab-separated "id<TAB>subject[<TAB>extra]" lines; the optional extra
-# field (e.g. "path:line") is appended to the subject when present, and an
-# empty `label` leaves the line without a "label: " prefix, for items that
-# carry their own event name in the subject. Seen IDs persist in seen_file
-# across polls so each item fires exactly once. With `seeding` at 1 the
-# IDs are recorded and nothing is emitted.
-emit_new() {
-  local fresh="$1" seen_file="$2" label="$3" seeding="$4"
-  [ -z "$fresh" ] && return 0
-  local sorted_fresh sorted_seen new
-  sorted_fresh="$(echo "$fresh" | cut -f1 | sort -u)"
-  sorted_seen="$(sort -u "$seen_file")"
-  new="$(comm -23 <(echo "$sorted_fresh") <(echo "$sorted_seen") || true)"
-  [ -z "$new" ] && return 0
-  if [ "$seeding" -eq 0 ]; then
-    # Two inputs to awk: `$fresh` on stdin supplies the records to scan;
-    # `$new` (the IDs to emit) goes via the environment, not `awk -v`,
-    # because BWK awk (the macOS default) rejects a literal newline in a
-    # -v assignment ("awk: newline in string").
-    echo "$fresh" | ids_nl="$new" awk -F'\t' -v label="$label" '
-      BEGIN { n = split(ENVIRON["ids_nl"], a, "\n"); for (i = 1; i <= n; i++) seen[a[i]] = 1 }
-      ($1 in seen) { print (label != "" ? label ": " : "") $2 ($3 != "" ? " " $3 : "") }
-    '
-  fi
-  echo "$sorted_fresh" >> "$seen_file"
+TIMELINE_EVENT_LINES = {
+    "ReadyForReviewEvent": "READY_FOR_REVIEW",
+    "ConvertToDraftEvent": "CONVERT_TO_DRAFT",
+    "ReviewDismissedEvent": "REVIEW_DISMISSED",
+    "MergedEvent": "STATE: MERGED",
+    "ClosedEvent": "STATE: CLOSED",
+    "ReopenedEvent": "STATE: OPEN",
 }
 
-while true; do
-  # Under `pr-watch-monitor`, a watcher killed without running its trap
-  # would otherwise leave this loop polling GitHub until the PR closes.
-  # Checked before the poll so a failing poll does not skip it.
-  if [ -n "${PR_WATCH_PARENT:-}" ] && ! kill -0 "$PR_WATCH_PARENT" 2>/dev/null; then
-    exit 0
-  fi
 
-  # `timeout` turns a call that hangs into a failed poll, which reports,
-  # rather than a stalled loop, which stays silent.
-  pr_json="$(timeout 60 gh pr view "$pr" --json state,reviewDecision,statusCheckRollup,headRefOid 2>/dev/null || true)"
-  # Requiring `.state` rather than mere parseability: `{}` parses, and an
-  # empty `state` reads as an open PR while an empty `headRefOid` resets
-  # `prev_check` twice over, replaying every failing check.
-  if ! echo "$pr_json" | jq -e '.state? // empty' >/dev/null 2>&1; then
-    poll_error "gh pr view"
-    sleep "$interval"
-    continue
-  fi
-  poll_ok "gh pr view"
-  state="$(echo "$pr_json" | jq -r '.state // ""')"
-  decision="$(echo "$pr_json" | jq -r '.reviewDecision // ""')"
-  head_sha="$(echo "$pr_json" | jq -r '.headRefOid // ""')"
+class NoRedirect(urllib.request.HTTPRedirectHandler):
+    """Fail on a redirect, since urllib carries `Authorization` to its target."""
 
-  # `prev_decision` tracks the empty value too: a dismissal clears
-  # `reviewDecision`, and holding the stale one here would then swallow
-  # the re-approval that follows.
-  if [ "$decision" != "$prev_decision" ]; then
-    if [ "$first_poll" -eq 0 ] && [ -n "$decision" ]; then
-      echo "REVIEW: $decision"
-    fi
-    prev_decision="$decision"
-  fi
+    def redirect_request(self, *args, **kwargs):
+        return None
 
-  # A new head retires the old commit's checks, and a check that lands on
-  # the same value it held there would otherwise compare equal and stay
-  # silent.
-  if [ "$head_sha" != "$prev_ci_sha" ]; then
-    prev_check=()
-    prev_ci_sha="$head_sha"
-  fi
-  # The rollup rides along on the poll above and covers every check on the
-  # head commit, Actions or not. Every value it holds is tracked, settled
-  # or not, so a rerun passing back through a running state is a change
-  # again on the way out; the ones that never warrant waking anybody are
-  # the only names spelled here, so a value added later reports rather
-  # than vanishes.
-  if ! echo "$pr_json" | jq -e '.statusCheckRollup | type == "array"' >/dev/null 2>&1; then
-    poll_error "gh pr view (rollup)"
-  else
-    poll_ok "gh pr view (rollup)"
-  fi
-  while IFS=$'\t' read -r check_name check_state; do
-    [ -z "$check_name" ] && continue
-    # `unseen` rather than an empty default: a check reporting COMPLETED
-    # with no conclusion holds the empty string, which would otherwise
-    # match a check never seen before and never report.
-    if [ "$check_state" != "${prev_check[$check_name]-unseen}" ]; then
-      case "$check_state" in
-        SUCCESS|NEUTRAL|SKIPPED|PENDING|EXPECTED|QUEUED|WAITING|REQUESTED|IN_PROGRESS) ;;
-        # The head sha tells a failure reported again after a restart
-        # from a new one.
-        *) echo "CHECK: $check_name ($check_state) @${head_sha:0:7}" ;;
-      esac
-      prev_check[$check_name]="$check_state"
-    fi
-  done < <(echo "$pr_json" | jq -r '
-    .statusCheckRollup[]?
-    | (.name // .context // "?") as $n
-    | (if (.status // "COMPLETED") == "COMPLETED"
-       then (.conclusion // .state // "") else .status end) as $c
-    | "\($n)\t\($c)"' || true)
 
-  threads_json="$(timeout 60 gh api graphql -f owner="$owner" -f repo="$repo" -F num="$pr" -f query="$threads_query" 2>/dev/null || true)"
-  # Testing the field rather than the string: GraphQL answers an error
-  # with a parseable body on stdout, which a non-empty test would read as
-  # a healthy poll and, worse, clear a running outage's suppression.
-  if ! echo "$threads_json" | jq -e '.data.repository.pullRequest.reviewThreads' >/dev/null 2>&1; then
-    poll_error "gh api graphql (threads)"
-  else
-    poll_ok "gh api graphql (threads)"
-    fresh_comments="$(echo "$threads_json" | jq -r '
-      .data.repository.pullRequest.reviewThreads.nodes[]
-      | select(.isResolved == false and .isOutdated == false)
-      | .comments.nodes[]
-      | "\(.id)\t\(if .author.__typename == "Bot" then "[BOT]" else "[USER]" end) \(.author.login)\t\(.path // "?"):\(.line // "?")"' \
-      2>/dev/null || true)"
-    emit_new "$fresh_comments" "$seen_comments" "NEW_COMMENT" "$seed_threads"
-    seed_threads=0
-  fi
+OPENER = urllib.request.build_opener(NoRedirect)
 
-  timeline_json="$(timeout 60 gh api graphql -f owner="$owner" -f repo="$repo" -F num="$pr" -f query="$timeline_query" 2>/dev/null || true)"
-  if ! echo "$timeline_json" | jq -e '.data.repository.pullRequest.timelineItems' >/dev/null 2>&1; then
-    poll_error "gh api graphql (timeline)"
-  else
-    poll_ok "gh api graphql (timeline)"
-    # Every item kind goes through one pass in timeline order, so a
-    # reviewer removed and requested again within one interval reads as
-    # requested. Pending reviews are left out because a review keeps its
-    # ID when submitted, so recording it while pending would mark it seen
-    # before it could print. Empty-body reviews are left out too: an empty
-    # approval or change request moves `REVIEW:`, and an empty comment
-    # review carries only thread comments, which `NEW_COMMENT` reports.
-    # A request's reviewer carries its own
-    # `__typename` as the bracketed prefix, since a request can name a
-    # team as well as a user or bot. An item kind without a line of its
-    # own prints its `__typename`, so it reports rather than vanishes.
-    fresh_timeline="$(echo "$timeline_json" | jq -r '
-      def who: "\(if .__typename == "Bot" then "[BOT]" else "[USER]" end) \(.login // "?")";
-      def reviewer: "[\((.__typename // "?") | ascii_upcase)] \(.login // .combinedSlug // "?")";
-      .data.repository.pullRequest.timelineItems.nodes[]
-      | select(.__typename != "PullRequestReview" or (.state != "PENDING" and (.body // "") != ""))
-      | "\(.id)\t" + (
-          if .__typename == "IssueComment" then "NEW_TOP_COMMENT: \(.author | who)"
-          elif .__typename == "PullRequestReview" then "NEW_REVIEW: \(.author | who) \(.state)"
-          elif .__typename == "ReviewRequestedEvent" then "REVIEW_REQUESTED: \(.requestedReviewer | reviewer) by \(.actor.login // "?")"
-          elif .__typename == "ReviewRequestRemovedEvent" then "REVIEW_REQUEST_REMOVED: \(.requestedReviewer | reviewer) by \(.actor.login // "?")"
-          elif .__typename == "ReadyForReviewEvent" then "READY_FOR_REVIEW"
-          elif .__typename == "ConvertToDraftEvent" then "CONVERT_TO_DRAFT"
-          elif .__typename == "ReviewDismissedEvent" then "REVIEW_DISMISSED"
-          elif .__typename == "MergedEvent" then "STATE: MERGED"
-          elif .__typename == "ClosedEvent" then "STATE: CLOSED"
-          elif .__typename == "ReopenedEvent" then "STATE: OPEN"
-          else .__typename end)' \
-      2>/dev/null || true)"
-    emitted="$(emit_new "$fresh_timeline" "$seen_timeline" "" "$seed_timeline")"
-    if [ -n "$emitted" ]; then
-      echo "$emitted"
-    fi
-    # The timeline is read after `gh pr view`, so its last `STATE` line is
-    # the newer reading and replaces `state`.
-    last_state_line="$(echo "$emitted" | grep '^STATE: ' | tail -n 1)"
-    if [ -n "$last_state_line" ]; then
-      state="${last_state_line#STATE: }"
-      if [ "$state" = OPEN ]; then
-        state_reported=0
-      else
-        state_reported=1
-      fi
-    fi
-    seed_timeline=0
-  fi
 
-  # `gh pr view` decides the end, and prints it when the timeline has not.
-  case "$state" in
-    MERGED|CLOSED)
-      if [ "$state_reported" -eq 0 ]; then
-        echo "STATE: $state"
-      fi
-      exit 0
-      ;;
-  esac
+def read_token():
+    try:
+        result = subprocess.run(
+            TOKEN_COMMAND,
+            capture_output=True,
+            text=True,
+            timeout=TIMEOUT_SECONDS,
+            check=True,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return None
+    return result.stdout.strip() or None
 
-  if [ "$announced" -eq 0 ] && [ "$seed_threads" -eq 0 ] && [ "$seed_timeline" -eq 0 ]; then
-    echo "WATCHING"
-    announced=1
-  fi
 
-  first_poll=0
-  sleep "$interval"
-done
+class Client:
+    def __init__(self, owner, repo, number):
+        self.variables = {"owner": owner, "repo": repo, "num": number}
+        self.token = None
+
+    def query(self, query):
+        """Return the parsed response, or None when the request fails.
+
+        A 401 takes the token again from `gh` and retries once, which covers
+        a token that expired or was replaced since it was read.
+        """
+        payload = json.dumps({"query": query, "variables": self.variables}).encode()
+        for _ in range(2):
+            if self.token is None:
+                self.token = read_token()
+            if self.token is None:
+                return None
+            request = urllib.request.Request(
+                ENDPOINT,
+                data=payload,
+                headers={
+                    "Authorization": "bearer " + self.token,
+                    "Content-Type": "application/json",
+                    "User-Agent": "pr-watch",
+                },
+            )
+            try:
+                with OPENER.open(request, timeout=TIMEOUT_SECONDS) as response:
+                    return json.load(response)
+            except urllib.error.HTTPError as error:
+                if error.code != 401:
+                    return None
+                self.token = None
+            except (OSError, http.client.HTTPException, ValueError):
+                return None
+        return None
+
+
+def dig(value, *keys):
+    """Follow keys through nested dicts, giving None where any is missing.
+
+    >>> dig({"a": {"b": 1}}, "a", "b")
+    1
+    >>> dig({"a": None}, "a", "b") is None
+    True
+    >>> dig(None, "a") is None
+    True
+    """
+    for key in keys:
+        if not isinstance(value, dict):
+            return None
+        value = value.get(key)
+    return value
+
+
+def nodes_of(connection):
+    return [node for node in dig(connection, "nodes") or [] if isinstance(node, dict)]
+
+
+def who(account):
+    """Label an author for a reaction turn to classify without re-fetching.
+
+    `__typename` is the authoritative Bot/User signal. For review-thread
+    comments this is a per-comment hint only: pr-reaction.md's targeting
+    policy still requires walking every comment in the thread before
+    mutating it.
+
+    >>> who({"__typename": "Bot", "login": "devin"})
+    '[BOT] devin'
+    >>> who({"__typename": "User", "login": "ikuwow"})
+    '[USER] ikuwow'
+    >>> who(None)
+    '[USER] ?'
+    """
+    kind = "[BOT]" if dig(account, "__typename") == "Bot" else "[USER]"
+    return f"{kind} {dig(account, 'login') or '?'}"
+
+
+def reviewer_label(reviewer):
+    """Label a requested reviewer, which can be a team as well as a user or bot.
+
+    >>> reviewer_label({"__typename": "Team", "combinedSlug": "org/team"})
+    '[TEAM] org/team'
+    >>> reviewer_label({"__typename": "User", "login": "ikuwow"})
+    '[USER] ikuwow'
+    >>> reviewer_label(None)
+    '[?] ?'
+    """
+    kind = (dig(reviewer, "__typename") or "?").upper()
+    name = dig(reviewer, "login") or dig(reviewer, "combinedSlug") or "?"
+    return f"[{kind}] {name}"
+
+
+def timeline_line(item):
+    """Return the event line of a timeline item, or None for one left out.
+
+    Pending reviews are left out because a review keeps its ID when
+    submitted, so recording it while pending would mark it seen before it
+    could print. Empty-body reviews are left out too: an empty approval or
+    change request moves `REVIEW:`, and an empty comment review carries only
+    thread comments, which `NEW_COMMENT` reports. An item kind without a
+    line of its own prints its `__typename`, so it reports rather than
+    vanishes.
+
+    >>> bot = {"__typename": "Bot", "login": "devin"}
+    >>> timeline_line({"__typename": "IssueComment", "author": bot})
+    'NEW_TOP_COMMENT: [BOT] devin'
+    >>> review = {"__typename": "PullRequestReview", "author": bot}
+    >>> timeline_line({**review, "state": "COMMENTED", "body": "Looks off"})
+    'NEW_REVIEW: [BOT] devin COMMENTED'
+    >>> timeline_line({**review, "state": "PENDING", "body": "Draft"}) is None
+    True
+    >>> timeline_line({**review, "state": "APPROVED", "body": ""}) is None
+    True
+    >>> team = {"__typename": "Team", "combinedSlug": "org/team"}
+    >>> actor = {"login": "ikuwow"}
+    >>> timeline_line({"__typename": "ReviewRequestedEvent", "requestedReviewer": team, "actor": actor})
+    'REVIEW_REQUESTED: [TEAM] org/team by ikuwow'
+    >>> timeline_line({"__typename": "ReviewRequestRemovedEvent", "requestedReviewer": team, "actor": None})
+    'REVIEW_REQUEST_REMOVED: [TEAM] org/team by ?'
+    >>> timeline_line({"__typename": "MergedEvent"})
+    'STATE: MERGED'
+    >>> timeline_line({"__typename": "SomeNewEvent"})
+    'SomeNewEvent'
+    """
+    kind = item.get("__typename")
+    if kind == "IssueComment":
+        return f"NEW_TOP_COMMENT: {who(item.get('author'))}"
+    if kind == "PullRequestReview":
+        if item.get("state") == "PENDING" or not item.get("body"):
+            return None
+        return f"NEW_REVIEW: {who(item.get('author'))} {item.get('state')}"
+    if kind in ("ReviewRequestedEvent", "ReviewRequestRemovedEvent"):
+        event = "REVIEW_REQUESTED" if kind == "ReviewRequestedEvent" else "REVIEW_REQUEST_REMOVED"
+        reviewer = reviewer_label(item.get("requestedReviewer"))
+        return f"{event}: {reviewer} by {dig(item, 'actor', 'login') or '?'}"
+    return TIMELINE_EVENT_LINES.get(kind, kind)
+
+
+def timeline_items(timeline):
+    """Return (id, line) per reported item, in timeline order.
+
+    One pass in timeline order means a reviewer removed and requested again
+    within one interval reads as requested.
+    """
+    items = ((node.get("id"), timeline_line(node)) for node in nodes_of(timeline))
+    return [(item_id, line) for item_id, line in items if line is not None]
+
+
+def thread_comment_items(threads):
+    """Return (id, line) per comment in the unresolved, current threads.
+
+    >>> comment = {"id": "C1", "author": {"__typename": "Bot", "login": "devin"}, "path": "a.py", "line": 3}
+    >>> current = {"isResolved": False, "isOutdated": False, "comments": {"nodes": [comment]}}
+    >>> thread_comment_items({"nodes": [current]})
+    [('C1', 'NEW_COMMENT: [BOT] devin a.py:3')]
+    >>> thread_comment_items({"nodes": [{**current, "isResolved": True}, {**current, "isOutdated": True}]})
+    []
+    >>> file_level = {"id": "C2", "author": None, "path": "a.py", "line": None}
+    >>> thread_comment_items({"nodes": [{**current, "comments": {"nodes": [file_level]}}]})
+    [('C2', 'NEW_COMMENT: [USER] ? a.py:?')]
+    """
+    return [
+        (
+            comment.get("id"),
+            f"NEW_COMMENT: {who(comment.get('author'))} "
+            f"{comment.get('path') or '?'}:{comment.get('line') or '?'}",
+        )
+        for thread in nodes_of(threads)
+        if thread.get("isResolved") is False and thread.get("isOutdated") is False
+        for comment in nodes_of(thread.get("comments"))
+    ]
+
+
+def new_lines(items, seen, seeding):
+    """Record the items' IDs in `seen`, and return the lines of those not seen.
+
+    With `seeding` the IDs are recorded and no line returns, so state that
+    held before the source's first success stays silent.
+
+    >>> seen = set()
+    >>> new_lines([("a", "A")], seen, True)
+    []
+    >>> new_lines([("a", "A"), ("b", "B")], seen, False)
+    ['B']
+    >>> new_lines([("a", "A"), ("b", "B")], seen, False)
+    []
+    """
+    lines = [line for item_id, line in items if item_id not in seen]
+    seen.update(item_id for item_id, _ in items)
+    return [] if seeding else lines
+
+
+def rollup_checks(pr):
+    """Return (name, value) per check, or None for a rollup of no known shape.
+
+    A commit with no checks has a null `statusCheckRollup`.
+
+    >>> run = {"name": "lint", "status": "COMPLETED", "conclusion": "FAILURE"}
+    >>> status = {"context": "ci/x", "state": "ERROR"}
+    >>> rolling = {"name": "test", "status": "IN_PROGRESS", "conclusion": None}
+    >>> contexts = {"contexts": {"nodes": [run, status, rolling]}}
+    >>> rollup_checks({"commits": {"nodes": [{"commit": {"statusCheckRollup": contexts}}]}})
+    [('lint', 'FAILURE'), ('ci/x', 'ERROR'), ('test', 'IN_PROGRESS')]
+    >>> rollup_checks({"commits": {"nodes": [{"commit": {"statusCheckRollup": None}}]}})
+    []
+    >>> rollup_checks({"commits": {"nodes": []}})
+    []
+    >>> rollup_checks({}) is None
+    True
+    """
+    commits = dig(pr, "commits", "nodes")
+    if not isinstance(commits, list):
+        return None
+    rollup = dig(commits[-1], "commit", "statusCheckRollup") if commits else None
+    if rollup is None:
+        return []
+    contexts = dig(rollup, "contexts", "nodes")
+    if not isinstance(contexts, list):
+        return None
+    checks = []
+    for context in contexts:
+        name = dig(context, "name") or dig(context, "context") or "?"
+        status = dig(context, "status") or "COMPLETED"
+        if status == "COMPLETED":
+            value = dig(context, "conclusion") or dig(context, "state") or ""
+        else:
+            value = status
+        checks.append((name, value))
+    return checks
+
+
+def parent_is_gone(pid):
+    try:
+        os.kill(pid, 0)
+    except OSError:
+        return True
+    return False
+
+
+def watch(client, interval, parent):
+    """Poll until the PR ends or the parent process is gone.
+
+    First-poll seeding: do not print events for state that already held when
+    this process started. Only transitions during its lifetime should wake
+    the operator. `first_poll` flips after the first successful pull request
+    query, and the threads and timeline sources seed on their own first
+    success, so a source that failed at first does not report everything it
+    held once it recovers. `CHECK` and a terminal `STATE` are the exceptions:
+    a check already red is the reader's problem now, and a PR already merged
+    or closed ends this process at the end of the first poll, so both report
+    rather than seed.
+    """
+    prev_decision = ""
+    prev_sha = ""
+    prev_check = {}
+    failed = set()
+    seen_comments = set()
+    seen_timeline = set()
+    first_poll = True
+    seed_threads = True
+    seed_timeline = True
+    announced = False
+    # True while the last `STATE` line printed is `MERGED` or `CLOSED`, so
+    # the end of a PR prints from the pull request query only when the
+    # timeline has not printed it, as when seeding swallowed it or the
+    # timeline poll fails.
+    state_reported = False
+
+    def report(source, ok):
+        # One line per outage, not per poll: an unauthorized token or an
+        # outage persists for many intervals, and a line each time would
+        # drown the silence the rest of the script maintains.
+        if ok:
+            failed.discard(source)
+        elif source not in failed:
+            print(f"POLL_ERROR: {source}")
+            failed.add(source)
+
+    while True:
+        # A watcher killed without running its trap would otherwise leave
+        # this loop polling GitHub until the PR closes. Checked before the
+        # poll so a failing poll does not skip it.
+        if parent is not None and parent_is_gone(parent):
+            return
+
+        body = client.query(PR_QUERY)
+        pr = dig(body, "data", "repository", "pullRequest")
+        # Field errors leave a parseable body with nulls in it, where a null
+        # rollup would read as a commit with no checks. Requiring `state`
+        # rules out a response without the PR, whose empty `state` would read
+        # as an open PR while its empty `headRefOid` reset `prev_check`.
+        pr_ok = not dig(body, "errors") and bool(dig(pr, "state"))
+        report(SOURCE_PR, pr_ok)
+        if not pr_ok:
+            time.sleep(interval)
+            continue
+        state = pr["state"]
+        decision = pr.get("reviewDecision") or ""
+        head_sha = pr.get("headRefOid") or ""
+
+        # `prev_decision` tracks the empty value too: a dismissal clears
+        # `reviewDecision`, and holding the stale one here would then swallow
+        # the re-approval that follows.
+        if decision != prev_decision:
+            if not first_poll and decision:
+                print(f"REVIEW: {decision}")
+            prev_decision = decision
+
+        # A new head retires the old commit's checks, and a check that lands
+        # on the same value it held there would otherwise compare equal and
+        # stay silent.
+        if head_sha != prev_sha:
+            prev_check = {}
+            prev_sha = head_sha
+        checks = rollup_checks(pr)
+        report(SOURCE_CHECKS, checks is not None)
+        # Every value is tracked, settled or not, so a rerun passing back
+        # through a running state is a change again on the way out.
+        for name, value in checks or []:
+            if name not in prev_check or prev_check[name] != value:
+                if value not in QUIET_CHECK_VALUES:
+                    # The head sha tells a failure reported again after a
+                    # restart from a new one.
+                    print(f"CHECK: {name} ({value}) @{head_sha[:7]}")
+                prev_check[name] = value
+
+        # Testing the field rather than the response: GraphQL answers an
+        # error with a parseable body, which would otherwise read as a
+        # healthy poll and clear a running outage's suppression.
+        threads = dig(client.query(THREADS_QUERY), "data", "repository", "pullRequest", "reviewThreads")
+        report(SOURCE_THREADS, threads is not None)
+        if threads is not None:
+            for line in new_lines(thread_comment_items(threads), seen_comments, seed_threads):
+                print(line)
+            seed_threads = False
+
+        timeline = dig(client.query(TIMELINE_QUERY), "data", "repository", "pullRequest", "timelineItems")
+        report(SOURCE_TIMELINE, timeline is not None)
+        if timeline is not None:
+            lines = new_lines(timeline_items(timeline), seen_timeline, seed_timeline)
+            for line in lines:
+                print(line)
+            # The timeline is read after the pull request query, so its last
+            # `STATE` line is the newer reading and replaces `state`.
+            state_lines = [line for line in lines if line.startswith("STATE: ")]
+            if state_lines:
+                state = state_lines[-1][len("STATE: "):]
+                state_reported = state != "OPEN"
+            seed_timeline = False
+
+        # The pull request query decides the end, and prints it when the
+        # timeline has not.
+        if state in ("MERGED", "CLOSED"):
+            if not state_reported:
+                print(f"STATE: {state}")
+            return
+
+        if not announced and not seed_threads and not seed_timeline:
+            print("WATCHING")
+            announced = True
+
+        first_poll = False
+        time.sleep(interval)
+
+
+def usage():
+    print("Usage: GH_REPO=OWNER/REPO pr-monitor <pr-number> [interval-seconds]", file=sys.stderr)
+
+
+def main(argv):
+    if not 2 <= len(argv) <= 3:
+        usage()
+        return 1
+    number = argv[1]
+    interval = argv[2] if len(argv) == 3 else "60"
+    # Reject anything that isn't a positive integer, so a flag such as
+    # `--help` errors out rather than polling for a PR that cannot exist.
+    if not re.fullmatch(r"[1-9][0-9]*", number):
+        print(f"pr-monitor: <pr-number> must be a positive integer, got: {number}", file=sys.stderr)
+        usage()
+        return 2
+    if not re.fullmatch(r"[1-9][0-9]*", interval):
+        print(f"pr-monitor: [interval-seconds] must be a positive integer, got: {interval}", file=sys.stderr)
+        usage()
+        return 2
+    owner_repo = os.environ.get("GH_REPO", "")
+    if not re.fullmatch(r"[^/\s]+/[^/\s]+", owner_repo):
+        print(f"pr-monitor: GH_REPO must be OWNER/REPO, got: {owner_repo}", file=sys.stderr)
+        usage()
+        return 2
+    owner, repo = owner_repo.split("/")
+    parent = os.environ.get("PR_WATCH_PARENT")
+
+    # Each line reaches the session through a pipe, which would otherwise
+    # hold it back in a block buffer until the buffer fills.
+    sys.stdout.reconfigure(line_buffering=True)
+    watch(Client(owner, repo, int(number)), int(interval), int(parent) if parent else None)
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))
