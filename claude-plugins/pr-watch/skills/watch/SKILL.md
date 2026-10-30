@@ -1,6 +1,6 @@
 ---
 name: watch
-description: Watch a GitHub pull request for new comments, reviews, failing checks, a ready-for-review flip, and merge or close, with each change delivered to this Claude Code session as a notification for as long as the session runs, idle or not. Use whenever a workflow says to watch, monitor, or wait on a PR's review activity or state, to stop watching a PR, or when a notification line starting with `<owner>/<repo>#<number>` or `WATCH_ERROR` arrives.
+description: Watch a GitHub pull request for new comments, reviews, review requests added or removed, failing checks, a ready-for-review flip, and merge or close, with each change delivered to this Claude Code session as a notification for as long as the session runs, idle or not. Use whenever a workflow says to watch, monitor, or wait on a PR's review activity or state, to stop watching a PR, or when a notification line starting with `<owner>/<repo>#<number>` or `WATCH_ERROR` arrives.
 ---
 
 # Watch a PR
@@ -23,7 +23,7 @@ Run `add` and `remove` one at a time rather than in parallel tool calls, since a
 
 Every line for a PR starts with `<owner>/<repo>#<number> `. An event line follows it with `<EVENT>` or `<EVENT>: <details>`, where the details are GitHub's own field values, passed through without classification. Any other line with the prefix is `pr-monitor`'s error output.
 
-A re-fetch below reads the PR's state, comments, reviews, review threads, and checks again with `gh`, through the commands the calling workflow names when it names them.
+A re-fetch below reads the PR's state, comments, reviews, review threads, requested reviewers, and checks again with `gh`, through the commands the calling workflow names when it names them.
 
 | Event | Printed when |
 | --- | --- |
@@ -34,20 +34,26 @@ A re-fetch below reads the PR's state, comments, reviews, review threads, and ch
 | `NEW_COMMENT: [BOT\|USER] <author> <path>:<line>` | A comment arrives in an unresolved, current review thread; `<path>` or `<line>` is `?` where GitHub gives none, as for a file-level comment |
 | `NEW_TOP_COMMENT: [BOT\|USER] <author>` | A comment arrives on the PR's conversation |
 | `NEW_REVIEW: [BOT\|USER] <author> <state>` | A review with a non-empty body is submitted |
+| `REVIEW_REQUESTED: [<TYPE>] <reviewer> by <actor>` | `<actor>` requests a review from `<reviewer>`, including a re-request after that reviewer's review |
+| `REVIEW_REQUEST_REMOVED: [<TYPE>] <reviewer> by <actor>` | `<actor>` removes `<reviewer>` from the requested reviewers; a reviewer leaving the list by submitting a review prints no line |
 | `CHECK: <name> (<conclusion or state>) @<sha>` | A check on the head commit takes a value other than success, neutral, skipped, and the pending, queued, and running states; `<sha>` is the head commit's first 7 characters |
 | `POLL_ERROR: <call>` | A source fails for the first time in a run of failures; `<call>` is `gh pr view`, `gh pr view (rollup)` for a check list that is not an array, `gh api graphql (threads)`, or `gh api graphql (reviews)` |
 | `WATCH_ERROR: pr-monitor exited with status <n>` | That PR's watch stopped on an error |
 
 - `[BOT]` marks an author whose GraphQL `author.__typename` is `Bot`, and `[USER]` every other author
   - Comment and review events carry every author, the account `gh` authenticates as included, so check on the re-fetch whether a comment or review is a post this session made before acting on it
+- `[<TYPE>]` on a review-request line is the reviewer's GraphQL `__typename` in upper case, such as `[USER]`, `[TEAM]`, `[BOT]`, or `[MANNEQUIN]`, and a team's `<reviewer>` is `<org>/<team>`
+  - `[<TYPE>]`, `<reviewer>`, or `<actor>` is `?` where GitHub gives none, as for a deleted account
+  - Review-request lines print in timeline order, so the last line for a reviewer is where that reviewer stands; the re-fetch's requested reviewers are the current list
+  - A team whose code review auto assignment removes the team's request can print the team's `REVIEW_REQUESTED` and `REVIEW_REQUEST_REMOVED` with a `REVIEW_REQUESTED` for each member assigned
 - On `WATCHING`, re-fetch the PR
-  - Before it, each source took what its first successful poll found as already seen, so comments, reviews, and state changes from before the watch began printed no line, and the re-fetch covers them
+  - Before it, each source took what its first successful poll found as already seen, so comments, reviews, review requests, and state changes from before the watch began printed no line, and the re-fetch covers them
   - It follows each new start of a watch, by an add, a restart after `WATCH_ERROR`, or a resumed session, unless the PR is already merged or closed, which prints its `STATE:` line instead, or a source's first poll keeps failing, which prints that source's `POLL_ERROR`
 - `CHECK` lines and a `STATE: MERGED` or `STATE: CLOSED` line print from the first poll
   - Treat a `CHECK` line whose name and `@<sha>` match one already handled as a repeat, as after a restart
 - A PR's watch ends on its own with the poll that printed its `STATE: MERGED` or `STATE: CLOSED` line, so lines from that poll can follow it
 - `POLL_ERROR` prints only when a call first fails; neither its later failures, its recovery, nor its cause print a line
-  - Events from that call wait until it recovers, a change that reverts before then prints no line, and a failing `gh pr view` holds back every event of the PR
+  - Events from that call wait until it recovers, a change that reverts before then prints no line except a review request and its removal, which both print, and a failing `gh pr view` holds back every event of the PR
   - Re-fetch the PR to see where it stands
 
 ## What the watch does not report

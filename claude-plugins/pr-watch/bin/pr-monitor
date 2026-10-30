@@ -62,7 +62,8 @@ declare -A poll_failed=()
 seen_comments="$(mktemp)"
 seen_top_comments="$(mktemp)"
 seen_reviews="$(mktemp)"
-trap 'rm -f "$seen_comments" "$seen_top_comments" "$seen_reviews"' EXIT
+seen_review_requests="$(mktemp)"
+trap 'rm -f "$seen_comments" "$seen_top_comments" "$seen_reviews" "$seen_review_requests"' EXIT
 
 # First-poll seeding: do not emit events for state that already held when
 # this process started. Only transitions during its lifetime should wake
@@ -117,6 +118,12 @@ threads_query='query($owner:String!,$repo:String!,$num:Int!){
 # --json comments` because that `author` object omits `__typename`, and
 # the same Bot/User classification is needed as for review threads and
 # reviews. Piggybacks on `reviews_query` to avoid an extra round-trip.
+#
+# Review requests are read from the timeline events rather than diffed
+# from `reviewRequests`: a reviewer who submits a review drops out of
+# `reviewRequests` without a ReviewRequestRemovedEvent, so only the
+# events tell a removal from a fulfilled request. `last` keeps the newest
+# events in the window however long the PR's history grows.
 # shellcheck disable=SC2016 # GraphQL query: $vars are query variables
 reviews_query='query($owner:String!,$repo:String!,$num:Int!){
   repository(owner:$owner,name:$repo){
@@ -127,15 +134,32 @@ reviews_query='query($owner:String!,$repo:String!,$num:Int!){
       comments(first:100){
         nodes{ id author{login __typename} }
       }
+      timelineItems(last:100,itemTypes:[REVIEW_REQUESTED_EVENT,REVIEW_REQUEST_REMOVED_EVENT]){
+        nodes{
+          __typename
+          ... on ReviewRequestedEvent{ id actor{login} requestedReviewer{ ...reviewer } }
+          ... on ReviewRequestRemovedEvent{ id actor{login} requestedReviewer{ ...reviewer } }
+        }
+      }
     }
   }
+}
+fragment reviewer on RequestedReviewer{
+  __typename
+  ... on User{login}
+  ... on Bot{login}
+  ... on Mannequin{login}
+  ... on Team{combinedSlug}
+  ... on EnterpriseTeam{combinedSlug}
 }'
 
-# Emit one line per not-yet-seen comment ID. `fresh` is tab-separated
-# "id<TAB>author[<TAB>extra]" lines; the optional extra field (e.g.
-# "path:line") is appended to the label when present. Seen IDs persist in
-# seen_file across polls so each comment fires exactly once. With
-# `seeding` at 1 the IDs are recorded and nothing is emitted.
+# Emit one line per not-yet-seen item ID, in the order of `fresh`. `fresh`
+# is tab-separated "id<TAB>subject[<TAB>extra]" lines; the optional extra
+# field (e.g. "path:line") is appended to the subject when present, and an
+# empty `label` leaves the line without a "label: " prefix, for items that
+# carry their own event name in the subject. Seen IDs persist in seen_file
+# across polls so each item fires exactly once. With `seeding` at 1 the
+# IDs are recorded and nothing is emitted.
 emit_new() {
   local fresh="$1" seen_file="$2" label="$3" seeding="$4"
   [ -z "$fresh" ] && return 0
@@ -151,7 +175,7 @@ emit_new() {
     # -v assignment ("awk: newline in string").
     echo "$fresh" | ids_nl="$new" awk -F'\t' -v label="$label" '
       BEGIN { n = split(ENVIRON["ids_nl"], a, "\n"); for (i = 1; i <= n; i++) seen[a[i]] = 1 }
-      ($1 in seen) { print label ": " $2 ($3 != "" ? " " $3 : "") }
+      ($1 in seen) { print (label != "" ? label ": " : "") $2 ($3 != "" ? " " $3 : "") }
     '
   fi
   echo "$sorted_fresh" >> "$seen_file"
@@ -287,6 +311,17 @@ while true; do
       | "\(.id)\t\(if .author.__typename == "Bot" then "[BOT]" else "[USER]" end) \(.author.login)\t\(.state)"' \
       2>/dev/null || true)"
     emit_new "$fresh_reviews" "$seen_reviews" "NEW_REVIEW" "$seed_reviews"
+
+    # Both event kinds go through one pass in timeline order, so a
+    # reviewer removed and requested again within one interval reads as
+    # requested. The reviewer's `__typename` becomes the bracketed prefix,
+    # since a request can name a team as well as a user or bot.
+    fresh_requests="$(echo "$reviews_json" | jq -r '
+      .data.repository.pullRequest.timelineItems.nodes[]
+      | .requestedReviewer as $r
+      | "\(.id)\t\(if .__typename == "ReviewRequestedEvent" then "REVIEW_REQUESTED" else "REVIEW_REQUEST_REMOVED" end): [\(($r.__typename // "?") | ascii_upcase)] \($r.login // $r.combinedSlug // "?")\tby \(.actor.login // "?")"' \
+      2>/dev/null || true)"
+    emit_new "$fresh_requests" "$seen_review_requests" "" "$seed_reviews"
     seed_reviews=0
   fi
 

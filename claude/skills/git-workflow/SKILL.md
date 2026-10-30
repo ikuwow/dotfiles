@@ -247,7 +247,7 @@ itself, such as `WATCH_ERROR`; this phase reacts to the PR's events.
 
 1. Re-fetch detail on each event, adding `-R <owner>/<repo>` from the
    line when the PR is in another repository, with:
-   - `gh pr view <number> --json state,isDraft,reviewDecision,latestReviews,statusCheckRollup,comments,updatedAt,mergedAt,headRefName`
+   - `gh pr view <number> --json state,isDraft,reviewDecision,latestReviews,reviewRequests,statusCheckRollup,comments,updatedAt,mergedAt,headRefName`
    - `gh run list --branch <headRefName> --json databaseId,name,status,conclusion,createdAt,headSha,workflowName --limit 20`
    - review threads: the listing in `pr-reaction.md`'s Step 1, which
      carries the flags each use needs
