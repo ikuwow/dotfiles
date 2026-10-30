@@ -199,6 +199,26 @@ class WatchTest(unittest.TestCase):
             ],
         )
 
+    def test_checks_sharing_a_name_report_each_value_once(self):
+        pair = [("lint", "FAILURE"), ("lint", "SUCCESS")]
+        lines = watch_lines(
+            StubClient(
+                poll(checks=pair),
+                poll(checks=pair),
+                poll(checks=[("lint", "FAILURE"), ("lint", "TIMED_OUT"), ("lint", "FAILURE")]),
+                poll(state="MERGED", checks=pair),
+            )
+        )
+        self.assertEqual(
+            lines,
+            [
+                "CHECK: lint (FAILURE) @aaaaaaa",
+                "WATCHING",
+                "CHECK: lint (TIMED_OUT) @aaaaaaa",
+                "STATE: MERGED",
+            ],
+        )
+
     def test_reapproval_after_a_dismissal_reports(self):
         lines = watch_lines(
             StubClient(

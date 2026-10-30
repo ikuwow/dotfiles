@@ -407,13 +407,19 @@ def watch(client, interval, parent):
         checks = rollup_checks(pr)
         report("graphql (checks)", checks is not None)
         # Every value is tracked, settled or not, so a rerun passing back
-        # through a running state is a change again on the way out.
+        # through a running state is a change again on the way out. A name
+        # holds a set, since the rollup can list several checks under one
+        # name, whose values would otherwise overwrite each other and print
+        # again on every poll.
+        polled = {}
         for name, value in checks or []:
-            if prev_check.get(name) != value and value not in QUIET_CHECK_VALUES:
+            values = polled.setdefault(name, set())
+            if value not in values and value not in prev_check.get(name, ()) and value not in QUIET_CHECK_VALUES:
                 # The head sha tells a failure reported again after a
                 # restart from a new one.
                 print(f"CHECK: {name} ({value}) @{head_sha[:7]}")
-            prev_check[name] = value
+            values.add(value)
+        prev_check.update(polled)
 
         # Testing the field rather than the response: GraphQL answers an
         # error with a parseable body, which would otherwise read as a
