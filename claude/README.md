@@ -16,7 +16,7 @@ here only takes effect after a corresponding line is added to
 | `../AIRULES.md`               | `~/.claude/CLAUDE.md`             | Global instructions Claude reads on every session. Also linked to `~/.codex/AGENTS.md` and `~/.junie/AGENTS.md`. |
 | `agents/*.md`                 | `~/.claude/agents/*.md`           | Subagent definitions.                                                                                         |
 | `hooks/*` (`! test_*`)        | `~/.claude/hooks/*`               | Hook scripts. Test fixtures under `hooks/test_*` are intentionally excluded.                                  |
-| `rules/*.md`                  | `~/.claude/rules/*.md`            | Topic-scoped rule files (development practice, execution judgment, git, rule authoring, etc.).                |
+| `rules/*.md`                  | `~/.claude/rules/*.md`            | Topic-scoped rule files (development practice, execution judgment, git, GitHub, rule authoring, etc.).        |
 | `skills/<name>/`              | `~/.claude/skills/<name>/`        | Skills. Each directory symlinked as a whole.                                                                  |
 | `plugins/config.json`         | (not symlinked)                   | Plugin enablement, applied via `scripts/claude-code-setup.sh`. Read by the `claude` CLI from its own state.   |
 

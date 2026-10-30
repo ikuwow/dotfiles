@@ -37,14 +37,3 @@ NOT restate the detailed procedures from the skill.
   published branch, back out to a merge-based one: `gh pr
   update-branch <N>`, merge the default branch into the feature
   branch, or a fresh commit on top.
-
-## PR / issue creation and edits
-
-- Invoke `Skill(pr-issue-writing)` before creating a PR or an issue
-  and before writing or editing a title or body, including a draft
-  shown in chat and a `gh pr edit` / `gh issue edit` run outside the
-  git workflow, since the checks before creating a PR or issue or
-  rewriting a body run only through it
-  - The `implementer` subagent's placeholder PR is exempt, as the
-    parent runs the skill's preflight before dispatching it and later
-    replaces its title and body

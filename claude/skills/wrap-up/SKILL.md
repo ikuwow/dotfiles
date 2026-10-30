@@ -8,8 +8,8 @@ description: Take stock of a session before it ends (unfinished work, state that
 This skill brings a session to a state where ending it loses nothing the
 user needs. Reading and routine cleanup run on their own, since
 routine cleanup removes only local state whose content exists elsewhere,
-and its one GitHub write, closing a settled issue, is undone by
-reopening it. A write the
+and its one GitHub write, closing a settled issue the user owns,
+is undone by reopening it. A write the
 user decides on runs only after they select it, since one wrap-up can
 touch several repositories and PRs and the user approves exactly the
 operations and text they were shown. Step 2 draws the line between the
@@ -31,7 +31,7 @@ tool-based listing when this session lacks that tool.
 - PRs this session created or updated
   - `gh pr view <number> --repo <owner>/<repo> --json state,isDraft,statusCheckRollup,reviewDecision`
   - unresolved review threads, listed by `gh pr-review review view -R <owner>/<repo> <number> --unresolved --not_outdated`
-- Open issues that those PRs address or that the user named as the work target, read with `gh issue view <number> --repo <owner>/<repo> --json title,body,state,comments`
+- Open issues that those PRs address or that the user named as the work target, read with `gh issue view <number> --repo <owner>/<repo> --json title,body,state,comments,author,assignees`
 - Work that runs only while this session is open
   - background shells, Monitors, and subagents this session started, identified from its own `run_in_background`, Monitor, and Agent calls
   - PR watches, listed by `pr-watch list` (the `pr-watch:watch` skill)
@@ -78,6 +78,7 @@ doubtful local cleanup runs and appears in the report.
   - Settled items: `--reason completed`, with a comment of a few lines naming what settled each item and linking the PR
   - Not needed: `--reason "not planned"`, and a duplicate of `<M>`: `--duplicate-of <M>`, each with a comment quoting what the user said
   - An issue with an unsettled item stays open, and the report names that item
+  - Only an issue whose `assignees` include the user's login (`gh api user --jq .login`), or whose `author` is the user with `assignees` empty, closes here; closing any other issue is a proposal, since its owner decides when it is done
   - This is the one GitHub write in this class, and it belongs here because reopening the issue undoes it and the comment keeps its basis on record
 
 Everything else is a proposal: a write to a repository or to GitHub, a
