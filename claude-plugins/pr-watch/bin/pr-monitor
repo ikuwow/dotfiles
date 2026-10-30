@@ -203,6 +203,7 @@ class Client:
                 with OPENER.open(request, timeout=TIMEOUT_SECONDS) as response:
                     return json.load(response)
             except urllib.error.HTTPError as error:
+                error.close()
                 if error.code != 401:
                     return None
                 self.token = None
@@ -212,15 +213,7 @@ class Client:
 
 
 def dig(value, *keys):
-    """Follow keys through nested dicts, giving None where any is missing.
-
-    >>> dig({"a": {"b": 1}}, "a", "b")
-    1
-    >>> dig({"a": None}, "a", "b") is None
-    True
-    >>> dig(None, "a") is None
-    True
-    """
+    """Follow keys through nested dicts, giving None where any is missing."""
     for key in keys:
         if not isinstance(value, dict):
             return None
@@ -239,28 +232,13 @@ def who(account):
     comments this is a per-comment hint only: pr-reaction.md's targeting
     policy still requires walking every comment in the thread before
     mutating it.
-
-    >>> who({"__typename": "Bot", "login": "devin"})
-    '[BOT] devin'
-    >>> who({"__typename": "User", "login": "ikuwow"})
-    '[USER] ikuwow'
-    >>> who(None)
-    '[USER] ?'
     """
     kind = "[BOT]" if dig(account, "__typename") == "Bot" else "[USER]"
     return f"{kind} {dig(account, 'login') or '?'}"
 
 
 def reviewer_label(reviewer):
-    """Label a requested reviewer, which can be a team as well as a user or bot.
-
-    >>> reviewer_label({"__typename": "Team", "combinedSlug": "org/team"})
-    '[TEAM] org/team'
-    >>> reviewer_label({"__typename": "User", "login": "ikuwow"})
-    '[USER] ikuwow'
-    >>> reviewer_label(None)
-    '[?] ?'
-    """
+    """Label a requested reviewer, which can be a team as well as a user or bot."""
     kind = (dig(reviewer, "__typename") or "?").upper()
     name = dig(reviewer, "login") or dig(reviewer, "combinedSlug") or "?"
     return f"[{kind}] {name}"
@@ -276,27 +254,6 @@ def timeline_line(item):
     thread comments, which `NEW_COMMENT` reports. An item kind without a
     line of its own prints its `__typename`, so it reports rather than
     vanishes.
-
-    >>> bot = {"__typename": "Bot", "login": "devin"}
-    >>> timeline_line({"__typename": "IssueComment", "author": bot})
-    'NEW_TOP_COMMENT: [BOT] devin'
-    >>> review = {"__typename": "PullRequestReview", "author": bot}
-    >>> timeline_line({**review, "state": "COMMENTED", "body": "Looks off"})
-    'NEW_REVIEW: [BOT] devin COMMENTED'
-    >>> timeline_line({**review, "state": "PENDING", "body": "Draft"}) is None
-    True
-    >>> timeline_line({**review, "state": "APPROVED", "body": ""}) is None
-    True
-    >>> team = {"__typename": "Team", "combinedSlug": "org/team"}
-    >>> actor = {"login": "ikuwow"}
-    >>> timeline_line({"__typename": "ReviewRequestedEvent", "requestedReviewer": team, "actor": actor})
-    'REVIEW_REQUESTED: [TEAM] org/team by ikuwow'
-    >>> timeline_line({"__typename": "ReviewRequestRemovedEvent", "requestedReviewer": team, "actor": None})
-    'REVIEW_REQUEST_REMOVED: [TEAM] org/team by ?'
-    >>> timeline_line({"__typename": "MergedEvent"})
-    'STATE: MERGED'
-    >>> timeline_line({"__typename": "SomeNewEvent"})
-    'SomeNewEvent'
     """
     kind = item.get("__typename")
     if kind == "IssueComment":
@@ -317,34 +274,13 @@ def timeline_items(timeline):
 
     One pass in timeline order means a reviewer removed and requested again
     within one interval reads as requested.
-
-    >>> merged = {"__typename": "MergedEvent", "id": "M1"}
-    >>> pending = {"__typename": "PullRequestReview", "id": "R1", "state": "PENDING", "body": "Draft"}
-    >>> timeline_items({"nodes": [None, pending, merged]})
-    [('M1', 'STATE: MERGED')]
-    >>> seen = set()
-    >>> new_lines(timeline_items({"nodes": [pending]}), seen, False)
-    []
-    >>> new_lines(timeline_items({"nodes": [{**pending, "state": "COMMENTED"}]}), seen, False)
-    ['NEW_REVIEW: [USER] ? COMMENTED']
     """
     items = ((node.get("id"), timeline_line(node)) for node in nodes_of(timeline))
     return [(item_id, line) for item_id, line in items if line is not None]
 
 
 def thread_comment_items(threads):
-    """Return (id, line) per comment in the unresolved, current threads.
-
-    >>> comment = {"id": "C1", "author": {"__typename": "Bot", "login": "devin"}, "path": "a.py", "line": 3}
-    >>> current = {"isResolved": False, "isOutdated": False, "comments": {"nodes": [comment]}}
-    >>> thread_comment_items({"nodes": [current]})
-    [('C1', 'NEW_COMMENT: [BOT] devin a.py:3')]
-    >>> thread_comment_items({"nodes": [{**current, "isResolved": True}, {**current, "isOutdated": True}]})
-    []
-    >>> file_level = {"id": "C2", "author": None, "path": "a.py", "line": None}
-    >>> thread_comment_items({"nodes": [{**current, "comments": {"nodes": [file_level]}}]})
-    [('C2', 'NEW_COMMENT: [USER] ? a.py:?')]
-    """
+    """Return (id, line) per comment in the unresolved, current threads."""
     return [
         (
             comment.get("id"),
@@ -362,14 +298,6 @@ def new_lines(items, seen, seeding):
 
     With `seeding` the IDs are recorded and no line returns, so state that
     held before the source's first success stays silent.
-
-    >>> seen = set()
-    >>> new_lines([("a", "A")], seen, True)
-    []
-    >>> new_lines([("a", "A"), ("b", "B")], seen, False)
-    ['B']
-    >>> new_lines([("a", "A"), ("b", "B")], seen, False)
-    []
     """
     lines = [line for item_id, line in items if item_id not in seen]
     seen.update(item_id for item_id, _ in items)
@@ -380,24 +308,6 @@ def rollup_checks(pr):
     """Return (name, value) per check, or None for a rollup of no known shape.
 
     A commit with no checks has a null `statusCheckRollup`.
-
-    >>> run = {"name": "lint", "status": "COMPLETED", "conclusion": "FAILURE"}
-    >>> status = {"context": "ci/x", "state": "ERROR"}
-    >>> rolling = {"name": "test", "status": "IN_PROGRESS", "conclusion": None}
-    >>> contexts = {"contexts": {"nodes": [run, status, rolling]}}
-    >>> rollup_checks({"commits": {"nodes": [{"commit": {"statusCheckRollup": contexts}}]}})
-    [('lint', 'FAILURE'), ('ci/x', 'ERROR'), ('test', 'IN_PROGRESS')]
-    >>> rollup_checks({"commits": {"nodes": [{"commit": {"statusCheckRollup": None}}]}})
-    []
-    >>> rollup_checks({"commits": {"nodes": []}})
-    []
-    >>> rollup_checks({}) is None
-    True
-    >>> rollup_checks({"commits": {"nodes": [{"commit": {"statusCheckRollup": {"contexts": None}}}]}}) is None
-    True
-    >>> no_conclusion = {"name": "x", "status": "COMPLETED", "conclusion": None}
-    >>> rollup_checks({"commits": {"nodes": [{"commit": {"statusCheckRollup": {"contexts": {"nodes": [no_conclusion]}}}}]}})
-    [('x', '')]
     """
     commits = dig(pr, "commits", "nodes")
     if not isinstance(commits, list):
@@ -541,75 +451,6 @@ def watch(client, interval, parent):
             announced = True
 
         time.sleep(interval)
-
-
-__test__ = {
-    "watch": """
->>> def body(**fields): return {"data": {"repository": {"pullRequest": fields}}}
->>> def run(*polls):
-...     answers = iter(answer for poll in polls for answer in poll)
-...     watch(type("Stub", (), {"query": lambda self, query: next(answers)})(), 0, None)
->>> def poll(state="OPEN", sha="aaaaaaa", decision=None, checks=(), comments=(), items=()):
-...     rollup = {"contexts": {"nodes": [{"name": n, "status": "COMPLETED", "conclusion": c} for n, c in checks]}}
-...     thread = {"isResolved": False, "isOutdated": False, "comments": {"nodes": [{"id": c, "path": "a", "line": 1} for c in comments]}}
-...     return (body(state=state, headRefOid=sha, reviewDecision=decision, commits={"nodes": [{"commit": {"statusCheckRollup": rollup}}]}),
-...             body(reviewThreads={"nodes": [thread]}),
-...             body(timelineItems={"nodes": [{"__typename": k, "id": k} for k in items]}))
->>> red = [("lint", "FAILURE")]
-
-State held at the start stays silent except a red check, an unchanged check
-does not repeat, and a new head or a rerun reports it again.
-
->>> run(poll(decision="APPROVED", checks=red, comments=["C1"], items=["IssueComment"]),
-...     poll(checks=red, comments=["C1"], items=["IssueComment"]),
-...     poll(decision="APPROVED", checks=red, comments=["C1", "C2"], items=["IssueComment"]),
-...     poll(sha="bbbbbbb", checks=red),
-...     poll(sha="bbbbbbb", checks=[("lint", "IN_PROGRESS")]),
-...     poll(sha="bbbbbbb", checks=red),
-...     poll(sha="bbbbbbb", checks=red, items=["MergedEvent", "ClosedEvent"]))
-CHECK: lint (FAILURE) @aaaaaaa
-WATCHING
-REVIEW: APPROVED
-NEW_COMMENT: [USER] ? a:1
-CHECK: lint (FAILURE) @bbbbbbb
-CHECK: lint (FAILURE) @bbbbbbb
-STATE: MERGED
-STATE: CLOSED
-
-A PR that ended before the watch began prints its end once.
-
->>> run(poll(state="MERGED", items=["MergedEvent"]))
-STATE: MERGED
-
-A close and a reopen within one interval keep the watch going.
-
->>> run(poll(), poll(state="CLOSED", items=["ClosedEvent", "ReopenedEvent"]), poll(state="MERGED"))
-WATCHING
-STATE: CLOSED
-STATE: OPEN
-STATE: MERGED
-
-An outage prints one line per source, and a source that failed at first seeds
-when it recovers.
-
->>> pr, threads, timeline = poll(items=["IssueComment"])
->>> run((None,), (None,), (pr, threads, None), (pr, threads, None), poll(items=["IssueComment"]), poll(state="MERGED"))
-POLL_ERROR: graphql (pull request)
-POLL_ERROR: graphql (timeline)
-WATCHING
-STATE: MERGED
-
-A failed pull request query drops the token, so the next poll reads it again.
-
->>> client = type("Stub", (), {"token": "old", "query": lambda self, query: None if self.token else body(state="MERGED")})()
->>> watch(client, 0, None)
-POLL_ERROR: graphql (pull request)
-POLL_ERROR: graphql (checks)
-POLL_ERROR: graphql (threads)
-POLL_ERROR: graphql (timeline)
-STATE: MERGED
-"""
-}
 
 
 def usage():

@@ -28,6 +28,9 @@ jobs:
             echo "Testing $f"
             python3 -m doctest "$f"
           done
-          # doctest reads a file without the .py suffix as text rather than as a module
-          cp claude-plugins/pr-watch/bin/pr-monitor "$RUNNER_TEMP/pr_monitor.py"
-          python3 -m doctest "$RUNNER_TEMP/pr_monitor.py"
+  pr-watch-unittest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: unittest
+        run: python3 -m unittest discover -s claude-plugins/pr-watch/tests

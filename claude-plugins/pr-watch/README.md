@@ -21,6 +21,10 @@ pr-watch reports events on GitHub pull requests to the Claude Code session that 
 
 The lines `pr-monitor` and `pr-watch-monitor` print are the contract `SKILL.md` documents, so a change to an event's name, format, or timing changes `SKILL.md` in the same commit.
 
+## Tests
+
+`python3 -m unittest discover -s claude-plugins/pr-watch/tests` runs the tests of `bin/pr-monitor` from the repository root, on the standard library alone, and CI runs the same command.
+
 ## Allow rules
 
 A plugin's own `settings.json` takes only the `agent` and `subagentStatusLine` keys ([Default settings](https://code.claude.com/docs/en/plugins/components.md#default-settings)), so the plugin cannot allow its own commands. A user who wants them to run without a prompt adds these rules to their settings:
