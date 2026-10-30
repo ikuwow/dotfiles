@@ -42,7 +42,7 @@ A re-fetch below reads the PR's state, comments, reviews, review threads, reques
 | `POLL_ERROR: <source>` | A source fails for the first time in a run of failures; `<source>` is `graphql (pull request)`, `graphql (checks)` for a check list of no known shape, `graphql (threads)`, or `graphql (timeline)` |
 | `WATCH_ERROR: pr-monitor exited with status <n>` | That PR's watch stopped on an error |
 
-- `[BOT]` marks an author whose GraphQL `author.__typename` is `Bot`, and `[USER]` every other author
+- `[BOT]` marks an author whose GraphQL `author.__typename` is `Bot`, and `[USER]` every other author, with `<author>` as `?` where GitHub gives none, as for a deleted account
   - Comment and review events carry every author, the account `gh` authenticates as included, so check on the re-fetch whether a comment or review is a post this session made before acting on it
 - `[<TYPE>]` on a review-request line is the reviewer's GraphQL `__typename` in upper case, such as `[USER]`, `[TEAM]`, `[BOT]`, or `[MANNEQUIN]`, and a team's `<reviewer>` is `<org>/<team>`
   - `[<TYPE>]`, `<reviewer>`, or `<actor>` is `?` where GitHub gives none, as for a deleted account

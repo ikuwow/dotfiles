@@ -13,8 +13,7 @@ The PR is looked up on github.com, with the token `gh` holds for that host.
 The events it prints, one per stdout line, and what each guarantees are
 the plugin's contract with its callers, documented in the plugin's
 skills/watch/SKILL.md; a change to an event's name, format, or timing
-changes that file too. A failing pull request query skips the rest of
-that poll.
+changes that file too.
 
 Runs on Python 3.9, the version of the macOS `/usr/bin/python3`, with the
 standard library alone.
@@ -34,14 +33,9 @@ ENDPOINT = "https://api.github.com/graphql"
 # The host is pinned on both sides of the request, since a token `gh` reads
 # for the host in GH_HOST would otherwise be sent to github.com.
 TOKEN_COMMAND = ["gh", "auth", "token", "--hostname", "github.com"]
-# Turns a call that hangs into a failed poll, which reports, rather than a
-# stalled loop, which stays silent.
+# Turns a call that stops responding for this long into a failed poll, which
+# reports, rather than a stalled loop, which stays silent.
 TIMEOUT_SECONDS = 60
-
-SOURCE_PR = "graphql (pull request)"
-SOURCE_CHECKS = "graphql (checks)"
-SOURCE_THREADS = "graphql (threads)"
-SOURCE_TIMELINE = "graphql (timeline)"
 
 # The values that never warrant waking anybody are the only ones spelled
 # here, so a value added later reports rather than vanishes.
@@ -59,8 +53,8 @@ QUIET_CHECK_VALUES = {
 
 # Checks and `reviewDecision` are state derived from the head commit and the
 # branch's protection, with no item marking their changes, so they come from
-# this query rather than the timeline. The rollup covers every check on the
-# head commit, Actions or not.
+# this query rather than the timeline. The rollup covers the first 100 checks
+# on the head commit, Actions or not.
 PR_QUERY = """
 query($owner:String!,$repo:String!,$num:Int!){
   repository(owner:$owner,name:$repo){
@@ -188,7 +182,7 @@ class Client:
         """Return the parsed response, or None when the request fails.
 
         A 401 takes the token again from `gh` and retries once, which covers
-        a token that expired or was replaced since it was read.
+        a token that expired since it was read.
         """
         payload = json.dumps({"query": query, "variables": self.variables}).encode()
         for _ in range(2):
@@ -323,6 +317,16 @@ def timeline_items(timeline):
 
     One pass in timeline order means a reviewer removed and requested again
     within one interval reads as requested.
+
+    >>> merged = {"__typename": "MergedEvent", "id": "M1"}
+    >>> pending = {"__typename": "PullRequestReview", "id": "R1", "state": "PENDING", "body": "Draft"}
+    >>> timeline_items({"nodes": [None, pending, merged]})
+    [('M1', 'STATE: MERGED')]
+    >>> seen = set()
+    >>> new_lines(timeline_items({"nodes": [pending]}), seen, False)
+    []
+    >>> new_lines(timeline_items({"nodes": [{**pending, "state": "COMMENTED"}]}), seen, False)
+    ['NEW_REVIEW: [USER] ? COMMENTED']
     """
     items = ((node.get("id"), timeline_line(node)) for node in nodes_of(timeline))
     return [(item_id, line) for item_id, line in items if line is not None]
@@ -389,6 +393,11 @@ def rollup_checks(pr):
     []
     >>> rollup_checks({}) is None
     True
+    >>> rollup_checks({"commits": {"nodes": [{"commit": {"statusCheckRollup": {"contexts": None}}}]}}) is None
+    True
+    >>> no_conclusion = {"name": "x", "status": "COMPLETED", "conclusion": None}
+    >>> rollup_checks({"commits": {"nodes": [{"commit": {"statusCheckRollup": {"contexts": {"nodes": [no_conclusion]}}}}]}})
+    [('x', '')]
     """
     commits = dig(pr, "commits", "nodes")
     if not isinstance(commits, list):
@@ -411,42 +420,28 @@ def rollup_checks(pr):
     return checks
 
 
-def parent_is_gone(pid):
-    try:
-        os.kill(pid, 0)
-    except OSError:
-        return True
-    return False
-
-
 def watch(client, interval, parent):
     """Poll until the PR ends or the parent process is gone.
 
     First-poll seeding: do not print events for state that already held when
     this process started. Only transitions during its lifetime should wake
-    the operator. `first_poll` flips after the first successful pull request
-    query, and the threads and timeline sources seed on their own first
-    success, so a source that failed at first does not report everything it
-    held once it recovers. `CHECK` and a terminal `STATE` are the exceptions:
-    a check already red is the reader's problem now, and a PR already merged
-    or closed ends this process at the end of the first poll, so both report
-    rather than seed.
+    the operator. `prev_decision` stays None until the first successful pull
+    request query, and the threads and timeline sources seed on their own
+    first success, so a source that failed at first does not report
+    everything it held once it recovers. `CHECK` and a terminal `STATE` are
+    the exceptions: a check already red is the reader's problem now, and a PR
+    already merged or closed ends this process at the end of the first poll,
+    so both report rather than seed.
     """
-    prev_decision = ""
+    prev_decision = None
     prev_sha = ""
     prev_check = {}
     failed = set()
     seen_comments = set()
     seen_timeline = set()
-    first_poll = True
     seed_threads = True
     seed_timeline = True
     announced = False
-    # True while the last `STATE` line printed is `MERGED` or `CLOSED`, so
-    # the end of a PR prints from the pull request query only when the
-    # timeline has not printed it, as when seeding swallowed it or the
-    # timeline poll fails.
-    state_reported = False
 
     def report(source, ok):
         # One line per outage, not per poll: an unauthorized token or an
@@ -459,11 +454,14 @@ def watch(client, interval, parent):
             failed.add(source)
 
     while True:
-        # A watcher killed without running its trap would otherwise leave
-        # this loop polling GitHub until the PR closes. Checked before the
-        # poll so a failing poll does not skip it.
-        if parent is not None and parent_is_gone(parent):
-            return
+        # A `pr-watch-monitor` killed without running its trap would otherwise
+        # leave this loop polling GitHub until the PR closes. Checked before
+        # the poll so a failing poll does not skip it.
+        if parent is not None:
+            try:
+                os.kill(parent, 0)
+            except OSError:
+                return
 
         body = client.query(PR_QUERY)
         pr = dig(body, "data", "repository", "pullRequest")
@@ -472,8 +470,11 @@ def watch(client, interval, parent):
         # rules out a response without the PR, whose empty `state` would read
         # as an open PR while its empty `headRefOid` reset `prev_check`.
         pr_ok = not dig(body, "errors") and bool(dig(pr, "state"))
-        report(SOURCE_PR, pr_ok)
+        report("graphql (pull request)", pr_ok)
         if not pr_ok:
+            # A token that cannot read the PR still answers 200, so no 401
+            # would replace it once `gh auth switch` fixes the access.
+            client.token = None
             time.sleep(interval)
             continue
         state = pr["state"]
@@ -483,10 +484,9 @@ def watch(client, interval, parent):
         # `prev_decision` tracks the empty value too: a dismissal clears
         # `reviewDecision`, and holding the stale one here would then swallow
         # the re-approval that follows.
-        if decision != prev_decision:
-            if not first_poll and decision:
-                print(f"REVIEW: {decision}")
-            prev_decision = decision
+        if decision and prev_decision is not None and decision != prev_decision:
+            print(f"REVIEW: {decision}")
+        prev_decision = decision
 
         # A new head retires the old commit's checks, and a check that lands
         # on the same value it held there would otherwise compare equal and
@@ -495,29 +495,28 @@ def watch(client, interval, parent):
             prev_check = {}
             prev_sha = head_sha
         checks = rollup_checks(pr)
-        report(SOURCE_CHECKS, checks is not None)
+        report("graphql (checks)", checks is not None)
         # Every value is tracked, settled or not, so a rerun passing back
         # through a running state is a change again on the way out.
         for name, value in checks or []:
-            if name not in prev_check or prev_check[name] != value:
-                if value not in QUIET_CHECK_VALUES:
-                    # The head sha tells a failure reported again after a
-                    # restart from a new one.
-                    print(f"CHECK: {name} ({value}) @{head_sha[:7]}")
-                prev_check[name] = value
+            if prev_check.get(name) != value and value not in QUIET_CHECK_VALUES:
+                # The head sha tells a failure reported again after a
+                # restart from a new one.
+                print(f"CHECK: {name} ({value}) @{head_sha[:7]}")
+            prev_check[name] = value
 
         # Testing the field rather than the response: GraphQL answers an
         # error with a parseable body, which would otherwise read as a
         # healthy poll and clear a running outage's suppression.
         threads = dig(client.query(THREADS_QUERY), "data", "repository", "pullRequest", "reviewThreads")
-        report(SOURCE_THREADS, threads is not None)
+        report("graphql (threads)", threads is not None)
         if threads is not None:
             for line in new_lines(thread_comment_items(threads), seen_comments, seed_threads):
                 print(line)
             seed_threads = False
 
         timeline = dig(client.query(TIMELINE_QUERY), "data", "repository", "pullRequest", "timelineItems")
-        report(SOURCE_TIMELINE, timeline is not None)
+        report("graphql (timeline)", timeline is not None)
         if timeline is not None:
             lines = new_lines(timeline_items(timeline), seen_timeline, seed_timeline)
             for line in lines:
@@ -527,22 +526,90 @@ def watch(client, interval, parent):
             state_lines = [line for line in lines if line.startswith("STATE: ")]
             if state_lines:
                 state = state_lines[-1][len("STATE: "):]
-                state_reported = state != "OPEN"
+                if state != "OPEN":
+                    return
             seed_timeline = False
 
-        # The pull request query decides the end, and prints it when the
-        # timeline has not.
+        # The end the timeline has not printed, as when seeding swallowed it
+        # or the timeline poll fails.
         if state in ("MERGED", "CLOSED"):
-            if not state_reported:
-                print(f"STATE: {state}")
+            print(f"STATE: {state}")
             return
 
         if not announced and not seed_threads and not seed_timeline:
             print("WATCHING")
             announced = True
 
-        first_poll = False
         time.sleep(interval)
+
+
+__test__ = {
+    "watch": """
+>>> def body(**fields): return {"data": {"repository": {"pullRequest": fields}}}
+>>> def run(*polls):
+...     answers = iter(answer for poll in polls for answer in poll)
+...     watch(type("Stub", (), {"query": lambda self, query: next(answers)})(), 0, None)
+>>> def poll(state="OPEN", sha="aaaaaaa", decision=None, checks=(), comments=(), items=()):
+...     rollup = {"contexts": {"nodes": [{"name": n, "status": "COMPLETED", "conclusion": c} for n, c in checks]}}
+...     thread = {"isResolved": False, "isOutdated": False, "comments": {"nodes": [{"id": c, "path": "a", "line": 1} for c in comments]}}
+...     return (body(state=state, headRefOid=sha, reviewDecision=decision, commits={"nodes": [{"commit": {"statusCheckRollup": rollup}}]}),
+...             body(reviewThreads={"nodes": [thread]}),
+...             body(timelineItems={"nodes": [{"__typename": k, "id": k} for k in items]}))
+>>> red = [("lint", "FAILURE")]
+
+State held at the start stays silent except a red check, an unchanged check
+does not repeat, and a new head or a rerun reports it again.
+
+>>> run(poll(decision="APPROVED", checks=red, comments=["C1"], items=["IssueComment"]),
+...     poll(checks=red, comments=["C1"], items=["IssueComment"]),
+...     poll(decision="APPROVED", checks=red, comments=["C1", "C2"], items=["IssueComment"]),
+...     poll(sha="bbbbbbb", checks=red),
+...     poll(sha="bbbbbbb", checks=[("lint", "IN_PROGRESS")]),
+...     poll(sha="bbbbbbb", checks=red),
+...     poll(sha="bbbbbbb", checks=red, items=["MergedEvent", "ClosedEvent"]))
+CHECK: lint (FAILURE) @aaaaaaa
+WATCHING
+REVIEW: APPROVED
+NEW_COMMENT: [USER] ? a:1
+CHECK: lint (FAILURE) @bbbbbbb
+CHECK: lint (FAILURE) @bbbbbbb
+STATE: MERGED
+STATE: CLOSED
+
+A PR that ended before the watch began prints its end once.
+
+>>> run(poll(state="MERGED", items=["MergedEvent"]))
+STATE: MERGED
+
+A close and a reopen within one interval keep the watch going.
+
+>>> run(poll(), poll(state="CLOSED", items=["ClosedEvent", "ReopenedEvent"]), poll(state="MERGED"))
+WATCHING
+STATE: CLOSED
+STATE: OPEN
+STATE: MERGED
+
+An outage prints one line per source, and a source that failed at first seeds
+when it recovers.
+
+>>> pr, threads, timeline = poll(items=["IssueComment"])
+>>> run((None,), (None,), (pr, threads, None), (pr, threads, None), poll(items=["IssueComment"]), poll(state="MERGED"))
+POLL_ERROR: graphql (pull request)
+POLL_ERROR: graphql (timeline)
+WATCHING
+STATE: MERGED
+
+A failed pull request query drops the token, so the next poll reads it again.
+
+>>> client = type("Stub", (), {"token": "old", "query": lambda self, query: None if self.token else body(state="MERGED")})()
+>>> watch(client, 0, None)
+POLL_ERROR: graphql (pull request)
+POLL_ERROR: graphql (checks)
+POLL_ERROR: graphql (threads)
+POLL_ERROR: graphql (timeline)
+STATE: MERGED
+"""
+}
 
 
 def usage():
@@ -555,21 +622,18 @@ def main(argv):
         return 1
     number = argv[1]
     interval = argv[2] if len(argv) == 3 else "60"
+    owner_repo = os.environ.get("GH_REPO", "")
     # Reject anything that isn't a positive integer, so a flag such as
     # `--help` errors out rather than polling for a PR that cannot exist.
-    if not re.fullmatch(r"[1-9][0-9]*", number):
-        print(f"pr-monitor: <pr-number> must be a positive integer, got: {number}", file=sys.stderr)
-        usage()
-        return 2
-    if not re.fullmatch(r"[1-9][0-9]*", interval):
-        print(f"pr-monitor: [interval-seconds] must be a positive integer, got: {interval}", file=sys.stderr)
-        usage()
-        return 2
-    owner_repo = os.environ.get("GH_REPO", "")
-    if not re.fullmatch(r"[^/\s]+/[^/\s]+", owner_repo):
-        print(f"pr-monitor: GH_REPO must be OWNER/REPO, got: {owner_repo}", file=sys.stderr)
-        usage()
-        return 2
+    for value, pattern, rule in (
+        (number, r"[1-9][0-9]*", "<pr-number> must be a positive integer"),
+        (interval, r"[1-9][0-9]*", "[interval-seconds] must be a positive integer"),
+        (owner_repo, r"[^/\s]+/[^/\s]+", "GH_REPO must be OWNER/REPO"),
+    ):
+        if not re.fullmatch(pattern, value):
+            print(f"pr-monitor: {rule}, got: {value}", file=sys.stderr)
+            usage()
+            return 2
     owner, repo = owner_repo.split("/")
     parent = os.environ.get("PR_WATCH_PARENT")
 
