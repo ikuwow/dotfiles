@@ -28,7 +28,7 @@ A re-fetch below reads the PR's state, comments, reviews, review threads, reques
 | Event | Printed when |
 | --- | --- |
 | `WATCHING` | Every source has had its first successful poll; every change after this line reports |
-| `STATE: <state>` | The PR is merged or closed, as `MERGED` or `CLOSED`; a merge prints `STATE: MERGED` and then `STATE: CLOSED`, since GitHub records both |
+| `STATE: <state>` | The PR is merged, closed, or reopened, as `MERGED`, `CLOSED`, or `OPEN`; a merge can print `STATE: MERGED` and then `STATE: CLOSED`, since GitHub records both |
 | `REVIEW: <reviewDecision>` | The review decision changes to a non-empty value |
 | `READY_FOR_REVIEW` | The PR leaves draft |
 | `CONVERT_TO_DRAFT` | The PR goes back to draft |
@@ -51,14 +51,13 @@ A re-fetch below reads the PR's state, comments, reviews, review threads, reques
 - On `WATCHING`, re-fetch the PR
   - Before it, each source took what its first successful poll found as already seen, so comments, reviews, review requests, and state changes from before the watch began printed no line, and the re-fetch covers them
   - It follows each new start of a watch, by an add, a restart after `WATCH_ERROR`, or a resumed session, unless the PR is already merged or closed, which prints its `STATE:` line instead, or a source's first poll keeps failing, which prints that source's `POLL_ERROR`
-- `NEW_TOP_COMMENT`, `NEW_REVIEW`, the review-request lines, `READY_FOR_REVIEW`, `CONVERT_TO_DRAFT`, `REVIEW_DISMISSED`, and `STATE` come from the PR's timeline, one line per timeline item in the timeline's order
+- `NEW_TOP_COMMENT`, `NEW_REVIEW`, the review-request lines, `READY_FOR_REVIEW`, `CONVERT_TO_DRAFT`, `REVIEW_DISMISSED`, and `STATE` come from the PR's timeline, one line per reported timeline item in the timeline's order
   - Each line marks that the item exists, so re-fetch the PR for its content
 - `CHECK` lines and a `STATE: MERGED` or `STATE: CLOSED` line print from the first poll
   - Treat a `CHECK` line whose name and `@<sha>` match one already handled as a repeat, as after a restart
-  - On the first poll, a PR already merged prints `STATE: MERGED` alone
-- A PR's watch ends on its own with the first poll that finds the PR merged or closed after its `STATE: MERGED` or `STATE: CLOSED` line has printed, so lines from that poll can follow it
+- A PR's watch ends on its own with the first poll that finds the PR merged or closed, printing its `STATE: MERGED` or `STATE: CLOSED` line in that poll unless the timeline has already printed it, so lines from that poll can follow it
 - `POLL_ERROR` prints only when a call first fails; neither its later failures, its recovery, nor its cause print a line
-  - Events from that call wait until it recovers; a timeline item prints even when what it changed has reverted by then, a check or review decision that reverts prints no line, and a failing `gh pr view` holds back every event of the PR
+  - Events from that call wait until it recovers; a timeline item prints even when what it changed has reverted by then, while a check or review decision that reverts, or a review-thread comment whose thread is resolved or outdated by then, prints no line, and a failing `gh pr view` holds back every event of the PR
   - Re-fetch the PR to see where it stands
 
 ## What the watch does not report

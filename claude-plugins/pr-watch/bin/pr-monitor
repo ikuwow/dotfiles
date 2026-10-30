@@ -73,8 +73,9 @@ first_poll=1
 seed_threads=1
 seed_timeline=1
 announced=0
-# Set once a `STATE` line for a merged or closed PR has printed, so the
-# process ends only after the poll that reported the end.
+# 1 while the last `STATE` line printed is `MERGED` or `CLOSED`, so the
+# end of a PR prints from `gh pr view` only when the timeline has not
+# printed it, as when seeding swallowed it or the timeline poll fails.
 state_reported=0
 
 # One line per outage, not per poll: an unauthorized token or an outage
@@ -113,14 +114,15 @@ threads_query='query($owner:String!,$repo:String!,$num:Int!){
   }
 }'
 
-# The PR's timeline is the source of every event that GitHub records as
-# an item on the conversation: comments, reviews, review requests, draft
-# flips, dismissals, merge, and close. Each item prints once, by node ID.
-# `last` keeps the newest items in the window however long the PR's
-# history grows. Commits are left out of `itemTypes`, since a burst of
-# them would push the other items out of that window.
+# The PR's timeline is the source of the events in `itemTypes`, each of
+# which GitHub records as an item on the conversation: comments, reviews,
+# review requests, draft flips, dismissals, merge, close, and reopen.
+# Each item prints once, by node ID. `last` keeps the newest items in the
+# window however long the PR's history grows. Commits are left out of
+# `itemTypes`, since a burst of them would push the other items out of
+# that window.
 #
-# Three sources stay outside the timeline. A reply in an existing review
+# Three kinds of event stay outside the timeline. A reply in an existing review
 # thread adds no timeline item, so review-thread comments come from
 # `threads_query`, which also carries the resolved and outdated state
 # they are filtered on. Checks and `reviewDecision` are state derived
@@ -135,7 +137,7 @@ threads_query='query($owner:String!,$repo:String!,$num:Int!){
 timeline_query='query($owner:String!,$repo:String!,$num:Int!){
   repository(owner:$owner,name:$repo){
     pullRequest(number:$num){
-      timelineItems(last:100,itemTypes:[ISSUE_COMMENT,PULL_REQUEST_REVIEW,REVIEW_REQUESTED_EVENT,REVIEW_REQUEST_REMOVED_EVENT,READY_FOR_REVIEW_EVENT,CONVERT_TO_DRAFT_EVENT,REVIEW_DISMISSED_EVENT,MERGED_EVENT,CLOSED_EVENT]){
+      timelineItems(last:100,itemTypes:[ISSUE_COMMENT,PULL_REQUEST_REVIEW,REVIEW_REQUESTED_EVENT,REVIEW_REQUEST_REMOVED_EVENT,READY_FOR_REVIEW_EVENT,CONVERT_TO_DRAFT_EVENT,REVIEW_DISMISSED_EVENT,MERGED_EVENT,CLOSED_EVENT,REOPENED_EVENT]){
         nodes{
           __typename
           ... on Node{ id }
@@ -208,17 +210,6 @@ while true; do
   state="$(echo "$pr_json" | jq -r '.state // ""')"
   decision="$(echo "$pr_json" | jq -r '.reviewDecision // ""')"
   head_sha="$(echo "$pr_json" | jq -r '.headRefOid // ""')"
-
-  # Later merges and closes print from the timeline, whose seeding would
-  # swallow the merge or close of a PR that ended before the watch began.
-  if [ "$first_poll" -eq 1 ]; then
-    case "$state" in
-      MERGED|CLOSED)
-        echo "STATE: $state"
-        state_reported=1
-        ;;
-    esac
-  fi
 
   # `prev_decision` tracks the empty value too: a dismissal clears
   # `reviewDecision`, and holding the stale one here would then swallow
@@ -295,8 +286,11 @@ while true; do
     # Every item kind goes through one pass in timeline order, so a
     # reviewer removed and requested again within one interval reads as
     # requested. Pending reviews are left out because a review keeps its
-    # ID when submitted, and empty-body reviews have nothing to read
-    # beyond what `REVIEW:` reports. A request's reviewer carries its own
+    # ID when submitted, so recording it while pending would mark it seen
+    # before it could print. Empty-body reviews are left out too: an empty
+    # approval or change request moves `REVIEW:`, and an empty comment
+    # review carries only thread comments, which `NEW_COMMENT` reports.
+    # A request's reviewer carries its own
     # `__typename` as the bracketed prefix, since a request can name a
     # team as well as a user or bot. An item kind without a line of its
     # own prints its `__typename`, so it reports rather than vanishes.
@@ -315,25 +309,27 @@ while true; do
           elif .__typename == "ReviewDismissedEvent" then "REVIEW_DISMISSED"
           elif .__typename == "MergedEvent" then "STATE: MERGED"
           elif .__typename == "ClosedEvent" then "STATE: CLOSED"
+          elif .__typename == "ReopenedEvent" then "STATE: OPEN"
           else .__typename end)' \
       2>/dev/null || true)"
     emitted="$(emit_new "$fresh_timeline" "$seen_timeline" "" "$seed_timeline")"
     if [ -n "$emitted" ]; then
       echo "$emitted"
     fi
-    if echo "$emitted" | grep -q '^STATE: '; then
-      state_reported=1
-    fi
+    case "$(echo "$emitted" | grep '^STATE: ' | tail -n 1)" in
+      "STATE: OPEN") state_reported=0 ;;
+      STATE:*) state_reported=1 ;;
+    esac
     seed_timeline=0
   fi
 
-  # Waiting for a reported `STATE` line keeps the end of a PR from going
-  # unreported when the timeline's poll fails or lags behind `gh pr view`.
+  # `gh pr view` decides the end, and prints it when the timeline has not.
   case "$state" in
     MERGED|CLOSED)
-      if [ "$state_reported" -eq 1 ]; then
-        exit 0
+      if [ "$state_reported" -eq 0 ]; then
+        echo "STATE: $state"
       fi
+      exit 0
       ;;
   esac
 
