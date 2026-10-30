@@ -2,6 +2,13 @@
 
 pr-watch reports events on GitHub pull requests to the Claude Code session that registered them, one notification line per change, for as long as the session runs. The `pr-watch:watch` skill (`skills/watch/SKILL.md`) is what a calling agent reads: the commands, the line format, the events, and what the watch leaves unreported. This page is for maintaining the plugin.
 
+## Requirements
+
+- A `gh` logged in to github.com, whose token `pr-monitor` reads with `gh auth token`
+- Python 3.9 or later for `pr-monitor`, standard library only
+- bash 4 or later for `pr-watch-monitor`
+- A local machine: the GitHub proxy of an Anthropic-hosted cloud session rejects GraphQL ([GitHub proxy](https://code.claude.com/docs/en/cloud-environments.md#github-proxy))
+
 ## How it runs
 
 - `monitors/monitors.json` starts `bin/pr-watch-monitor` with each session
@@ -13,6 +20,10 @@ pr-watch reports events on GitHub pull requests to the Claude Code session that 
 - `scripts/claude-code-setup.sh` adds `claude-plugins/` as a local marketplace, so the plugin loads in place from this checkout
 
 The lines `pr-monitor` and `pr-watch-monitor` print are the contract `SKILL.md` documents, so a change to an event's name, format, or timing changes `SKILL.md` in the same commit.
+
+## Tests
+
+`python3 -m unittest discover -s claude-plugins/pr-watch/tests` runs the tests of `bin/pr-monitor` from the repository root, on the standard library alone, and CI runs the same command.
 
 ## Allow rules
 
@@ -39,7 +50,7 @@ Concurrency:
 Lifecycle and install:
 
 - A session resumed more than 30 days after its watcher stopped starts with no watches, since its state files are gone
-- A SIGKILL of the watcher prints no `WATCH_ERROR`, and a `pr-monitor` killed with SIGKILL leaves its four temporary files in `$TMPDIR`; a SIGTERM removes them
+- A SIGKILL of the watcher prints no `WATCH_ERROR`
 - A change to `monitors.json` or to `bin/pr-watch-monitor` reaches a session at its next start; `/reload-plugins` did not start the watcher again in a session where the monitor's command had changed
-- An add lists the PR without its host, so `pr-monitor` polls it on `gh`'s default host
+- An add lists the PR without its host, and `pr-monitor` polls github.com, so a PR on another host fails with `POLL_ERROR` or reads as a same-named PR on github.com
 - The marketplace path in the dotfiles `claude/settings.json` is absolute; whether `~` works there, and what `claude plugin marketplace add` does on a machine with another `$HOME` where that name is already declared, are unverified
