@@ -6,7 +6,7 @@ pr-watch reports events on GitHub pull requests to the Claude Code session that 
 
 - A `gh` logged in to github.com, whose token `pr-monitor` reads with `gh auth token`
 - Python 3.9 or later for `pr-monitor`, standard library only
-- bash 4 or later for `pr-watch` and `pr-watch-monitor`
+- bash 4 or later for `pr-watch-monitor`
 - A local machine: the GitHub proxy of an Anthropic-hosted cloud session rejects GraphQL ([GitHub proxy](https://code.claude.com/docs/en/cloud-environments.md#github-proxy))
 
 ## How it runs
