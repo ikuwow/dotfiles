@@ -1,6 +1,6 @@
 # GitHub
 
-## gh の使い分け
+## gh の使い分けとリポジトリの調べ方
 
 - GitHubの操作はコーディングタスクの場合 `gh` コマンドを使う
     - ghが使えない環境やghで実現できない操作の場合のみ `raw.githubusercontent.com` 等を使ってよい

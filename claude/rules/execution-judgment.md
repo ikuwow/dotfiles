@@ -17,8 +17,9 @@
     - compaction summary や既存 issue のチェックリストに残る作業のうち、ユーザーが指示・承認した記録が会話にも summary にも無いものは、確認すべき提案として扱い、承認済みの plan に数えない（ユーザーが承認したのは示された範囲だけのため）
 - 外部影響のある操作を plan 承認・進行指示が個別承認したとみなすのは、対象と操作がそこに明記されている場合と、起動済み workflow/skill の手順として pre-authorize されている場合のみ
     - 例: issue body 編集の承認は comment 投稿の承認を含まない
-    - GitHub の issue・PR の状態変更と編集（close、reopen、merge、title・body・label・assignee の変更等）は、ユーザーが assignee の issue、ユーザーが author で assignee が空の issue、ユーザーが author の PR を除き、plan 承認・workflow/skill の pre-authorize に数えず、対象と操作を名指しした確認を取ってから実行する（他人の issue・PR は、作業の文脈で完了に見えても持ち主が判断するため）
-        - ユーザーかどうかは、その場で取った `gh issue view --json author,assignees` / `gh pr view --json author` を `gh api user --jq .login` と突き合わせて判定する
+    - GitHub の issue・PR の状態変更と編集（close、reopen、merge、title・body・label・assignee の変更等）は、assignees にユーザーを含む issue、ユーザーが author で assignees が空の issue、ユーザーが author の PR を除き、workflow/skill の pre-authorize に数えず、ユーザーが会話で対象と操作を名指しした指示・plan 承認・確認への肯定を得てから実行する（他人の issue・PR は、作業の文脈で完了に見えても持ち主が判断するため）
+        - ユーザーかどうかは、その場で取った `gh issue view <number> --json author,assignees --jq '.author.login, [.assignees[].login]'` / `gh pr view <number> --json author --jq .author.login` を `gh api user --jq .login` と突き合わせて判定する
+        - コメント投稿はこの対象に含めず、上の規則に従う
 
 ## 待機
 
