@@ -72,6 +72,8 @@ kind, `NEW_COMMENT` is pre-filtered to unresolved / non-outdated).
 - `READY_FOR_REVIEW`: no action; register that review activity is now
   expected.
 - `REVIEW: APPROVED`: no action; surface to the user on the next turn.
+- `REVIEW_REQUESTED` / `REVIEW_REQUEST_REMOVED`: no action; surface to
+  the user on the next turn, since who reviews the PR is the user's call.
 
 `NEW_TOP_COMMENT` carries author + login only — re-fetch body from
 the `comments` field before classifying.

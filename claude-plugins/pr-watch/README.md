@@ -39,7 +39,7 @@ Concurrency:
 Lifecycle and install:
 
 - A session resumed more than 30 days after its watcher stopped starts with no watches, since its state files are gone
-- A SIGKILL of the watcher prints no `WATCH_ERROR`, and a `pr-monitor` killed with SIGKILL leaves its three temporary files in `$TMPDIR`; a SIGTERM removes them
+- A SIGKILL of the watcher prints no `WATCH_ERROR`, and a `pr-monitor` killed with SIGKILL leaves its four temporary files in `$TMPDIR`; a SIGTERM removes them
 - A change to `monitors.json` or to `bin/pr-watch-monitor` reaches a session at its next start; `/reload-plugins` did not start the watcher again in a session where the monitor's command had changed
 - An add lists the PR without its host, so `pr-monitor` polls it on `gh`'s default host
 - The marketplace path in the dotfiles `claude/settings.json` is absolute; whether `~` works there, and what `claude plugin marketplace add` does on a machine with another `$HOME` where that name is already declared, are unverified

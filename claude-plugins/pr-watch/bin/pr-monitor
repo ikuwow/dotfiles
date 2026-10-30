@@ -62,7 +62,8 @@ declare -A poll_failed=()
 seen_comments="$(mktemp)"
 seen_top_comments="$(mktemp)"
 seen_reviews="$(mktemp)"
-trap 'rm -f "$seen_comments" "$seen_top_comments" "$seen_reviews"' EXIT
+seen_review_requests="$(mktemp)"
+trap 'rm -f "$seen_comments" "$seen_top_comments" "$seen_reviews" "$seen_review_requests"' EXIT
 
 # First-poll seeding: do not emit events for state that already held when
 # this process started. Only transitions during its lifetime should wake
@@ -117,6 +118,12 @@ threads_query='query($owner:String!,$repo:String!,$num:Int!){
 # --json comments` because that `author` object omits `__typename`, and
 # the same Bot/User classification is needed as for review threads and
 # reviews. Piggybacks on `reviews_query` to avoid an extra round-trip.
+#
+# Review requests are read from the timeline events rather than diffed
+# from `reviewRequests`: a reviewer who submits a review drops out of
+# `reviewRequests` without a ReviewRequestRemovedEvent, so only the
+# events tell a removal from a fulfilled request. `last` keeps the newest
+# events in the window however long the PR's history grows.
 # shellcheck disable=SC2016 # GraphQL query: $vars are query variables
 reviews_query='query($owner:String!,$repo:String!,$num:Int!){
   repository(owner:$owner,name:$repo){
@@ -127,8 +134,22 @@ reviews_query='query($owner:String!,$repo:String!,$num:Int!){
       comments(first:100){
         nodes{ id author{login __typename} }
       }
+      timelineItems(last:100,itemTypes:[REVIEW_REQUESTED_EVENT,REVIEW_REQUEST_REMOVED_EVENT]){
+        nodes{
+          __typename
+          ... on ReviewRequestedEvent{ id actor{login} requestedReviewer{ ...reviewer } }
+          ... on ReviewRequestRemovedEvent{ id actor{login} requestedReviewer{ ...reviewer } }
+        }
+      }
     }
   }
+}
+fragment reviewer on RequestedReviewer{
+  __typename
+  ... on User{login}
+  ... on Bot{login}
+  ... on Mannequin{login}
+  ... on Team{combinedSlug}
 }'
 
 # Emit one line per not-yet-seen comment ID. `fresh` is tab-separated
@@ -155,6 +176,19 @@ emit_new() {
     '
   fi
   echo "$sorted_fresh" >> "$seen_file"
+}
+
+# Print the review-request timeline events of one `__typename` from
+# `reviews_json` in `emit_new`'s format. The reviewer's `__typename`
+# becomes the label prefix, since a request can name a team as well as a
+# user or bot.
+review_requests() {
+  echo "$reviews_json" | jq -r --arg t "$1" '
+    .data.repository.pullRequest.timelineItems.nodes[]
+    | select(.__typename == $t)
+    | .requestedReviewer as $r
+    | "\(.id)\t[\(($r.__typename // "?") | ascii_upcase)] \($r.login // $r.combinedSlug // "?")\tby \(.actor.login // "?")"' \
+    2>/dev/null || true
 }
 
 while true; do
@@ -287,6 +321,11 @@ while true; do
       | "\(.id)\t\(if .author.__typename == "Bot" then "[BOT]" else "[USER]" end) \(.author.login)\t\(.state)"' \
       2>/dev/null || true)"
     emit_new "$fresh_reviews" "$seen_reviews" "NEW_REVIEW" "$seed_reviews"
+
+    emit_new "$(review_requests ReviewRequestedEvent)" \
+      "$seen_review_requests" "REVIEW_REQUESTED" "$seed_reviews"
+    emit_new "$(review_requests ReviewRequestRemovedEvent)" \
+      "$seen_review_requests" "REVIEW_REQUEST_REMOVED" "$seed_reviews"
     seed_reviews=0
   fi
 
