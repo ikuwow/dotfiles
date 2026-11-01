@@ -59,11 +59,11 @@ flowchart LR
   worktree (or feature branch) first. Creating files before branching
   leads to redundant copy-and-delete work.
 - Never modify commits that have already been pushed
-- Fix-push cap: stop autonomous fix pushes after 5 for this PR in this
-  session, counting the pushes made in every step and each fix round
-  that changed only the PR body, since past that the fixes are no longer
-  converging on their own. Surface the state and wait for a user
-  instruction — in the Watch step that means answering further events
+- Fix-push cap: stop autonomous fixes after 5 for this PR in this
+  session, counting every fix push made in any step and every
+  `/pr-selfcheck` re-run that follows a body-only fix, since past that
+  the fixes are no longer converging on their own. Surface the state and
+  wait for a user instruction — in the Watch step that means answering further events
   with replies and no push.
 - Run a design-change round whenever a design change is made in a fix
   that no upcoming code review will cover, in any step and whatever
@@ -127,8 +127,8 @@ Note: `.worktrees/` is covered by the global gitignore.
 
 ## 2. Implement
 
-The implementation work for this branch happens here. When it is
-delegated to the `implementer` subagent, read
+The implementation work for this branch happens here, ending with the
+branch committed and pushed. When it is delegated to the `implementer` subagent, read
 [implementer-dispatch.md](implementer-dispatch.md) before writing the
 brief, and follow it through the handback bound in the Check and
 review step.
@@ -155,8 +155,9 @@ displayed.
 
 ## 4. Check and review
 
-The checks run at once and feed one fix round, which repeats until
-nothing is left to fix.
+Three checks start at once, the code review joins once CI passes, and
+all of them feed one fix round, which repeats until nothing is left to
+fix. A design-change round restarts this step.
 
 ```mermaid
 flowchart TD
@@ -189,9 +190,9 @@ After any push, and after a watch exits with checks still pending,
 re-arm `gh pr checks --watch --fail-fast`.
 
 As soon as CI passes on a design no code review has judged, launch the
-code review without waiting for the other two, since `/pr-selfcheck`
-judges the PR body, the sweep strips process narration, and this review
-needs neither result first:
+code review, unless the user skipped it for this PR. Do not wait for the
+other two, since `/pr-selfcheck` judges the PR body, the sweep strips
+process narration, and this review needs neither result first:
 
 - `/pr-review-toolkit:review-pr` — multi-agent code review (CLAUDE.md
   compliance, bug detection, error handling, test coverage).
@@ -212,29 +213,34 @@ review waits for CI, so a CI failure leaves none to wait for.
    over in silence leaves the user unable to see the call was made
 1. Move anything the sweep escalated into the PR body
 1. Fix issues found by the code review and CI failures
-   (`gh run view --log-failed`), and commit the fixes (the sweep reads
-   committed content only). A dispatched implementer takes the CI
-   failure instead, under the push step below
-1. When any of the fixes is a design change, start the design-change
-   round from Principles and skip the remaining steps below
+   (`gh run view --log-failed`), and commit every fix so far, since the
+   sweep stops on a dirty working tree. A dispatched implementer whose
+   handback is unused takes the CI failure instead, under the push step
+   below
+1. When any of the fixes is a design change that no upcoming code review
+   will cover, start the design-change round from Principles and skip
+   the remaining steps below
 1. Re-run the `narrative-sweeper` agent when the fixes changed any file,
    so the comments and prose those fixes introduced are covered, and move
    anything it escalates into the PR body. Skip it when no file changed
    — its previous pass already covers the branch
-1. Push the fixes and the sweep's commits in one push. With a dispatched
-   implementer and a CI failure, hand the failure back to it instead,
-   under the handback bound in `implementer-dispatch.md`, so its push
-   carries these commits
+1. Push the fixes and the sweep's commits in one push. An implementer
+   taking a CI failure pushes them instead: hand the failure back under
+   the handback bound in `implementer-dispatch.md`, wait for its
+   completion report, and push anything it left
 1. Re-run `/pr-selfcheck` when the PR body or the branch changed since
-   its last run, and run the next fix round on what it and CI report
+   its last run, along with the sweep when an implementer's push brought
+   commits the sweep has not read, and run the next fix round on what
+   they and CI report
 
 Go to the Finalize step when CI passes, the last `/pr-selfcheck` read
 the current body and head, and no Fix, Note, review finding, escalation,
 or unpushed commit is left unhandled.
 
 The code review runs again only in a design-change round. After local
-fixes, the narrative-sweep re-run and the `/pr-selfcheck` re-run catch
-the inconsistencies those fixes introduced.
+fixes, the sweep re-run catches narration in the new comments and prose,
+and the `/pr-selfcheck` re-run catches drift between the body and the
+diff.
 
 ## 5. Finalize
 
