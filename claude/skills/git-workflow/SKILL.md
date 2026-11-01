@@ -15,7 +15,7 @@ step), and the `pr-watch` plugin (the Finalize and Watch steps).
 
 ## Flow
 
-A design change after a code review returns to Check and review.
+A design change in a later step returns to Check and review.
 
 ```mermaid
 flowchart LR
@@ -128,10 +128,10 @@ Note: `.worktrees/` is covered by the global gitignore.
 ## 2. Implement
 
 The implementation work for this branch happens here, ending with the
-branch committed and pushed. When it is delegated to the `implementer` subagent, read
-[implementer-dispatch.md](implementer-dispatch.md) before writing the
-brief, and follow it through the handback bound in the Check and
-review step.
+branch committed and pushed. When it is delegated to the `implementer`
+subagent, read [implementer-dispatch.md](implementer-dispatch.md) before
+writing the brief, and follow it through the handback bound it sets for
+the Check and review step.
 
 When the commit message or PR body will claim an exhaustive
 replacement or update ("replaced all X with Y"), run
@@ -155,24 +155,26 @@ displayed.
 
 ## 4. Check and review
 
-Three checks start at once, the code review joins once CI passes, and
-all of them feed one fix round, which repeats until nothing is left to
-fix. A design-change round restarts this step.
+Four checks read the PR and change nothing: three start at once, and
+the code review joins once CI passes. All of them feed one fix round,
+which repeats until nothing is left to fix. A design-change round
+restarts this step.
 
 ```mermaid
 flowchart TD
     selfcheck["/pr-selfcheck"]
-    sweep["narrative-sweeper"]
+    narrative["narrative-checker"]
     ci["CI"]
     review["Code review"]
     round["Fix round"]
 
     ci -- "passes, design not reviewed yet" --> review
     selfcheck --> round
-    sweep --> round
+    narrative --> round
     ci --> round
     review --> round
     round -- "PR changed" --> selfcheck
+    round -- "branch changed" --> narrative
     round -- "pushed" --> ci
     round -- "nothing left" --> finalize["5. Finalize"]
 ```
@@ -180,7 +182,7 @@ flowchart TD
 Launch all three in a single assistant message so they execute concurrently:
 
 - `/pr-selfcheck <PR number>` — PR body presentation review
-- the `narrative-sweeper` agent — process-record narration in the comments
+- the `narrative-checker` agent — process-record narration in the comments
   and Markdown prose the branch added. Pass it the repository path and
   the branch name, and nothing else
 - `gh pr checks --watch --fail-fast` — CI monitoring. Run with
@@ -191,12 +193,13 @@ re-arm `gh pr checks --watch --fail-fast`.
 
 As soon as CI passes on a design no code review has judged, launch the
 code review, unless the user skipped it for this PR. Do not wait for the
-other two, since `/pr-selfcheck` judges the PR body, the sweep strips
-process narration, and this review needs neither result first:
+other two, since no check writes to what another reads:
 
-- `/pr-review-toolkit:review-pr` — multi-agent code review (CLAUDE.md
-  compliance, bug detection, error handling, test coverage).
-  Reports findings in the conversation, does not post PR comments.
+- `/pr-review-toolkit:review-pr code comments tests errors types` —
+  multi-agent code review (CLAUDE.md compliance, bug detection, error
+  handling, test coverage). These aspects leave out `simplify`, which
+  edits in place. Reports findings in the conversation, does not post
+  PR comments.
 
 Fix a self-review finding that only touches the PR body as soon as it
 reports, since `gh pr edit` changes neither the branch nor the working
@@ -204,43 +207,39 @@ tree.
 
 ### Fix round
 
-Run a fix round once every launched check has reported, since the sweep
-edits the same working tree and the fixes land in one push. A code
-review waits for CI, so a CI failure leaves none to wait for.
+Run a fix round once every launched check has reported, so the fixes
+land in one push. A code review waits for CI, so a CI failure leaves
+none to wait for.
 
 1. Fix every self-review "Fix" item. Each "Note" is either acted on too,
    or declined in the assistant message with the reason — a Note passed
    over in silence leaves the user unable to see the call was made
-1. Move anything the sweep escalated into the PR body
+1. Apply what the `narrative-checker` agent reported: each finding's
+   rewrite or removal, and anything escalated into the PR body
 1. Fix issues found by the code review and CI failures
-   (`gh run view --log-failed`), and commit every fix so far, since the
-   sweep stops on a dirty working tree. A dispatched implementer whose
-   handback is unused takes the CI failure instead, under the push step
-   below
+   (`gh run view --log-failed`), and commit every fix so far. A
+   dispatched implementer whose handback is unused takes the CI failure
+   instead, under the push step below
 1. When any of the fixes is a design change that no upcoming code review
    will cover, start the design-change round from Principles and skip
    the remaining steps below
-1. Re-run the `narrative-sweeper` agent when the fixes changed any file,
-   so the comments and prose those fixes introduced are covered, and move
-   anything it escalates into the PR body. Skip it when no file changed
-   — its previous pass already covers the branch
-1. Push the fixes and the sweep's commits in one push. An implementer
-   taking a CI failure pushes them instead: hand the failure back under
-   the handback bound in `implementer-dispatch.md`, wait for its
-   completion report, and push anything it left
+1. Push the fixes in one push. An implementer taking a CI failure pushes
+   them instead: hand the failure back under the handback bound in
+   `implementer-dispatch.md`, wait for its completion report, and push
+   anything it left
 1. Re-run `/pr-selfcheck` when the PR body or the branch changed since
-   its last run, along with the sweep when an implementer's push brought
-   commits the sweep has not read, and run the next fix round on what
-   they and CI report
+   its last run and the `narrative-checker` agent when the branch
+   changed, and run the next fix round on what they and CI report
 
 Go to the Finalize step when CI passes, the last `/pr-selfcheck` read
-the current body and head, and no Fix, Note, review finding, escalation,
-or unpushed commit is left unhandled.
+the current body and head, the last `narrative-checker` read the current
+head, and no finding, Note, escalation, or unpushed commit is left
+unhandled.
 
 The code review runs again only in a design-change round. After local
-fixes, the sweep re-run catches narration in the new comments and prose,
-and the `/pr-selfcheck` re-run catches drift between the body and the
-diff.
+fixes, the `narrative-checker` re-run catches narration in the new
+comments and prose, and the `/pr-selfcheck` re-run catches drift between
+the body and the diff.
 
 ## 5. Finalize
 
