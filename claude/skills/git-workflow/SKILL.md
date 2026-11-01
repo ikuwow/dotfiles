@@ -13,6 +13,48 @@ Prerequisites: the `agynio/gh-pr-review` gh extension (Phase 5 review
 threads), the `pr-review-toolkit` plugin (Phase 2), and the `pr-watch`
 plugin (Phases 4 and 5).
 
+## Flow
+
+Phases 1 and 2 overlap, and every result converges in Phase 3.
+
+```mermaid
+flowchart TD
+    start["Steps 1-3: branch, implement, draft PR"]
+    start --> selfcheck
+    start --> sweep
+    start --> ci
+
+    subgraph phase1["Phase 1"]
+        selfcheck["/pr-selfcheck"]
+        sweep["narrative-sweeper"]
+        ci["gh pr checks --watch"]
+    end
+
+    subgraph phase2["Phase 2"]
+        review["/pr-review-toolkit:review-pr"]
+    end
+
+    ci -- "passes" --> review
+    ci -- "fails" --> ciFix["Fix CI with the self-review and sweep results in one push"]
+    ciFix --> phase1
+
+    selfcheck --> consolidate
+    sweep --> consolidate
+    review --> consolidate
+
+    consolidate["Phase 3: apply every result in one fix round"]
+    consolidate -- "design change" --> round["Design-change round: push, update title and body"]
+    round --> phase1
+    consolidate -- "changes made" --> recheck["Phase 3: re-run /pr-selfcheck and CI"]
+    recheck -- "Fix or failure" --> consolidate
+    recheck -- "both pass" --> finalize
+    consolidate -- "nothing to change" --> finalize
+
+    finalize["Phase 4: finalize the PR, start the watch"]
+    finalize --> watch["Phase 5: watch until merge"]
+    watch --> cleanup["Step 5: cleanup"]
+```
+
 ## Supporting files
 
 - [pr-reaction.md](pr-reaction.md) — bot-versus-human targeting for PR
@@ -66,9 +108,6 @@ plugin (Phases 4 and 5).
   - The round: push the committed fixes, update the PR title and body to
     the new design, then run Phase 1, Phase 2, and Phase 3 on the new
     head
-    - When the user skipped Phase 2 for this PR, the round runs Phase 1
-      alone after the title and body update, since Phase 3 without a
-      code review repeats what Phase 1 checks
   - A round started while the PR watch is not running continues into
     Phase 4
   - A round started while the PR watch is running, nested rounds
@@ -140,9 +179,9 @@ Proceed to step 4 once the PR exists and its URL is displayed.
 
 ## 4. Checks, review, and merge
 
-Five phases: pass all mechanical checks, run the code review,
-consolidate fixes, finalize the PR for review readiness, then watch
-PR activity until merge.
+Five phases: run the checks on the PR, overlap the code review with
+them, apply every result in one fix round, finalize the PR for review
+readiness, then watch PR activity until merge.
 
 ### Phase 1: PR self-review + narrative sweep + CI (parallel)
 
@@ -155,24 +194,25 @@ Launch all three in a single assistant message so they execute concurrently:
 - `gh pr checks --watch --fail-fast` — CI monitoring. Run with
   `run_in_background: true`
 
-If any of the three fails:
-- Fix every self-review "Fix" item. Each "Note" is either acted on too,
-  or declined in the assistant message with the reason — a Note passed
-  over in silence leaves the user unable to see the call was made
-- Move anything the sweep escalated into the PR body
-- Fix CI failures (`gh run view --log-failed`), or hand them back to
-  the implementer when one is dispatched, under the handback bound in
-  `implementer-dispatch.md`
-
-The sweep commits locally without pushing. Whenever it produced commits,
-push them together with any self-review and CI fixes in one push,
-regardless of whether the three checks passed, then re-run all three
-until all pass. After any push, and after a watch exits with checks still
+The sweep commits locally without pushing, and Phase 3 pushes its
+commits. After any push, and after a watch exits with checks still
 pending, re-arm `gh pr checks --watch --fail-fast`.
+
+When CI fails, wait for `/pr-selfcheck` and the sweep to report, since
+the sweep stops on a dirty working tree, then:
+
+- Fix the failure (`gh run view --log-failed`), or hand it back to the
+  implementer when one is dispatched, under the handback bound in
+  `implementer-dispatch.md`
+- Apply the self-review and sweep results as Phase 3 does
+- Push everything in one push and re-run all three, since the code
+  review waits for a head that passes CI
 
 ### Phase 2: Code review
 
-Once Phase 1 passes, launch:
+Launch this as soon as CI passes, without waiting for `/pr-selfcheck`
+or the sweep, since those two cover the PR body and the comments while
+this review judges the code:
 
 - `/pr-review-toolkit:review-pr` — multi-agent code review (CLAUDE.md
   compliance, bug detection, error handling, test coverage).
@@ -180,19 +220,29 @@ Once Phase 1 passes, launch:
 
 ### Phase 3: Consolidate and fix
 
-Once the review finishes, review the results:
+Once `/pr-selfcheck`, the sweep, and the code review have all reported,
+apply their results in one fix round so the fixes land in one push. A
+code review the user skipped is not waited for. Go to Phase 4 when
+there is nothing to fix and no sweep commit to push.
 
+1. Fix every self-review "Fix" item. Each "Note" is either acted on too,
+   or declined in the assistant message with the reason — a Note passed
+   over in silence leaves the user unable to see the call was made
+1. Move anything the sweep escalated into the PR body
 1. Fix issues found by the code review and commit the fixes (the sweep
    reads committed content only)
 1. When any of the fixes is a design change, start the design-change
    round from Principles and skip the remaining steps below
-1. Re-run the `narrative-sweeper` agent when the review fixes changed any
-   file, so the comments and prose those fixes introduced are covered.
-   Skip it when the review produced no code changes — its previous pass
-   already covers the branch
+1. Re-run the `narrative-sweeper` agent when the fixes changed any file,
+   so the comments and prose those fixes introduced are covered, and move
+   anything it escalates into the PR body. Skip it when no file changed
+   — its previous pass already covers the branch
 1. Push the fixes and the sweep's commits in one push, then re-run
    `/pr-selfcheck` and `gh pr checks --watch --fail-fast` to confirm the
-   PR is still consistent and CI passes.
+   PR is still consistent and CI passes. With nothing to push after a
+   body-only fix, re-run `/pr-selfcheck` alone
+1. When the re-run reports a "Fix" or CI fails, repeat these steps with
+   those results, fixing CI as in Phase 1, until both pass
 
 The code review runs again only in a design-change round. After local
 fixes, the narrative-sweep re-run and the push step that re-runs
