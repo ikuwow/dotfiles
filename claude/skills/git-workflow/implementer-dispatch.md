@@ -38,9 +38,11 @@ the point where the answer is yes.
 ## While it runs
 
 - A mid-run message from an implementer (push landed, entering a CI
-  fix round) is visibility only and needs no reply
+  fix round) needs no reply
   - The branch is still moving, so the Check and review step waits for
     the completion report
+- Start the PR watch on the message that gives the PR's URL, under the
+  Create a PR step
 
 ## When it returns
 
