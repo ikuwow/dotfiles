@@ -91,7 +91,7 @@ dotfiles/
 
 ### AI-Assisted Commit Messages
 
-`xdg-config/git/hooks/prepare-commit-msg` drafts a commit message via `claude -p` when `git commit` opens the editor, using the Claude Code login for authentication. The hook is a no-op when the `claude` CLI is not on PATH. Per-repo opt-in via `install-aimsg-hook.sh`. Disable per-invocation with `GIT_AI_COMMIT_MSG=0 git commit`. See the hook script for the model and requirements.
+`xdg-config/git/hooks/prepare-commit-msg` drafts a commit message via `claude -p` when `git commit` opens the editor, using the Claude Code login for authentication. The hook is a no-op when the `claude` CLI is not on PATH. `xdg-config/git/config` enables it as a config-based hook in repositories with a remote under `ikuwow/`, and hooks in `.git/hooks/` keep running after it. Other repositories opt in with `install-aimsg-hook.sh`; running that in an `ikuwow/` repository drafts twice. Disable it for a repository with `git config set hook.aimsg.enabled false`, or for one commit with `GIT_AI_COMMIT_MSG=0 git commit`. See the hook script for the model and requirements.
 
 ### Machine-Local Overrides
 
