@@ -11,7 +11,7 @@ structurally absent (e.g., no PR exists yet).
 
 Prerequisites: the `agynio/gh-pr-review` gh extension (the Watch step's
 review threads), the `pr-review-toolkit` plugin (the Check and review
-step), and the `pr-watch` plugin (the Finalize and Watch steps).
+step), and the `pr-watch` plugin (the Create a PR step onward).
 
 ## Flow
 
@@ -63,8 +63,8 @@ flowchart LR
   session, counting every fix push made in any step and every
   `/pr-selfcheck` re-run that follows a body-only fix, since past that
   the fixes are no longer converging on their own. Surface the state and
-  wait for a user instruction — in the Watch step that means answering further events
-  with replies and no push.
+  wait for a user instruction, answering further events and fixes still
+  waiting for a fix round with replies and no push.
 - Run a design-change round whenever a design change is made in a fix
   that no upcoming code review will cover, in any step and whatever
   finding, event, or failure the fix answers, since no code
@@ -82,19 +82,15 @@ flowchart LR
     design change
   - The round: push the committed fixes, update the PR title and body to
     the new design, then run the Check and review step on the new head
-  - A round started while the PR watch is not running continues into
-    the Finalize step
-  - A round started while the PR watch is running, nested rounds
-    included, ends with the Finalize items that update Verification and
-    check acceptance criteria, then returns to the watch
-    - Events arriving during the round wait until it ends, and the Watch
-      step's pre-push checks apply to its pushes
-    - A `STATE: MERGED` or `STATE: CLOSED` event with no `STATE: OPEN`
-      after it ends the round at once and goes to the Watch step's exit
-      conditions
+  - A round started in the Check and review or Finalize step continues
+    into the Finalize step
+  - A round started in the Watch step, nested rounds included, ends with
+    the Finalize items that update Verification and check acceptance
+    criteria, then returns to the Watch step
+    - The Watch step's pre-push checks apply to its pushes
   - When a round needs a push the fix-push cap forbids, the round ends
-    there and the cap's own handling takes over, including for held
-    events
+    there and the cap's own handling takes over, including for fixes
+    waiting for a fix round
   - Each round starts with a push, so the fix-push cap also bounds how
     many rounds run
 - Never end a turn that claims ongoing waiting (delegated fix push,
@@ -140,6 +136,20 @@ formatting or indentation.
 
 ## 3. Create a PR
 
+As soon as a PR exists, start the PR watch through the `pr-watch:watch`
+skill, so that a bot comment or a failing check on the draft reaches the
+session during the steps below. The re-fetch on its `WATCHING` line
+covers what arrived before the watch began.
+
+- For a PR an implementer opened or found, start it on the implementer's
+  progress message that gives the URL, or on its completion report when
+  no such message came
+- When the watch fails to start, report that and go on, since the
+  Finalize step checks the watch again
+- Start none when the user named "no PR watch" or a stopping point at
+  the draft PR, since an event would otherwise resume work past that
+  point
+
 For a PR the implementer opened, read
 [implementer-dispatch.md](implementer-dispatch.md) first and apply its
 `When it returns` steps, since the body it left is a placeholder.
@@ -155,9 +165,9 @@ displayed.
 ## 4. Check and review
 
 Four checks leave the branch and the working tree alone: three start at
-once, and the code review joins once CI passes. All of them feed one fix
-round, which repeats until nothing is left to fix. A design-change round
-restarts this step.
+once, and the code review joins once CI passes. All of them and the PR
+watch's events feed one fix round, which repeats until nothing is left
+to fix. A design-change round restarts this step.
 
 ```mermaid
 flowchart TD
@@ -165,6 +175,7 @@ flowchart TD
     narrative["narrative-checker"]
     ci["CI"]
     review["Code review"]
+    events["PR watch events"]
     round["Fix round"]
 
     ci -- "passes, design not reviewed yet" --> review
@@ -172,6 +183,7 @@ flowchart TD
     narrative --> round
     ci --> round
     review --> round
+    events --> round
     round -- "PR changed" --> selfcheck
     round -- "branch changed" --> narrative
     round -- "pushed" --> ci
@@ -204,6 +216,25 @@ Fix a self-review finding that only touches the PR body as soon as it
 reports, since `gh pr edit` changes neither the branch nor the working
 tree.
 
+### PR events
+
+The Watch step's items govern each line the PR watch delivers before
+the Finalize step hands the PR to review, and during a design-change
+round, with the differences below. A run that enters the workflow at
+this step starts the watch first.
+
+- A fix an event asks for waits for a fix round, so it lands in that
+  round's one push
+  - One asked for in the Finalize step returns the run to a fix round,
+    so the conditions for leaving this step hold again before the PR is
+    handed to review
+- A reply goes out at once, since it changes neither the branch nor the
+  working tree
+- A `CHECK` line and the `gh pr checks` monitoring can report one
+  failure, which makes one fix
+  - While an implementer works, a `CHECK` line waits for its completion
+    report, since the implementer can take that failure itself
+
 ### Fix round
 
 Run a fix round once every launched check has reported, so the fixes
@@ -218,10 +249,10 @@ none to wait for.
    first. In a rule, skill, or agent definition, apply one only when it
    keeps the instruction's meaning, and otherwise decline it in the
    assistant message with the reason
-1. Fix issues found by the code review and CI failures
-   (`gh run view --log-failed`), and commit every fix so far. A
-   dispatched implementer whose handback is unused takes the CI failure
-   instead, under the push step below
+1. Fix issues found by the code review, CI failures
+   (`gh run view --log-failed`), and what PR events ask for, and commit
+   every fix so far. A dispatched implementer whose handback is unused
+   takes the CI failure instead, under the push step below
 1. When any of the fixes is a design change that no upcoming code review
    will cover, start the design-change round from Principles and skip
    the remaining steps below
@@ -240,7 +271,8 @@ Go to the Finalize step when all of these hold:
 - A code review has judged the design, unless the user skipped it
 - The last `/pr-selfcheck` read the current body and head, and the last
   `narrative-checker` read the current head
-- No finding, Note, escalation, or unpushed commit is left unhandled
+- No finding, Note, escalation, PR event, or unpushed commit is left
+  unhandled
 
 The code review runs again only in a design-change round. After local
 fixes, the `narrative-checker` re-run catches narration in the new
@@ -263,14 +295,17 @@ Bring the PR into a state where a human reviewer can act on it:
    either address it or call it out as out-of-scope / follow-up. When
    addressing it makes a design change, start the design-change round
    from Principles.
-1. Start the PR watch through the `pr-watch:watch` skill
-   before the PR leaves draft. `READY_FOR_REVIEW` is itself a watched
-   event, so a watch started after the ready flip can never observe it.
-   - When the watch fails to start, carry that into this step's report
-1. In the same turn as the watch start, hand the PR to review:
+1. Unless the user named "no PR watch", confirm through the
+   `pr-watch:watch` skill that the PR's watch runs before the PR leaves
+   draft, and start it again when `pr-watch list` omits the PR.
+   `READY_FOR_REVIEW` is itself a watched event, so a watch started
+   after the ready flip can never observe it.
+   - When the watch fails to start, or `pr-watch list` exits 1 because
+     no watcher runs, carry that into this step's report
+1. Then, in the same turn, hand the PR to review:
    - When a loaded rule assigns the ready flip to the agent for this
-     PR, run `gh pr ready <PR number>` in a tool call after the watch
-     start, then continue into the Watch step
+     PR, run `gh pr ready <PR number>` in a later tool call, then
+     continue into the Watch step
      - A flip before the watch's `WATCHING` line may not report as
        `READY_FOR_REVIEW`, and the re-fetch on that line shows it
    - Otherwise surface this step's completion, before handing control back,
@@ -284,11 +319,13 @@ verification with `curl`, `aws logs tail`, etc.).
 
 ## 6. Watch
 
-The PR watch started in the Finalize step delivers one notification line per
-actionable change and stays silent in between, across turns. Start it
-here through the `pr-watch:watch` skill when the run entered the
-workflow at this step. The skill governs the lines about the watch
-itself, such as `WATCH_ERROR`; this step reacts to the PR's events.
+The PR watch delivers one notification line per actionable change and
+stays silent in between, across turns. Start it here through the
+`pr-watch:watch` skill when the run entered the workflow at this step.
+The skill governs the lines about the watch itself, such as
+`WATCH_ERROR`; this step reacts to the PR's events, in the steps before
+it too, where the Check and review step's PR events section adds its
+differences.
 
 1. Each event line names the PR and carries an `<EVENT>` with GitHub's
    own field values. The steps below cover the events with a fixed
@@ -323,6 +360,10 @@ itself, such as `WATCH_ERROR`; this step reacts to the PR's events.
    Principles.
 
 1. Exit conditions:
+   - A `STATE: MERGED` or `STATE: CLOSED` event with no `STATE: OPEN`
+     after it ends any step or design-change round still running, with
+     an implementer working on the branch stopped first, and the two
+     items below apply.
    - `STATE: MERGED` → run the Clean up step.
    - `STATE: CLOSED` without merge → skip cleanup.
      - A `STATE: OPEN` after it means the PR was reopened and the watch
