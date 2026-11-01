@@ -1,6 +1,6 @@
 ---
 name: pr-review
-description: The user's own policy and procedure for reviewing pull requests written by other people together with the user - working through the queue of PRs that request the user's review, prioritizing it, sizing review depth to risk, judging the overall design before line-level comments, and leaving every post on the PR to the user. Use whenever the user asks to review someone else's PR, to go through review requests or the review queue, or to decide which PR to review next, even when they only paste a PR URL and say "レビューして". Not for the user's own PRs, which pr-selfcheck and the git-workflow review phases cover.
+description: The user's own policy and procedure for reviewing pull requests written by other people together with the user - working through the queue of PRs that request the user's review, prioritizing it, sizing review depth to risk, judging the overall design before line-level comments, and leaving every post on the PR to the user. Use whenever the user asks to review someone else's PR, to go through review requests or the review queue, or to decide which PR to review next, even when they only paste a PR URL and say "レビューして". Not for the user's own PRs, which pr-selfcheck and the git-workflow Check and review step cover.
 ---
 
 # PR Review

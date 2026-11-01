@@ -1,6 +1,6 @@
 ---
 name: git-workflow
-description: Standard git/GitHub workflow - branch setup, implementation, draft PR creation, CI wait, code review phases, PR monitoring until merge, and post-merge cleanup. Trigger for any coding, editing, or fix task in a git repository that will end in a commit, branch, or pull request — including "just fix X" requests and documentation-only changes, not only tasks explicitly framed as workflow or release work. Also trigger when creating or updating a PR, watching CI, self-reviewing a PR, reacting to PR review comments or CI failures, or cleaning up branches after a merge.
+description: Standard git/GitHub workflow - branch setup, implementation, draft PR creation, CI wait, code review, PR monitoring until merge, and post-merge cleanup. Trigger for any coding, editing, or fix task in a git repository that will end in a commit, branch, or pull request — including "just fix X" requests and documentation-only changes, not only tasks explicitly framed as workflow or release work. Also trigger when creating or updating a PR, watching CI, self-reviewing a PR, reacting to PR review comments or CI failures, or cleaning up branches after a merge.
 ---
 
 # Git Workflow
@@ -9,50 +9,24 @@ Standard git/GitHub workflow for all projects.
 Follow each step in order. Skip a step only when its precondition is
 structurally absent (e.g., no PR exists yet).
 
-Prerequisites: the `agynio/gh-pr-review` gh extension (Phase 5 review
-threads), the `pr-review-toolkit` plugin (Phase 2), and the `pr-watch`
-plugin (Phases 4 and 5).
+Prerequisites: the `agynio/gh-pr-review` gh extension (the Watch step's
+review threads), the `pr-review-toolkit` plugin (the Check and review
+step), and the `pr-watch` plugin (the Finalize and Watch steps).
 
 ## Flow
 
-Phases 1 and 2 overlap, and every result converges in Phase 3.
+A design change after a code review returns to Check and review.
 
 ```mermaid
-flowchart TD
-    start["Steps 1-3: branch, implement, draft PR"]
-    start --> selfcheck
-    start --> sweep
-    start --> ci
-
-    subgraph phase1["Phase 1"]
-        selfcheck["/pr-selfcheck"]
-        sweep["narrative-sweeper"]
-        ci["gh pr checks --watch"]
-    end
-
-    subgraph phase2["Phase 2"]
-        review["/pr-review-toolkit:review-pr"]
-    end
-
-    ci -- "passes" --> review
-    ci -- "fails" --> ciFix["Fix CI with the self-review and sweep results in one push"]
-    ciFix --> phase1
-
-    selfcheck --> consolidate
-    sweep --> consolidate
-    review --> consolidate
-
-    consolidate["Phase 3: apply every result in one fix round"]
-    consolidate -- "design change" --> round["Design-change round: push, update title and body"]
-    round --> phase1
-    consolidate -- "changes made" --> recheck["Phase 3: re-run /pr-selfcheck and CI"]
-    recheck -- "Fix or failure" --> consolidate
-    recheck -- "both pass" --> finalize
-    consolidate -- "nothing to change" --> finalize
-
-    finalize["Phase 4: finalize the PR, start the watch"]
-    finalize --> watch["Phase 5: watch until merge"]
-    watch --> cleanup["Step 5: cleanup"]
+flowchart LR
+    start["1. Start work"] --> implement["2. Implement"]
+    implement --> pr["3. Create a PR"]
+    pr --> check["4. Check and review"]
+    check --> finalize["5. Finalize"]
+    finalize --> watch["6. Watch"]
+    watch --> cleanup["7. Clean up"]
+    finalize -. "design change" .-> check
+    watch -. "design change" .-> check
 ```
 
 ## Supporting files
@@ -67,15 +41,15 @@ flowchart TD
 
 ## Principles
 
-- Every step and every phase of a single workflow run is pre-authorized
-  by the user who initiated the task. Run every phase, continuously, and
-  report results at the end
+- Every step of a single workflow run is pre-authorized by the user who
+  initiated the task. Run every step, continuously, and report results
+  at the end
   - Pause only when blocked by an error or ambiguity, or when the user
     named a stopping point ("stop after creating the draft PR", "skip
-    Phase 2 for this PR", "no PR watch")
+    the code review for this PR", "no PR watch")
   - A small diff, a documentation-only change, and personal-project
-    scope are signals for weighing a finding within a phase; whether
-    the phase runs is not a judgment they reach
+    scope are signals for weighing a finding within a step; whether
+    the step runs is not a judgment they reach
   - Flipping the PR from draft to ready for review is the user's
     action, since marking a PR ready can request reviewers such as code
     owners at once, and a PR left in draft gives the user the first look
@@ -86,13 +60,14 @@ flowchart TD
   leads to redundant copy-and-delete work.
 - Never modify commits that have already been pushed
 - Fix-push cap: stop autonomous fix pushes after 5 for this PR in this
-  session, counting the pushes made in every phase, since past that the
-  fixes are no longer converging on their own. Surface the state and
-  wait for a user instruction — in Phase 5 that means answering further
-  events with replies and no push.
+  session, counting the pushes made in every step and each fix round
+  that changed only the PR body, since past that the fixes are no longer
+  converging on their own. Surface the state and wait for a user
+  instruction — in the Watch step that means answering further events
+  with replies and no push.
 - Run a design-change round whenever a design change is made in a fix
-  that no upcoming Phase 2 code review will cover, in any phase and
-  whatever finding, event, or failure the fix answers, since no code
+  that no upcoming code review will cover, in any step and whatever
+  finding, event, or failure the fix answers, since no code
   review has judged the new design
   - A fix is a design change when it changes an interface or contract,
     the data flow, the split of responsibilities between files or
@@ -106,17 +81,16 @@ flowchart TD
     would need a new sentence about the approach in the PR body is a
     design change
   - The round: push the committed fixes, update the PR title and body to
-    the new design, then run Phase 1, Phase 2, and Phase 3 on the new
-    head
+    the new design, then run the Check and review step on the new head
   - A round started while the PR watch is not running continues into
-    Phase 4
+    the Finalize step
   - A round started while the PR watch is running, nested rounds
-    included, ends with the Phase 4 steps that update Verification and
+    included, ends with the Finalize items that update Verification and
     check acceptance criteria, then returns to the watch
-    - Events arriving during the round wait until it ends, and Phase 5's
-      pre-push checks apply to its pushes
+    - Events arriving during the round wait until it ends, and the Watch
+      step's pre-push checks apply to its pushes
     - A `STATE: MERGED` or `STATE: CLOSED` event with no `STATE: OPEN`
-      after it ends the round at once and goes to Phase 5's exit
+      after it ends the round at once and goes to the Watch step's exit
       conditions
   - When a round needs a push the fix-push cap forbids, the round ends
     there and the cap's own handling takes over, including for held
@@ -127,12 +101,12 @@ flowchart TD
   CI run, CI rerun, external state change) without an armed event
   source — the completion notice of the background subagent for a
   delegated fix push, `gh pr checks --watch --fail-fast` with
-  `run_in_background: true` for a CI run or rerun, and the Phase 5 PR
-  watch for review activity and PR state. After every `gh run rerun` or
+  `run_in_background: true` for a CI run or rerun, and the PR watch
+  for review activity and PR state. After every `gh run rerun` or
   other re-kick, re-arm `gh pr checks` before yielding. State what is
   being awaited in the final message before going idle.
 
-## 1. Start Work
+## 1. Start work
 
 When the approved plan is several independent PRs, read
 [implementer-dispatch.md](implementer-dispatch.md) before the steps
@@ -151,12 +125,13 @@ isolation each one needs.
 
 Note: `.worktrees/` is covered by the global gitignore.
 
-## 2. Implement, commit, push
+## 2. Implement
 
 The implementation work for this branch happens here. When it is
 delegated to the `implementer` subagent, read
 [implementer-dispatch.md](implementer-dispatch.md) before writing the
-brief, and follow it through the Phase 1 handback bound.
+brief, and follow it through the handback bound in the Check and
+review step.
 
 When the commit message or PR body will claim an exhaustive
 replacement or update ("replaced all X with Y"), run
@@ -173,17 +148,33 @@ For a PR the implementer opened, read
 Then invoke the `pr-issue-writing` skill, which carries the
 properties a title and body are judged against and the commands that
 write them. This holds wherever the workflow writes or edits a title or
-body, including the Phase 4 updates.
+body, including the Finalize updates.
 
-Proceed to step 4 once the PR exists and its URL is displayed.
+Proceed to the Check and review step once the PR exists and its URL is
+displayed.
 
-## 4. Checks, review, and merge
+## 4. Check and review
 
-Five phases: run the checks on the PR, overlap the code review with
-them, apply every result in one fix round, finalize the PR for review
-readiness, then watch PR activity until merge.
+The checks run at once and feed one fix round, which repeats until
+nothing is left to fix.
 
-### Phase 1: PR self-review + narrative sweep + CI (parallel)
+```mermaid
+flowchart TD
+    selfcheck["/pr-selfcheck"]
+    sweep["narrative-sweeper"]
+    ci["CI"]
+    review["Code review"]
+    round["Fix round"]
+
+    ci -- "passes, design not reviewed yet" --> review
+    selfcheck --> round
+    sweep --> round
+    ci --> round
+    review --> round
+    round -- "PR changed" --> selfcheck
+    round -- "pushed" --> ci
+    round -- "nothing left" --> finalize["5. Finalize"]
+```
 
 Launch all three in a single assistant message so they execute concurrently:
 
@@ -194,61 +185,58 @@ Launch all three in a single assistant message so they execute concurrently:
 - `gh pr checks --watch --fail-fast` — CI monitoring. Run with
   `run_in_background: true`
 
-The sweep commits locally without pushing, and Phase 3 pushes its
-commits. After any push, and after a watch exits with checks still
-pending, re-arm `gh pr checks --watch --fail-fast`.
+After any push, and after a watch exits with checks still pending,
+re-arm `gh pr checks --watch --fail-fast`.
 
-When CI fails, wait for `/pr-selfcheck` and the sweep to report, since
-the sweep stops on a dirty working tree, then:
-
-- Fix the failure (`gh run view --log-failed`), or hand it back to the
-  implementer when one is dispatched, under the handback bound in
-  `implementer-dispatch.md`
-- Apply the self-review and sweep results as Phase 3 does
-- Push everything in one push and re-run all three, since the code
-  review waits for a head that passes CI
-
-### Phase 2: Code review
-
-Launch this as soon as CI passes, without waiting for `/pr-selfcheck`
-or the sweep, since those two cover the PR body and the comments while
-this review judges the code:
+As soon as CI passes on a design no code review has judged, launch the
+code review without waiting for the other two, since `/pr-selfcheck`
+judges the PR body, the sweep strips process narration, and this review
+needs neither result first:
 
 - `/pr-review-toolkit:review-pr` — multi-agent code review (CLAUDE.md
   compliance, bug detection, error handling, test coverage).
   Reports findings in the conversation, does not post PR comments.
 
-### Phase 3: Consolidate and fix
+Fix a self-review finding that only touches the PR body as soon as it
+reports, since `gh pr edit` changes neither the branch nor the working
+tree.
 
-Once `/pr-selfcheck`, the sweep, and the code review have all reported,
-apply their results in one fix round so the fixes land in one push. A
-code review the user skipped is not waited for. Go to Phase 4 when
-there is nothing to fix and no sweep commit to push.
+### Fix round
+
+Run a fix round once every launched check has reported, since the sweep
+edits the same working tree and the fixes land in one push. A code
+review waits for CI, so a CI failure leaves none to wait for.
 
 1. Fix every self-review "Fix" item. Each "Note" is either acted on too,
    or declined in the assistant message with the reason — a Note passed
    over in silence leaves the user unable to see the call was made
 1. Move anything the sweep escalated into the PR body
-1. Fix issues found by the code review and commit the fixes (the sweep
-   reads committed content only)
+1. Fix issues found by the code review and CI failures
+   (`gh run view --log-failed`), and commit the fixes (the sweep reads
+   committed content only). A dispatched implementer takes the CI
+   failure instead, under the push step below
 1. When any of the fixes is a design change, start the design-change
    round from Principles and skip the remaining steps below
 1. Re-run the `narrative-sweeper` agent when the fixes changed any file,
    so the comments and prose those fixes introduced are covered, and move
    anything it escalates into the PR body. Skip it when no file changed
    — its previous pass already covers the branch
-1. Push the fixes and the sweep's commits in one push, then re-run
-   `/pr-selfcheck` and `gh pr checks --watch --fail-fast` to confirm the
-   PR is still consistent and CI passes. With nothing to push after a
-   body-only fix, re-run `/pr-selfcheck` alone
-1. When the re-run reports a "Fix" or CI fails, repeat these steps with
-   those results, fixing CI as in Phase 1, until both pass
+1. Push the fixes and the sweep's commits in one push. With a dispatched
+   implementer and a CI failure, hand the failure back to it instead,
+   under the handback bound in `implementer-dispatch.md`, so its push
+   carries these commits
+1. Re-run `/pr-selfcheck` when the PR body or the branch changed since
+   its last run, and run the next fix round on what it and CI report
+
+Go to the Finalize step when CI passes, the last `/pr-selfcheck` read
+the current body and head, and no Fix, Note, review finding, escalation,
+or unpushed commit is left unhandled.
 
 The code review runs again only in a design-change round. After local
-fixes, the narrative-sweep re-run and the push step that re-runs
-`/pr-selfcheck` catch the inconsistencies those fixes introduced.
+fixes, the narrative-sweep re-run and the `/pr-selfcheck` re-run catch
+the inconsistencies those fixes introduced.
 
-### Phase 4: Finalize PR for review readiness
+## 5. Finalize
 
 Bring the PR into a state where a human reviewer can act on it:
 
@@ -264,32 +252,32 @@ Bring the PR into a state where a human reviewer can act on it:
    either address it or call it out as out-of-scope / follow-up. When
    addressing it makes a design change, start the design-change round
    from Principles.
-1. Start the Phase 5 PR watch through the `pr-watch:watch` skill
+1. Start the PR watch through the `pr-watch:watch` skill
    before the PR leaves draft. `READY_FOR_REVIEW` is itself a watched
    event, so a watch started after the ready flip can never observe it.
-   - When the watch fails to start, carry that into the Phase 4 report
+   - When the watch fails to start, carry that into this step's report
 1. In the same turn as the watch start, hand the PR to review:
    - When a loaded rule assigns the ready flip to the agent for this
      PR, run `gh pr ready <PR number>` in a tool call after the watch
-     start, then continue into Phase 5
+     start, then continue into the Watch step
      - A flip before the watch's `WATCHING` line may not report as
        `READY_FOR_REVIEW`, and the re-fetch on that line shows it
-   - Otherwise surface Phase 4 completion, before handing control back,
+   - Otherwise surface this step's completion, before handing control back,
      so the user can decide whether to mark the PR ready for review,
      and run `gh pr ready` only when the user asks for it
 
-Update incrementally as conditions are confirmed (e.g., after Phase 1
-CI passes, after apply / deploy succeeds, after post-deploy
+Update incrementally as conditions are confirmed (e.g., after CI
+passes, after apply / deploy succeeds, after post-deploy
 verification with `curl`, `aws logs tail`, etc.).
 
 
-### Phase 5: Watch PR activity until merge
+## 6. Watch
 
-The PR watch started in Phase 4 delivers one notification line per
+The PR watch started in the Finalize step delivers one notification line per
 actionable change and stays silent in between, across turns. Start it
 here through the `pr-watch:watch` skill when the run entered the
-workflow at this phase. The skill governs the lines about the watch
-itself, such as `WATCH_ERROR`; this phase reacts to the PR's events.
+workflow at this step. The skill governs the lines about the watch
+itself, such as `WATCH_ERROR`; this step reacts to the PR's events.
 
 1. Each event line names the PR and carries an `<EVENT>` with GitHub's
    own field values. The steps below cover the events with a fixed
@@ -324,7 +312,7 @@ itself, such as `WATCH_ERROR`; this phase reacts to the PR's events.
    Principles.
 
 1. Exit conditions:
-   - `STATE: MERGED` → execute step 5 (Cleanup).
+   - `STATE: MERGED` → run the Clean up step.
    - `STATE: CLOSED` without merge → skip cleanup.
      - A `STATE: OPEN` after it means the PR was reopened and the watch
        goes on, so keep watching.
@@ -343,7 +331,7 @@ itself, such as `WATCH_ERROR`; this phase reacts to the PR's events.
 next (merge, or "needs human attention" after the fix-push cap). Skip
 routine CI / comment events.
 
-## 5. Cleanup After Task Completion
+## 7. Clean up
 
 After the PR is merged (or the task is fully done):
 

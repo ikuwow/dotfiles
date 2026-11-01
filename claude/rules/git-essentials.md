@@ -5,7 +5,7 @@ include the workflow checklist below as an explicit section, from
 branch setup through cleanup. State scope-specific deviations
 explicitly (e.g., "stop after Step 3, skip CI wait").
 
-The full procedure (worktree setup, CI phases,
+The full procedure (worktree setup, checks, review,
 monitoring, cleanup) lives in the git-workflow skill. Plans MUST
 NOT restate the detailed procedures from the skill.
 
@@ -18,8 +18,10 @@ NOT restate the detailed procedures from the skill.
   project rules prohibit worktrees)
 - Step 2: implement, commit, push
 - Step 3: create a draft PR
-- Step 4: CI wait and review (Phases 1-5)
-- Step 5: cleanup after merge
+- Step 4: check and review
+- Step 5: finalize the PR
+- Step 6: watch until merge
+- Step 7: clean up after merge
 
 ## Commit
 

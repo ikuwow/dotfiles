@@ -1,6 +1,6 @@
 # PR Reaction
 
-How to react to PR events delivered by the Phase 5 PR watch.
+How to react to PR events delivered by the PR watch of the Watch step.
 
 ## Targeting policy
 
@@ -58,7 +58,8 @@ kind, `NEW_COMMENT` is pre-filtered to unresolved / non-outdated).
 
 - Clear fix request (`CHANGES_REQUESTED`, or a `NEW_COMMENT` /
   `NEW_TOP_COMMENT` / `NEW_REVIEW` asking for a change): modify code
-  and push, subject to Phase 5's pre-push checks and the fix-push cap.
+  and push, subject to the Watch step's pre-push checks and the
+  fix-push cap.
   When the fix is a design change, that push opens the design-change
   round from the git-workflow Principles.
   For a `NEW_COMMENT` whose thread is now `is_resolved` / `is_outdated`
