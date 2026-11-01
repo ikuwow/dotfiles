@@ -130,8 +130,7 @@ Note: `.worktrees/` is covered by the global gitignore.
 The implementation work for this branch happens here, ending with the
 branch committed and pushed. When it is delegated to the `implementer`
 subagent, read [implementer-dispatch.md](implementer-dispatch.md) before
-writing the brief, and follow it through the handback bound it sets for
-the Check and review step.
+writing the brief, and follow it through the handback bound it sets.
 
 When the commit message or PR body will claim an exhaustive
 replacement or update ("replaced all X with Y"), run
@@ -155,9 +154,9 @@ displayed.
 
 ## 4. Check and review
 
-Four checks read the PR and change nothing: three start at once, and
-the code review joins once CI passes. All of them feed one fix round,
-which repeats until nothing is left to fix. A design-change round
+Four checks leave the branch and the working tree alone: three start at
+once, and the code review joins once CI passes. All of them feed one fix
+round, which repeats until nothing is left to fix. A design-change round
 restarts this step.
 
 ```mermaid
@@ -193,7 +192,7 @@ re-arm `gh pr checks --watch --fail-fast`.
 
 As soon as CI passes on a design no code review has judged, launch the
 code review, unless the user skipped it for this PR. Do not wait for the
-other two, since no check writes to what another reads:
+other two, since no check changes the branch or the working tree:
 
 - `/pr-review-toolkit:review-pr code comments tests errors types` —
   multi-agent code review (CLAUDE.md compliance, bug detection, error
@@ -214,8 +213,11 @@ none to wait for.
 1. Fix every self-review "Fix" item. Each "Note" is either acted on too,
    or declined in the assistant message with the reason — a Note passed
    over in silence leaves the user unable to see the call was made
-1. Apply what the `narrative-checker` agent reported: each finding's
-   rewrite or removal, and anything escalated into the PR body
+1. Apply what the `narrative-checker` agent reported: each rewrite or
+   removal, with an escalated line's rationale moved into the PR body
+   first. In a rule, skill, or agent definition, apply one only when it
+   keeps the instruction's meaning, and otherwise decline it in the
+   assistant message with the reason
 1. Fix issues found by the code review and CI failures
    (`gh run view --log-failed`), and commit every fix so far. A
    dispatched implementer whose handback is unused takes the CI failure
@@ -229,12 +231,16 @@ none to wait for.
    anything it left
 1. Re-run `/pr-selfcheck` when the PR body or the branch changed since
    its last run and the `narrative-checker` agent when the branch
-   changed, and run the next fix round on what they and CI report
+   changed, and run the next fix round on what they, CI, and any code
+   review report
 
-Go to the Finalize step when CI passes, the last `/pr-selfcheck` read
-the current body and head, the last `narrative-checker` read the current
-head, and no finding, Note, escalation, or unpushed commit is left
-unhandled.
+Go to the Finalize step when all of these hold:
+
+- CI passes and every launched check has reported
+- A code review has judged the design, unless the user skipped it
+- The last `/pr-selfcheck` read the current body and head, and the last
+  `narrative-checker` read the current head
+- No finding, Note, escalation, or unpushed commit is left unhandled
 
 The code review runs again only in a design-change round. After local
 fixes, the `narrative-checker` re-run catches narration in the new

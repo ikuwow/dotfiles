@@ -110,8 +110,8 @@ for removal, never escalated.
 - <path>:<line> — <why it passes the criterion>
 
 ## Escalated
-- <the rationale, condensed, for the parent to place in the PR body, an
-  issue, or an ADR>
+- <path>:<line> — <the rationale, condensed, for the parent to place in
+  the PR body, an issue, or an ADR> — <the rewrite, or "remove">
 ```
 
 The verdict is PASS when Findings and Escalated are both "None", and
