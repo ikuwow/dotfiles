@@ -17,7 +17,7 @@ leaves a reviewer able to decide is the correct one.
 A body is ready when it holds all five properties below. Every rule in
 the five property sections belongs to exactly one of them, and within a
 section the top-level line is the rule while the lines beneath it
-qualify it. `/pr-selfcheck` evaluates the properties one at a time.
+qualify it.
 
 - Decidable — reading top-down, a reviewer arrives at the diff knowing
   what the change is for and where their attention belongs, each item

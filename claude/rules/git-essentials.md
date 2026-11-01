@@ -1,25 +1,13 @@
 # Git Essentials
 
 Every plan produced by EnterPlanMode's Phase 4 (Final Plan) MUST
-include the workflow checklist below as an explicit section, from
+list the steps of the git-workflow skill as an explicit section, from
 branch setup through cleanup. State scope-specific deviations
-explicitly (e.g., "stop after Step 3, skip CI wait").
+explicitly (e.g., "stop after creating the draft PR, skip CI wait").
 
-The full procedure (worktree setup, CI phases,
-monitoring, cleanup) lives in the git-workflow skill. Plans MUST
-NOT restate the detailed procedures from the skill.
-
-## Workflow checklist
-
-- Step 0: invoke `Skill(git-workflow)` (or `/git-workflow`) before
-  Step 1 — do not improvise the flow from this checklist alone
-- Step 1: pull default branch, create branch
-  (`git-worktree-create <branch>`, or `git checkout -b` where
-  project rules prohibit worktrees)
-- Step 2: implement, commit, push
-- Step 3: create a draft PR
-- Step 4: CI wait and review (Phases 1-5)
-- Step 5: cleanup after merge
+Invoke `Skill(git-workflow)` (or `/git-workflow`) to read those steps
+and before creating a branch, since the full procedure lives there.
+Plans MUST NOT restate the detailed procedures from the skill.
 
 ## Commit
 

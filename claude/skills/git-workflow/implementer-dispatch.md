@@ -39,7 +39,7 @@ the point where the answer is yes.
 
 - A mid-run message from an implementer (push landed, entering a CI
   fix round) is visibility only and needs no reply
-  - The branch is still moving, so review and Phase 1 checks wait for
+  - The branch is still moving, so the Check and review step waits for
     the completion report
 
 ## When it returns
@@ -52,13 +52,12 @@ the point where the answer is yes.
 - Systematic review stays with the PR review pipeline (pr-selfcheck /
   pr-review-toolkit)
 - When the implementer opened the PR, replace the placeholder body and
-  drop the `WIP:` prefix from the title before launching the Phase 1
-  checks, since `/pr-selfcheck` is one of the three and reviews
-  whatever body it finds
+  drop the `WIP:` prefix from the title before starting the Check and
+  review step, since `/pr-selfcheck` reviews whatever body it finds
   - The body is a fixed stub carrying no content, and the title is a
     real one-line summary that only needs the prefix removed
-- Once the body and title are rewritten, go straight to the Phase 1
-  checks even with CI still in flight, instead of waiting on it
+- Once the body and title are rewritten, go straight to the Check and
+  review step even with CI still in flight, instead of waiting on it
 
 ## CI failures
 

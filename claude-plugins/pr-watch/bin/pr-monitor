@@ -3,8 +3,7 @@
 
 Run per PR by `pr-watch-monitor`, whose output a Claude Code session
 receives as notifications; the silence between events is the entire
-point. See the git-workflow skill
-(claude/skills/git-workflow/SKILL.md) Phase 5 for the reaction protocol.
+point.
 
 Usage: GH_REPO=OWNER/REPO pr-monitor <pr-number> [interval-seconds]
 
