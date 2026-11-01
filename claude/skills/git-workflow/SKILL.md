@@ -63,8 +63,8 @@ flowchart LR
   session, counting every fix push made in any step and every
   `/pr-selfcheck` re-run that follows a body-only fix, since past that
   the fixes are no longer converging on their own. Surface the state and
-  wait for a user instruction, answering further events with replies and
-  no push.
+  wait for a user instruction, answering further events and fixes still
+  waiting for a fix round with replies and no push.
 - Run a design-change round whenever a design change is made in a fix
   that no upcoming code review will cover, in any step and whatever
   finding, event, or failure the fix answers, since no code
@@ -89,8 +89,8 @@ flowchart LR
     criteria, then returns to the Watch step
     - The Watch step's pre-push checks apply to its pushes
   - When a round needs a push the fix-push cap forbids, the round ends
-    there and the cap's own handling takes over, including for held
-    events
+    there and the cap's own handling takes over, including for fixes
+    waiting for a fix round
   - Each round starts with a push, so the fix-push cap also bounds how
     many rounds run
 - Never end a turn that claims ongoing waiting (delegated fix push,
@@ -145,9 +145,7 @@ covers what arrived before the watch began.
   progress message that gives the URL, or on its completion report when
   no such message came
 - When the watch fails to start, report that and go on, since the
-  Finalize step tries again
-- A run that enters the workflow after this step starts the watch where
-  it enters
+  Finalize step checks the watch again
 - Start none when the user named "no PR watch" or a stopping point at
   the draft PR, since an event would otherwise resume work past that
   point
@@ -220,16 +218,22 @@ tree.
 
 ### PR events
 
-The Watch step's items govern each line the PR watch delivers during
-this step, with these differences, which also hold for lines that
-arrive in the Create a PR step or while an implementer works on the
-branch:
+The Watch step's items govern each line the PR watch delivers before
+the Finalize step hands the PR to review, and during a design-change
+round, with the differences below. A run that enters the workflow at
+this step starts the watch first.
 
-- A fix an event asks for waits for the fix round, so it lands in that
-  round's one push; a reply goes out at once, since it changes neither
-  the branch nor the working tree
-- A `CHECK` line names a failure the `gh pr checks` monitoring also
-  reports, so the two make one fix
+- A fix an event asks for waits for a fix round, so it lands in that
+  round's one push
+  - One asked for in the Finalize step returns the run to a fix round,
+    so the conditions for leaving this step hold again before the PR is
+    handed to review
+- A reply goes out at once, since it changes neither the branch nor the
+  working tree
+- A `CHECK` line and the `gh pr checks` monitoring can report one
+  failure, which makes one fix
+  - While an implementer works, a `CHECK` line waits for its completion
+    report, since the implementer can take that failure itself
 
 ### Fix round
 
@@ -293,14 +297,15 @@ Bring the PR into a state where a human reviewer can act on it:
    from Principles.
 1. Unless the user named "no PR watch", confirm through the
    `pr-watch:watch` skill that the PR's watch runs before the PR leaves
-   draft, and start it again when `pr-watch list` exits 1 or omits the
-   PR. `READY_FOR_REVIEW` is itself a watched event, so a watch started
+   draft, and start it again when `pr-watch list` omits the PR.
+   `READY_FOR_REVIEW` is itself a watched event, so a watch started
    after the ready flip can never observe it.
-   - When the watch fails to start, carry that into this step's report
-1. In the same turn as that confirmation, hand the PR to review:
+   - When the watch fails to start, or `pr-watch list` exits 1 because
+     no watcher runs, carry that into this step's report
+1. Then, in the same turn, hand the PR to review:
    - When a loaded rule assigns the ready flip to the agent for this
-     PR, run `gh pr ready <PR number>` in a tool call after the
-     confirmation, then continue into the Watch step
+     PR, run `gh pr ready <PR number>` in a later tool call, then
+     continue into the Watch step
      - A flip before the watch's `WATCHING` line may not report as
        `READY_FOR_REVIEW`, and the re-fetch on that line shows it
    - Otherwise surface this step's completion, before handing control back,
@@ -314,12 +319,13 @@ verification with `curl`, `aws logs tail`, etc.).
 
 ## 6. Watch
 
-The PR watch started in the Create a PR step delivers one notification
-line per actionable change and stays silent in between, across turns.
-The `pr-watch:watch` skill governs the lines about the watch itself,
-such as `WATCH_ERROR`; this step reacts to the PR's events from the
-watch's start on, and the Check and review step's PR events section
-sets when a fix lands while that step runs.
+The PR watch delivers one notification line per actionable change and
+stays silent in between, across turns. Start it here through the
+`pr-watch:watch` skill when the run entered the workflow at this step.
+The skill governs the lines about the watch itself, such as
+`WATCH_ERROR`; this step reacts to the PR's events, in the steps before
+it too, where the Check and review step's PR events section adds its
+differences.
 
 1. Each event line names the PR and carries an `<EVENT>` with GitHub's
    own field values. The steps below cover the events with a fixed
@@ -355,8 +361,9 @@ sets when a fix lands while that step runs.
 
 1. Exit conditions:
    - A `STATE: MERGED` or `STATE: CLOSED` event with no `STATE: OPEN`
-     after it ends any step or design-change round still running, and
-     the two items below apply.
+     after it ends any step or design-change round still running, with
+     an implementer working on the branch stopped first, and the two
+     items below apply.
    - `STATE: MERGED` → run the Clean up step.
    - `STATE: CLOSED` without merge → skip cleanup.
      - A `STATE: OPEN` after it means the PR was reopened and the watch
