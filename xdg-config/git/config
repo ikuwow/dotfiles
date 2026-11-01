@@ -59,3 +59,9 @@
 	prune = true
 [submodule]
 	recurse = true
+[includeIf "hasconfig:remote.*.url:git@github.com:ikuwow/**"]
+    path = ~/.config/git/aimsg.inc
+[includeIf "hasconfig:remote.*.url:ssh://git@github.com/ikuwow/**"]
+    path = ~/.config/git/aimsg.inc
+[includeIf "hasconfig:remote.*.url:https://github.com/ikuwow/**"]
+    path = ~/.config/git/aimsg.inc
