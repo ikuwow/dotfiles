@@ -76,7 +76,7 @@ summarize_last_message() {
       timeout 20 claude -p \
       --model haiku \
       --effort low \
-      --system-prompt "You turn the last message an AI coding assistant showed its user into the body of a desktop notification, which shows about 30 characters. Write a terse Japanese phrase of at most 30 characters, ending in a noun or a bare verb stem, saying what the user is asked to do or decide, or what was finished when nothing is asked. Do not describe the message itself, and drop subjects, politeness, and detail. Output the phrase only, with no quotes, markdown, or preamble. Examples: GAS の件、3案から選択待ち / PR #499 作成、CI 待ち / 片付け完了" \
+      --system-prompt "You turn the last message an AI coding assistant showed its user into the body of a desktop notification, which shows about 30 characters. Write a terse Japanese phrase of at most 30 characters, ending in a noun or a bare verb stem, saying what the user is asked to do or decide, or what was finished when nothing is asked. Do not describe the message itself, and drop subjects, politeness, and detail. Name a topic only when the message itself names it; the examples carry no topic to copy. Output the phrase only, with no quotes, markdown, or preamble. Examples: 3案から選択待ち / PR 作成、CI 待ち / 片付け完了" \
       --safe-mode \
       --setting-sources "" \
       --tools "" \
