@@ -25,6 +25,12 @@ font-size = 12
 # Disable ligatures
 font-feature = -calt, -liga, -dlig
 
+# Resize every surface at once to force a fresh font load, aimed at CJK glyphs
+# drawn in a wrong face after a display change (whether it recovers them is unconfirmed)
+# Ref: https://github.com/ikuwow/dotfiles/issues/540
+keybind = all:super+alt+equal=increase_font_size:1
+keybind = all:super+alt+0=reset_font_size
+
 # Do not dim unfocused splits
 unfocused-split-opacity = 0.9
 
