@@ -20,8 +20,8 @@ quick-terminal-size = 1080px, 50%
 
 font-family = "Monaco"
 font-family = "BIZ UDGothic"
-# Monaco has no Bold face, so this leaves the bold style without a real face and
-# Ghostty synthesizes bold from Monaco instead of drawing bold ASCII with BIZ UDGothic Bold
+# Monaco has no Bold face, so Ghostty synthesizes bold from Monaco for the glyphs
+# Monaco covers instead of drawing them with BIZ UDGothic Bold
 font-family-bold = "Monaco"
 font-style = Regular
 font-size = 12
