@@ -131,8 +131,6 @@
       "mcp__claude_ai_Context7",
       "mcp__aws-knowledge",
       "mcp__google-developer-knowledge",
-      "mcp__claude_ai_Datadog__search_datadog_documentation",
-      "mcp__claude_ai_Datadog__read_datadog_documentation",
       "mcp__textlint",
       "mcp__notion__notion-search",
       "mcp__mcp-obsidian__obsidian_list_files_in_vault",

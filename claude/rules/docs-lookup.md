@@ -1,5 +1,5 @@
-# Documentation Lookup
+# ドキュメント参照
 
-- Search a product's documentation through the MCP server its vendor provides for that documentation, before Context7 or DeepWiki (a vendor's server searches its current official docs, and Context7's server instructions ask to be used for cloud services too)
-  - A vendor's MCP server for operating the product counts when it carries a documentation search tool, as the Datadog connector's `search_datadog_documentation` does
-- When no such server is connected to the session, use Context7 or DeepWiki
+- 製品のドキュメントは、ベンダーが提供するdocs用MCPサーバーでContext7・DeepWikiより先に検索する（ベンダーのサーバーは最新の公式ドキュメントを検索し、Context7のserver instructionsはクラウドサービスにも自身を使うよう求めるため）
+- そのサーバーがセッションに接続されていない時はContext7かDeepWikiを使う
+- Web検索よりMCPサーバー等の外部情報ツールを優先する
