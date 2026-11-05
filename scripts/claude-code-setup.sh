@@ -30,6 +30,15 @@ mcp_add() {
 # IDE-local servers (intellij-index, goland-index) are intentionally omitted
 mcp_add deepwiki '{"type":"http","url":"https://mcp.deepwiki.com/mcp"}'
 mcp_add Context7 '{"command":"npx","args":["-y","@upstash/context7-mcp"]}'
+mcp_add aws-knowledge '{"type":"http","url":"https://knowledge-mcp.global.api.aws"}'
+# Needs gcloud ADC (gcloud auth application-default login) and a quota
+# project with developerknowledge.googleapis.com enabled; set
+# GOOGLE_MCP_QUOTA_PROJECT in ~/.bash_profile.local to override the ADC
+# file's quota_project_id. Environments without gcloud skip it,
+# since the helper cannot produce a token there.
+if command -v gcloud >/dev/null 2>&1; then
+  mcp_add google-developer-knowledge '{"type":"http","url":"https://developerknowledge.googleapis.com/mcp","headersHelper":"~/bin/gcloud-adc-mcp-headers"}'
+fi
 # OBSIDIAN_API_KEY is expanded from process env by Claude Code at MCP server
 # launch time; set it in ~/.bash_profile.local. Host/port are hardcoded since
 # they're not secret and Claude Code's diagnostics warn about missing env vars.
