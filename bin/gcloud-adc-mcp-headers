@@ -3,7 +3,8 @@
 # Print MCP request headers for a Google API that authenticates with the
 # gcloud Application Default Credentials, for use as an MCP server's
 # headersHelper. A raw ADC access token carries no quota project, so the
-# API needs X-Goog-User-Project naming a project with the API enabled.
+# API needs X-Goog-User-Project naming a project with the API enabled, on
+# which the user holds serviceusage.services.use.
 # GOOGLE_MCP_QUOTA_PROJECT picks that project; without it, the
 # quota_project_id in gcloud's default ADC file is used.
 #

@@ -33,9 +33,9 @@ mcp_add Context7 '{"command":"npx","args":["-y","@upstash/context7-mcp"]}'
 mcp_add aws-knowledge '{"type":"http","url":"https://knowledge-mcp.global.api.aws"}'
 # Needs gcloud ADC (gcloud auth application-default login) and a quota
 # project with developerknowledge.googleapis.com enabled; set
-# GOOGLE_MCP_QUOTA_PROJECT in ~/.bash_profile.local to pick a project other
-# than the ADC one. Environments without gcloud, such as Claude Code web,
-# skip it so the server does not fail to connect in every session.
+# GOOGLE_MCP_QUOTA_PROJECT in ~/.bash_profile.local to override the project
+# (see bin/gcloud-adc-mcp-headers). Environments without gcloud skip it,
+# since the helper cannot produce a token there.
 if command -v gcloud >/dev/null 2>&1; then
   mcp_add google-developer-knowledge '{"type":"http","url":"https://developerknowledge.googleapis.com/mcp","headersHelper":"~/bin/gcloud-adc-mcp-headers"}'
 fi
