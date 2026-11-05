@@ -30,6 +30,9 @@ mcp_add() {
 # IDE-local servers (intellij-index, goland-index) are intentionally omitted
 mcp_add deepwiki '{"type":"http","url":"https://mcp.deepwiki.com/mcp"}'
 mcp_add Context7 '{"command":"npx","args":["-y","@upstash/context7-mcp"]}'
+mcp_add aws-knowledge '{"type":"http","url":"https://knowledge-mcp.global.api.aws"}'
+# Authenticates with gcloud ADC through bin/gcloud-adc-mcp-headers.
+mcp_add google-developer-knowledge '{"type":"http","url":"https://developerknowledge.googleapis.com/mcp","headersHelper":"~/bin/gcloud-adc-mcp-headers"}'
 # OBSIDIAN_API_KEY is expanded from process env by Claude Code at MCP server
 # launch time; set it in ~/.bash_profile.local. Host/port are hardcoded since
 # they're not secret and Claude Code's diagnostics warn about missing env vars.

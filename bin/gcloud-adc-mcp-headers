@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+# Print MCP request headers for a Google API that authenticates with the
+# gcloud Application Default Credentials, for use as an MCP server's
+# headersHelper. A raw ADC access token carries no quota project, so the
+# API needs X-Goog-User-Project naming a project with the API enabled.
+# GOOGLE_DEVELOPER_KNOWLEDGE_PROJECT picks that project; without it, the
+# ADC quota project is used.
+#
+# Usage: gcloud-adc-mcp-headers
+
+set -eu
+
+project="${GOOGLE_DEVELOPER_KNOWLEDGE_PROJECT:-}"
+if [ -z "$project" ]; then
+  project=$(jq -r '.quota_project_id // empty' "$HOME/.config/gcloud/application_default_credentials.json")
+fi
+
+gcloud auth application-default print-access-token |
+  jq -R --arg project "$project" '{Authorization: ("Bearer " + .), "X-Goog-User-Project": $project}'
