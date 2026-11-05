@@ -4,16 +4,16 @@
 # gcloud Application Default Credentials, for use as an MCP server's
 # headersHelper. A raw ADC access token carries no quota project, so the
 # API needs X-Goog-User-Project naming a project with the API enabled.
-# GOOGLE_DEVELOPER_KNOWLEDGE_PROJECT picks that project; without it, the
-# ADC quota project is used.
+# GOOGLE_MCP_QUOTA_PROJECT picks that project; without it, the
+# quota_project_id in gcloud's default ADC file is used.
 #
 # Usage: gcloud-adc-mcp-headers
 
-set -eu
+set -euo pipefail
 
-project="${GOOGLE_DEVELOPER_KNOWLEDGE_PROJECT:-}"
+project="${GOOGLE_MCP_QUOTA_PROJECT:-}"
 if [ -z "$project" ]; then
-  project=$(jq -r '.quota_project_id // empty' "$HOME/.config/gcloud/application_default_credentials.json")
+  project=$(jq -er '.quota_project_id' "$HOME/.config/gcloud/application_default_credentials.json")
 fi
 
 gcloud auth application-default print-access-token |
