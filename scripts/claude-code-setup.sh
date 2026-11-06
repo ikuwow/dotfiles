@@ -35,15 +35,20 @@ mcp_add aws-knowledge '{"type":"http","url":"https://knowledge-mcp.global.api.aw
 # project with developerknowledge.googleapis.com enabled; set
 # GOOGLE_MCP_QUOTA_PROJECT in ~/.bash_profile.local to override the ADC
 # file's quota_project_id. Environments without gcloud skip it,
-# since the helper cannot produce a token there.
-if command -v gcloud >/dev/null 2>&1; then
+# since the helper cannot produce a token there. Claude Code web skips it
+# too: its image ships gcloud but no ADC credentials.
+if [ "${CLAUDE_CODE_REMOTE:-}" != "true" ] && command -v gcloud >/dev/null 2>&1; then
   mcp_add google-developer-knowledge '{"type":"http","url":"https://developerknowledge.googleapis.com/mcp","headersHelper":"~/bin/gcloud-adc-mcp-headers"}'
 fi
 # OBSIDIAN_API_KEY is expanded from process env by Claude Code at MCP server
 # launch time; set it in ~/.bash_profile.local. Host/port are hardcoded since
 # they're not secret and Claude Code's diagnostics warn about missing env vars.
-# shellcheck disable=SC2016
-mcp_add mcp-obsidian '{"command":"uvx","args":["mcp-obsidian"],"env":{"OBSIDIAN_API_KEY":"${OBSIDIAN_API_KEY}","OBSIDIAN_HOST":"127.0.0.1","OBSIDIAN_PORT":"27123"}}'
+# Claude Code web skips it, since the Obsidian REST API listens only on the
+# local machine.
+if [ "${CLAUDE_CODE_REMOTE:-}" != "true" ]; then
+  # shellcheck disable=SC2016
+  mcp_add mcp-obsidian '{"command":"uvx","args":["mcp-obsidian"],"env":{"OBSIDIAN_API_KEY":"${OBSIDIAN_API_KEY}","OBSIDIAN_HOST":"127.0.0.1","OBSIDIAN_PORT":"27123"}}'
+fi
 # textlint resolves presets via Node sibling lookup, so each preset needs its own -p.
 mcp_add textlint "{\"command\":\"npx\",\"args\":[\"-y\",\"-p\",\"textlint\",\"-p\",\"textlint-rule-preset-jtf-style\",\"-p\",\"textlint-rule-preset-ja-technical-writing\",\"-p\",\"textlint-rule-preset-ai-writing\",\"textlint\",\"--mcp\",\"--config\",\"$HOME/.textlintrc.json\"]}"
 
