@@ -341,11 +341,12 @@ def rollup_checks(pr):
 
 
 def sleep_counting_clock():
-    """Return seconds on a clock that keeps counting while the machine sleeps.
+    """Return seconds on a clock that keeps counting while a Mac sleeps.
 
     macOS documents CLOCK_MONOTONIC so in clock_gettime(3), while
     `time.monotonic` there reads mach_absolute_time(), and the wall clock
-    can be set.
+    can be set. On Linux this clock skips a suspend, so no sleep is told
+    apart there.
     """
     return time.clock_gettime(time.CLOCK_MONOTONIC)
 
