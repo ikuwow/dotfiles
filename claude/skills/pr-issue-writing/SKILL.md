@@ -1,6 +1,6 @@
 ---
 name: pr-issue-writing
-description: Write or edit the title and body of a pull request or an issue, and create either. Carries the preflight that runs before writing one (target repository and its visibility, the repository's own rules and language, its template, a duplicate search), the five properties a PR body is judged against (Decidable, Grounded, Necessary, Scoped, Conformant), the criteria an issue body is judged against, the PR body template, the review a draft body passes against its sources, and the commands for creating a draft PR or an issue and for editing a title or body safely. Invoke before creating a PR or an issue, before writing a PR or issue title or body, including a draft shown in chat for the user to review, before editing one, and when bringing an existing PR into conformance. Invoke it again whenever the target repository differs from the one it last ran for.
+description: Write or edit the title and body of a pull request or an issue, and create either. Carries the preflight that runs before writing one (target repository and its visibility, the repository's own rules and language, its template, a duplicate search), the five properties a PR body is judged against (Decidable, Grounded, Necessary, Scoped, Conformant), the criteria an issue body is judged against, the PR body template, the review a draft body passes against its sources, and the commands for creating a draft PR or an issue, for editing a title or body safely, and for posting a comment. Invoke before creating a PR or an issue, before writing a PR or issue title or body, including a draft shown in chat for the user to review, before editing one, before posting a comment on an issue or a PR, and when bringing an existing PR into conformance. Invoke it again whenever the target repository differs from the one it last ran for.
 ---
 
 # Write a Pull Request or Issue
@@ -8,6 +8,11 @@ description: Write or edit the title and body of a pull request or an issue, and
 Creating a PR or an issue, and writing or editing its title or body,
 runs through this workflow, including a draft shown in chat, since
 approving it leads straight to posting it.
+
+A comment on an issue or a PR runs a shorter path: Step 1's
+`technical-writing` invocation, Step 2's Target check, Step 3's file
+write, Step 4, and Step 5, since a claim in a comment steers its readers
+as one in a body does.
 
 ## Workflow
 
@@ -129,6 +134,9 @@ changes.
      is an inference
    - Classifying an item states the writer's view, and reading a
      decision into it is an inference
+   - A sentence or heading saying the work proceeds with, adopts, or
+     decided on an option is a decision claim, and it is `sourced` only
+     when a source names who decided
    - A tool named in a step the reader is meant to follow
      (verification, rollout, rollback, monitoring) is a claim that the
      project uses it
@@ -161,3 +169,5 @@ repository than the working directory's.
   reworded, then send the title with `gh pr edit <number> --title '...'`
   and the body with `gh pr edit <number> --body-file <file>`
   (`gh issue edit` for an issue)
+- Comment: `gh issue comment <number> --body-file <file>`
+  (`gh pr comment` for a PR), and display the URL it prints

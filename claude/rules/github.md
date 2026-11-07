@@ -21,8 +21,9 @@
     - GitHub上に載る文章（issue/PR本文・コメント・commit message）では `#123` 形式で書き、現在のリポジトリと異なるリポジトリのものは `orgname/reponame#123` 形式で書く
     - 会話応答では `[#123 タイトル](<issue/PRのURL>)` 形式のMarkdownリンクにする（ターミナル上の `#123` はリンクにならず、番号だけでは何のissueか分からないため）
 
-## issue・PR の作成と title・body の編集
+## issue・PR の作成と title・body・コメントの執筆
 
-- PR・issueの作成前と、title・bodyを書く・編集する前に `Skill(pr-issue-writing)` を起動する（チャットに見せる下書きと、git workflow外で走らせる `gh pr edit` / `gh issue edit` を含む）
-    - PR・issueの作成前と本文の書き換え前のチェックは、このskillを通した時だけ走るため
+- PR・issueの作成前と、title・bodyを書く・編集する前と、issue・PRにコメントを投稿する前に `Skill(pr-issue-writing)` を起動する（チャットに見せる下書きと、git workflow外で走らせる `gh pr edit` / `gh issue edit` / `gh issue comment` / `gh pr comment` を含む）
+    - 作成前・本文の書き換え前・コメント投稿前のチェックは、このskillを通した時だけ走るため
+    - git-workflowがbotのreview eventに返すreplyは対象外（botの指摘への応答で、それを読んで動く人がいないため）
     - `implementer` subagentが作るplaceholder PRは対象外（親がdispatch前にskillのpreflightを済ませ、後でtitleとbodyを差し替えるため）
