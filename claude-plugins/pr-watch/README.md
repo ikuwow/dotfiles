@@ -8,8 +8,6 @@ pr-watch reports events on GitHub pull requests to the Claude Code session that 
 - Python 3.9 or later for `pr-monitor`, standard library only
 - bash 4 or later for `pr-watch-monitor`
 - A local machine: the GitHub proxy of an Anthropic-hosted cloud session rejects GraphQL ([GitHub proxy](https://code.claude.com/docs/en/cloud-environments.md#github-proxy))
-  - The plugin stays local-only, and a cloud session follows a PR with [Auto-fix](https://code.claude.com/docs/en/claude-code-on-the-web.md#auto-fix-pull-requests), which needs the Claude GitHub App on the repository
-  - Auto-fix acts on what it receives instead of reporting it: it pushes a fix it judges clear, asks the user first on an ambiguous request, and may reply to review threads under the user's GitHub account
 
 ## How it runs
 
