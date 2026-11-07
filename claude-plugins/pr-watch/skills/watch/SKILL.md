@@ -1,6 +1,6 @@
 ---
 name: watch
-description: Watch a GitHub pull request for new comments, reviews, review requests added or removed, dismissed reviews, failing checks, a flip into or out of draft, and merge or close, with each change delivered to this Claude Code session as a notification for as long as the session runs, idle or not. Use whenever a workflow says to watch, monitor, or wait on a PR's review activity or state, to stop watching a PR, or when a notification line starting with `<owner>/<repo>#<number>` or `WATCH_ERROR` arrives.
+description: Watch a GitHub pull request for new comments, reviews, review requests added or removed, dismissed reviews, failing checks, a flip into or out of draft, and merge or close, with each change delivered to this Claude Code session as a notification for as long as the session runs, idle or not. Use whenever a workflow says to watch, monitor, or wait on a PR's review activity or state, to stop watching a PR, or when a notification line starting with `<owner>/<repo>#<number>` or `WATCH_ERROR` arrives. Runs on a local machine only, since the GitHub proxy of an Anthropic-hosted cloud session rejects the GraphQL it polls; a cloud session follows a PR with Auto-fix instead, which needs the Claude GitHub App on the repository and acts on review comments and CI failures itself, pushing a fix it judges clear and replying to review threads under the user's GitHub account.
 ---
 
 # Watch a PR

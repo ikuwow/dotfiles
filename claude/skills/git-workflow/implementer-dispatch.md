@@ -65,7 +65,9 @@ the point where the answer is yes.
 
 - Hand a CI failure back to the same implementer, addressed by the
   name or agentId from its spawn result, instead of dispatching a
-  fresh one or taking the fix loop into the parent
+  fresh one or taking the fix loop into the parent, whether the failure
+  arrives in the Check and review step's fix round or as a `CHECK`
+  line in the Watch step
   - One handback per PR: the implementer gets a single fix round per
     dispatch, and a failure that survives the handback is the parent's
     call
