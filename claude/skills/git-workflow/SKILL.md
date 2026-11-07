@@ -47,15 +47,16 @@ flowchart LR
   - Pause only when blocked by an error or ambiguity, or when the user
     named a stopping point ("stop after creating the draft PR", "skip
     the code review for this PR", "no PR watch")
-  - A pause on a question whose answer the run needs before it can act
-    on the PR stops the PR watch through the `pr-watch:watch` skill and
-    starts it again on the user's answer, with the final message before
-    the pause saying so, since the answer arrives in the session while
-    each line of an unattended watch wakes it for a re-fetch and a
-    report
-    - The Finalize step's hand-off for the ready flip keeps the watch
-      running, since the flip and the reviews after it reach the
-      session only through the watch
+  - A pause on an error or ambiguity that blocks the run stops the PR
+    watch through the `pr-watch:watch` skill and starts it again on the
+    user's answer, with the final message before the pause saying so,
+    since the answer arrives in the session while each line of an
+    unattended watch wakes it for a re-fetch and a report
+    - Three pauses keep the watch running, since the PR goes on moving
+      during them and what moves it reaches the session only through
+      the watch: the Finalize step's hand-off for the ready flip, the
+      fix-push cap's wait, and a human-authored event surfaced under
+      [pr-reaction.md](pr-reaction.md)
   - A small diff, a documentation-only change, and personal-project
     scope are signals for weighing a finding within a step; whether
     the step runs is not a judgment they reach
@@ -214,8 +215,8 @@ re-arm `gh pr checks --watch --fail-fast`.
 When `gh pr checks` exits 1 with `no checks reported`, re-run it once
 after `/pr-selfcheck` and the `narrative-checker` agent report, since
 checks may not have registered against a new head yet. A second
-`no checks reported` means no check runs on this head, which counts as
-CI passing in this step, so the code review starts and the Finalize
+`no checks reported` counts as no check running on this head and as CI
+passing in this step, so the code review starts and the Finalize
 conditions can hold.
 
 As soon as CI passes on a design no code review has judged, launch the
@@ -371,10 +372,11 @@ differences.
 1. `CHECK`: `gh pr checks` links the failing check. For an Actions job,
    `gh run view --log-failed <databaseId>` from `gh run list` reaches the
    failed steps, which a conclusion like `cancelled` or `timed_out` does
-   not have. Fix and push under the same pre-push checks. On a PR a
-   dispatched implementer built whose handback is unused, hand the
-   failure back to it instead under the handback bound in
-   `implementer-dispatch.md`, and push anything it left. When the fix
+   not have. Fix and push under the same pre-push checks. When the
+   failing check is an Actions job, a dispatched implementer built this
+   PR, and its handback is unused, hand the failure back to it instead
+   under the handback bound in `implementer-dispatch.md`, and push
+   anything it left under the same pre-push checks. When the fix
    is a design change, that push opens the design-change round from
    Principles.
 

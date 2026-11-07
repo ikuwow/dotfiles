@@ -25,5 +25,5 @@
 
 - PR・issueの作成前と、title・bodyを書く・編集する前と、issue・PRにコメントを投稿する前に `Skill(pr-issue-writing)` を起動する（チャットに見せる下書きと、git workflow外で走らせる `gh pr edit` / `gh issue edit` / `gh issue comment` / `gh pr comment` を含む）
     - 作成前・本文の書き換え前・コメント投稿前のチェックは、このskillを通した時だけ走るため
-    - git-workflowがbotのreview eventに返すreplyは対象外（botの指摘への応答で、それを読んで動く人がいないため）
+    - git-workflowが `[BOT]` の `NEW_COMMENT` / `NEW_TOP_COMMENT` / `NEW_REVIEW` に返すreplyは対象外（botの質問・nitへの応答に限られ、git-workflowの手順が送り方まで定めるため）
     - `implementer` subagentが作るplaceholder PRは対象外（親がdispatch前にskillのpreflightを済ませ、後でtitleとbodyを差し替えるため）
