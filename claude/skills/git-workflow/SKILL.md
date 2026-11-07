@@ -47,14 +47,19 @@ flowchart LR
   - Pause only when blocked by an error or ambiguity, or when the user
     named a stopping point ("stop after creating the draft PR", "skip
     the code review for this PR", "no PR watch")
-  - A pause that hands control back to the user, on an error or
-    ambiguity that blocks the run or at the Finalize step's hand-off,
-    stops the PR watch through the `pr-watch:watch` skill and starts it
-    again on the user's next message, with the final message before the
-    pause saying so, since the reply arrives in the session while each
-    line of an unattended watch wakes it for a re-fetch and a report.
-    The re-fetch on the restarted watch's `WATCHING` line covers what
-    the PR did in between
+  - While a PR watch runs, a pause that hands control back to the
+    user, on an error or ambiguity that blocks the run or at the
+    Finalize step's hand-off, stops the watch through the
+    `pr-watch:watch` skill and starts it again on the user's next
+    message, with the final message before the pause saying so, since
+    the reply arrives in the session while each line of an unattended
+    watch wakes it for a re-fetch and a report
+    - The restarted watch takes what already exists as seen, so each
+      comment, review, and unresolved review thread that its
+      `WATCHING` re-fetch shows as newer than the pause goes through
+      [pr-reaction.md](pr-reaction.md) as if its line had printed
+    - A PR that merged or closed in between prints its `STATE:` line
+      on the restart, which the Watch step's exit conditions act on
     - Two pauses keep the watch running, since the run goes on reacting
       to the PR's events during them: the fix-push cap's wait and a
       human-authored event surfaced under [pr-reaction.md](pr-reaction.md)
@@ -329,8 +334,8 @@ Bring the PR into a state where a human reviewer can act on it:
      surface this step's completion, before handing control back, so
      the user can decide whether to mark the PR ready for review, and
      run `gh pr ready` only when the user asks for it
-     - On the user's next message, start the watch again unless the PR
-       has merged or closed, then continue into the Watch step
+     - On the user's next message, start the watch again under the
+       same item, then continue into the Watch step
 
 Update incrementally as conditions are confirmed (e.g., after CI
 passes, after apply / deploy succeeds, after post-deploy
