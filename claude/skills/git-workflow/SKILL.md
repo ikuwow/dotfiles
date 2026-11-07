@@ -285,14 +285,14 @@ none to wait for.
    `implementer-dispatch.md`, wait for its completion report, and push
    anything it left
 1. Re-run `/pr-selfcheck` once, here, when the branch changed or a body
-   edit added or changed a claim (a fact, figure, decision, or scope)
-   since its last run, and the `narrative-checker` agent when the branch
-   changed, then run the next fix round on what they, CI, and any code
-   review report
-   - A body edit that only rewords, splits, or reorders needs none, since
-     the claims `/pr-selfcheck` judged stand as it judged them, and
-     neither does an edit answering the Notes of a `PASS` verdict, since
-     a Note leaves the call to the author
+   edit added, changed, or removed a claim (a fact, figure, decision, or
+   scope) since its last run, and the `narrative-checker` agent when the
+   branch changed, then run the next fix round on what they, CI, and any
+   code review report
+   - Any other body edit, such as a rewording, a split, or a reorder,
+     needs none, whatever finding or Note it answers, since the claims
+     `/pr-selfcheck` judged stand as it judged them; a prose defect such
+     an edit brings in is left to the human reviewer
 
 Go to the Finalize step when all of these hold:
 
