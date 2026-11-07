@@ -283,9 +283,18 @@ class WatchTest(unittest.TestCase):
         )
 
     def test_a_source_that_worked_reports_only_a_run_of_failures(self):
-        short = [FAILED_POLL] * (pr_monitor.REPORT_AFTER_FAILURES - 1)
         long = [FAILED_POLL] * pr_monitor.REPORT_AFTER_FAILURES
-        lines = watch_lines(StubClient(poll(), *short, poll(), *long, poll(state="MERGED")))
+        lines = watch_lines(StubClient(poll(), *long, poll(state="MERGED")))
+        self.assertEqual(lines, ["WATCHING", "POLL_ERROR: graphql (pull request)", "STATE: MERGED"])
+
+    def test_a_success_between_short_runs_starts_the_count_again(self):
+        short = [FAILED_POLL] * (pr_monitor.REPORT_AFTER_FAILURES - 1)
+        lines = watch_lines(StubClient(poll(), *short, poll(), *short, poll(state="MERGED")))
+        self.assertEqual(lines, ["WATCHING", "STATE: MERGED"])
+
+    def test_an_outage_one_poll_short_of_the_stop_keeps_watching(self):
+        almost = [FAILED_POLL] * (pr_monitor.STOP_AFTER_FAILURES - 1)
+        lines = watch_lines(StubClient(poll(), *almost, poll(state="MERGED")))
         self.assertEqual(lines, ["WATCHING", "POLL_ERROR: graphql (pull request)", "STATE: MERGED"])
 
     def test_a_long_outage_stops_the_watch_with_one_line(self):
