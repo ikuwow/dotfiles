@@ -35,6 +35,17 @@ TOKEN_COMMAND = ["gh", "auth", "token", "--hostname", "github.com"]
 # Turns a call that stops responding for this long into a failed poll, which
 # reports, rather than a stalled loop, which stays silent.
 TIMEOUT_SECONDS = 60
+# A flaky network fails a source for a poll or two and recovers, and every
+# printed line wakes the session, so a source that has worked reports only a
+# run of failures this long. A source that has never worked reports at once,
+# since that is a watch that never started.
+REPORT_AFTER_FAILURES = 5
+# A network gone for this many polls in a row, as on a laptop carried away,
+# ends the watch with one line instead of leaving it to poll unattended.
+STOP_AFTER_FAILURES = 30
+# A poll that comes this much later than the interval asks means the machine
+# slept, and the failures right after a wake say nothing about the network.
+SLEEP_GAP_SECONDS = 60
 
 # The values that never warrant waking anybody are the only ones spelled
 # here, so a value added later reports rather than vanishes.
@@ -329,7 +340,7 @@ def rollup_checks(pr):
     return checks
 
 
-def watch(client, interval, parent):
+def watch(client, interval, parent, clock=time.time):
     """Poll until the PR ends or the parent process is gone.
 
     First-poll seeding: do not print events for state that already held when
@@ -341,11 +352,17 @@ def watch(client, interval, parent):
     the exceptions: a check already red is the reader's problem now, and a PR
     already merged or closed ends this process at the end of the first poll,
     so both report rather than seed.
+
+    `clock` is the wall clock, which keeps running while the machine sleeps,
+    so an interval's sleep that took far longer than asked tells a machine
+    sleep apart.
     """
     prev_decision = None
     prev_sha = ""
     prev_check = {}
     failed = set()
+    worked = set()
+    streak = {}
     seen_comments = set()
     seen_timeline = set()
     seed_threads = True
@@ -358,9 +375,23 @@ def watch(client, interval, parent):
         # drown the silence the rest of the script maintains.
         if ok:
             failed.discard(source)
-        elif source not in failed:
+            worked.add(source)
+            streak[source] = 0
+            return
+        streak[source] = streak.get(source, 0) + 1
+        if source in failed:
+            return
+        if source not in worked or streak[source] >= REPORT_AFTER_FAILURES:
             print(f"POLL_ERROR: {source}")
             failed.add(source)
+
+    def rest():
+        # Only the sleep is timed, since a query can take up to its timeout
+        # on a network that is up but slow.
+        start = clock()
+        time.sleep(interval)
+        if clock() - start > interval + SLEEP_GAP_SECONDS:
+            streak.clear()
 
     while True:
         # A `pr-watch-monitor` killed without running its trap would otherwise
@@ -381,10 +412,15 @@ def watch(client, interval, parent):
         pr_ok = not dig(body, "errors") and bool(dig(pr, "state"))
         report("graphql (pull request)", pr_ok)
         if not pr_ok:
+            # The pull request query gates every other source, so its run of
+            # failures is the watch's.
+            if streak["graphql (pull request)"] >= STOP_AFTER_FAILURES:
+                print(f"WATCH_STOPPED: graphql (pull request) failed in {STOP_AFTER_FAILURES} polls in a row")
+                return
             # A token that cannot read the PR still answers 200, so no 401
             # would replace it once `gh auth switch` fixes the access.
             client.token = None
-            time.sleep(interval)
+            rest()
             continue
         state = pr["state"]
         decision = pr.get("reviewDecision") or ""
@@ -451,7 +487,7 @@ def watch(client, interval, parent):
             print("WATCHING")
             announced = True
 
-        time.sleep(interval)
+        rest()
 
 
 def usage():

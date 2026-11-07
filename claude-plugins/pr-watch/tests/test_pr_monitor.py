@@ -161,11 +161,17 @@ class StubClient:
         return next(self.answers)
 
 
-def watch_lines(client):
+def watch_lines(client, clock=None):
     out = io.StringIO()
     with contextlib.redirect_stdout(out):
-        pr_monitor.watch(client, 0, None)
+        if clock is None:
+            pr_monitor.watch(client, 0, None)
+        else:
+            pr_monitor.watch(client, 0, None, clock)
     return out.getvalue().splitlines()
+
+
+FAILED_POLL = (None,)
 
 
 class WatchTest(unittest.TestCase):
@@ -275,6 +281,38 @@ class WatchTest(unittest.TestCase):
             lines,
             ["POLL_ERROR: graphql (pull request)", "POLL_ERROR: graphql (timeline)", "WATCHING", "STATE: MERGED"],
         )
+
+    def test_a_source_that_worked_reports_only_a_run_of_failures(self):
+        short = [FAILED_POLL] * (pr_monitor.REPORT_AFTER_FAILURES - 1)
+        long = [FAILED_POLL] * pr_monitor.REPORT_AFTER_FAILURES
+        lines = watch_lines(StubClient(poll(), *short, poll(), *long, poll(state="MERGED")))
+        self.assertEqual(lines, ["WATCHING", "POLL_ERROR: graphql (pull request)", "STATE: MERGED"])
+
+    def test_a_long_outage_stops_the_watch_with_one_line(self):
+        lines = watch_lines(StubClient(poll(), *[FAILED_POLL] * pr_monitor.STOP_AFTER_FAILURES))
+        self.assertEqual(
+            lines,
+            [
+                "WATCHING",
+                "POLL_ERROR: graphql (pull request)",
+                f"WATCH_STOPPED: graphql (pull request) failed in {pr_monitor.STOP_AFTER_FAILURES} polls in a row",
+            ],
+        )
+
+    def test_a_machine_sleep_restarts_the_run_of_failures(self):
+        run = pr_monitor.REPORT_AFTER_FAILURES - 1
+        # Each rest reads the clock before and after its sleep; the rest after
+        # the first run of failures takes far longer than the interval.
+        readings = []
+        for rest in range(1, 2 * run + 2):
+            start = rest * 10.0
+            slept = pr_monitor.SLEEP_GAP_SECONDS + 1 if rest == run + 1 else 0
+            readings += [start, start + slept]
+        lines = watch_lines(
+            StubClient(poll(), *[FAILED_POLL] * (2 * run), poll(state="MERGED")),
+            clock=iter(readings).__next__,
+        )
+        self.assertEqual(lines, ["WATCHING", "STATE: MERGED"])
 
     def test_unknown_rollup_shape_reports_once_and_the_watch_goes_on(self):
         pr = body(state="OPEN", headRefOid="aaaaaaa", commits="malformed")
