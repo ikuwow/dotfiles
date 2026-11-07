@@ -200,7 +200,7 @@ flowchart TD
     ci --> round
     review --> round
     events --> round
-    round -- "PR changed" --> selfcheck
+    round -- "claim or branch changed" --> selfcheck
     round -- "branch changed" --> narrative
     round -- "pushed" --> ci
     round -- "nothing left" --> finalize["5. Finalize"]
@@ -237,7 +237,8 @@ other two, since no check changes the branch or the working tree:
 
 Fix a self-review finding that only touches the PR body as soon as it
 reports, since `gh pr edit` changes neither the branch nor the working
-tree.
+tree, and leave its re-run to the fix round's last step, so the round's
+other body edits share it.
 
 ### PR events
 
@@ -283,17 +284,22 @@ none to wait for.
    them instead: hand the failure back under the handback bound in
    `implementer-dispatch.md`, wait for its completion report, and push
    anything it left
-1. Re-run `/pr-selfcheck` when the PR body or the branch changed since
-   its last run and the `narrative-checker` agent when the branch
-   changed, and run the next fix round on what they, CI, and any code
-   review report
+1. Re-run `/pr-selfcheck` once, here, when the branch changed or a body
+   edit added, changed, or removed a claim (a fact, figure, decision, or
+   scope) since its last run, and the `narrative-checker` agent when the
+   branch changed, then run the next fix round on what they, CI, and any
+   code review report
+   - Any other body edit, such as a rewording, a split, or a reorder,
+     needs none, whatever finding or Note it answers, since the claims
+     `/pr-selfcheck` judged stand as it judged them; a prose defect such
+     an edit brings in is left to the human reviewer
 
 Go to the Finalize step when all of these hold:
 
 - CI passes and every launched check has reported
 - A code review has judged the design, unless the user skipped it
-- The last `/pr-selfcheck` read the current body and head, and the last
-  `narrative-checker` read the current head
+- No `/pr-selfcheck` re-run is due under the fix round's last step, and
+  the last `narrative-checker` read the current head
 - No finding, Note, escalation, PR event, or unpushed commit is left
   unhandled
 
