@@ -340,7 +340,17 @@ def rollup_checks(pr):
     return checks
 
 
-def watch(client, interval, parent, clock=time.time):
+def sleep_counting_clock():
+    """Return seconds on a clock that keeps counting while the machine sleeps.
+
+    macOS documents CLOCK_MONOTONIC so in clock_gettime(3), while
+    `time.monotonic` there reads mach_absolute_time(), and the wall clock
+    can be set.
+    """
+    return time.clock_gettime(time.CLOCK_MONOTONIC)
+
+
+def watch(client, interval, parent, clock=sleep_counting_clock):
     """Poll until the PR ends or the parent process is gone.
 
     First-poll seeding: do not print events for state that already held when
@@ -353,9 +363,8 @@ def watch(client, interval, parent, clock=time.time):
     already merged or closed ends this process at the end of the first poll,
     so both report rather than seed.
 
-    `clock` is the wall clock, which keeps running while the machine sleeps,
-    so an interval's sleep that took far longer than asked tells a machine
-    sleep apart.
+    `clock` keeps counting while the machine sleeps, so an interval's sleep
+    that took far longer than asked tells a machine sleep apart.
     """
     prev_decision = None
     prev_sha = ""
