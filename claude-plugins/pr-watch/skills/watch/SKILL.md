@@ -39,7 +39,8 @@ A re-fetch below reads the PR's state, comments, reviews, review threads, reques
 | `REVIEW_REQUESTED: [<TYPE>] <reviewer> by <actor>` | `<actor>` requests a review from `<reviewer>`, including a re-request after that reviewer's review |
 | `REVIEW_REQUEST_REMOVED: [<TYPE>] <reviewer> by <actor>` | `<actor>` removes `<reviewer>` from the requested reviewers; a reviewer leaving the list by submitting a review prints no line |
 | `CHECK: <name> (<conclusion or state>) @<sha>` | A check on the head commit takes a value other than success, neutral, skipped, and the pending, queued, and running states; `<sha>` is the head commit's first 7 characters |
-| `POLL_ERROR: <source>` | A source fails for the first time in a run of failures; `<source>` is `graphql (pull request)`, `graphql (checks)` for a check list of no known shape, `graphql (threads)`, or `graphql (timeline)` |
+| `POLL_ERROR: <source>` | A source fails before its first success, or, after one, fails in 5 polls in a row; `<source>` is `graphql (pull request)`, `graphql (checks)` for a check list of no known shape, `graphql (threads)`, or `graphql (timeline)` |
+| `WATCH_STOPPED: graphql (pull request) failed in 30 polls in a row` | The pull request source failed in 30 polls in a row, which takes 30 to 60 minutes, and that PR's watch ended |
 | `WATCH_ERROR: pr-monitor exited with status <n>` | That PR's watch stopped on an error |
 
 - `[BOT]` marks an author whose GraphQL `author.__typename` is `Bot`, and `[USER]` every other author, with `<author>` as `?` where GitHub gives none, as for a deleted account
@@ -57,7 +58,10 @@ A re-fetch below reads the PR's state, comments, reviews, review threads, reques
   - A `CHECK` line matching a handled one in name, value, and `@<sha>` can be a repeat after a restart, a rerun that failed again, or another check sharing the name, and `gh pr view --json statusCheckRollup` lists each check to tell them apart
 - A PR's watch ends on its own with the first poll that finds the PR merged or closed, printing its `STATE: MERGED` or `STATE: CLOSED` line in that poll unless the timeline has already printed it, so lines from that poll can follow it
   - A poll whose last `STATE` line is `STATE: OPEN` finds the PR reopened, and the watch goes on
-- `POLL_ERROR` prints only when a source first fails; neither its later failures, its recovery, nor its cause print a line
+- `POLL_ERROR` prints once per run of failures; neither its later failures, its recovery, nor its cause print a line
+  - A source that has worked stays silent through a shorter run, so a flaky network wakes nobody
+  - A sleep of the machine that stretches the wait between two polls by more than a minute starts the count of a run again, since the network is down right after a wake
+    - The count of a run toward `WATCH_STOPPED` starts again too, so a machine that wakes for a few minutes at a time with no network keeps a silent watch rather than ending it
   - Events from that source wait until it recovers; a timeline item prints even when what it changed has reverted by then, while a check or review decision that reverts, or a review-thread comment whose thread is resolved or outdated by then, prints no line, and a failing `graphql (pull request)` holds back every event of the PR
   - Re-fetch the PR to see where it stands
 
@@ -77,6 +81,9 @@ Re-fetch the PR to find these, since no line reports them:
 - `<owner>/<repo>#<number> WATCH_ERROR` means that PR's watch stopped
   - Report it together with the lines just before it with the same prefix, which carry `pr-monitor`'s error output
   - Restart it once with `pr-watch add <owner>/<repo>#<number>`, then re-fetch on its `WATCHING` line; on a second `WATCH_ERROR` for the PR, report it and claim no ongoing wait on that PR
+- `<owner>/<repo>#<number> WATCH_STOPPED` means that PR's watch ended because the PR could not be read for 30 polls, as when the machine is off the network or the token lost access
+  - Report it once and claim no ongoing wait on that PR
+  - Start it again with `pr-watch add <owner>/<repo>#<number>` on the user's next message, once the network is up and `gh auth status` passes, then re-fetch on its `WATCHING` line; comments and reviews from while it was stopped show in that re-fetch and print no line
 - `WATCH_ERROR: pr-watch-monitor exited with status <n>` with no `<owner>/<repo>#<number>` means the watcher itself stopped, and no PR is watched until a new watcher starts: report it, and claim no ongoing wait on any PR
 - When the session ends, its watches stop; resuming the session under the same session ID (`claude --resume <session-id>`) starts a new watcher, which starts every unfinished watch again, each with a `WATCHING` line, and a PR that merged or closed in between prints its `STATE:` line instead
 - A watcher can also stop without a line, so before saying in a later turn that a PR is still watched, run `pr-watch list`; when it exits 1 or omits the PR, report that the PR is not watched and claim no ongoing wait on it
