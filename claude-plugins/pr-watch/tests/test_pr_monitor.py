@@ -299,6 +299,12 @@ class WatchTest(unittest.TestCase):
             ],
         )
 
+    def test_a_long_outage_of_another_source_reports_once_and_the_watch_goes_on(self):
+        pr, threads, _ = poll()
+        failing_timeline = [(pr, threads, None)] * pr_monitor.STOP_AFTER_FAILURES
+        lines = watch_lines(StubClient(poll(), *failing_timeline, poll(state="MERGED")))
+        self.assertEqual(lines, ["WATCHING", "POLL_ERROR: graphql (timeline)", "STATE: MERGED"])
+
     def test_a_machine_sleep_restarts_the_run_of_failures(self):
         run = pr_monitor.REPORT_AFTER_FAILURES - 1
         # Each rest reads the clock before and after its sleep; the rest after
