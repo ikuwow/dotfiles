@@ -55,8 +55,9 @@ if [ -n "$EFFORT" ]; then
   EFFORT_SEG="⚡ ${EFFORT_COLOR}${EFFORT}${RESET}${SEP}"
 fi
 
-# rate_seg <label> <pct> <resets_at> <date format>
-# Prints one rate-limit segment, or nothing when <pct> is empty.
+# rate_seg <label> <pct> <resets_at> <date format without the leading +>
+# Prints one rate-limit segment followed by SEP, or nothing when <pct> is
+# empty.
 rate_seg() {
   local label=$1 pct=$2 resets_at=$3 fmt=$4 seg resets
   if [ -z "$pct" ]; then
@@ -71,11 +72,11 @@ rate_seg() {
   printf '%s' "${seg}${SEP}"
 }
 
-# rate_limits is present only for claude.ai subscribers and only after the
-# session's first API response. Each window may be absent on its own
-# (five_hour can be missing while seven_day is present) and is dropped once
-# its resets_at passes, so each segment is omitted independently. The
-# seven_day reset can be days away, so it carries the weekday.
+# rate_limits carries five_hour and seven_day only for claude.ai
+# subscribers, and only after the session's first API response. Each window
+# may be absent on its own and is dropped once its resets_at passes, so each
+# segment is omitted independently. The seven_day reset can be days away,
+# so it carries the weekday.
 RATE_SEG="$(rate_seg 5h "$FIVE_HOUR_PCT" "$FIVE_HOUR_RESETS_AT" %H:%M)$(rate_seg 7d "$SEVEN_DAY_PCT" "$SEVEN_DAY_RESETS_AT" '%a %H:%M')"
 
 # Line 1: model, effort, context, rate limits, lines changed
