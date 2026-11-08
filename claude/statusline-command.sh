@@ -23,6 +23,8 @@ LINES_REMOVED=$(echo "$INPUT" | jq -r '.cost.total_lines_removed // 0')
 # comparisons in color_for_pct.
 FIVE_HOUR_PCT=$(echo "$INPUT" | jq -r '.rate_limits.five_hour.used_percentage // empty | round')
 FIVE_HOUR_RESETS_AT=$(echo "$INPUT" | jq -r '.rate_limits.five_hour.resets_at // empty')
+SEVEN_DAY_PCT=$(echo "$INPUT" | jq -r '.rate_limits.seven_day.used_percentage // empty | round')
+SEVEN_DAY_RESETS_AT=$(echo "$INPUT" | jq -r '.rate_limits.seven_day.resets_at // empty')
 
 color_for_pct() {
   local pct=$1
@@ -53,21 +55,30 @@ if [ -n "$EFFORT" ]; then
   EFFORT_SEG="⚡ ${EFFORT_COLOR}${EFFORT}${RESET}${SEP}"
 fi
 
-# rate_limits.five_hour is present only for claude.ai Pro/Max subscribers,
-# only after the session's first API response, and is dropped once its
-# resets_at passes; omit the segment whenever it is absent.
-RATE_SEG=""
-if [ -n "$FIVE_HOUR_PCT" ]; then
-  RATE_COLOR=$(color_for_pct "$FIVE_HOUR_PCT")
-  RATE_SEG="⏳ ${RATE_COLOR}${FIVE_HOUR_PCT}%${RESET}"
-  if [ -n "$FIVE_HOUR_RESETS_AT" ]; then
-    # BSD date takes -r <epoch>; GNU date takes -d @<epoch>.
-    RESETS_HM=$(date -r "$FIVE_HOUR_RESETS_AT" +%H:%M 2>/dev/null || date -d "@$FIVE_HOUR_RESETS_AT" +%H:%M)
-    RATE_SEG="${RATE_SEG} (→${RESETS_HM})"
+# rate_seg <label> <pct> <resets_at> <date format without the leading +>
+# Prints one rate-limit segment followed by SEP, or nothing when <pct> is
+# empty.
+rate_seg() {
+  local label=$1 pct=$2 resets_at=$3 fmt=$4 seg resets
+  if [ -z "$pct" ]; then
+    return
   fi
-  RATE_SEG="${RATE_SEG}${SEP}"
-fi
+  seg="⏳ ${label} $(color_for_pct "$pct")${pct}%${RESET}"
+  if [ -n "$resets_at" ]; then
+    # BSD date takes -r <epoch>; GNU date takes -d @<epoch>.
+    resets=$(date -r "$resets_at" "+$fmt" 2>/dev/null || date -d "@$resets_at" "+$fmt")
+    seg="${seg} (→${resets})"
+  fi
+  printf '%s' "${seg}${SEP}"
+}
 
-# Line 1: model, effort, context, 5-hour rate limit, lines changed
+# rate_limits carries five_hour and seven_day only for claude.ai
+# subscribers, and only after the session's first API response. Each window
+# may be absent on its own and is dropped once its resets_at passes, so each
+# segment is omitted independently. The seven_day reset can be days away,
+# so it carries the weekday.
+RATE_SEG="$(rate_seg 5h "$FIVE_HOUR_PCT" "$FIVE_HOUR_RESETS_AT" %H:%M)$(rate_seg 7d "$SEVEN_DAY_PCT" "$SEVEN_DAY_RESETS_AT" '%a %H:%M')"
+
+# Line 1: model, effort, context, rate limits, lines changed
 CTX_COLOR=$(color_for_pct "$CONTEXT_PCT")
 printf '%b' "🤖 ${MODEL}${SEP}${EFFORT_SEG}📊 ${CTX_COLOR}${CONTEXT_PCT}%${RESET}${SEP}${RATE_SEG}✏️ +${LINES_ADDED}/-${LINES_REMOVED}${SEP}\n"
