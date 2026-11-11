@@ -10,11 +10,14 @@ runs through this workflow, including a draft shown in chat, since
 approving it leads straight to posting it.
 
 A comment on an issue or a PR runs a shorter path: Step 1's
-`technical-writing` invocation, Step 2's Target and Rules checks, Step
+`technical-writing` invocation and the Grounding section of
+[issue-body.md](issue-body.md), Step 2's Target and Rules checks, Step
 3's file write, Step 4 with its title check left out, and Step 5, since
 a claim in a comment steers its readers as one in a body does. With no
 language rule in the target's files, a comment takes the language of
-the thread it joins.
+the thread it joins. A comment on an issue that records a result
+also applies the `- [ ]` items bullet of
+[issue-body.md](issue-body.md).
 
 ## Workflow
 
