@@ -35,8 +35,8 @@ body carries the content below in the order listed.
     reader takes the boxes as the issue's progress and an item settled
     earlier stays unchecked until an edit marks it
   - When a comment records the result, follow it with a body edit that
-    marks the item, or where the body stays unedited, name the settled
-    item in the comment
+    marks the item, and where that edit is refused or waits on an
+    approval, name the settled item in the comment
   - An item the results leave partly open stays `- [ ]`
 - Write every sentence so it reads without the chat session or the plan
   that produced it, since a reader of the issue has seen neither
