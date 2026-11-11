@@ -62,8 +62,8 @@ MESSAGE = (
 def _is_fable_model(name) -> bool:
     """Return True if ``name`` names a Fable model.
 
-    The alias and every full model ID count, so a new Fable release
-    needs no edit here:
+    The ``fable`` alias and any ID starting with ``claude-fable-``
+    count:
     >>> _is_fable_model("fable")
     True
     >>> _is_fable_model("claude-fable-5")
@@ -77,6 +77,8 @@ def _is_fable_model(name) -> bool:
     >>> _is_fable_model("opus")
     False
     >>> _is_fable_model("claude-opus-5-5")
+    False
+    >>> _is_fable_model("claude-fable")
     False
     >>> _is_fable_model(None)
     False
@@ -170,7 +172,7 @@ def _agent_pins_fable(subagent_type: str, agents_dir: str = _AGENTS_DIR) -> bool
     >>> _agent_pins_fable("opus-pinned", agents_dir=_tmpdir)
     False
 
-    Alias ``claude-fable-5`` also counts as fable-pinned:
+    A full ID (``claude-fable-5``) also counts as fable-pinned:
     >>> _ = open(os.path.join(_tmpdir, "cf5-pinned.md"), "w").write(
     ...     "---\\nmodel: claude-fable-5\\n---\\n")
     >>> _agent_pins_fable("cf5-pinned", agents_dir=_tmpdir)
@@ -181,6 +183,12 @@ def _agent_pins_fable(subagent_type: str, agents_dir: str = _AGENTS_DIR) -> bool
     ...     "---\\nmodel: 'claude-fable-5-2'\\n---\\n")
     >>> _agent_pins_fable("cf52-pinned", agents_dir=_tmpdir)
     True
+
+    A non-Fable full ID is not fable-pinned:
+    >>> _ = open(os.path.join(_tmpdir, "co55-pinned.md"), "w").write(
+    ...     "---\\nmodel: claude-opus-5-5\\n---\\n")
+    >>> _agent_pins_fable("co55-pinned", agents_dir=_tmpdir)
+    False
     """
     if not subagent_type or "/" in subagent_type or ".." in subagent_type:
         return False
@@ -212,8 +220,10 @@ def _effective_model_is_fable(tool_input: dict) -> bool:
     >>> _effective_model_is_fable({"model": "fable"})
     True
 
-    Alias ``claude-fable-5`` also counts as Fable:
+    Full IDs (``claude-fable-5``, ``claude-fable-5-2``) also count as Fable:
     >>> _effective_model_is_fable({"model": "claude-fable-5"})
+    True
+    >>> _effective_model_is_fable({"model": "claude-fable-5-2"})
     True
 
     Explicit non-fable model, regardless of session inheritance:
