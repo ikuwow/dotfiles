@@ -30,13 +30,13 @@ body carries the content below in the order listed.
   body, including what it quotes, since an issue may be public
 - List what closes the issue, where it is already known, as `- [ ]`
   items
-  - Mark an item `[x]` in the edit that records the result settling
-    it, and when a comment records that result, follow the comment with
-    a body edit that marks it, since a reader takes the boxes as the
-    issue's progress
   - On every edit, read each `- [ ]` item against the results the
-    session has seen and mark the ones they settle, since an item
-    settled earlier stays unchecked until an edit marks it
+    session has seen and mark `[x]` the ones they settle, since a
+    reader takes the boxes as the issue's progress and an item settled
+    earlier stays unchecked until an edit marks it
+  - When a comment records the result, follow it with a body edit that
+    marks the item, or where the body stays unedited, name the settled
+    item in the comment
   - An item the results leave partly open stays `- [ ]`
 - Write every sentence so it reads without the chat session or the plan
   that produced it, since a reader of the issue has seen neither
@@ -61,6 +61,9 @@ body carries the content below in the order listed.
     `git -C <clone> rev-parse origin/HEAD`, or with no clone, or when
     `origin/HEAD` does not resolve, from
     `gh api repos/<owner>/<repo>/commits/HEAD --jq .sha`
+    - For code that only another branch or a tag holds, put
+      `origin/<branch>` or `<tag>^{commit}` in place of `origin/HEAD`,
+      and the branch or tag name in place of `HEAD` in the API path
   - Read the line numbers from the file at that SHA, as
     `git -C <clone> grep -n <pattern> <sha> -- <path>` prints them,
     since the working tree may differ from it

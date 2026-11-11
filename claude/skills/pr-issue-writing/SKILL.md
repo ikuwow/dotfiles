@@ -15,9 +15,8 @@ A comment on an issue or a PR runs a shorter path: Step 1's
 3's file write, Step 4 with its title check left out, and Step 5, since
 a claim in a comment steers its readers as one in a body does. With no
 language rule in the target's files, a comment takes the language of
-the thread it joins. When a comment on an issue records a result that
-settles a `- [ ]` item of the issue's body, an edit of that body
-follows it under the checklist item of
+the thread it joins. A comment on an issue that records a result
+also applies the `- [ ]` items bullet of
 [issue-body.md](issue-body.md).
 
 ## Workflow
