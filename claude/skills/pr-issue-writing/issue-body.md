@@ -59,11 +59,7 @@ body carries the content below in the order listed.
     `git -C <clone> fetch origin`, from
     `git -C <clone> rev-parse origin/HEAD`, or with no clone, or when
     `origin/HEAD` does not resolve, from
-    `gh api repos/<owner>/<repo>/commits/HEAD --jq .sha`
-    - For code that only another branch or a tag holds, put
-      `origin/<branch>` or `<tag>^{commit}` in place of `origin/HEAD`,
-      and the branch or tag name in place of `HEAD` in the API path
-  - Read the line numbers from the file at that SHA, as
+    `gh api repos/<owner>/<repo>/commits/HEAD --jq .sha`  - Read the line numbers from the file at that SHA, as
     `git -C <clone> grep -n <pattern> <sha> -- <path>` prints them,
     since the working tree may differ from it
   - For a Markdown file put `?plain=1` before `#L`, since line anchors
