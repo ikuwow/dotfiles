@@ -527,7 +527,7 @@
     }
   },
   "modelSettings": {
-    "claude-opus-5-5": {
+    "opus": {
       "effortLevel": "high"
     },
     "fable": {
