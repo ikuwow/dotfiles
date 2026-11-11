@@ -58,7 +58,8 @@ body carries the content below in the order listed.
   - Take the full SHA from the remote, since a link to a commit that
     was never pushed does not resolve: after
     `git -C <clone> fetch origin`, from
-    `git -C <clone> rev-parse origin/HEAD`, or with no clone from
+    `git -C <clone> rev-parse origin/HEAD`, or with no clone, or when
+    `origin/HEAD` does not resolve, from
     `gh api repos/<owner>/<repo>/commits/HEAD --jq .sha`
   - Read the line numbers from the file at that SHA, as
     `git -C <clone> grep -n <pattern> <sha> -- <path>` prints them,
