@@ -30,6 +30,14 @@ body carries the content below in the order listed.
   body, including what it quotes, since an issue may be public
 - List what closes the issue, where it is already known, as `- [ ]`
   items
+  - Mark an item `[x]` in the edit that records the result settling
+    it, and when a comment records that result, follow the comment with
+    a body edit that marks it, since a reader takes the boxes as the
+    issue's progress
+  - On every edit, read each `- [ ]` item against the results the
+    session has seen and mark the ones they settle, since an item
+    settled earlier stays unchecked until an edit marks it
+  - An item the results leave partly open stays `- [ ]`
 - Write every sentence so it reads without the chat session or the plan
   that produced it, since a reader of the issue has seen neither
 
@@ -42,6 +50,24 @@ body carries the content below in the order listed.
     a hypothesis with the evidence that points to it
 - Show the query and the scope behind a negative or absence claim ("no
   X remains")
+- Cite source code as a link to its lines at a commit,
+  `https://github.com/<owner>/<repo>/blob/<sha>/<path>#L<start>-L<end>`,
+  since a bare path and line names neither the repository nor the
+  revision, and a link through a branch name points at other lines
+  once the branch moves
+  - Take the full SHA from the remote, since a link to a commit that
+    was never pushed does not resolve: after
+    `git -C <clone> fetch origin`, from
+    `git -C <clone> rev-parse origin/HEAD`, or with no clone from
+    `gh api repos/<owner>/<repo>/commits/HEAD --jq .sha`
+  - Read the line numbers from the file at that SHA, as
+    `git -C <clone> grep -n <pattern> <sha> -- <path>` prints them,
+    since the working tree may differ from it
+  - For a Markdown file put `?plain=1` before `#L`, since line anchors
+    apply to the unrendered view
+  - GitHub renders such a link as a code snippet only in the repository
+    the code is in, so cite code of any other repository as a link
+    whose text names the repository, the path, and the lines
 - Check that every URL the writer can open resolves to the content it
   is cited for
 - Summarize context that lives elsewhere (another issue, a PR, a design
