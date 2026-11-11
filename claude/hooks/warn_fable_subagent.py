@@ -3,9 +3,9 @@
 
 Fires on ``PreToolUse`` events matched to the ``Agent`` tool. Denies
 the call when the subagent would run on Fable, either via an explicit
-``tool_input.model`` of ``"fable"``/``"claude-fable-5"``, or via
-inheritance when ``model`` is unset and the session's
-``ANTHROPIC_MODEL`` env var is a Fable alias.
+``tool_input.model`` naming Fable (the ``fable`` alias or a
+``claude-fable-*`` model ID), or via inheritance when ``model`` is
+unset and the session's ``ANTHROPIC_MODEL`` env var names Fable.
 
 ``PreToolUse`` with matcher ``Agent`` was chosen over
 ``PermissionRequest``: the Agent tool was not observed to route
@@ -14,7 +14,7 @@ not documented on the linked spec page), so ``PermissionRequest``
 would not fire for it.
 
 Exempt: subagent types whose ``~/.claude/agents/<subagent_type>.md``
-frontmatter pins ``model: fable`` (or ``claude-fable-5``) — naming
+frontmatter pins ``model: fable`` (or a ``claude-fable-*`` ID) — naming
 Fable in the agent definition is a deliberate per-agent choice, so
 calls to that agent are exempt however the model was supplied.
 
@@ -41,14 +41,13 @@ from datetime import datetime
 
 _STATE_DIR = os.path.expanduser("~/.claude/state")
 _STATE_PREFIX = "fable_subagent_warned_"
-_FABLE_ALIASES = frozenset({"fable", "claude-fable-5"})
 _AGENTS_DIR = os.path.expanduser("~/.claude/agents")
 
-_FRONTMATTER_MODEL_RE = re.compile(r"""^model:\s*['"]?(fable|claude-fable-5)['"]?\s*$""")
+_FRONTMATTER_MODEL_RE = re.compile(r"""^model:\s*['"]?([^'"\s]+)['"]?\s*$""")
 
 MESSAGE = (
-    "Subagent would run on Fable (either explicit model=\"fable\" or inherited "
-    "from session ANTHROPIC_MODEL=fable). Fable is the costliest tier and "
+    "Subagent would run on Fable (either an explicit Fable model or one "
+    "inherited from the session's ANTHROPIC_MODEL). Fable is the costliest tier and "
     "most subagent work does not need it, so "
     "subagents should default to sonnet (search / formatting / well-defined "
     "code) or opus (multi-file implementation / deep debugging / adversarial "
@@ -58,6 +57,33 @@ MESSAGE = (
     "exact same Agent call (same subagent_type + model) — this hook lets the "
     "second occurrence in the same session through."
 )
+
+
+def _is_fable_model(name) -> bool:
+    """Return True if ``name`` names a Fable model.
+
+    The alias and every full model ID count, so a new Fable release
+    needs no edit here:
+    >>> _is_fable_model("fable")
+    True
+    >>> _is_fable_model("claude-fable-5")
+    True
+    >>> _is_fable_model("claude-fable-5-2")
+    True
+    >>> _is_fable_model("claude-fable-5-2[1m]")
+    True
+
+    Other models and an unset value do not:
+    >>> _is_fable_model("opus")
+    False
+    >>> _is_fable_model("claude-opus-5-5")
+    False
+    >>> _is_fable_model(None)
+    False
+    """
+    if not name:
+        return False
+    return name == "fable" or name.startswith("claude-fable-")
 
 
 def _state_path(session_id: str) -> str:
@@ -106,7 +132,7 @@ def _agent_pins_fable(subagent_type: str, agents_dir: str = _AGENTS_DIR) -> bool
     Reads ``<agents_dir>/<subagent_type>.md`` (defaults to
     ``~/.claude/agents/``) and checks whether the frontmatter block
     (delimited by ``---`` lines, starting at line 1) contains a
-    ``model: fable`` (or ``claude-fable-5``) line. ``agents_dir`` is
+    ``model:`` line naming Fable. ``agents_dir`` is
     a doctest hook — production callers omit it.
 
     Rejects subagent_type values with path-traversal characters
@@ -149,6 +175,12 @@ def _agent_pins_fable(subagent_type: str, agents_dir: str = _AGENTS_DIR) -> bool
     ...     "---\\nmodel: claude-fable-5\\n---\\n")
     >>> _agent_pins_fable("cf5-pinned", agents_dir=_tmpdir)
     True
+
+    A full model ID, quoted or not, counts as fable-pinned:
+    >>> _ = open(os.path.join(_tmpdir, "cf52-pinned.md"), "w").write(
+    ...     "---\\nmodel: 'claude-fable-5-2'\\n---\\n")
+    >>> _agent_pins_fable("cf52-pinned", agents_dir=_tmpdir)
+    True
     """
     if not subagent_type or "/" in subagent_type or ".." in subagent_type:
         return False
@@ -167,7 +199,8 @@ def _agent_pins_fable(subagent_type: str, agents_dir: str = _AGENTS_DIR) -> bool
         stripped = line.rstrip("\n")
         if stripped.strip() == "---":
             break
-        if _FRONTMATTER_MODEL_RE.match(stripped):
+        match = _FRONTMATTER_MODEL_RE.match(stripped)
+        if match and _is_fable_model(match.group(1)):
             return True
     return False
 
@@ -195,6 +228,12 @@ def _effective_model_is_fable(tool_input: dict) -> bool:
     True
     >>> del os.environ["ANTHROPIC_MODEL"]
 
+    Unset model, session set to a full Fable model ID:
+    >>> os.environ["ANTHROPIC_MODEL"] = "claude-fable-5-2"
+    >>> _effective_model_is_fable({})
+    True
+    >>> del os.environ["ANTHROPIC_MODEL"]
+
     Unset model, session is not fable:
     >>> _ = os.environ.pop("ANTHROPIC_MODEL", None)
     >>> _effective_model_is_fable({})
@@ -202,8 +241,8 @@ def _effective_model_is_fable(tool_input: dict) -> bool:
     """
     model = tool_input.get("model")
     if model:
-        return model in _FABLE_ALIASES
-    return os.environ.get("ANTHROPIC_MODEL") in _FABLE_ALIASES
+        return _is_fable_model(model)
+    return _is_fable_model(os.environ.get("ANTHROPIC_MODEL"))
 
 
 def _state_key(subagent_type: str, model: str) -> str:
