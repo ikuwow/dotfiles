@@ -70,7 +70,8 @@ flowchart LR
     action, since marking a PR ready can request reviewers such as code
     owners at once, and a PR left in draft gives the user the first look
     - A loaded rule that assigns the flip to the agent for this PR
-      hands it to the agent
+      hands it to the agent, except while a point the Finalize step
+      could not settle holds the PR in draft
 - Never create or edit files on the default branch. Always move into the
   worktree (or feature branch) first. Creating files before branching
   leads to redundant copy-and-delete work.
@@ -324,6 +325,19 @@ Bring the PR into a state where a human reviewer can act on it:
    either address it or call it out as out-of-scope / follow-up. When
    addressing it makes a design change, start the design-change round
    from Principles.
+1. Settle each point the change would leave a reviewer to judge, check,
+   or confirm in the author's place, such as a design choice made
+   without evidence or a behavior not yet observed, since such a point
+   marks investigation, verification, or an experiment the run has not
+   done
+   - Do that work and write its outcome into the PR body, or move the
+     point out of this PR as the item above does
+   - A point that work cannot settle, such as a preference that is the
+     user's to state, stays open and holds the PR in draft under the
+     next item
+   - A verification item the body lists as pending, with the reason
+     the author could not run it, is a check rather than a point, and
+     holds nothing
 1. Unless the user named "no PR watch", confirm through the
    `pr-watch:watch` skill that the PR's watch runs before the PR leaves
    draft, and start it again when `pr-watch list` omits the PR.
@@ -332,6 +346,10 @@ Bring the PR into a state where a human reviewer can act on it:
    - When the watch fails to start, or `pr-watch list` exits 1 because
      no watcher runs, carry that into this step's report
 1. Then, in the same turn, hand the PR to review:
+   - When a point stays open under the settle item above, leave the PR
+     in draft whoever the ready flip is assigned to, and report each
+     point with what would settle it, since the user decides whether
+     the PR waits for that work or goes to review as it stands
    - When a loaded rule assigns the ready flip to the agent for this
      PR, run `gh pr ready <PR number>` in a later tool call, then
      continue into the Watch step

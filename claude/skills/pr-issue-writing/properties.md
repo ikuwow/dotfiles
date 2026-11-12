@@ -44,12 +44,26 @@ qualify it.
   - The changed lines are the diff's to show, so the body names the
     change rather than describing it
 - Where a design decision was weighed, the body carries its shape: the
-  approach taken against the approaches rejected, and risks or things a
-  reviewer should watch out for
+  approach taken against the approaches rejected, and the risks it
+  accepts with what bounds them
   - A change with one obvious approach carries none of this, and
     inventing an alternative to name is itself a defect
   - "Approaches rejected" covers design alternatives weighed for the
     delivered design
+- The body states each decision as settled, and hands the reviewer no
+  point to judge, check, or confirm in the author's place, such as a
+  "review focus" section or a question addressed to the reviewer
+  - A point the author would hand over marks investigation,
+    verification, or an experiment not yet done, so the author does
+    that work and writes its outcome
+  - A point that work cannot settle, such as a preference that is the
+    user's to state, goes to the user in the session, outside the body
+  - Leading with the settled decision that matters most, as the rules
+    on where a reviewer's attention belongs ask, is orientation and
+    stays
+  - Verification items Grounded lets the author leave unverified, and
+    `- [ ]` items the user owes, are checks with their own rules and
+    stay
 - Where the diff changes something other code reaches — a function
   signature, a config key, an exit code, a file another script reads —
   name the invariant it still holds
