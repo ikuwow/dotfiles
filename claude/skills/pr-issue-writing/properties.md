@@ -51,20 +51,14 @@ qualify it.
     inventing an alternative to name is itself a defect
   - "Approaches rejected" covers design alternatives weighed for the
     delivered design
-- The body states each decision as settled, and hands the reviewer no
-  point to judge, check, or confirm in the author's place, such as a
-  section or a question asking the reviewer to check or decide
-  something
-  - A point the author would hand over marks investigation,
-    verification, or an experiment not yet done, so the author does
-    that work and writes the result the change rests on
-  - A point that work cannot settle, such as a preference that is the
-    user's to state, goes to the user in the session, outside the body
-  - Leading with the settled decision that matters most, as Inverted
-    pyramid asks, is orientation and stays
-  - Verification items Grounded lets the author leave unverified, and
-    `- [ ]` items the user owes, are checks with their own rules and
-    stay
+- The body states each decision as settled and asks the reviewer to
+  judge, check, or confirm nothing in the author's place
+  - Such a point marks investigation, verification, or an experiment
+    not yet done, so the author does that work and writes the result
+  - A point that work cannot settle, such as the user's preference,
+    goes to the user in the session
+  - Orientation under Inverted pyramid, Grounded's items the author
+    could not verify, and user-owed `- [ ]` items are not such points
 - Where the diff changes something other code reaches — a function
   signature, a config key, an exit code, a file another script reads —
   name the invariant it still holds

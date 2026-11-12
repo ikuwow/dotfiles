@@ -326,19 +326,16 @@ Bring the PR into a state where a human reviewer can act on it:
    either address it or call it out as out-of-scope / follow-up. When
    addressing it makes a design change, start the design-change round
    from Principles.
-1. Settle each point the change would leave a reviewer to judge, check,
-   or confirm in the author's place, such as a design choice made
-   without evidence or a tool's behavior assumed but not checked, since
-   such a point marks investigation, verification, or an experiment the
-   run has not done
-   - Do that work and write the result the change rests on into the PR
-     body, or move the point out of this PR as the item above does
-   - A point that work cannot settle, such as a preference that is the
-     user's to state, stays open for the hand-off item below
-   - These are checks rather than points, and hold nothing: a
-     verification item the body lists as pending with the reason the
-     author could not run it, a `- [ ]` item the user owes, and a
-     result the project's rules leave to use after merge
+1. Settle each point the PR would leave a reviewer to judge, check, or
+   confirm in the author's place, since it marks investigation,
+   verification, or an experiment the run has not done: do that work
+   and write the result into the PR body, or move the point out of this
+   PR as the item above does
+   - A point that work cannot settle, such as the user's preference,
+     stays open for the hand-off item below
+   - Pending verification items with their reason, user-owed `- [ ]`
+     items, and results the project's rules leave to use after merge
+     are checks, not points
 1. Unless the user named "no PR watch", confirm through the
    `pr-watch:watch` skill that the PR's watch runs before the PR leaves
    draft, and start it again when `pr-watch list` omits the PR.
@@ -347,13 +344,10 @@ Bring the PR into a state where a human reviewer can act on it:
    - When the watch fails to start, or `pr-watch list` exits 1 because
      no watcher runs, carry that into this step's report
 1. Then, in the same turn, hand the PR to review:
-   - When a point stays open under the settle item above, leave the PR
-     in draft whoever the ready flip is assigned to, report each point
-     with what would settle it, and continue into the Watch step
-     - The user's answer settles the point, or the user's instruction
-       to send the PR to review as it stands releases the hold; either
-       way, run this item again, with the flip going as the bullets
-       below assign it
+   - While a point stays open, leave the PR in draft whoever holds the
+     flip, report each point with what would settle it, and continue
+     into the Watch step; once the user's answer settles it or the user
+     sends the PR to review as it stands, run this item again
    - When a loaded rule assigns the ready flip to the agent for this
      PR, run `gh pr ready <PR number>` in a later tool call, then
      continue into the Watch step
