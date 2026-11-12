@@ -59,10 +59,11 @@ flowchart LR
       [pr-reaction.md](pr-reaction.md) as if its line had printed
     - A PR that merged or closed in between prints its `STATE:` line
       on the restart, which the Watch step's exit conditions act on
-    - Three pauses keep the watch running, since the run goes on
+    - Four pauses keep the watch running, since the run goes on
       reacting to the PR's events during them: the Finalize step's
-      hand-off for the ready flip, the fix-push cap's wait, and a
-      human-authored event surfaced under [pr-reaction.md](pr-reaction.md)
+      hand-off for the ready flip, its hold on an open point, the
+      fix-push cap's wait, and a human-authored event surfaced under
+      [pr-reaction.md](pr-reaction.md)
   - A small diff, a documentation-only change, and personal-project
     scope are signals for weighing a finding within a step; whether
     the step runs is not a judgment they reach
@@ -70,7 +71,8 @@ flowchart LR
     action, since marking a PR ready can request reviewers such as code
     owners at once, and a PR left in draft gives the user the first look
     - A loaded rule that assigns the flip to the agent for this PR
-      hands it to the agent
+      hands it to the agent, except while the Finalize step holds the
+      PR in draft on an open point
 - Never create or edit files on the default branch. Always move into the
   worktree (or feature branch) first. Creating files before branching
   leads to redundant copy-and-delete work.
@@ -324,6 +326,16 @@ Bring the PR into a state where a human reviewer can act on it:
    either address it or call it out as out-of-scope / follow-up. When
    addressing it makes a design change, start the design-change round
    from Principles.
+1. Settle each point the PR would leave a reviewer to judge, check, or
+   confirm in the author's place, since it marks investigation,
+   verification, or an experiment the run has not done: do that work
+   and write the result into the PR body, or move the point out of this
+   PR as the item above does
+   - A point that work cannot settle, such as the user's preference,
+     stays open for the hand-off item below
+   - Pending verification items with their reason, user-owed `- [ ]`
+     items, and results the project's rules leave to use after merge
+     are checks, not points
 1. Unless the user named "no PR watch", confirm through the
    `pr-watch:watch` skill that the PR's watch runs before the PR leaves
    draft, and start it again when `pr-watch list` omits the PR.
@@ -332,6 +344,10 @@ Bring the PR into a state where a human reviewer can act on it:
    - When the watch fails to start, or `pr-watch list` exits 1 because
      no watcher runs, carry that into this step's report
 1. Then, in the same turn, hand the PR to review:
+   - While a point stays open, leave the PR in draft whoever holds the
+     flip, report each point with what would settle it, and continue
+     into the Watch step; once the user's answer settles it or the user
+     sends the PR to review as it stands, run this item again
    - When a loaded rule assigns the ready flip to the agent for this
      PR, run `gh pr ready <PR number>` in a later tool call, then
      continue into the Watch step

@@ -20,8 +20,9 @@ section the top-level line is the rule while the lines beneath it
 qualify it.
 
 - Decidable — reading top-down, a reviewer arrives at the diff knowing
-  what the change is for and where their attention belongs, each item
-  carrying one claim at the shortest length that lands it
+  what the change is for and where their attention belongs, with each
+  decision settled and each item carrying one claim at the shortest
+  length that lands it
 - Grounded — every claim is checkable on the evidence the body itself
   carries, and the body names a verification mechanism for the code
   paths the diff changes
@@ -44,12 +45,20 @@ qualify it.
   - The changed lines are the diff's to show, so the body names the
     change rather than describing it
 - Where a design decision was weighed, the body carries its shape: the
-  approach taken against the approaches rejected, and risks or things a
-  reviewer should watch out for
+  approach taken against the approaches rejected, and the risks it
+  accepts with what bounds them
   - A change with one obvious approach carries none of this, and
     inventing an alternative to name is itself a defect
   - "Approaches rejected" covers design alternatives weighed for the
     delivered design
+- The body states each decision as settled and asks the reviewer to
+  judge, check, or confirm nothing in the author's place
+  - Such a point marks investigation, verification, or an experiment
+    not yet done, so the author does that work and writes the result
+  - A point that work cannot settle, such as the user's preference,
+    goes to the user in the session
+  - Orientation under Inverted pyramid, Grounded's items the author
+    could not verify, and user-owed `- [ ]` items are not such points
 - Where the diff changes something other code reaches — a function
   signature, a config key, an exit code, a file another script reads —
   name the invariant it still holds
