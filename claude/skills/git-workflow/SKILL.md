@@ -59,10 +59,11 @@ flowchart LR
       [pr-reaction.md](pr-reaction.md) as if its line had printed
     - A PR that merged or closed in between prints its `STATE:` line
       on the restart, which the Watch step's exit conditions act on
-    - Three pauses keep the watch running, since the run goes on
+    - Four pauses keep the watch running, since the run goes on
       reacting to the PR's events during them: the Finalize step's
-      hand-off for the ready flip, the fix-push cap's wait, and a
-      human-authored event surfaced under [pr-reaction.md](pr-reaction.md)
+      hand-off for the ready flip, its hold on an open point, the
+      fix-push cap's wait, and a human-authored event surfaced under
+      [pr-reaction.md](pr-reaction.md)
   - A small diff, a documentation-only change, and personal-project
     scope are signals for weighing a finding within a step; whether
     the step runs is not a judgment they reach
@@ -70,8 +71,8 @@ flowchart LR
     action, since marking a PR ready can request reviewers such as code
     owners at once, and a PR left in draft gives the user the first look
     - A loaded rule that assigns the flip to the agent for this PR
-      hands it to the agent, except while a point the Finalize step
-      could not settle holds the PR in draft
+      hands it to the agent, except while the Finalize step holds the
+      PR in draft on an open point
 - Never create or edit files on the default branch. Always move into the
   worktree (or feature branch) first. Creating files before branching
   leads to redundant copy-and-delete work.
@@ -327,17 +328,17 @@ Bring the PR into a state where a human reviewer can act on it:
    from Principles.
 1. Settle each point the change would leave a reviewer to judge, check,
    or confirm in the author's place, such as a design choice made
-   without evidence or a behavior not yet observed, since such a point
-   marks investigation, verification, or an experiment the run has not
-   done
-   - Do that work and write its outcome into the PR body, or move the
-     point out of this PR as the item above does
+   without evidence or a tool's behavior assumed but not checked, since
+   such a point marks investigation, verification, or an experiment the
+   run has not done
+   - Do that work and write the result the change rests on into the PR
+     body, or move the point out of this PR as the item above does
    - A point that work cannot settle, such as a preference that is the
-     user's to state, stays open and holds the PR in draft under the
-     next item
-   - A verification item the body lists as pending, with the reason
-     the author could not run it, is a check rather than a point, and
-     holds nothing
+     user's to state, stays open for the hand-off item below
+   - These are checks rather than points, and hold nothing: a
+     verification item the body lists as pending with the reason the
+     author could not run it, a `- [ ]` item the user owes, and a
+     result the project's rules leave to use after merge
 1. Unless the user named "no PR watch", confirm through the
    `pr-watch:watch` skill that the PR's watch runs before the PR leaves
    draft, and start it again when `pr-watch list` omits the PR.
@@ -347,9 +348,12 @@ Bring the PR into a state where a human reviewer can act on it:
      no watcher runs, carry that into this step's report
 1. Then, in the same turn, hand the PR to review:
    - When a point stays open under the settle item above, leave the PR
-     in draft whoever the ready flip is assigned to, and report each
-     point with what would settle it, since the user decides whether
-     the PR waits for that work or goes to review as it stands
+     in draft whoever the ready flip is assigned to, report each point
+     with what would settle it, and continue into the Watch step
+     - The user's answer settles the point, or the user's instruction
+       to send the PR to review as it stands releases the hold; either
+       way, run this item again, with the flip going as the bullets
+       below assign it
    - When a loaded rule assigns the ready flip to the agent for this
      PR, run `gh pr ready <PR number>` in a later tool call, then
      continue into the Watch step

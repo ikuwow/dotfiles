@@ -20,8 +20,9 @@ section the top-level line is the rule while the lines beneath it
 qualify it.
 
 - Decidable — reading top-down, a reviewer arrives at the diff knowing
-  what the change is for and where their attention belongs, each item
-  carrying one claim at the shortest length that lands it
+  what the change is for and where their attention belongs, with each
+  decision settled and each item carrying one claim at the shortest
+  length that lands it
 - Grounded — every claim is checkable on the evidence the body itself
   carries, and the body names a verification mechanism for the code
   paths the diff changes
@@ -52,15 +53,15 @@ qualify it.
     delivered design
 - The body states each decision as settled, and hands the reviewer no
   point to judge, check, or confirm in the author's place, such as a
-  "review focus" section or a question addressed to the reviewer
+  section or a question asking the reviewer to check or decide
+  something
   - A point the author would hand over marks investigation,
     verification, or an experiment not yet done, so the author does
-    that work and writes its outcome
+    that work and writes the result the change rests on
   - A point that work cannot settle, such as a preference that is the
     user's to state, goes to the user in the session, outside the body
-  - Leading with the settled decision that matters most, as the rules
-    on where a reviewer's attention belongs ask, is orientation and
-    stays
+  - Leading with the settled decision that matters most, as Inverted
+    pyramid asks, is orientation and stays
   - Verification items Grounded lets the author leave unverified, and
     `- [ ]` items the user owes, are checks with their own rules and
     stay
