@@ -27,3 +27,6 @@
     - 作成前・本文の書き換え前・コメント投稿前のチェックは、このskillを通した時だけ走るため
     - git-workflowが `[BOT]` の `NEW_COMMENT` / `NEW_TOP_COMMENT` / `NEW_REVIEW` に返すreplyは対象外（botの質問・nitへの応答に限られ、git-workflowの手順が送り方まで定めるため）
     - `implementer` subagentが作るplaceholder PRは対象外（親がdispatch前にskillのpreflightを済ませ、後でtitleとbodyを差し替えるため）
+- GitHubに投稿するissue・PRのコメント、review本文、review threadへのreply、close時のコメントは、本文の末尾に空行を挟んで `🤖 Generated with [Claude Code](https://claude.com/claude-code)` を付ける（botへのreplyと、`gh` 以外のツールで投稿するものを含む）
+    - 投稿はユーザーのアカウントから出てユーザー自身の発言として読まれるため
+    - harnessがコメント用のfooterを指定している時はその書式で置き換え、footerは1つだけにする
