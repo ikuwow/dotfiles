@@ -37,14 +37,31 @@ fi
 dir="$(cd "${1:-.}" && pwd)"
 
 if common_dir="$(git -C "$dir" rev-parse --path-format=absolute --git-common-dir 2>/dev/null)"; then
-  root="$(dirname "$common_dir")"
+  if [ "$(basename "$common_dir")" = .git ]; then
+    root="$(dirname "$common_dir")"
+  else
+    # A submodule keeps its git directory under the superproject's
+    # .git/modules/, so the checkout root is not the git directory's parent
+    root="$(git -C "$dir" rev-parse --show-toplevel)"
+  fi
 else
   root="$dir"
 fi
 
-# tmux rewrites '.' and ':' in session names, which would break the
-# exact-match lookup below
-name="$(basename "$root" | tr '.:' '__')"
+# tmux target syntax reads '.' and ':' as window and pane separators, so
+# a name containing them breaks the exact-match lookups below
+session_name() {
+  basename "$1" | tr '.:' '__'
+}
+
+name="$(session_name "$root")"
+
+# Repositories that share a basename, such as a fork and its upstream,
+# get the parent directory's name as a prefix
+if tmux has-session -t "=$name" 2>/dev/null &&
+  [ "$(tmux display-message -p -t "=$name:" '#{session_path}')" != "$root" ]; then
+  name="$(session_name "$(dirname "$root")")_$name"
+fi
 
 if ! tmux has-session -t "=$name" 2>/dev/null; then
   # Start each program from a shell, so its window keeps a shell after
