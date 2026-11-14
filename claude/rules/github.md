@@ -10,6 +10,7 @@
     - `gh api`（特に `gh api graphql -f query=...`）はこれらで実現できない操作に限定する
 - GitHub repositoryの内部詳細（source code・formula・configファイル等）を確認する時は個別ファイルから入らず上位から順に見る: README → 直近release tagとmain差分（`gh api repos/.../releases`）→ 既知issue/PR検索（`gh search issues/prs`）→ DeepWikiの `ask_wiki_question` → source code
     - source codeはDeepWikiの回答が指すファイルに絞って読む（コードを広く読むのは手間が大きく、DeepWikiの回答はAIが生成した二次情報で、結論を担う箇所は該当ファイルでの裏取りが要るため）
+    - DeepWikiが回答を返さない時と、回答がファイルを指さない時は、DeepWikiの段を飛ばしてsource codeに入る
     - CLIの使い方・挙動を `--help`・man page・実機実行で確認する段階では適用不要
 
 ## issue・PR の読み方と参照
