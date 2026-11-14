@@ -195,7 +195,9 @@ endfunction
 
 augroup fern-drawer-per-tab
     autocmd!
-    autocmd TabNewEntered * call timer_start(0, function('s:inherit_fern_drawer'))
+    if exists('##TabNewEntered')
+        autocmd TabNewEntered * call timer_start(0, function('s:inherit_fern_drawer'))
+    endif
 augroup END
 
 let g:ale_completion_enabled = 1 " This setting must be set before ALE is loaded.
