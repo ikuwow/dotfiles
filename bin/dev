@@ -7,7 +7,8 @@
 # including inside one of its worktrees, resolves to the main checkout's
 # root, so worktrees share their project's session. A directory outside
 # git is used as is. A new session gets one window split into nvim on the
-# left and claude on the right, both started from that root.
+# left, with fern's drawer open and focused, and claude on the right, both
+# started from that root.
 # claudecode.nvim registers the root as nvim's workspace, which is what
 # `claude --ide` matches the current directory against to pick the IDE to
 # connect to.
@@ -68,7 +69,7 @@ if ! tmux has-session -t "=$name" 2>/dev/null; then
   # Start each program from a shell, so its pane keeps a shell after the
   # program exits
   nvim_pane="$(tmux new-session -d -P -F '#{pane_id}' -s "$name" -c "$root")"
-  tmux send-keys -t "$nvim_pane" nvim Enter
+  tmux send-keys -t "$nvim_pane" "nvim -c 'Fern . -drawer'" Enter
   claude_pane="$(tmux split-window -h -P -F '#{pane_id}' -t "$nvim_pane" -c "$root")"
   tmux send-keys -t "$claude_pane" 'claude --ide' Enter
 fi
