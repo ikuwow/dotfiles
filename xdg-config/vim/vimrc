@@ -174,6 +174,30 @@ augroup fern-custom
     autocmd FileType fern call s:init_fern()
 augroup END
 
+" A tab opened from a tab that shows the fern drawer gets its own drawer
+function! s:has_fern_drawer(tabnr) abort
+    for l:bufnr in tabpagebuflist(a:tabnr)
+        if getbufvar(l:bufnr, '&filetype') ==# 'fern'
+            return 1
+        endif
+    endfor
+    return 0
+endfunction
+
+" Deferred by a timer, so the drawer opens after the new tab has loaded
+" its file
+function! s:inherit_fern_drawer(...) abort
+    let l:prev = tabpagenr('#')
+    if l:prev > 0 && s:has_fern_drawer(l:prev) && !s:has_fern_drawer(tabpagenr())
+        Fern . -drawer -stay
+    endif
+endfunction
+
+augroup fern-drawer-per-tab
+    autocmd!
+    autocmd TabNewEntered * call timer_start(0, function('s:inherit_fern_drawer'))
+augroup END
+
 let g:ale_completion_enabled = 1 " This setting must be set before ALE is loaded.
 Plug 'dense-analysis/ale'
     let g:ale_linters = {
