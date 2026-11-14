@@ -1,0 +1,62 @@
+#!/bin/bash
+
+# Open the tmux session for a project, creating it on first use
+# Usage: dev [dir]
+#
+# One session per project: a directory anywhere inside a git repository,
+# including inside one of its worktrees, resolves to the main checkout's
+# root, so worktrees share their project's session. A directory outside
+# git is used as is. A new session gets an nvim window and a claude
+# window, both started from that root. claudecode.nvim registers the
+# root as nvim's workspace, which is what `claude --ide` matches the
+# current directory against to pick the IDE to connect to.
+
+set -eu
+
+usage="Usage: dev [dir]"
+
+for arg in "$@"; do
+  case "$arg" in
+    -h | --help)
+      echo "$usage"
+      exit 0
+      ;;
+    -*)
+      echo "Error: unknown option: $arg" >&2
+      echo "$usage" >&2
+      exit 1
+      ;;
+  esac
+done
+
+if [ $# -gt 1 ]; then
+  echo "$usage" >&2
+  exit 1
+fi
+
+dir="$(cd "${1:-.}" && pwd)"
+
+if common_dir="$(git -C "$dir" rev-parse --path-format=absolute --git-common-dir 2>/dev/null)"; then
+  root="$(dirname "$common_dir")"
+else
+  root="$dir"
+fi
+
+# tmux rewrites '.' and ':' in session names, which would break the
+# exact-match lookup below
+name="$(basename "$root" | tr '.:' '__')"
+
+if ! tmux has-session -t "=$name" 2>/dev/null; then
+  # Start each program from a shell, so its window keeps a shell after
+  # the program exits
+  tmux new-session -d -s "$name" -n nvim -c "$root"
+  tmux send-keys -t "=$name:nvim" nvim Enter
+  tmux new-window -t "=$name:" -n claude -c "$root"
+  tmux send-keys -t "=$name:claude" 'claude --ide' Enter
+fi
+
+if [ -n "${TMUX:-}" ]; then
+  tmux switch-client -t "=$name"
+else
+  tmux attach-session -t "=$name"
+fi

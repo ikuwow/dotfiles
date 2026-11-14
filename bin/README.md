@@ -8,6 +8,7 @@ Custom executable scripts deployed to `~/bin/` via symlinks.
 | --- | --- |
 | `aws-mfa` | Automate AWS session token acquisition via MFA |
 | `claude-subagent-models` | Show which model each Claude Code subagent ran on, from session transcripts |
+| `dev` | Open the tmux session for a project, creating it with an nvim window and a `claude --ide` window from the repository root |
 | `gcloud-adc-mcp-headers` | Print a bearer token from gcloud Application Default Credentials and a quota project header for an MCP server's `headersHelper` |
 | `install-aimsg-hook.sh` | Symlink `~/.config/git/hooks/prepare-commit-msg` into the current repo's `.git/hooks/` to enable the AI commit-message drafter in a repo outside `ikuwow/` |
 | `git-cleanup-branches` | Delete local branches whose content the default branch holds (merged, squash-merged) and prune stale worktree entries |
