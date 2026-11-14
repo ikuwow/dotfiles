@@ -7,11 +7,11 @@
 # including inside one of its worktrees, resolves to the main checkout's
 # root, so worktrees share their project's session. A directory outside
 # git is used as is. A new session gets one window split into nvim on the
-# left, with fern's drawer open and focused, and claude on the right, both
-# started from that root.
-# claudecode.nvim registers the root as nvim's workspace, which is what
-# `claude --ide` matches the current directory against to pick the IDE to
-# connect to.
+# left, with fern's drawer open, and claude on the right, both started
+# from that root.
+# claudecode.nvim registers nvim's working directory, the root, as its
+# workspace, which is what `claude --ide` matches the current directory
+# against to pick the IDE to connect to.
 
 set -eu
 
@@ -42,8 +42,8 @@ if common_dir="$(git -C "$dir" rev-parse --path-format=absolute --git-common-dir
   if [ "$(basename "$common_dir")" = .git ]; then
     root="$(dirname "$common_dir")"
   else
-    # A submodule keeps its git directory under the superproject's
-    # .git/modules/, so the checkout root is not the git directory's parent
+    # A git directory named otherwise, such as a submodule's under the
+    # superproject's .git/modules/, does not sit in the checkout root
     root="$(git -C "$dir" rev-parse --show-toplevel)"
   fi
 else
@@ -56,16 +56,24 @@ session_name() {
   basename "$1" | tr '.:' '__'
 }
 
-name="$(session_name "$root")"
+# A session is found by its root, since its name depends on which other
+# sessions held the plain name when it was created
+name="$(tmux list-sessions -F '#{session_path}	#{session_name}' 2>/dev/null |
+  awk -F '\t' -v root="$root" '$1 == root { print $2; exit }')"
 
-# Repositories that share a basename, such as a fork and its upstream,
-# get the parent directory's name as a prefix
-if tmux has-session -t "=$name" 2>/dev/null &&
-  [ "$(tmux display-message -p -t "=$name:" '#{session_path}')" != "$root" ]; then
-  name="$(session_name "$(dirname "$root")")_$name"
-fi
+if [ -z "$name" ]; then
+  name="$(session_name "$root")"
+  # Of repositories that share a basename, such as a fork and its
+  # upstream, the one opened while another holds the plain name gets the
+  # parent directory's name as a prefix
+  if tmux has-session -t "=$name" 2>/dev/null; then
+    name="$(session_name "$(dirname "$root")")_$name"
+  fi
+  if tmux has-session -t "=$name" 2>/dev/null; then
+    echo "Error: session $name belongs to another directory" >&2
+    exit 1
+  fi
 
-if ! tmux has-session -t "=$name" 2>/dev/null; then
   # Start each program from a shell, so its pane keeps a shell after the
   # program exits
   nvim_pane="$(tmux new-session -d -P -F '#{pane_id}' -s "$name" -c "$root")"
