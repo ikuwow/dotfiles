@@ -23,12 +23,13 @@ if vim.fn.executable("ghostty") == 1 then
   end
 end
 
--- <C-w> then h, j, k, l, w, or p leaves Terminal mode for that window
--- command. Any other key after <C-w>, <C-w> included, reaches the program
--- together with the <C-w> at once, and a lone <C-w> after 'timeoutlen', so
--- a shell's or Claude Code's word deletion keeps working.
+-- <C-\> then h, j, k, l, w, or p leaves Terminal mode for that <C-w>
+-- window command. <C-w> itself stays with the program, as a shell's and
+-- Claude Code's word deletion, since a word typed right after it would
+-- otherwise run as Normal-mode commands in another window. <C-\> is the
+-- key nvim already uses to leave Terminal mode (<C-\><C-n>).
 for _, key in ipairs({ "h", "j", "k", "l", "w", "p" }) do
-  vim.keymap.set("t", "<C-w>" .. key, "<C-\\><C-n><C-w>" .. key, { desc = "Window command " .. key })
+  vim.keymap.set("t", "<C-\\>" .. key, "<C-\\><C-n><C-w>" .. key, { desc = "Window command " .. key })
 end
 
 -- The main config and its plugins highlight indentation, trailing spaces,
@@ -47,7 +48,9 @@ vim.api.nvim_create_autocmd({ "TermOpen", "BufWinEnter", "WinEnter" }, {
       vim.fn.clearmatches()
       -- Panels get the same colors through edgy.nvim's window options
       if not require("edgy").get_win() then
-        vim.wo.winhighlight = "Normal:IdeTerminal,NormalNC:IdeTerminal"
+        -- Local to this window and buffer, so a file opened in the window
+        -- later keeps the colorscheme
+        vim.wo[0][0].winhighlight = "Normal:IdeTerminal,NormalNC:IdeTerminal"
       end
     end)
   end,
