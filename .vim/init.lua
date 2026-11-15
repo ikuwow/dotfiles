@@ -10,7 +10,7 @@ end
 -- $MYVIMRC points at this file, so the vimrc's own reload autocmd misses
 -- writes to the shared vimrc.
 vim.api.nvim_create_autocmd('BufWritePost', {
-  group = 'AutoReloadVimrc',
+  group = vim.api.nvim_create_augroup('AutoReloadVimrc', { clear = false }),
   pattern = { core_vimrc, vim.fn.resolve(core_vimrc) },
   nested = true,
   command = 'source $MYVIMRC',
