@@ -13,7 +13,7 @@ here only takes effect after a corresponding line is added to
 | `.mcp.json`                   | `~/.claude/.mcp.json`             | MCP server registry the `claude` CLI reads. The file itself is edited by hand; server registration runs through `scripts/claude-code-setup.sh`. |
 | `settings.json`               | `~/.claude/settings.json`         | Permissions (`allow` / `ask` / `deny`), hooks, env. Schema: <https://json.schemastore.org/claude-code-settings.json>. |
 | `statusline-command.sh`       | `~/.claude/statusline-command.sh` | Renders the status line.                                                                                      |
-| `../AIRULES.md`               | `~/.claude/CLAUDE.md`             | Global instructions Claude reads on every session. Also linked to `~/.codex/AGENTS.md` and `~/.junie/AGENTS.md`. |
+| `../AIRULES.md`               | `~/.claude/CLAUDE.md`             | Global instructions Claude reads on every session. Also linked to `~/.codex/AGENTS.md`. |
 | `agents/*.md`                 | `~/.claude/agents/*.md`           | Subagent definitions.                                                                                         |
 | `hooks/*` (`! test_*`)        | `~/.claude/hooks/*`               | Hook scripts. Test fixtures under `hooks/test_*` are intentionally excluded.                                  |
 | `rules/*.md`                  | `~/.claude/rules/*.md`            | Topic-scoped rule files (development practice, execution judgment, git, GitHub, rule authoring, etc.).        |

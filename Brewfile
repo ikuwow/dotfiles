@@ -10,7 +10,6 @@ tap "oven-sh/bun", trusted: true
 tap "configcat/tap", trusted: true
 tap "pipe-cd/tap", trusted: true
 tap "datadog-labs/pack", trusted: true
-tap "jetbrains/junie", trusted: true
 tap "anthropics/tap", trusted: true
 
 brew "mas"
@@ -33,7 +32,6 @@ cask "logi-options+"
 # This installation process hangs up!
 # Install by yourself from: https://www.logitechg.com/en-us/innovation/g-hub.html
 # cask "logitech-g-hub"
-cask "jetbrains-toolbox"
 cask "adguard"
 
 brew "coreutils"
@@ -48,7 +46,6 @@ brew "grep"
 cask "codex"
 cask "claude-code@latest"
 brew "gemini-cli"
-brew "junie"
 cask "anthropics/tap/ant"
 brew "poppler" # Claude Code renders PDF pages with pdftoppm
 
