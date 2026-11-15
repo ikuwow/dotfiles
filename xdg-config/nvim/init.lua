@@ -222,7 +222,9 @@ if ok then
 end
 
 local ok_tree, nvim_tree = pcall(require, 'nvim-tree')
-if ok_tree then
+-- A second setup() closes the tree in every tab, and saving this file or
+-- the vimrc sources this file again, so setup runs once per session
+if ok_tree and vim.g.NvimTreeSetup ~= 1 then
   local api = require('nvim-tree.api')
   nvim_tree.setup({
     on_attach = function(bufnr)
@@ -232,7 +234,9 @@ if ok_tree then
       -- NERDTree-like mappings over the defaults
       local mappings = {
         o = { api.node.open.edit, 'Open' },
-        go = { api.node.open.preview, 'Open Preview' },
+        -- open.preview would mark the buffer bufhidden=delete, so the next
+        -- go in the same window would drop it from the buffer list
+        go = { function() api.node.open.edit(nil, { focus = true }) end, 'Open: Keep Focus' },
         t = { api.node.open.tab, 'Open: New Tab' },
         i = { api.node.open.horizontal, 'Open: Horizontal Split' },
         s = { api.node.open.vertical, 'Open: Vertical Split' },
