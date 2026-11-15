@@ -11,12 +11,18 @@ local function shell()
     -- A login shell, as Ghostty starts, since the exported PROMPT_COMMAND
     -- calls functions from .functions, which only .bash_profile sources
     shell = { vim.o.shell, "-l" },
-    win = { position = "bottom", height = 0.3 },
+    win = {
+      position = "bottom",
+      height = 0.3,
+      -- Ghostty's colors, as ide/terminal.lua gives every terminal window
+      wo = { winhighlight = "Normal:IdeTerminal,NormalNC:IdeTerminal" },
+    },
   })
 end
 
 local function tree()
-  vim.cmd("Neotree toggle reveal")
+  local file = vim.bo.buftype == "" and vim.fn.expand("%:p") or ""
+  vim.cmd("Fern . -drawer -toggle" .. (file ~= "" and (" -reveal=" .. vim.fn.fnameescape(file)) or ""))
 end
 
 local function claude()
@@ -56,10 +62,3 @@ map("n", "<Space>ab", "<cmd>ClaudeCodeAdd %<cr>", { desc = "Add current buffer" 
 map("v", "<Space>as", "<cmd>ClaudeCodeSend<cr>", { desc = "Send to Claude" })
 map("n", "<Space>aa", "<cmd>ClaudeCodeDiffAccept<cr>", { desc = "Accept diff" })
 map("n", "<Space>ad", "<cmd>ClaudeCodeDiffDeny<cr>", { desc = "Deny diff" })
-vim.api.nvim_create_autocmd("FileType", {
-  group = vim.api.nvim_create_augroup("ide-keymaps", { clear = true }),
-  pattern = "neo-tree",
-  callback = function(ev)
-    map("n", "<Space>as", "<cmd>ClaudeCodeTreeAdd<cr>", { buffer = ev.buf, desc = "Add file" })
-  end,
-})

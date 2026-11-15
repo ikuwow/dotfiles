@@ -7,7 +7,7 @@ local function open()
     return
   end
   local editor = vim.api.nvim_get_current_win()
-  vim.cmd("Neotree show")
+  vim.cmd("Fern . -drawer -stay")
   vim.cmd("ClaudeCodeOpen")
   vim.schedule(function()
     vim.cmd.stopinsert()
@@ -17,15 +17,21 @@ local function open()
   end)
 end
 
--- On the first run, the main config installs the missing plugins on
--- VimEnter and then sources this config, after VimEnter has passed
+-- fern.vim fills its buffer from a BufReadCmd autocmd, which an autocmd
+-- triggers only when nested.
+-- On the first run, the main config installs the missing plugins and
+-- sources this config from inside its VimEnter autocmd, too late for a
+-- VimEnter handler to fire and not nested, so the layout opens once that
+-- autocmd is done. A later re-source ($MYVIMRC on save, :Sv) also lands
+-- here, where an existing session means the layout is already open.
 if vim.v.vim_did_enter == 1 then
   if not require("ide.claude").get_active_bufnr() then
-    open()
+    vim.schedule(open)
   end
 else
   vim.api.nvim_create_autocmd("VimEnter", {
     group = vim.api.nvim_create_augroup("ide-startup", { clear = true }),
+    nested = true,
     callback = open,
   })
 end

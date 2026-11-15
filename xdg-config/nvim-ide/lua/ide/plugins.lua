@@ -1,5 +1,6 @@
--- Setup of the plugins the IDE layout uses. snacks.nvim and claudecode.nvim
--- come from the main config's plugin list; init.lua adds the rest.
+-- Setup of the plugins the IDE layout uses. fern.vim, snacks.nvim, and
+-- claudecode.nvim come from the main config's plugin list; init.lua adds the
+-- rest.
 
 -- snacks.nvim refuses a second setup(), which sourcing $MYVIMRC again runs
 if not require("snacks").did_setup then
@@ -9,18 +10,7 @@ if not require("snacks").did_setup then
   })
 end
 
-require("neo-tree").setup({
-  close_if_last_window = true,
-  -- Files opened from the tree go to the editor area, never to a terminal or
-  -- a panel that edgy.nvim holds
-  open_files_do_not_replace_types = { "terminal", "snacks_terminal", "qf", "edgy" },
-  filesystem = {
-    filtered_items = { visible = true },
-    follow_current_file = { enabled = true },
-    use_libuv_file_watcher = true,
-  },
-  window = { width = 32 },
-})
+vim.g["fern#drawer_width"] = 32
 
 require("bufferline").setup({
   options = {
@@ -29,7 +19,7 @@ require("bufferline").setup({
     end,
     always_show_bufferline = true,
     offsets = {
-      { filetype = "neo-tree", text = "Files", separator = true },
+      { filetype = "fern", text = "Files", separator = true },
     },
   },
 })
@@ -61,26 +51,28 @@ local function snacks_at(pos)
   end
 end
 
+-- edgy.nvim's default maps Normal to NormalFloat, a popup color in the
+-- main colorscheme; the file tree keeps the editor's Normal, and terminal
+-- panels take Ghostty's colors (see ide/terminal.lua)
+local winbar_hl = "WinBar:EdgyWinBar,WinBarNC:EdgyWinBarNC"
+local terminal_wo = { winhighlight = winbar_hl .. ",Normal:IdeTerminal,NormalNC:IdeTerminal" }
+
 require("edgy").setup({
   left = {
-    {
-      title = "Files",
-      ft = "neo-tree",
-      filter = function(buf)
-        return vim.b[buf].neo_tree_source == "filesystem"
-      end,
-    },
+    { title = "Files", ft = "fern" },
   },
   right = {
-    { title = "Claude Code %{v:lua.require'ide.claude'.label()}", ft = "claudecode" },
+    { title = "Claude Code %{v:lua.require'ide.claude'.label()}", ft = "claudecode", wo = terminal_wo },
   },
   bottom = {
     {
       title = "Terminal %{b:snacks_terminal.id}",
       ft = "snacks_terminal",
       filter = snacks_at("bottom"),
+      wo = terminal_wo,
     },
   },
+  wo = { winhighlight = winbar_hl },
   options = {
     left = { size = 32 },
     right = {

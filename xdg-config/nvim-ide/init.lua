@@ -5,7 +5,8 @@
 -- parts on top. Plain nvim never reads this file.
 
 local this = vim.fn.fnamemodify(debug.getinfo(1, "S").source:sub(2), ":p")
-vim.opt.rtp:prepend(vim.fn.fnamemodify(this, ":h"))
+-- Appended, so the runtimepath keeps the main config's order
+vim.opt.rtp:append(vim.fn.fnamemodify(this, ":h"))
 -- -u leaves $MYVIMRC unset, and the main config sources it again after
 -- installing plugins
 vim.env.MYVIMRC = this
@@ -15,23 +16,23 @@ vim.cmd.source(vim.fn.stdpath("config") .. "/init.vim")
 -- The main config's vim-plug list, extended. plug#end() places the plugins
 -- added after the main config's own plug#end() on the runtimepath, and the
 -- main config's VimEnter check installs any that are missing, then sources
--- $MYVIMRC, which -u makes this file.
+-- $MYVIMRC, which the assignment above points at this file. The file tree
+-- is the main config's fern.vim.
+-- The added plugins live outside g:plug_home, where :PlugClean in plain
+-- nvim, whose list lacks them, never looks.
 local extra = {
-  { "nvim-lua/plenary.nvim" },
-  { "MunifTanjim/nui.nvim" },
-  { "nvim-tree/nvim-web-devicons" },
-  { "nvim-neo-tree/neo-tree.nvim", { branch = "v3.x" } },
-  { "akinsho/bufferline.nvim" },
-  { "folke/edgy.nvim" },
+  "nvim-tree/nvim-web-devicons",
+  "akinsho/bufferline.nvim",
+  "folke/edgy.nvim",
 }
-for _, plug in ipairs(extra) do
-  vim.fn["plug#"](plug[1], plug[2] or vim.empty_dict())
+local extra_home = vim.fn.stdpath("data") .. "/plugged-nvim-ide/"
+for _, repo in ipairs(extra) do
+  vim.fn["plug#"](repo, { dir = extra_home .. repo:match("[^/]+$") })
 end
 vim.fn["plug#end"]()
 
-for _, plug in ipairs(extra) do
-  local name = plug[1]:match("[^/]+$")
-  if vim.fn.isdirectory(vim.g.plugs[name].dir) == 0 then
+for _, repo in ipairs(extra) do
+  if vim.fn.isdirectory(vim.g.plugs[repo:match("[^/]+$")].dir) == 0 then
     return
   end
 end
@@ -49,22 +50,7 @@ vim.g.lightline = vim.tbl_extend("force", vim.g.lightline, {
   enable = { statusline = 1, tabline = 0 },
 })
 
--- The main config highlights indentation, trailing spaces, and full-width
--- spaces in every window, which would paint over the terminal programs'
--- own drawing, so terminal windows drop those matches once the main
--- config's autocmds have added them
-vim.g.indent_guides_exclude_buftype = 1
-vim.api.nvim_create_autocmd({ "TermOpen", "BufWinEnter", "WinEnter" }, {
-  group = vim.api.nvim_create_augroup("ide-terminal-matches", { clear = true }),
-  callback = function()
-    vim.schedule(function()
-      if vim.bo.buftype == "terminal" then
-        vim.fn.clearmatches()
-      end
-    end)
-  end,
-})
-
+require("ide.terminal")
 require("ide.plugins")
 require("ide.keymaps")
 require("ide.startup")
