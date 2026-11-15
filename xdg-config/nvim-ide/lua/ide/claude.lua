@@ -127,6 +127,10 @@ local function spawn(cmd_string, env_table, config)
             )
           end
           forget(buf, failed)
+          if failed and valid(buf) then
+            -- Out of the filetype that edgy.nvim pulls into the Claude panel
+            vim.bo[buf].filetype = ""
+          end
         end)
       end,
     })
@@ -141,7 +145,9 @@ local function spawn(cmd_string, env_table, config)
   vim.api.nvim_create_autocmd("BufEnter", {
     buffer = buf,
     callback = function()
-      if not config or config.auto_insert ~= false then
+      -- A session that exited keeps its buffer for reading, and a key in
+      -- Terminal mode would close it
+      if index_of(buf) and (not config or config.auto_insert ~= false) then
         vim.cmd.startinsert()
       end
     end,
