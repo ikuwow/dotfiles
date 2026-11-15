@@ -153,8 +153,8 @@ vim.g.lightline = {
 vim.cmd([[
 function! LLCurrentBranch()
     try
-        if exists('*fugitive#head') && strlen(fugitive#head())
-            return "ト " . fugitive#head()
+        if exists('*FugitiveHead') && strlen(FugitiveHead())
+            return "ト " . FugitiveHead()
         endif
     catch
     endtry
