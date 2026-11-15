@@ -78,7 +78,7 @@ vim.g['fern#disable_drawer_tabpage_isolation'] = 1
 vim.api.nvim_create_user_command('Nt', 'Fern . -toggle -drawer -reveal=%', {})
 Plug('lambdalisue/fern-git-status.vim') -- It depends on fern.vim
 -- File type icons need Nerd Font glyphs, which Ghostty draws from its
--- built-in Symbols Nerd Font whatever font-family is set
+-- built-in Symbols Nerd Font regardless of font-family
 Plug('lambdalisue/vim-nerdfont')
 Plug('lambdalisue/vim-fern-renderer-nerdfont') -- It depends on vim-nerdfont
 vim.g['fern#renderer'] = 'nerdfont'
@@ -123,8 +123,8 @@ vim.api.nvim_create_autocmd('FileType', {
   end,
 })
 
--- The drawer is shown in every tab or in none, like an IDE's sidebar:
--- entering a tab opens or closes its drawer to match the tab just left.
+-- Tabs share the drawer's visibility like an IDE's sidebar: entering a tab
+-- opens or closes its drawer to match the tab just left.
 -- A tab with a diff window, such as claudecode.nvim's diff tab, neither
 -- follows nor leads, so the diff keeps its width and leaving it changes
 -- nothing.
@@ -143,9 +143,9 @@ local function has_diff_win(tabpage)
   end
   return false
 end
--- Moves the drawer's cursor to a file under the working directory and
--- expands its parents, like an IDE revealing the active file. The drawer's
--- cursorline keeps the file marked while the focus is elsewhere.
+-- Moves the drawer's cursor to the file and expands its parents, like an IDE
+-- revealing the active file. Only a file under the working directory
+-- qualifies, since "Fern ." roots the drawer there.
 local function reveal_in_drawer(bufnr)
   if vim.bo[bufnr].buftype ~= '' then
     return
@@ -158,7 +158,6 @@ local function reveal_in_drawer(bufnr)
   if not win then
     return
   end
-  vim.wo[win].cursorline = true
   vim.api.nvim_win_call(win, function()
     vim.cmd('FernReveal ' .. vim.fn.fnameescape(path))
   end)
