@@ -75,7 +75,7 @@ vim.g['fern#default_hidden'] = 1
 -- Every tab's drawer shows one shared fern buffer, so its expanded
 -- directories stay the same across tabs
 vim.g['fern#disable_drawer_tabpage_isolation'] = 1
-vim.api.nvim_create_user_command('Nt', 'Fern . -toggle -drawer', {})
+vim.api.nvim_create_user_command('Nt', 'Fern . -toggle -drawer -reveal=%', {})
 Plug('lambdalisue/fern-git-status.vim') -- It depends on fern.vim
 -- File type icons need Nerd Font glyphs, which Ghostty draws from its
 -- built-in Symbols Nerd Font whatever font-family is set
@@ -143,6 +143,32 @@ local function has_diff_win(tabpage)
   end
   return false
 end
+-- Moves the drawer's cursor to a file under the working directory and
+-- expands its parents, like an IDE revealing the active file. The drawer's
+-- cursorline keeps the file marked while the focus is elsewhere.
+local function reveal_in_drawer(bufnr)
+  if vim.bo[bufnr].buftype ~= '' then
+    return
+  end
+  local path = vim.api.nvim_buf_get_name(bufnr)
+  if not vim.startswith(path, vim.fn.getcwd() .. '/') then
+    return
+  end
+  local win = drawer_win(0)
+  if not win then
+    return
+  end
+  vim.wo[win].cursorline = true
+  vim.api.nvim_win_call(win, function()
+    vim.cmd('FernReveal ' .. vim.fn.fnameescape(path))
+  end)
+end
+vim.api.nvim_create_autocmd('BufEnter', {
+  group = vim.api.nvim_create_augroup('fern-drawer-reveal', { clear = true }),
+  callback = function(args)
+    reveal_in_drawer(args.buf)
+  end,
+})
 local drawer_in_left_tab
 local drawer_sync = vim.api.nvim_create_augroup('fern-drawer-tab-sync', { clear = true })
 vim.api.nvim_create_autocmd('TabLeave', {
@@ -169,6 +195,7 @@ vim.api.nvim_create_autocmd('TabEnter', {
       local win = drawer_win(tabpage)
       if want and not win then
         vim.cmd('Fern . -drawer -stay')
+        reveal_in_drawer(0)
       elseif not want and win and #vim.api.nvim_tabpage_list_wins(tabpage) > 1 then
         vim.api.nvim_win_close(win, false)
       end
