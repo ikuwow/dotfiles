@@ -30,19 +30,6 @@ vim.api.nvim_create_autocmd("ColorScheme", {
   callback = set_group,
 })
 
--- <C-;> then h, j, k, l, w, or p leaves Terminal mode for that <C-w>
--- window command, and a lone <C-;> leaves Terminal mode after
--- 'timeoutlen'. <C-w> itself stays with the program, as a shell's and
--- Claude Code's word deletion, since a word typed right after it would
--- otherwise run as Normal-mode commands in another window. <C-;> reaches
--- nvim as its own key only from a terminal that speaks the CSI u encoding
--- nvim asks for (:help tui-csiu), and neither a shell nor Claude Code
--- binds it.
-vim.keymap.set("t", "<C-;>", "<C-\\><C-n>", { desc = "Leave Terminal mode" })
-for _, key in ipairs({ "h", "j", "k", "l", "w", "p" }) do
-  vim.keymap.set("t", "<C-;>" .. key, "<C-\\><C-n><C-w>" .. key, { desc = "Window command " .. key })
-end
-
 -- The main config and its plugins highlight indentation, trailing spaces,
 -- and full-width spaces in every window, which would paint over the
 -- terminal programs' own drawing. Indent guides skip every buffer with a

@@ -37,6 +37,24 @@ local function session(f, ...)
   end
 end
 
+-- Window moves, the same key in every window: <C-;> then h, j, k, l, w, or
+-- p runs that <C-w> window command from Normal, Insert, or Terminal mode,
+-- and a lone <C-;> leaves Insert or Terminal mode after 'timeoutlen'.
+-- <C-w> itself stays with the program in a terminal window, as a shell's
+-- and Claude Code's word deletion, since a word typed right after it would
+-- otherwise run as Normal-mode commands in another window. <C-;> reaches
+-- nvim as its own key only from a terminal that speaks the CSI u encoding
+-- nvim asks for (:help tui-csiu), and neither a shell nor Claude Code
+-- binds it.
+map("i", "<C-;>", "<Esc>", { desc = "Leave Insert mode" })
+map("t", "<C-;>", "<C-\\><C-n>", { desc = "Leave Terminal mode" })
+for _, key in ipairs({ "h", "j", "k", "l", "w", "p" }) do
+  local desc = "Window command " .. key
+  map("n", "<C-;>" .. key, "<C-w>" .. key, { desc = desc })
+  map("i", "<C-;>" .. key, "<Esc><C-w>" .. key, { desc = desc })
+  map("t", "<C-;>" .. key, "<C-\\><C-n><C-w>" .. key, { desc = desc })
+end
+
 -- Panels
 map("n", "<Space>e", tree, { desc = "File tree" })
 map("n", "<Space>t", shell, { desc = "Toggle terminal" })
