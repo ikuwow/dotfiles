@@ -1,7 +1,8 @@
 -- A claudecode.nvim terminal provider that holds several Claude Code sessions
 -- in one panel on the right, one shown at a time. Each session is a terminal
 -- buffer, and the panel is one window whose buffer changes to the shown
--- session, so switching keeps every session's window size and scrollback.
+-- session, so switching sessions leaves the panel's size as it is and keeps
+-- each session's scrollback.
 --
 -- Every session connects to this nvim's claudecode.nvim server: claudecode.nvim
 -- builds the command and its environment, CLAUDE_CODE_SSE_PORT included, and
@@ -70,12 +71,16 @@ end
 local function hide()
   local win = panel_win()
   if win then
-    -- The last window of a tab cannot close; the panel then keeps the session
+    -- The only window of the last tab cannot close (E444), so the panel stays
+    -- there; the only window of another tab closes with its tab. The
+    -- session's buffer stays hidden either way.
     pcall(vim.api.nvim_win_close, win, false)
   end
 end
 
-local function forget(buf)
+-- Drops buf from the sessions. keep leaves the buffer in place, so the output
+-- of a session that failed stays readable with :buffer.
+local function forget(buf, keep)
   local i = index_of(buf)
   if not i then
     return
@@ -93,7 +98,7 @@ local function forget(buf)
       end
     end
   end
-  if valid(buf) then
+  if valid(buf) and not keep then
     vim.api.nvim_buf_delete(buf, { force = true })
   end
 end
@@ -103,22 +108,32 @@ local function spawn(cmd_string, env_table, config)
   vim.bo[buf].bufhidden = "hide"
   table.insert(sessions, buf)
   local win = show(buf, config)
-  local job
+  local ok, job
   vim.api.nvim_win_call(win, function()
-    job = vim.fn.jobstart(require("claudecode.utils").parse_command(cmd_string), {
+    -- jobstart() raises E475 when the command is not executable
+    ok, job = pcall(vim.fn.jobstart, require("claudecode.utils").parse_command(cmd_string), {
       term = true,
       env = env_table,
       cwd = config and config.cwd,
-      on_exit = function()
+      on_exit = function(_, code)
         vim.schedule(function()
-          forget(buf)
+          -- 129 is the SIGHUP that jobstop(), deleting the buffer, and
+          -- quitting nvim send
+          local failed = code ~= 0 and code ~= 129
+          if failed then
+            vim.notify(
+              ("Claude Code exited with code %d; its output stays in buffer %d"):format(code, buf),
+              vim.log.levels.WARN
+            )
+          end
+          forget(buf, failed)
         end)
       end,
     })
   end)
-  if job <= 0 then
+  if not ok or job <= 0 then
     forget(buf)
-    vim.notify("Failed to start " .. cmd_string, vim.log.levels.ERROR)
+    vim.notify("Failed to start " .. cmd_string .. (ok and "" or (": " .. tostring(job))), vim.log.levels.ERROR)
     return
   end
   vim.bo[buf].filetype = "claudecode"
