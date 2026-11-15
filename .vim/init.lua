@@ -1,6 +1,11 @@
 -- Basic settings are shared with Vim, which falls back to the same vimrc.
 local core_vimrc = vim.fs.joinpath(vim.fs.dirname(vim.fn.stdpath('config')), 'vim', 'vimrc')
-vim.cmd.source(core_vimrc)
+-- An error in the vimrc aborts the source, and pcall keeps the rest of this
+-- file running, as Neovim does for an error in an init.vim.
+local ok, err = pcall(vim.cmd.source, core_vimrc)
+if not ok then
+  vim.notify(err, vim.log.levels.ERROR)
+end
 
 -- $MYVIMRC points at this file, so the vimrc's own reload autocmd misses
 -- writes to the shared vimrc.
@@ -26,9 +31,11 @@ else
 end
 
 local nvim_venv = vim.fn.stdpath('data') .. '/python3-venv'
+-- The shell form fails with a nonzero exit when a command is missing, where
+-- the list form raises E475 and stops this file.
 if vim.fn.filereadable(nvim_venv .. '/bin/python3') == 0 then
-  vim.fn.system({ bin_prefix .. 'python3', '-m', 'venv', nvim_venv })
-  vim.fn.system({ nvim_venv .. '/bin/pip', 'install', 'pynvim' })
+  vim.fn.system(bin_prefix .. 'python3 -m venv ' .. nvim_venv)
+  vim.fn.system(nvim_venv .. '/bin/pip install pynvim')
 end
 vim.g.python3_host_prog = nvim_venv .. '/bin/python3'
 
@@ -40,10 +47,8 @@ end
 -- Install vim-plug
 local plug_vim = vim.fn.stdpath('data') .. '/site/autoload/plug.vim'
 if vim.fn.filereadable(plug_vim) == 0 then
-  vim.fn.system({
-    'curl', '-fLo', plug_vim, '--create-dirs',
-    'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim',
-  })
+  vim.fn.system('curl -fLo ' .. plug_vim .. ' --create-dirs '
+    .. 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim')
   vim.api.nvim_create_autocmd('VimEnter', { command = 'PlugInstall --sync | source $MYVIMRC' })
 end
 

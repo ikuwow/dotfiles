@@ -91,8 +91,10 @@ else
     autocmd AutoReloadVimrc BufWritePost $MYVIMRC nested source $MYVIMRC
 endif
 
-" Everything above is shared with Neovim, whose init.lua sources this file
-" and then configures plugins itself. Everything below is for Vim only.
+" Everything above is shared with Neovim, whose init.lua sources this file.
+" Everything below is for Vim only; init.lua keeps its own copy of the
+" provider, vim-plug, and plugin setup, so a plugin added here does not
+" reach Neovim.
 if has('nvim')
     finish
 endif
