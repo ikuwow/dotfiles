@@ -77,6 +77,20 @@ vim.g['fern#default_hidden'] = 1
 vim.g['fern#disable_drawer_tabpage_isolation'] = 1
 vim.api.nvim_create_user_command('Nt', 'Fern . -toggle -drawer', {})
 Plug('lambdalisue/fern-git-status.vim') -- It depends on fern.vim
+-- File type icons need Nerd Font glyphs, which Ghostty draws from its
+-- built-in Symbols Nerd Font whatever font-family is set
+Plug('lambdalisue/vim-nerdfont')
+Plug('lambdalisue/vim-fern-renderer-nerdfont') -- It depends on vim-nerdfont
+vim.g['fern#renderer'] = 'nerdfont'
+vim.g['fern#renderer#nerdfont#indent_markers'] = 1
+Plug('lambdalisue/vim-glyph-palette')
+vim.api.nvim_create_autocmd('FileType', {
+  group = vim.api.nvim_create_augroup('fern-glyph-palette', { clear = true }),
+  pattern = 'fern',
+  callback = function()
+    vim.fn['glyph_palette#apply']()
+  end,
+})
 
 -- https://github.com/lambdalisue/vim-fern/wiki/Tips#define-nerdtree-like-mappings
 local fern_mappings = {
