@@ -117,8 +117,8 @@ local function spawn(cmd_string, env_table, config)
       cwd = config and config.cwd,
       on_exit = function(_, code)
         vim.schedule(function()
-          -- 129 is the SIGHUP that jobstop(), deleting the buffer, and
-          -- quitting nvim send
+          -- 129 is the SIGHUP that jobstop() and deleting the buffer send;
+          -- quitting nvim runs no on_exit
           local failed = code ~= 0 and code ~= 129
           if failed then
             vim.notify(
