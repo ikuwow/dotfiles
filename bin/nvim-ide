@@ -4,7 +4,7 @@
 # Usage: nvim-ide [dir]
 #
 # nvim reads the overlay's init.lua through -u in place of the main
-# init.vim, and the overlay sources the main config before adding the IDE
+# init.lua, and the overlay sources the main config before adding the IDE
 # layout, so both share one plugin list, data directory, and colorscheme.
 # Plain nvim never reads the overlay. nvim starts in dir, the current
 # directory by default, which claudecode.nvim registers as the workspace for

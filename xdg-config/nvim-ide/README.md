@@ -1,6 +1,6 @@
 # nvim-ide
 
-Neovim as the whole IDE: the main Neovim config (`xdg-config/vim/vimrc`) with an overlay that adds a fixed layout around the editor, holding a file tree, buffers shown as tabs, Claude Code sessions, and a shell terminal.
+Neovim as the whole IDE: the main Neovim config (`xdg-config/nvim/init.lua`) with an overlay that adds a fixed layout around the editor, holding a file tree, buffers shown as tabs, Claude Code sessions, and a shell terminal.
 
 ```
 +------------------------------------------------------+

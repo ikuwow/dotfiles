@@ -1,7 +1,7 @@
 -- Neovim as the whole IDE, as an overlay on the main config: a file tree on
 -- the left, buffers as tabs, Claude Code on the right, and a shell terminal
 -- at the bottom. bin/nvim-ide starts nvim with `-u` pointing here, so this
--- file runs in place of the main init.vim, sources it, and adds the IDE
+-- file runs in place of the main init.lua, sources it, and adds the IDE
 -- parts on top. Plain nvim never reads this file.
 
 local this = vim.fn.fnamemodify(debug.getinfo(1, "S").source:sub(2), ":p")
@@ -11,7 +11,7 @@ vim.opt.rtp:append(vim.fn.fnamemodify(this, ":h"))
 -- installing plugins
 vim.env.MYVIMRC = this
 
-vim.cmd.source(vim.fn.stdpath("config") .. "/init.vim")
+vim.cmd.source(vim.fn.stdpath("config") .. "/init.lua")
 
 -- The main config's vim-plug list, extended. plug#end() places the plugins
 -- added after the main config's own plug#end() on the runtimepath, and the
