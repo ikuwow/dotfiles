@@ -23,6 +23,14 @@ if vim.fn.executable("ghostty") == 1 then
   end
 end
 
+-- <C-w> then h, j, k, l, w, or p leaves Terminal mode for that window
+-- command. Any other key after <C-w>, <C-w> included, reaches the program
+-- together with the <C-w> at once, and a lone <C-w> after 'timeoutlen', so
+-- a shell's or Claude Code's word deletion keeps working.
+for _, key in ipairs({ "h", "j", "k", "l", "w", "p" }) do
+  vim.keymap.set("t", "<C-w>" .. key, "<C-\\><C-n><C-w>" .. key, { desc = "Window command " .. key })
+end
+
 -- The main config and its plugins highlight indentation, trailing spaces,
 -- and full-width spaces in every window, which would paint over the
 -- terminal programs' own drawing. Indent guides skip terminal buffers
