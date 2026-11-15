@@ -234,6 +234,35 @@ if ok_tree and vim.g.NvimTreeSetup ~= 1 then
     tab = { sync = { open = true, close = true } },
   })
 end
+-- nvim-tree leaves closing with the last window to the user
+-- (https://github.com/nvim-tree/nvim-tree.lua/wiki/Auto-Close). Quitting a
+-- tab's last editor window closes the tree beside it, so the tab closes, or
+-- Neovim in the last tab; :q in the tree closes it in every tab, as q does.
+vim.api.nvim_create_autocmd('QuitPre', {
+  group = vim.api.nvim_create_augroup('nvim-tree-quit', { clear = true }),
+  callback = function()
+    if not ok_tree then
+      return
+    end
+    if vim.bo.filetype == 'NvimTree' then
+      vim.schedule(require('nvim-tree.api').tree.close)
+      return
+    end
+    local trees, editors = {}, 0
+    for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+      if vim.bo[vim.api.nvim_win_get_buf(win)].filetype == 'NvimTree' then
+        table.insert(trees, win)
+      elseif vim.api.nvim_win_get_config(win).relative == '' then
+        editors = editors + 1
+      end
+    end
+    if editors == 1 then
+      for _, win in ipairs(trees) do
+        vim.api.nvim_win_close(win, true)
+      end
+    end
+  end,
+})
 
 -- statusline config
 vim.o.laststatus = 2
