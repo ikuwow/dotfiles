@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# Start Neovim as the whole IDE, with the config in ~/.config/nvim-ide
+# Usage: nvim-ide [dir]
+#
+# NVIM_APPNAME=nvim-ide makes nvim read its config from
+# $XDG_CONFIG_HOME/nvim-ide and keep plugins, state, and cache under
+# nvim-ide directories of their own, so the config in ~/.config/nvim and
+# its plugins stay as they are. nvim starts in dir, the current directory
+# by default, which claudecode.nvim registers as the workspace for Claude
+# Code.
+
+set -eu
+
+usage="Usage: nvim-ide [dir]"
+
+for arg in "$@"; do
+  case "$arg" in
+    -h | --help)
+      echo "$usage"
+      exit 0
+      ;;
+    -*)
+      echo "Error: unknown option: $arg" >&2
+      echo "$usage" >&2
+      exit 1
+      ;;
+  esac
+done
+
+if [ $# -gt 1 ]; then
+  echo "$usage" >&2
+  exit 1
+fi
+
+config_dir="${XDG_CONFIG_HOME:-$HOME/.config}/nvim-ide"
+if [ ! -e "$config_dir/init.lua" ]; then
+  echo "Error: $config_dir/init.lua not found; link xdg-config/nvim-ide there" >&2
+  exit 1
+fi
+
+cd "${1:-.}"
+NVIM_APPNAME=nvim-ide exec nvim
