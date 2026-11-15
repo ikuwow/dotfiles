@@ -5,9 +5,6 @@
 .*.un~
 .tool-versions
 
-.vim/autoload/plug.vim
-.vim/plugged/*
-
 Brewfile.lock.json
 
 # Backup files
