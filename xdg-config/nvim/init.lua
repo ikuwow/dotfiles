@@ -70,41 +70,14 @@ local Plug = vim.fn['plug#']
 
 vim.call('plug#begin')
 
-Plug('lambdalisue/fern.vim')
-vim.g['fern#default_hidden'] = 1
-vim.api.nvim_create_user_command('Nt', 'Fern . -toggle -drawer', {})
-Plug('lambdalisue/fern-git-status.vim') -- It depends on fern.vim
-
--- https://github.com/lambdalisue/vim-fern/wiki/Tips#define-nerdtree-like-mappings
-local fern_mappings = {
-  o = '<Plug>(fern-action-open:edit)',
-  go = '<Plug>(fern-action-open:edit)<C-w>p',
-  t = '<Plug>(fern-action-open:tabedit)',
-  T = '<Plug>(fern-action-open:tabedit)gT',
-  i = '<Plug>(fern-action-open:split)',
-  gi = '<Plug>(fern-action-open:split)<C-w>p',
-  s = '<Plug>(fern-action-open:vsplit)',
-  gs = '<Plug>(fern-action-open:vsplit)<C-w>p',
-  ma = '<Plug>(fern-action-new-path)',
-  P = 'gg',
-  C = '<Plug>(fern-action-enter)',
-  u = '<Plug>(fern-action-leave)',
-  r = '<Plug>(fern-action-reload)',
-  R = 'gg<Plug>(fern-action-reload)<C-o>',
-  cd = '<Plug>(fern-action-cd)',
-  CD = 'gg<Plug>(fern-action-cd)<C-o>',
-  I = '<Plug>(fern-action-hidden-toggle)',
-  q = ':<C-u>quit<CR>',
-}
-vim.api.nvim_create_autocmd('FileType', {
-  group = vim.api.nvim_create_augroup('fern-custom', { clear = true }),
-  pattern = 'fern',
-  callback = function()
-    for lhs, rhs in pairs(fern_mappings) do
-      vim.keymap.set('n', lhs, rhs, { buffer = true, remap = true })
-    end
-  end,
-})
+-- nvim-tree replaces netrw, which its docs advise disabling (:help nvim-tree-netrw)
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
+Plug('nvim-tree/nvim-tree.lua')
+-- File type icons need Nerd Font glyphs, which Ghostty draws from its
+-- built-in Symbols Nerd Font regardless of font-family
+Plug('nvim-tree/nvim-web-devicons')
+vim.api.nvim_create_user_command('Nt', 'NvimTreeFindFileToggle', {})
 
 vim.g.ale_completion_enabled = 1 -- This setting must be set before ALE is loaded.
 Plug('dense-analysis/ale')
@@ -245,6 +218,40 @@ if ok then
       vertical_split = false,
       open_in_current_tab = false,
     },
+  })
+end
+
+local ok_tree, nvim_tree = pcall(require, 'nvim-tree')
+if ok_tree then
+  local api = require('nvim-tree.api')
+  nvim_tree.setup({
+    on_attach = function(bufnr)
+      api.map.on_attach.default(bufnr)
+      -- The default m (bookmark) is nowait, which would shadow ma
+      vim.keymap.del('n', 'm', { buffer = bufnr })
+      -- NERDTree-like mappings over the defaults
+      local mappings = {
+        o = { api.node.open.edit, 'Open' },
+        go = { api.node.open.preview, 'Open Preview' },
+        t = { api.node.open.tab, 'Open: New Tab' },
+        i = { api.node.open.horizontal, 'Open: Horizontal Split' },
+        s = { api.node.open.vertical, 'Open: Vertical Split' },
+        ma = { api.fs.create, 'Create File Or Directory' },
+        C = { api.tree.change_root_to_node, 'CD' },
+        u = { api.tree.change_root_to_parent, 'Up' },
+        r = { api.tree.reload, 'Refresh' },
+        I = { api.filter.dotfiles.toggle, 'Toggle Filter: Dotfiles' },
+      }
+      for lhs, m in pairs(mappings) do
+        vim.keymap.set('n', lhs, m[1], { buffer = bufnr, nowait = true, desc = 'nvim-tree: ' .. m[2] })
+      end
+    end,
+    filters = { git_ignored = false },
+    renderer = { indent_markers = { enable = true, icons = { item = '├' } } },
+    -- Moves the tree's cursor to the current file, like an IDE revealing it
+    update_focused_file = { enable = true },
+    -- The tree is shown in every tab or in none, like an IDE's sidebar
+    tab = { sync = { open = true, close = true } },
   })
 end
 
