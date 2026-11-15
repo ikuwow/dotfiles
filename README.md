@@ -63,9 +63,9 @@ Editing any dotfile means editing the source file in this repository.
 | Shell / version-manager dotfiles (`.bashrc`, `.aliases`, etc.) | `~/` |
 | `xdg-config/*` (all subdirectories) | `~/.config/` |
 | `bin/*` (executable files) | `~/bin/` |
-| `claude/` (settings, hooks, skills, agents, rules) | `~/.claude/`, plus shared parts to `~/.codex/` and `~/.junie/` |
+| `claude/` (settings, hooks, skills, agents, rules) | `~/.claude/` |
 | `hammerspoon/*` (files) | `~/.hammerspoon/` |
-| `AIRULES.md` | Global AI instructions for Claude, Codex, and Junie |
+| `AIRULES.md` | Global AI instructions for Claude and Codex |
 
 See `scripts/deploy.sh` for the exact mapping.
 
