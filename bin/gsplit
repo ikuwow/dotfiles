@@ -1,0 +1,102 @@
+#!/bin/bash
+
+# Split the current Ghostty pane left and right: nvim on the left and a
+# shell on the right, both in <dir>, with the left taking about 60% of
+# the width.
+# Usage: gsplit [dir]
+
+set -eu
+
+usage="Usage: gsplit [dir]"
+left_percent=60
+
+for arg in "$@"; do
+  case "$arg" in
+    -h | --help)
+      echo "$usage"
+      exit 0
+      ;;
+    -*)
+      echo "Error: unknown option: $arg" >&2
+      echo "$usage" >&2
+      exit 1
+      ;;
+  esac
+done
+
+if [ $# -gt 1 ]; then
+  echo "$usage" >&2
+  exit 1
+fi
+
+dir="$(cd "${1:-.}" && pwd)"
+
+# Ghostty finds the pane to split by its tty, and a pane inside tmux
+# has a tty of tmux's own, which no Ghostty terminal owns.
+if [ -n "${TMUX:-}" ]; then
+  echo "Error: run gsplit outside tmux" >&2
+  exit 1
+fi
+if [ "${TERM_PROGRAM:-}" != "ghostty" ]; then
+  echo "Error: gsplit needs a Ghostty terminal" >&2
+  exit 1
+fi
+
+my_tty="$(tty)"
+
+right_tty="$(osascript - "$my_tty" "$dir" <<'EOF'
+on run argv
+	set myTty to item 1 of argv
+	set dir to item 2 of argv
+	tell application "Ghostty"
+		set leftTerm to first terminal whose tty is myTty
+		set cfg to new surface configuration
+		set initial working directory of cfg to dir
+		set rightTerm to split leftTerm direction right with configuration cfg
+		focus leftTerm
+		return tty of rightTerm
+	end tell
+end run
+EOF
+)"
+
+resize() {
+  osascript - "$my_tty" "$1" <<'EOF' >/dev/null
+on run argv
+	tell application "Ghostty"
+		perform action ("resize_split:" & item 2 of argv) on (first terminal whose tty is item 1 of argv)
+	end tell
+end run
+EOF
+  # The new size reaches the tty after Ghostty lays the split out again.
+  sleep 0.2
+}
+
+cols() {
+  stty size <"$1" | cut -d ' ' -f 2
+}
+
+# resize_split takes pixels and the tty reports columns, so one fixed
+# resize measures the pixels per column for the final one.
+sleep 0.2
+left_before="$(cols "$my_tty")"
+total=$((left_before + $(cols "$right_tty")))
+probe_px=100
+resize "right,${probe_px}"
+left_after="$(cols "$my_tty")"
+probe_cols=$((left_after - left_before))
+if [ "$probe_cols" -le 0 ]; then
+  echo "Error: the probe resize moved the split by $probe_cols columns" >&2
+  exit 1
+fi
+
+target=$((total * left_percent / 100))
+delta_px=$(((target - left_after) * probe_px / probe_cols))
+if [ "$delta_px" -gt 0 ]; then
+  resize "right,${delta_px}"
+elif [ "$delta_px" -lt 0 ]; then
+  resize "left,$((-delta_px))"
+fi
+
+cd "$dir"
+exec nvim
