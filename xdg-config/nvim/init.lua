@@ -72,6 +72,9 @@ vim.call('plug#begin')
 
 Plug('lambdalisue/fern.vim')
 vim.g['fern#default_hidden'] = 1
+-- Every tab's drawer shows one shared fern buffer, so its expanded
+-- directories stay the same across tabs
+vim.g['fern#disable_drawer_tabpage_isolation'] = 1
 vim.api.nvim_create_user_command('Nt', 'Fern . -toggle -drawer', {})
 Plug('lambdalisue/fern-git-status.vim') -- It depends on fern.vim
 
@@ -106,7 +109,7 @@ vim.api.nvim_create_autocmd('FileType', {
   end,
 })
 
--- A tab opened from a tab that shows the fern drawer gets its own drawer
+-- A tab opened from a tab that shows the fern drawer shows the drawer too
 local function has_fern_drawer(tabnr)
   for _, bufnr in ipairs(vim.fn.tabpagebuflist(tabnr)) do
     if vim.bo[bufnr].filetype == 'fern' then
