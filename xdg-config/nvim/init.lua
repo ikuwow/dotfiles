@@ -225,31 +225,7 @@ local ok_tree, nvim_tree = pcall(require, 'nvim-tree')
 -- A second setup() closes the tree in every tab, and saving this file or
 -- the vimrc sources this file again, so setup runs once per session
 if ok_tree and vim.g.NvimTreeSetup ~= 1 then
-  local api = require('nvim-tree.api')
   nvim_tree.setup({
-    on_attach = function(bufnr)
-      api.map.on_attach.default(bufnr)
-      -- The default m (bookmark) is nowait, which would shadow ma
-      vim.keymap.del('n', 'm', { buffer = bufnr })
-      -- NERDTree-like mappings over the defaults
-      local mappings = {
-        o = { api.node.open.edit, 'Open' },
-        -- open.preview would mark the buffer bufhidden=delete, so the next
-        -- go in the same window would drop it from the buffer list
-        go = { function() api.node.open.edit(nil, { focus = true }) end, 'Open: Keep Focus' },
-        t = { api.node.open.tab, 'Open: New Tab' },
-        i = { api.node.open.horizontal, 'Open: Horizontal Split' },
-        s = { api.node.open.vertical, 'Open: Vertical Split' },
-        ma = { api.fs.create, 'Create File Or Directory' },
-        C = { api.tree.change_root_to_node, 'CD' },
-        u = { api.tree.change_root_to_parent, 'Up' },
-        r = { api.tree.reload, 'Refresh' },
-        I = { api.filter.dotfiles.toggle, 'Toggle Filter: Dotfiles' },
-      }
-      for lhs, m in pairs(mappings) do
-        vim.keymap.set('n', lhs, m[1], { buffer = bufnr, nowait = true, desc = 'nvim-tree: ' .. m[2] })
-      end
-    end,
     filters = { git_ignored = false },
     renderer = { indent_markers = { enable = true, icons = { item = '├' } } },
     -- Moves the tree's cursor to the current file, like an IDE revealing it
