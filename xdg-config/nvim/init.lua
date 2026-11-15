@@ -92,37 +92,6 @@ vim.api.nvim_create_autocmd('FileType', {
   end,
 })
 
--- https://github.com/lambdalisue/vim-fern/wiki/Tips#define-nerdtree-like-mappings
-local fern_mappings = {
-  o = '<Plug>(fern-action-open:edit)',
-  go = '<Plug>(fern-action-open:edit)<C-w>p',
-  t = '<Plug>(fern-action-open:tabedit)',
-  T = '<Plug>(fern-action-open:tabedit)gT',
-  i = '<Plug>(fern-action-open:split)',
-  gi = '<Plug>(fern-action-open:split)<C-w>p',
-  s = '<Plug>(fern-action-open:vsplit)',
-  gs = '<Plug>(fern-action-open:vsplit)<C-w>p',
-  ma = '<Plug>(fern-action-new-path)',
-  P = 'gg',
-  C = '<Plug>(fern-action-enter)',
-  u = '<Plug>(fern-action-leave)',
-  r = '<Plug>(fern-action-reload)',
-  R = 'gg<Plug>(fern-action-reload)<C-o>',
-  cd = '<Plug>(fern-action-cd)',
-  CD = 'gg<Plug>(fern-action-cd)<C-o>',
-  I = '<Plug>(fern-action-hidden-toggle)',
-  q = ':<C-u>quit<CR>',
-}
-vim.api.nvim_create_autocmd('FileType', {
-  group = vim.api.nvim_create_augroup('fern-custom', { clear = true }),
-  pattern = 'fern',
-  callback = function()
-    for lhs, rhs in pairs(fern_mappings) do
-      vim.keymap.set('n', lhs, rhs, { buffer = true, remap = true })
-    end
-  end,
-})
-
 -- Tabs share the drawer's visibility like an IDE's sidebar: entering a tab
 -- opens or closes its drawer to match the tab just left.
 -- A tab with a diff window, such as claudecode.nvim's diff tab, neither
