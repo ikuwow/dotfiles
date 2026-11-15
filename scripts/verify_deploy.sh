@@ -82,7 +82,6 @@ check_symlink "${XDG_CONFIG_HOME:-$HOME/.config}/git"
 check_symlink "${XDG_CONFIG_HOME:-$HOME/.config}/nvim"
 check_symlink "${XDG_CONFIG_HOME:-$HOME/.config}/tmux"
 check_symlink "${XDG_CONFIG_HOME:-$HOME/.config}/vim"
-check_symlink "${XDG_CONFIG_HOME:-$HOME/.config}/ideavim"
 
 echo ""
 echo "=== bin (auto-discovered) ==="
