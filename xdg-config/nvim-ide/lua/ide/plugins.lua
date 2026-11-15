@@ -17,6 +17,11 @@ require("bufferline").setup({
     close_command = function(buf)
       Snacks.bufdelete(buf)
     end,
+    -- Right-click closes a tab as its × does, asking before it drops
+    -- unsaved changes, in place of bufferline's default :bdelete!
+    right_mouse_command = function(buf)
+      Snacks.bufdelete(buf)
+    end,
     always_show_bufferline = true,
     offsets = {
       { filetype = "fern", text = "Files", separator = true },
