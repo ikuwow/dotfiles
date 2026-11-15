@@ -4,7 +4,7 @@
 
 " Only Vim >= 8.0 and NeoVim are supported
 if v:version < 800 && !has("nvim")
-    echo "WARNING: This .vimrc/init.vim does not support your vim!"
+    echo "WARNING: This vimrc does not support your vim!"
     echo "Some functions may not work."
 endif
 
@@ -14,7 +14,8 @@ set nocompatible " do not use vi compatible mode
 " When launched from Finder/Dock on macOS (e.g. Neovide.app, gvim cask),
 " the login shell init files do not run, so $PATH stays at the bare
 " /usr/bin:/bin:/usr/sbin:/sbin and Homebrew tools become invisible.
-" Prepend Homebrew's bin directory so executable('brew') works.
+" Prepend Homebrew's bin directory so that init.lua, which sources this file
+" first, finds brew with executable('brew').
 " See ikuwow/dotfiles#73.
 if has('mac') || has('macunix')
     let s:brew_path = '/opt/homebrew/bin'
@@ -56,7 +57,7 @@ set backupskip=/tmp/*,/private/tmp/*
 set cmdheight=1
 set virtualedit=block
 
-" quickly edit .vimrc
+" quickly edit the init file ($MYVIMRC: this vimrc in Vim, init.lua in Neovim)
 command! Ev edit $MYVIMRC
 command! Eg edit $MYGVIMRC
 command! Sv source $MYVIMRC

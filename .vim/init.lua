@@ -1,14 +1,16 @@
 -- Basic settings are shared with Vim, which falls back to the same vimrc.
 local core_vimrc = vim.fs.joinpath(vim.fs.dirname(vim.fn.stdpath('config')), 'vim', 'vimrc')
--- An error in the vimrc aborts the source, and pcall keeps the rest of this
--- file running, as Neovim does for an error in an init.vim.
+-- An error stops the vimrc at that line; pcall reports it and keeps the rest
+-- of this file running.
 local ok, err = pcall(vim.cmd.source, core_vimrc)
 if not ok then
   vim.notify(err, vim.log.levels.ERROR)
 end
 
 -- $MYVIMRC points at this file, so the vimrc's own reload autocmd misses
--- writes to the shared vimrc.
+-- writes to the shared vimrc. The group is joined without clearing, which
+-- keeps that autocmd, and is created here when the vimrc stopped before
+-- defining it.
 vim.api.nvim_create_autocmd('BufWritePost', {
   group = vim.api.nvim_create_augroup('AutoReloadVimrc', { clear = false }),
   pattern = { core_vimrc, vim.fn.resolve(core_vimrc) },
@@ -146,8 +148,8 @@ vim.g.lightline = {
   },
 }
 
--- lightline resolves component functions with exists('*name') and call(),
--- and call() rejects v:lua names, so these stay Vimscript functions.
+-- lightline#init() calls each component function once with call(), which
+-- rejects v:lua names, so these are Vimscript functions.
 vim.cmd([[
 function! LLCurrentBranch()
     try
