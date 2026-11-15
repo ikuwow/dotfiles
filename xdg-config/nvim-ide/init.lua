@@ -16,6 +16,9 @@ vim.opt.tabstop = 4
 vim.opt.breakindent = true
 vim.opt.virtualedit = "block"
 vim.opt.undofile = false
+-- The colors of the main config in xdg-config/vim/vimrc
+vim.opt.termguicolors = true
+vim.cmd.colorscheme("desert")
 -- One statusline for the whole screen, and splits that keep the text in
 -- place, as edgy.nvim asks for
 vim.opt.laststatus = 3
