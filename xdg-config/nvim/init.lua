@@ -72,6 +72,9 @@ vim.call('plug#begin')
 
 Plug('lambdalisue/fern.vim')
 vim.g['fern#default_hidden'] = 1
+-- Every tab's drawer shows one shared fern buffer, so its expanded
+-- directories stay the same across tabs
+vim.g['fern#disable_drawer_tabpage_isolation'] = 1
 vim.api.nvim_create_user_command('Nt', 'Fern . -toggle -drawer', {})
 Plug('lambdalisue/fern-git-status.vim') -- It depends on fern.vim
 
