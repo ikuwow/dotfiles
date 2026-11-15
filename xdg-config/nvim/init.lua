@@ -70,66 +70,14 @@ local Plug = vim.fn['plug#']
 
 vim.call('plug#begin')
 
-Plug('lambdalisue/fern.vim')
-vim.g['fern#default_hidden'] = 1
--- Every tab's drawer shows one shared fern buffer, so its expanded
--- directories stay the same across tabs
-vim.g['fern#disable_drawer_tabpage_isolation'] = 1
-vim.api.nvim_create_user_command('Nt', 'Fern . -toggle -drawer', {})
-Plug('lambdalisue/fern-git-status.vim') -- It depends on fern.vim
-
--- https://github.com/lambdalisue/vim-fern/wiki/Tips#define-nerdtree-like-mappings
-local fern_mappings = {
-  o = '<Plug>(fern-action-open:edit)',
-  go = '<Plug>(fern-action-open:edit)<C-w>p',
-  t = '<Plug>(fern-action-open:tabedit)',
-  T = '<Plug>(fern-action-open:tabedit)gT',
-  i = '<Plug>(fern-action-open:split)',
-  gi = '<Plug>(fern-action-open:split)<C-w>p',
-  s = '<Plug>(fern-action-open:vsplit)',
-  gs = '<Plug>(fern-action-open:vsplit)<C-w>p',
-  ma = '<Plug>(fern-action-new-path)',
-  P = 'gg',
-  C = '<Plug>(fern-action-enter)',
-  u = '<Plug>(fern-action-leave)',
-  r = '<Plug>(fern-action-reload)',
-  R = 'gg<Plug>(fern-action-reload)<C-o>',
-  cd = '<Plug>(fern-action-cd)',
-  CD = 'gg<Plug>(fern-action-cd)<C-o>',
-  I = '<Plug>(fern-action-hidden-toggle)',
-  q = ':<C-u>quit<CR>',
-}
-vim.api.nvim_create_autocmd('FileType', {
-  group = vim.api.nvim_create_augroup('fern-custom', { clear = true }),
-  pattern = 'fern',
-  callback = function()
-    for lhs, rhs in pairs(fern_mappings) do
-      vim.keymap.set('n', lhs, rhs, { buffer = true, remap = true })
-    end
-  end,
-})
-
--- A tab opened from a tab that shows the fern drawer shows the drawer too
-local function has_fern_drawer(tabnr)
-  for _, bufnr in ipairs(vim.fn.tabpagebuflist(tabnr)) do
-    if vim.bo[bufnr].filetype == 'fern' then
-      return true
-    end
-  end
-  return false
-end
-vim.api.nvim_create_autocmd('TabNewEntered', {
-  group = vim.api.nvim_create_augroup('fern-drawer-per-tab', { clear = true }),
-  callback = function()
-    -- Deferred, so the drawer opens after the new tab has loaded its file
-    vim.schedule(function()
-      local prev = vim.fn.tabpagenr('#')
-      if prev > 0 and has_fern_drawer(prev) and not has_fern_drawer(vim.fn.tabpagenr()) then
-        vim.cmd('Fern . -drawer -stay')
-      end
-    end)
-  end,
-})
+-- nvim-tree replaces netrw, which its docs advise disabling (:help nvim-tree-netrw)
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
+Plug('nvim-tree/nvim-tree.lua')
+-- File type icons need Nerd Font glyphs, which Ghostty draws from its
+-- built-in Symbols Nerd Font regardless of font-family
+Plug('nvim-tree/nvim-web-devicons')
+vim.api.nvim_create_user_command('Nt', 'NvimTreeFindFileToggle', {})
 
 vim.g.ale_completion_enabled = 1 -- This setting must be set before ALE is loaded.
 Plug('dense-analysis/ale')
@@ -272,6 +220,49 @@ if ok then
     },
   })
 end
+
+local ok_tree, nvim_tree = pcall(require, 'nvim-tree')
+-- A second setup() closes the tree in every tab, and saving this file or
+-- the vimrc sources this file again, so setup runs once per session
+if ok_tree and vim.g.NvimTreeSetup ~= 1 then
+  nvim_tree.setup({
+    filters = { git_ignored = false },
+    renderer = { indent_markers = { enable = true, icons = { item = '├' } } },
+    -- Moves the tree's cursor to the current file, like an IDE revealing it
+    update_focused_file = { enable = true },
+    -- The tree is shown in every tab or in none, like an IDE's sidebar
+    tab = { sync = { open = true, close = true } },
+  })
+end
+-- nvim-tree leaves closing with the last window to the user
+-- (https://github.com/nvim-tree/nvim-tree.lua/wiki/Auto-Close). Quitting a
+-- tab's last editor window closes the tree beside it, so the tab closes, or
+-- Neovim in the last tab; :q in the tree closes it in every tab, as q does.
+vim.api.nvim_create_autocmd('QuitPre', {
+  group = vim.api.nvim_create_augroup('nvim-tree-quit', { clear = true }),
+  callback = function()
+    if not ok_tree then
+      return
+    end
+    if vim.bo.filetype == 'NvimTree' then
+      vim.schedule(require('nvim-tree.api').tree.close)
+      return
+    end
+    local trees, editors = {}, 0
+    for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+      if vim.bo[vim.api.nvim_win_get_buf(win)].filetype == 'NvimTree' then
+        table.insert(trees, win)
+      elseif vim.api.nvim_win_get_config(win).relative == '' then
+        editors = editors + 1
+      end
+    end
+    if editors == 1 then
+      for _, win in ipairs(trees) do
+        vim.api.nvim_win_close(win, true)
+      end
+    end
+  end,
+})
 
 -- statusline config
 vim.o.laststatus = 2
