@@ -63,7 +63,7 @@ mkdir -p "$HOME/.hammerspoon"
 find "$DOTPATH/hammerspoon" -maxdepth 1 -mindepth 1 -type f -exec ln -fvns {} "$HOME/.hammerspoon/" \;
 find "$HOME/.hammerspoon/" -maxdepth 1 -type l ! -exec test -e {} \; -print -delete
 
-# Agent CLIs (Claude Code, Codex, Junie). Each auto-discovered directory
+# Agent CLIs (Claude Code, Codex). Each auto-discovered directory
 # below relinks first and prunes broken symlinks second, so a missing or
 # partial source tree aborts under `set -e` before anything is deleted.
 # Only broken symlinks go: real files stay, and so do the entries deployed
@@ -92,9 +92,3 @@ link AIRULES.md  "$HOME/.codex/AGENTS.md"
 mkdir -p "$HOME/.codex/rules"
 find "$DOTPATH/codex/rules" -maxdepth 1 -mindepth 1 -type f -name '*.rules' -exec ln -fvns {} "$HOME/.codex/rules/" \;
 find "$HOME/.codex/rules/" -maxdepth 1 -type l ! -exec test -e {} \; -print -delete
-
-# Junie CLI (JetBrains)
-link AIRULES.md  "$HOME/.junie/AGENTS.md"
-mkdir -p "$HOME/.junie/skills"
-find "$DOTPATH/claude/skills" -maxdepth 1 -mindepth 1 -type d -exec ln -fvns {} "$HOME/.junie/skills/" \;
-find "$HOME/.junie/skills/" -maxdepth 1 -type l ! -exec test -e {} \; -print -delete
