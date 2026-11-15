@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Open the tmux session for a project, creating it on first use
-# Usage: dev [dir]
+# Usage: ide [dir]
 #
 # One session per project: a directory anywhere inside a git repository,
 # including inside one of its worktrees, resolves to the main checkout's
@@ -15,7 +15,7 @@
 
 set -eu
 
-usage="Usage: dev [dir]"
+usage="Usage: ide [dir]"
 
 for arg in "$@"; do
   case "$arg" in
