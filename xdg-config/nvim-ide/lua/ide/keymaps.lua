@@ -14,7 +14,8 @@ local function shell()
     win = {
       position = "bottom",
       height = 0.3,
-      -- Ghostty's colors, as ide/terminal.lua gives every terminal window
+      -- In place of snacks.win's default, which maps Normal to a popup
+      -- color; IdeTerminal is defined in ide/terminal.lua
       wo = { winhighlight = "Normal:IdeTerminal,NormalNC:IdeTerminal" },
     },
   })

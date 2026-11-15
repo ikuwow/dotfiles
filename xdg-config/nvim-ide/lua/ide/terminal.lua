@@ -1,27 +1,34 @@
 -- Terminal windows look as the programs in them look in Ghostty: the
--- colorscheme stays with the editor, and terminal windows take Ghostty's
--- default colors and palette.
+-- colorscheme stays with the editor, and terminal windows take the
+-- foreground, background, and 16-color palette of Ghostty's current theme.
+-- Without ghostty on PATH, terminal windows keep the colorscheme's Normal
+-- and nvim's own palette.
 
--- An empty group in place of Normal leaves the cells at the terminal's
--- default foreground and background
-vim.api.nvim_set_hl(0, "IdeTerminal", {})
-vim.api.nvim_create_autocmd("ColorScheme", {
-  group = vim.api.nvim_create_augroup("ide-terminal-colors", { clear = true }),
-  callback = function()
-    vim.api.nvim_set_hl(0, "IdeTerminal", {})
-  end,
-})
-
--- The 16-color palette of Ghostty's current theme, which nvim reads on
--- TermOpen; nvim uses its own palette when ghostty is not on PATH
+local ghostty = {}
 if vim.fn.executable("ghostty") == 1 then
   for _, line in ipairs(vim.fn.systemlist({ "ghostty", "+show-config" })) do
-    local i, color = line:match("^palette = (%d+)=(#%x+)$")
+    local key, color = line:match("^(%w+) = (#%x+)$")
+    if key == "foreground" or key == "background" then
+      ghostty[key] = color
+    end
+    local i, pcolor = line:match("^palette = (%d+)=(#%x+)$")
     if i and tonumber(i) <= 15 then
-      vim.g["terminal_color_" .. i] = color
+      -- nvim reads these on TermOpen
+      vim.g["terminal_color_" .. i] = pcolor
     end
   end
 end
+
+-- Terminal windows map Normal to this group, since a cell with no color of
+-- its own takes Normal's colors, which are the colorscheme's
+local function set_group()
+  vim.api.nvim_set_hl(0, "IdeTerminal", { fg = ghostty.foreground, bg = ghostty.background })
+end
+set_group()
+vim.api.nvim_create_autocmd("ColorScheme", {
+  group = vim.api.nvim_create_augroup("ide-terminal-colors", { clear = true }),
+  callback = set_group,
+})
 
 -- <C-\> then h, j, k, l, w, or p leaves Terminal mode for that <C-w>
 -- window command. <C-w> itself stays with the program, as a shell's and
@@ -34,9 +41,9 @@ end
 
 -- The main config and its plugins highlight indentation, trailing spaces,
 -- and full-width spaces in every window, which would paint over the
--- terminal programs' own drawing. Indent guides skip terminal buffers
--- outright, and the autocmd clears the other matches once their autocmds
--- have added them.
+-- terminal programs' own drawing. Indent guides skip every buffer with a
+-- 'buftype', terminals included, and the autocmd clears the other matches
+-- once their autocmds have added them.
 vim.g.indent_guides_exclude_buftype = 1
 vim.api.nvim_create_autocmd({ "TermOpen", "BufWinEnter", "WinEnter" }, {
   group = vim.api.nvim_create_augroup("ide-terminal-windows", { clear = true }),
