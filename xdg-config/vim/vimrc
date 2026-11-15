@@ -91,11 +91,11 @@ else
     autocmd AutoReloadVimrc BufWritePost $MYVIMRC nested source $MYVIMRC
 endif
 
-" Disable providers except python3
-let g:loaded_python_provider = 0
-let g:loaded_ruby_provider = 0
-let g:loaded_node_provider = 0
-let g:loaded_perl_provider = 0
+" Everything above is shared with Neovim, whose init.lua sources this file
+" and then configures plugins itself. Everything below is for Vim only.
+if has('nvim')
+    finish
+endif
 
 " Python3 configurations
 if executable('brew')
@@ -107,16 +107,7 @@ else
     let s:bin_prefix = ''
 endif
 
-if has("nvim")
-    let s:nvim_venv = stdpath('data') . '/python3-venv'
-    if !filereadable(s:nvim_venv . '/bin/python3')
-        call system(s:bin_prefix . 'python3 -m venv ' . s:nvim_venv)
-        call system(s:nvim_venv . '/bin/pip install pynvim')
-    endif
-    let g:python3_host_prog = s:nvim_venv . '/bin/python3'
-else
-    let g:python3_host_prog = s:bin_prefix . 'python3'
-endif
+let g:python3_host_prog = s:bin_prefix . 'python3'
 
 if strlen($SSH_CLIENT) != 0
     echo 'Your vim is over ssh, so no plugins are loaded.'
@@ -124,7 +115,7 @@ if strlen($SSH_CLIENT) != 0
 endif
 
 " Install vim-plug
-let data_dir = has('nvim') ? stdpath('data') . '/site' : '~/.vim'
+let data_dir = '~/.vim'
 if empty(glob(data_dir . '/autoload/plug.vim'))
     let s:vim_plug_url = 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
     silent execute '!curl -fLo ' . data_dir . '/autoload/plug.vim --create-dirs ' . s:vim_plug_url
@@ -302,30 +293,8 @@ Plug 'posva/vim-vue'
 Plug 'bfontaine/Brewfile.vim'
 Plug 'okkiroxx/rtx.vim'
 
-if has('nvim')
-    Plug 'kassio/neoterm'
-    Plug 'folke/snacks.nvim'
-    Plug 'coder/claudecode.nvim'
-    " Neovide IME inline preedit; self-detects Neovide, no-op in terminal nvim
-    Plug 'sevenc-nanashi/neov-ime.nvim'
-endif
-
 " This automatically executes `filetype plugin indent on` and `syntax enable`.
 call plug#end()
-
-" claudecode.nvim setup
-if has('nvim')
-lua << EOF
-    if pcall(require, "claudecode") then
-        require("claudecode").setup({
-            diff_opts = {
-                vertical_split = false,
-                open_in_current_tab = false,
-            },
-        })
-    end
-EOF
-endif
 
 " statusline config
 set laststatus=2
