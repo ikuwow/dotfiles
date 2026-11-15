@@ -123,6 +123,59 @@ vim.api.nvim_create_autocmd('FileType', {
   end,
 })
 
+-- The drawer is shown in every tab or in none, like an IDE's sidebar:
+-- entering a tab opens or closes its drawer to match the tab just left.
+-- A tab with a diff window, such as claudecode.nvim's diff tab, neither
+-- follows nor leads, so the diff keeps its width and leaving it changes
+-- nothing.
+local function drawer_win(tabpage)
+  for _, win in ipairs(vim.api.nvim_tabpage_list_wins(tabpage)) do
+    if vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(win)):match('^fern://drawer:') then
+      return win
+    end
+  end
+end
+local function has_diff_win(tabpage)
+  for _, win in ipairs(vim.api.nvim_tabpage_list_wins(tabpage)) do
+    if vim.wo[win].diff then
+      return true
+    end
+  end
+  return false
+end
+local drawer_in_left_tab
+local drawer_sync = vim.api.nvim_create_augroup('fern-drawer-tab-sync', { clear = true })
+vim.api.nvim_create_autocmd('TabLeave', {
+  group = drawer_sync,
+  callback = function()
+    local tabpage = vim.api.nvim_get_current_tabpage()
+    if has_diff_win(tabpage) then
+      drawer_in_left_tab = nil
+    else
+      drawer_in_left_tab = drawer_win(tabpage) ~= nil
+    end
+  end,
+})
+vim.api.nvim_create_autocmd('TabEnter', {
+  group = drawer_sync,
+  callback = function()
+    local want = drawer_in_left_tab
+    -- Deferred, so a new tab has loaded its file and set up its diff first
+    vim.schedule(function()
+      local tabpage = vim.api.nvim_get_current_tabpage()
+      if want == nil or has_diff_win(tabpage) then
+        return
+      end
+      local win = drawer_win(tabpage)
+      if want and not win then
+        vim.cmd('Fern . -drawer -stay')
+      elseif not want and win and #vim.api.nvim_tabpage_list_wins(tabpage) > 1 then
+        vim.api.nvim_win_close(win, false)
+      end
+    end)
+  end,
+})
+
 vim.g.ale_completion_enabled = 1 -- This setting must be set before ALE is loaded.
 Plug('dense-analysis/ale')
 vim.g.ale_linters = {
