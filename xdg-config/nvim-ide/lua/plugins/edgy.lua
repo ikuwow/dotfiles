@@ -24,7 +24,7 @@ return {
       },
     },
     right = {
-      { title = "Claude Code", ft = "claudecode" },
+      { title = "Claude Code %{v:lua.require'ide.claude'.label()}", ft = "claudecode" },
     },
     bottom = {
       {

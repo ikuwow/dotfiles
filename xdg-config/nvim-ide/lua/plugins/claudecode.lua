@@ -7,8 +7,11 @@ return {
   keys = {
     { "<leader>ac", "<cmd>ClaudeCode<cr>", desc = "Toggle Claude" },
     { "<leader>af", "<cmd>ClaudeCodeFocus<cr>", desc = "Focus Claude" },
-    { "<leader>ar", "<cmd>ClaudeCode --resume<cr>", desc = "Resume Claude" },
-    { "<leader>aC", "<cmd>ClaudeCode --continue<cr>", desc = "Continue Claude" },
+    { "<leader>an", function() require("ide.claude").new() end, desc = "New Claude session" },
+    { "<leader>ar", function() require("ide.claude").new("--resume") end, desc = "Resume in a new session" },
+    { "<leader>aC", function() require("ide.claude").new("--continue") end, desc = "Continue in a new session" },
+    { "<leader>a]", function() require("ide.claude").cycle(1) end, desc = "Next Claude session" },
+    { "<leader>a[", function() require("ide.claude").cycle(-1) end, desc = "Previous Claude session" },
     { "<leader>ab", "<cmd>ClaudeCodeAdd %<cr>", desc = "Add current buffer" },
     { "<leader>as", "<cmd>ClaudeCodeSend<cr>", mode = "v", desc = "Send to Claude" },
     { "<leader>as", "<cmd>ClaudeCodeTreeAdd<cr>", desc = "Add file", ft = { "neo-tree" } },
@@ -18,6 +21,7 @@ return {
   opts = function()
     return {
       terminal = {
+        provider = require("ide.claude"),
         split_side = "right",
         split_width_percentage = 0.4,
       },
