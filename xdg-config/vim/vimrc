@@ -29,6 +29,7 @@ set nu
 set title " display filename (not Thank you for using Vim.)
 set ruler " display ruler (60,7 13%)
 set showcmd " show inputting key
+set showtabline=2 " show the tab line even with one tab
 
 set hlsearch " highlight the search word
 set ignorecase
