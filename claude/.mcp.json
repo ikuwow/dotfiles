@@ -7,14 +7,6 @@
     "Context7": {
       "command": "npx",
       "args": ["-y", "@upstash/context7-mcp"]
-    },
-    "intellij-index": {
-      "type": "sse",
-      "url": "http://127.0.0.1:29170/index-mcp/sse"
-    },
-    "goland-index": {
-      "type": "sse",
-      "url": "http://127.0.0.1:29174/index-mcp/sse"
     }
   }
 }

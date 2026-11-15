@@ -27,7 +27,6 @@ mcp_add() {
 }
 
 # --- MCP servers ---
-# IDE-local servers (intellij-index, goland-index) are intentionally omitted
 mcp_add deepwiki '{"type":"http","url":"https://mcp.deepwiki.com/mcp"}'
 mcp_add Context7 '{"command":"npx","args":["-y","@upstash/context7-mcp"]}'
 mcp_add aws-knowledge '{"type":"http","url":"https://knowledge-mcp.global.api.aws"}'
