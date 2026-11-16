@@ -74,11 +74,23 @@ if [ -z "$name" ]; then
     exit 1
   fi
 
+  # The session starts at the size of the terminal it opens in, because
+  # tmux spreads a later change in window width across the panes instead
+  # of keeping the 6:4 split between nvim and claude
+  if [ -n "${TMUX:-}" ]; then
+    width="$(tmux display-message -p '#{client_width}')"
+    height="$(tmux display-message -p '#{client_height}')"
+  else
+    size="$(stty size </dev/tty)"
+    height="${size% *}"
+    width="${size#* }"
+  fi
+
   # Start each program from a shell, so its pane keeps a shell after the
   # program exits
-  nvim_pane="$(tmux new-session -d -P -F '#{pane_id}' -s "$name" -c "$root")"
+  nvim_pane="$(tmux new-session -d -P -F '#{pane_id}' -s "$name" -c "$root" -x "$width" -y "$height")"
   tmux send-keys -t "$nvim_pane" 'nvim -c NvimTreeOpen' Enter
-  claude_pane="$(tmux split-window -h -P -F '#{pane_id}' -t "$nvim_pane" -c "$root")"
+  claude_pane="$(tmux split-window -h -l 40% -P -F '#{pane_id}' -t "$nvim_pane" -c "$root")"
   tmux send-keys -t "$claude_pane" 'claude --ide' Enter
 fi
 
