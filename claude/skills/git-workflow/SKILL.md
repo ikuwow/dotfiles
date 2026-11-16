@@ -77,7 +77,7 @@ flowchart LR
   worktree (or feature branch) first. Creating files before branching
   leads to redundant copy-and-delete work.
 - Never modify commits that have already been pushed
-- Fix-push cap: stop autonomous fixes after 5 for this PR in this
+- Fix-push cap: stop autonomous fixes after 10 for this PR in this
   session, counting every fix push made in any step and every
   `/pr-selfcheck` re-run that follows a body-only fix, since past that
   the fixes are no longer converging on their own. Surface the state and
