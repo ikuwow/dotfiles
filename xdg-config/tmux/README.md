@@ -6,6 +6,9 @@ running server with `tmux source-file ~/.config/tmux/tmux.conf`; a
 setting removed from the file keeps its old value until the server
 restarts.
 
+The terminal's title, which Ghostty shows as the tab name, is the tmux
+session's name; `ide` names a session after its project's directory.
+
 ## Tabs in a pane
 
 A pane can hold several tabs, one shown at a time, such as further
