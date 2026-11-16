@@ -229,9 +229,9 @@ if ok_tree and vim.g.NvimTreeSetup ~= 1 then
     filters = { git_ignored = false },
     renderer = {
       indent_markers = { enable = true, icons = { item = '├' } },
-      -- Git glyphs go in the sign column, so every name starts in the same
-      -- column whatever its git status
-      icons = { git_placement = 'signcolumn' },
+      -- The ignored glyph before a name starts it one column right of its
+      -- siblings'; an empty glyph adds no column
+      icons = { glyphs = { git = { ignored = '' } } },
     },
     -- Moves the tree's cursor to the current file, like an IDE revealing it
     update_focused_file = { enable = true },
