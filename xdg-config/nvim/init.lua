@@ -227,7 +227,12 @@ local ok_tree, nvim_tree = pcall(require, 'nvim-tree')
 if ok_tree and vim.g.NvimTreeSetup ~= 1 then
   nvim_tree.setup({
     filters = { git_ignored = false },
-    renderer = { indent_markers = { enable = true, icons = { item = '├' } } },
+    renderer = {
+      indent_markers = { enable = true, icons = { item = '├' } },
+      -- The ignored glyph before a name starts it one column right of its
+      -- siblings'; an empty glyph adds no column
+      icons = { glyphs = { git = { ignored = '' } } },
+    },
     -- Moves the tree's cursor to the current file, like an IDE revealing it
     update_focused_file = { enable = true },
     -- The tree is shown in every tab or in none, like an IDE's sidebar
