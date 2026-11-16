@@ -50,21 +50,19 @@ render() {
   if [ "$(members "$group" | wc -l)" -lt 2 ]; then
     tmux set-option -pu -t "$shown" @tab_group ';' set-option -pu -t "$shown" @tab_list \
       ';' set-option -pu -t "$shown" remain-on-exit
-    if [ -z "$(tmux list-panes -t "$shown" -F '#{@tab_list}' | tr -d '\n')" ]; then
-      tmux set-option -wu -t "$shown" pane-border-status
-    fi
     return 0
   fi
-  label='#{?#{==:#{pane_current_command},claude},#{=20:pane_title},#{pane_current_command}}'
+  # The shown tab's label stays a format, so it follows its pane live
+  label="$(tmux show-options -gv @tab_label)"
   while read -r p _; do
     i=$((i + 1))
     if [ "$p" = "$shown" ]; then
-      list="$list#[reverse] $i:$label #[noreverse]"
+      list="$list#[reverse] $i:#{E:@tab_label} #[noreverse]"
     else
       list="$list $i:$(info "$p" "$label" | sed 's/#/##/g') "
     fi
   done < <(members "$group")
-  tmux set-option -p -t "$shown" @tab_list "$list" ';' set-option -w -t "$shown" pane-border-status top
+  tmux set-option -p -t "$shown" @tab_list "$list"
 }
 
 prune

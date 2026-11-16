@@ -9,10 +9,10 @@ restarts.
 ## Tabs in a pane
 
 A pane can hold several tabs, one shown at a time, such as further
-shells or Claude Code sessions in the right pane that `ide` opens. While
-a pane has two or more tabs, its top border lists them, with the shown
-tab in reverse video; a Claude Code tab is labeled with its session
-title.
+shells or Claude Code sessions in the right pane that `ide` opens. Every
+pane's top border lists its tabs, with the shown tab in reverse video,
+and a pane without tabs shows itself as tab 1; a Claude Code tab is
+labeled with its session title.
 
 | Keys | Action |
 | --- | --- |
@@ -29,8 +29,6 @@ title.
 - A pane removed any other way than `C-q x`, such as with `kill-window`,
   takes its hidden tabs with it
 - Tabs switch by key only, not by clicking the list
-- While a window holds tabs, each of its panes gives one row to the
-  border line
 
 `tabs.sh` does the work behind these keys and the `pane-died` and
 `pane-title-changed` hooks in `tmux.conf`; its header describes how a tab
