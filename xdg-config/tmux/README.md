@@ -7,7 +7,9 @@ setting removed from the file keeps its old value until the server
 restarts.
 
 The terminal's title, which Ghostty shows as the tab name, is the tmux
-session's name; `ide` names a session after its project's directory.
+session's name; `ide` names a session after its project's directory
+and titles its sessions `IDE: <name>`, followed by the title of the
+Claude Code pane shown in the window.
 
 ## Tabs in a pane
 

@@ -3,6 +3,8 @@
 # Open the tmux session for a project, creating it on first use
 # Usage: ide [dir]
 #
+# IDE stands for ikuwow's development environment.
+#
 # One session per project: a directory anywhere inside a git repository,
 # including inside one of its worktrees, resolves to the main checkout's
 # root, so worktrees share their project's session. A directory outside
@@ -93,6 +95,11 @@ if [ -z "$name" ]; then
   claude_pane="$(tmux split-window -h -l 40% -P -F '#{pane_id}' -t "$nvim_pane" -c "$root")"
   tmux send-keys -t "$claude_pane" 'claude --ide' Enter
 fi
+
+# The terminal tab reads "IDE: <project> — <Claude Code session title>",
+# taken from the claude pane shown in the window, whose title also marks
+# whether it is working
+tmux set-option -t "=$name:" set-titles-string 'IDE: #S#{P:#{?#{==:#{pane_current_command},claude}, — #{=30:pane_title},}}'
 
 if [ -n "${TMUX:-}" ]; then
   tmux switch-client -t "=$name"
