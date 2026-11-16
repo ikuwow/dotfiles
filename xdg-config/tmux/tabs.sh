@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Give a tmux pane slot several tabs, shown one at a time
-# Usage: tmux-tabs new|claude|next|prev|close|died|render <pane-id>
+# Usage: tabs.sh new|claude|next|prev|close|died|render <pane-id>
 #
 # Tmux key bindings and hooks run this with the pane they act on. A tab is
 # a real pane: the shown one sits in the slot, and the others are parked,
