@@ -82,10 +82,11 @@ case "$cmd" in
     if ! tmux has-session -t "=$store" 2>/dev/null; then
       placeholder="$(tmux new-session -d -P -F '#{window_id}' -s "$store" -c /)"
     fi
-    tab="$(tmux new-window -d -P -F '#{pane_id}' -t "=$store:" -c "$dir")"
+    # A Claude Code tab runs claude as its program, so its tab closes with it
+    if [ "$cmd" = claude ]; then set -- 'claude --ide'; else set --; fi
+    tab="$(tmux new-window -d -P -F '#{pane_id}' -t "=$store:" -c "$dir" "$@")"
     if [ -n "$placeholder" ]; then tmux kill-window -t "$placeholder"; fi
     tmux set-option -p -t "$tab" @tab_group "$group" ';' set-option -p -t "$tab" remain-on-exit on
-    if [ "$cmd" = claude ]; then tmux send-keys -t "$tab" 'claude --ide' Enter; fi
     swap_in "$tab" "$pane"
     tmux select-pane -t "$tab"
     ;;
