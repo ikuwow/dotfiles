@@ -15,4 +15,5 @@ Custom executable scripts deployed to `~/bin/` via symlinks.
 | `git-worktree-create` | Create a git worktree under `.worktrees/`. Defaults to branching from `origin/<default>`; pass a second argument to override the base |
 | `pipectlx` | PipeCD CLI wrapper that auto-injects API key and server address from config |
 | `ssm` | Start an AWS SSM session by instance ID or Name tag |
+| `tmux-tabs` | Give a tmux pane slot several tabs shown one at a time, with a tab strip on the pane's top border; run by the bindings and hooks in `xdg-config/tmux/tmux.conf` |
 | `vssh` | SSH into a Vagrant machine using sshrc with auto-generated ssh-config |
