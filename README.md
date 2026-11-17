@@ -86,8 +86,13 @@ dotfiles/
 ├── codex/          # Codex CLI rules → ~/.codex/
 ├── hammerspoon/    # Hammerspoon config → ~/.hammerspoon/
 ├── userscripts/    # Safari userscripts loaded by the Userscripts extension
+├── docs/           # Tool decision index
 └── ... (dotfiles deployed to ~/, see Symlink Map)
 ```
+
+### Tool Decisions
+
+[`docs/decisions.md`](docs/decisions.md) indexes the repository's tool choices and the pull requests and issues behind them.
 
 ### AI-Assisted Commit Messages
 
