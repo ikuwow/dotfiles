@@ -38,3 +38,23 @@ labeled with its session title.
 `tabs.sh` does the work behind these keys and the `pane-died` and
 `pane-title-changed` hooks in `tmux.conf`; its header describes how a tab
 is kept.
+
+## Quitting a session
+
+`C-q X`, then `y`, quits every program in the session, its panes' hidden
+tabs included, with the keys its user would type, so the session closes
+with its last pane.
+
+1. Every nvim gets `:qa`
+1. Every Claude Code session gets Ctrl-D twice
+1. Every shell gets Ctrl-D once
+
+A program still running when its round ends stops the run, and the
+status line names its pane; nvim stays while a buffer has unsaved
+changes, and bash stays while it has stopped jobs. Before sending any
+key, the run also stops on a pane running any other program, and on a
+Claude Code session not marked idle in its pane by the hooks of
+`claude/hooks/tmux_claude_state.sh`. Those hooks mark a session busy
+from a submitted prompt or a tool call until its turn ends, and a turn
+interrupted with Esc leaves it busy until the next turn ends. A session
+started before the hooks were installed has no mark, so quit it by hand.
