@@ -1,7 +1,8 @@
 # Tool Decisions
 
-This index lists the tools this repository settles on, with the pull requests and issues where each choice was made.
-Each entry names the current choice and what it replaced, and the linked bodies carry the reasoning; pull requests from before 2025 mostly record no reasoning.
+This index lists the tool choices this repository has made, with the pull requests and issues where each was made.
+Each entry names the current choice and, where one is recorded, what it replaced, and the linked bodies carry the reasoning; pull requests from before 2025 mostly record no reasoning.
+Choices still under comparison sit under Open Questions at the end.
 Claude Code configuration under `claude/` and `claude-plugins/` is outside this index, since its rules and skills state their own policy.
 
 - Platform: macOS on Apple Silicon, with Linux limited to symlink deployment
@@ -20,20 +21,21 @@ Claude Code configuration under `claude/` and `claude-plugins/` is outside this 
   - File tree: nvim-tree, which replaced fern in [#579], which in turn replaced NERDTree in [#38]
   - GUI front end: Neovide, which replaced goneovim in [#72]
   - Claude Code integration: claudecode.nvim, added in [#71]
-- IDE setup around Claude Code: compared across candidate setups in [#569]
-  - JetBrains IDEs and Junie CLI were removed in [#571]
-  - Zed's evaluation in [#568] was closed as a duplicate
-  - [#564] and [#570] propose launchers for the candidate setups
 - Key remapping: Hammerspoon for the solo ⌘ tap that switches the input mode, replacing Karabiner-Elements in [#415] as planned in [#401]
   - Caps Lock to Control is set in the macOS Modifier Keys panel, since [#415] found no scripted setting that persists across a restart
   - The HHKB's Esc and backtick swap goes through `hidutil` ([#436])
 - Containers: colima, plus Apple `container` with socktainer, which [#226] set up
-- GitHub CLI extensions: gh-dash ([#276]) and gh-sub-issue, vendored under `gh-extensions/` ([#289])
+- GitHub CLI extensions: gh-pr-review ([#246]), gh-dash ([#276]), and gh-sub-issue, written in this repository under `gh-extensions/` ([#289])
 - Browser customization: userscripts under `userscripts/`, loaded by the Userscripts extension in Safari ([#241]) and by Violentmonkey in Chrome ([#300])
   - x-declutter replaced the Control Panel for Twitter extension in [#495]
 - AI commit message drafts: the prepare-commit-msg hook runs `claude -p` on the Claude Code login ([#451])
   - The hook first ran the claude CLI with Haiku ([#177]), then called the Anthropic API ([#179])
   - [#178] measures the latency of the claude CLI route and lists faster backends to try
+
+## Open Questions
+
+- IDE setup around Claude Code: [#569] compares the candidate setups that take over from JetBrains IDEs and Junie CLI, which [#571] removed
+  - Zed's evaluation in [#568] was closed as a duplicate
 
 [#3]: https://github.com/ikuwow/dotfiles/pull/3
 [#13]: https://github.com/ikuwow/dotfiles/pull/13
@@ -52,6 +54,7 @@ Claude Code configuration under `claude/` and `claude-plugins/` is outside this 
 [#179]: https://github.com/ikuwow/dotfiles/pull/179
 [#226]: https://github.com/ikuwow/dotfiles/pull/226
 [#241]: https://github.com/ikuwow/dotfiles/pull/241
+[#246]: https://github.com/ikuwow/dotfiles/pull/246
 [#276]: https://github.com/ikuwow/dotfiles/pull/276
 [#289]: https://github.com/ikuwow/dotfiles/pull/289
 [#300]: https://github.com/ikuwow/dotfiles/pull/300
@@ -62,10 +65,8 @@ Claude Code configuration under `claude/` and `claude-plugins/` is outside this 
 [#451]: https://github.com/ikuwow/dotfiles/pull/451
 [#494]: https://github.com/ikuwow/dotfiles/pull/494
 [#495]: https://github.com/ikuwow/dotfiles/pull/495
-[#564]: https://github.com/ikuwow/dotfiles/pull/564
 [#568]: https://github.com/ikuwow/dotfiles/issues/568
 [#569]: https://github.com/ikuwow/dotfiles/issues/569
-[#570]: https://github.com/ikuwow/dotfiles/pull/570
 [#571]: https://github.com/ikuwow/dotfiles/pull/571
 [#572]: https://github.com/ikuwow/dotfiles/pull/572
 [#579]: https://github.com/ikuwow/dotfiles/pull/579

@@ -92,7 +92,7 @@ dotfiles/
 
 ### Tool Decisions
 
-[`docs/decisions.md`](docs/decisions.md) indexes the tools this repository uses, linking each to the pull requests and issues where it was chosen.
+[`docs/decisions.md`](docs/decisions.md) indexes the repository's tool choices and the pull requests and issues behind them.
 
 ### AI-Assisted Commit Messages
 
