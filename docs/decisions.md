@@ -27,13 +27,13 @@ Claude Code configuration under `claude/` and `claude-plugins/` is outside this 
 - Key remapping: Hammerspoon for the solo ⌘ tap that switches the input mode, replacing Karabiner-Elements in [#415] as planned in [#401]
   - Caps Lock to Control is set in the macOS Modifier Keys panel, since [#415] found no scripted setting that persists across a restart
   - The HHKB's Esc and backtick swap goes through `hidutil` ([#436])
-- Containers: colima, and Apple `container` with socktainer, set up in [#226]
+- Containers: colima, plus Apple `container` with socktainer, which [#226] set up
 - GitHub CLI extensions: gh-dash ([#276]) and gh-sub-issue, vendored under `gh-extensions/` ([#289])
 - Browser customization: userscripts under `userscripts/`, loaded by the Userscripts extension in Safari ([#241]) and by Violentmonkey in Chrome ([#300])
   - x-declutter replaced the Control Panel for Twitter extension in [#495]
 - AI commit message drafts: the prepare-commit-msg hook runs `claude -p` on the Claude Code login ([#451])
   - The hook first ran the claude CLI with Haiku ([#177]), then called the Anthropic API ([#179])
-  - [#178] records the backends tried to cut latency
+  - [#178] measures the latency of the claude CLI route and lists faster backends to try
 
 [#3]: https://github.com/ikuwow/dotfiles/pull/3
 [#13]: https://github.com/ikuwow/dotfiles/pull/13
