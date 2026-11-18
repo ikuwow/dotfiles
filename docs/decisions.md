@@ -2,7 +2,6 @@
 
 This index lists the tool choices this repository has made, with the pull requests and issues where each was made.
 Each entry names the current choice and, where one is recorded, what it replaced, and the linked bodies carry the reasoning; pull requests from before 2025 mostly record no reasoning.
-Choices still under comparison sit under Open Questions at the end.
 Claude Code configuration under `claude/` and `claude-plugins/` is outside this index, since its rules and skills state their own policy.
 
 - Platform: macOS on Apple Silicon, with Linux limited to symlink deployment
@@ -21,6 +20,9 @@ Claude Code configuration under `claude/` and `claude-plugins/` is outside this 
   - File tree: nvim-tree, which replaced fern in [#579], which in turn replaced NERDTree in [#38]
   - GUI front end: Neovide, which replaced goneovim in [#72]
   - Claude Code integration: claudecode.nvim, added in [#71]
+- IDE around Claude Code: `bin/ide` opens one tmux session per project, with Neovim and nvim-tree on the left and `claude --ide` on the right, connected through claudecode.nvim ([#564])
+  - It takes over from JetBrains IDEs and Junie CLI, which [#571] removed
+  - [#569] compared it with Neovim holding every pane ([#570]) and with Zed, whose evaluation in [#568] was closed as a duplicate
 - Key remapping: Hammerspoon for the solo ⌘ tap that switches the input mode, replacing Karabiner-Elements in [#415] as planned in [#401]
   - Caps Lock to Control is set in the macOS Modifier Keys panel, since [#415] found no scripted setting that persists across a restart
   - The HHKB's Esc and backtick swap goes through `hidutil` ([#436])
@@ -31,11 +33,6 @@ Claude Code configuration under `claude/` and `claude-plugins/` is outside this 
 - AI commit message drafts: the prepare-commit-msg hook runs `claude -p` on the Claude Code login ([#451])
   - The hook first ran the claude CLI with Haiku ([#177]), then called the Anthropic API ([#179])
   - [#178] measures the latency of the claude CLI route and lists faster backends to try
-
-## Open Questions
-
-- IDE setup around Claude Code: [#569] compares the candidate setups that take over from JetBrains IDEs and Junie CLI, which [#571] removed
-  - Zed's evaluation in [#568] was closed as a duplicate
 
 [#3]: https://github.com/ikuwow/dotfiles/pull/3
 [#13]: https://github.com/ikuwow/dotfiles/pull/13
@@ -65,8 +62,10 @@ Claude Code configuration under `claude/` and `claude-plugins/` is outside this 
 [#451]: https://github.com/ikuwow/dotfiles/pull/451
 [#494]: https://github.com/ikuwow/dotfiles/pull/494
 [#495]: https://github.com/ikuwow/dotfiles/pull/495
+[#564]: https://github.com/ikuwow/dotfiles/pull/564
 [#568]: https://github.com/ikuwow/dotfiles/issues/568
 [#569]: https://github.com/ikuwow/dotfiles/issues/569
+[#570]: https://github.com/ikuwow/dotfiles/pull/570
 [#571]: https://github.com/ikuwow/dotfiles/pull/571
 [#572]: https://github.com/ikuwow/dotfiles/pull/572
 [#579]: https://github.com/ikuwow/dotfiles/pull/579
