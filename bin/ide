@@ -51,9 +51,10 @@ session_name() {
 }
 
 # The nvim RPC socket of session $1. Whoever connects to it can run any
-# command as the user, so it lives in a directory only the user can enter
-# (macOS gives each user a TMPDIR of mode 700), and nvim reads an address
-# with a ':' as a TCP host and port, which would listen on the network
+# command as the user, so it lives in a runtime directory the user owns,
+# which XDG_RUNTIME_DIR and macOS's per-user TMPDIR create with mode 700.
+# nvim reads an address with a ':' as a TCP host and port, which would
+# listen on the network, so such a path is refused
 nvim_socket() {
   local dir="${XDG_RUNTIME_DIR:-${TMPDIR:-}}"
   if [ -z "$dir" ] || [ ! -O "$dir" ]; then
