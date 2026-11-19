@@ -1,7 +1,10 @@
 #!/bin/bash
 
-# Open the tmux session for a project, creating it on first use
+# Open the tmux session for a project, creating it on first use, or reach
+# the nvim of the current project's session
 # Usage: ide [dir]
+#        ide --open <file> [<line>]
+#        ide --socket
 #
 # IDE stands for ikuwow's development environment.
 #
@@ -14,10 +17,142 @@
 # claudecode.nvim registers nvim's working directory, the root, as its
 # workspace, which is what `claude --ide` matches the current directory
 # against to pick the IDE to connect to.
+#
+# --open shows <file> in the editor window of the nvim in the session of
+# the project the current directory belongs to, beside the tree, at
+# <line> when given. Claude Code's IDE connection gives the model no tool
+# to open a file, so a Claude Code pane runs this instead.
+#
+# --socket prints the RPC socket of that nvim, for any other operation
+# through `nvim --server <socket>`.
 
 set -eu
 
-usage="Usage: ide [dir]"
+usage="Usage: ide [dir]
+       ide --open <file> [<line>]
+       ide --socket"
+
+# The main checkout root of the project that directory $1 belongs to
+project_root() {
+  local common_dir
+  if common_dir="$(git -C "$1" rev-parse --path-format=absolute --git-common-dir 2>/dev/null)"; then
+    if [ "$(basename "$common_dir")" = .git ]; then
+      dirname "$common_dir"
+    else
+      # A git directory named otherwise, such as a submodule's under the
+      # superproject's .git/modules/, does not sit in the checkout root
+      git -C "$1" rev-parse --show-toplevel
+    fi
+  else
+    echo "$1"
+  fi
+}
+
+# tmux target syntax reads ':' as the session-window separator and '.' as
+# the window-pane separator, so a name containing them breaks the
+# exact-match lookups below
+session_name() {
+  basename "$1" | tr '.:' '__'
+}
+
+# The nvim RPC socket of session $1. Whoever connects to it can run any
+# command as the user, so it lives in a runtime directory the user owns,
+# which XDG_RUNTIME_DIR and macOS's per-user TMPDIR create with mode 700.
+# nvim reads an address with a ':' as a TCP host and port, which would
+# listen on the network, so such a path is refused
+nvim_socket() {
+  local dir="${XDG_RUNTIME_DIR:-${TMPDIR:-}}"
+  if [ -z "$dir" ] || [ ! -O "$dir" ]; then
+    echo "Error: no runtime directory owned by $(id -un) in XDG_RUNTIME_DIR or TMPDIR" >&2
+    return 1
+  fi
+  local socket="${dir%/}/ide-$1.sock"
+  case "$socket" in
+    *:*)
+      echo "Error: socket path contains ':': $socket" >&2
+      return 1
+      ;;
+  esac
+  echo "$socket"
+}
+
+# Fail when session $1, which must exist, belongs to a directory other
+# than $2
+check_session_root() {
+  if [ "$(tmux display-message -p -t "=$1:" '#{session_path}')" != "$2" ]; then
+    echo "Error: session $1 belongs to another directory" >&2
+    exit 1
+  fi
+}
+
+# The RPC socket of the nvim in the session of the project the current
+# directory belongs to, failing when no socket file exists at its path.
+# open_file runs this in a command substitution, where bash turns off
+# set -e, so each failing step exits on its own
+session_socket() {
+  local root name socket
+  root="$(project_root "$(pwd)")" || exit
+  name="$(session_name "$root")"
+  if ! tmux has-session -t "=$name" 2>/dev/null; then
+    echo "Error: no ide session for $root" >&2
+    exit 1
+  fi
+  check_session_root "$name" "$root"
+  socket="$(nvim_socket "$name")" || exit
+  if [ ! -S "$socket" ]; then
+    echo "Error: the nvim of session $name is not listening on $socket" >&2
+    exit 1
+  fi
+  echo "$socket"
+}
+
+open_file() {
+  local file="$1" line="${2:-0}"
+  if [ ! -f "$file" ]; then
+    echo "Error: no such file: $file" >&2
+    exit 1
+  fi
+  case "$line" in
+    '' | *[!0-9]*)
+      echo "Error: line must be a number: $line" >&2
+      exit 1
+      ;;
+  esac
+  local path socket
+  path="$(cd "$(dirname "$file")" && pwd)/$(basename "$file")"
+  socket="$(session_socket)"
+  # A Vim string in single quotes takes a quote as two, and the number
+  # drops leading zeros, which Vim would read as octal
+  local q="'" status=0
+  # A prompt in nvim's pane, such as the hit-enter prompt, holds the request
+  # unanswered, and nvim drops it once this client exits
+  timeout 5 nvim --server "$socket" --remote-expr \
+    "v:lua.require'ide'.open('${path//$q/$q$q}', $((10#$line)))" || status=$?
+  if [ "$status" -eq 124 ]; then
+    echo "Error: the nvim on $socket did not answer in 5 seconds; a prompt in its pane may be waiting for input, so answer it and run this again" >&2
+  fi
+  return "$status"
+}
+
+case "${1:-}" in
+  --open)
+    if [ $# -lt 2 ] || [ $# -gt 3 ]; then
+      echo "$usage" >&2
+      exit 1
+    fi
+    shift
+    open_file "$@"
+    exit
+    ;;
+  --socket)
+    if [ $# -ne 1 ]; then
+      echo "$usage" >&2
+      exit 1
+    fi
+    session_socket
+    exit
+    ;;
+esac
 
 for arg in "$@"; do
   case "$arg" in
@@ -39,30 +174,14 @@ if [ $# -gt 1 ]; then
 fi
 
 dir="$(cd "${1:-.}" && pwd)"
-
-if common_dir="$(git -C "$dir" rev-parse --path-format=absolute --git-common-dir 2>/dev/null)"; then
-  if [ "$(basename "$common_dir")" = .git ]; then
-    root="$(dirname "$common_dir")"
-  else
-    # A git directory named otherwise, such as a submodule's under the
-    # superproject's .git/modules/, does not sit in the checkout root
-    root="$(git -C "$dir" rev-parse --show-toplevel)"
-  fi
-else
-  root="$dir"
-fi
-
-# tmux target syntax reads ':' as the session-window separator and '.' as
-# the window-pane separator, so a name containing them breaks the
-# exact-match lookups below
-name="$(basename "$root" | tr '.:' '__')"
+root="$(project_root "$dir")"
+name="$(session_name "$root")"
 
 if tmux has-session -t "=$name" 2>/dev/null; then
-  if [ "$(tmux display-message -p -t "=$name:" '#{session_path}')" != "$root" ]; then
-    echo "Error: session $name belongs to another directory" >&2
-    exit 1
-  fi
+  check_session_root "$name" "$root"
 else
+  socket="$(nvim_socket "$name")"
+
   # The session starts at the size of the terminal it opens in, because
   # tmux spreads a later change in window width evenly across the panes instead
   # of keeping the 55:45 split between nvim and claude
@@ -80,7 +199,7 @@ else
   nvim_pane="$(tmux new-session -d -P -F '#{pane_id}' -s "$name" -c "$root" -x "$width" -y "$height")"
   # The window lists each pane's tabs, kept by tabs.sh, on its top border
   tmux set-option -w -t "$nvim_pane" pane-border-status top
-  tmux send-keys -t "$nvim_pane" 'nvim -c NvimTreeOpen' Enter
+  tmux send-keys -t "$nvim_pane" "nvim --listen $(printf '%q' "$socket") -c NvimTreeOpen" Enter
   claude_pane="$(tmux split-window -h -l 45% -P -F '#{pane_id}' -t "$nvim_pane" -c "$root")"
   tmux send-keys -t "$claude_pane" 'claude --ide' Enter
 fi
