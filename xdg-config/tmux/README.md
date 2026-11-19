@@ -41,17 +41,18 @@ is kept.
 
 ## Quitting a session
 
-`C-q X`, then `y`, quits every program in the session, its panes' hidden
-tabs included, with the keys its user would type, so the session closes
-with its last pane.
+`C-q X`, then `y`, quits every program in the session with the keys its
+user would type, so the session closes with its last pane: nvim gets
+`:qa`, Claude Code Ctrl-D twice, and a shell Ctrl-D once. A pane whose
+program exits drops to its shell, which is quit next, and a closed tab
+brings the next tab of its slot into view, which is quit in turn.
 
-1. Every nvim gets `:qa`
-1. Every Claude Code session gets Ctrl-D twice
-1. Every shell gets Ctrl-D once
-
-A program still running when its round ends stops the run, and the
-status line names its pane; nvim stays while a buffer has unsaved
-changes, and bash stays while it has stopped jobs. Before sending any
-key, the run also stops on a pane running any other program. Claude
-Code exits on Ctrl-D twice even in the middle of a turn, so check that
-no session is at work before answering `y`.
+- nvim stays while a buffer has unsaved changes, and bash while it has
+  stopped jobs; the run quits the rest and names the panes left on the
+  status line
+- A second run sends that bash another Ctrl-D, which ends it with its
+  stopped jobs, as a second Ctrl-D typed by hand does
+- The run sends nothing more once a pane runs any other program, and
+  names that pane
+- Claude Code exits on Ctrl-D twice even in the middle of a turn, so
+  check that no session is at work before answering `y`
