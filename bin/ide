@@ -1,0 +1,97 @@
+#!/bin/bash
+
+# Open the tmux session for a project, creating it on first use
+# Usage: ide [dir]
+#
+# IDE stands for ikuwow's development environment.
+#
+# One session per project: a directory anywhere inside a git repository,
+# including inside one of its worktrees, resolves to the main checkout's
+# root, so worktrees share their project's session. A directory outside
+# git is used as is. A new session gets one window split into nvim on the
+# left, with nvim-tree open, and claude on the right, both started
+# from that root.
+# claudecode.nvim registers nvim's working directory, the root, as its
+# workspace, which is what `claude --ide` matches the current directory
+# against to pick the IDE to connect to.
+
+set -eu
+
+usage="Usage: ide [dir]"
+
+for arg in "$@"; do
+  case "$arg" in
+    -h | --help)
+      echo "$usage"
+      exit 0
+      ;;
+    -*)
+      echo "Error: unknown option: $arg" >&2
+      echo "$usage" >&2
+      exit 1
+      ;;
+  esac
+done
+
+if [ $# -gt 1 ]; then
+  echo "$usage" >&2
+  exit 1
+fi
+
+dir="$(cd "${1:-.}" && pwd)"
+
+if common_dir="$(git -C "$dir" rev-parse --path-format=absolute --git-common-dir 2>/dev/null)"; then
+  if [ "$(basename "$common_dir")" = .git ]; then
+    root="$(dirname "$common_dir")"
+  else
+    # A git directory named otherwise, such as a submodule's under the
+    # superproject's .git/modules/, does not sit in the checkout root
+    root="$(git -C "$dir" rev-parse --show-toplevel)"
+  fi
+else
+  root="$dir"
+fi
+
+# tmux target syntax reads ':' as the session-window separator and '.' as
+# the window-pane separator, so a name containing them breaks the
+# exact-match lookups below
+name="$(basename "$root" | tr '.:' '__')"
+
+if tmux has-session -t "=$name" 2>/dev/null; then
+  if [ "$(tmux display-message -p -t "=$name:" '#{session_path}')" != "$root" ]; then
+    echo "Error: session $name belongs to another directory" >&2
+    exit 1
+  fi
+else
+  # The session starts at the size of the terminal it opens in, because
+  # tmux spreads a later change in window width evenly across the panes instead
+  # of keeping the 55:45 split between nvim and claude
+  if [ -n "${TMUX:-}" ]; then
+    width="$(tmux display-message -p '#{client_width}')"
+    height="$(tmux display-message -p '#{client_height}')"
+  else
+    size="$(stty size </dev/tty)"
+    height="${size% *}"
+    width="${size#* }"
+  fi
+
+  # Start each program from a shell, so its pane keeps a shell after the
+  # program exits
+  nvim_pane="$(tmux new-session -d -P -F '#{pane_id}' -s "$name" -c "$root" -x "$width" -y "$height")"
+  # The window lists each pane's tabs, kept by tabs.sh, on its top border
+  tmux set-option -w -t "$nvim_pane" pane-border-status top
+  tmux send-keys -t "$nvim_pane" 'nvim -c NvimTreeOpen' Enter
+  claude_pane="$(tmux split-window -h -l 45% -P -F '#{pane_id}' -t "$nvim_pane" -c "$root")"
+  tmux send-keys -t "$claude_pane" 'claude --ide' Enter
+fi
+
+# The terminal tab reads "IDE: <project> — <Claude Code session title>",
+# taken from the claude pane shown in the window, whose title also marks
+# whether it is working
+tmux set-option -t "=$name:" set-titles-string 'IDE: #S#{P:#{?#{==:#{pane_current_command},claude}, — #{=30:pane_title},}}'
+
+if [ -n "${TMUX:-}" ]; then
+  tmux switch-client -t "=$name"
+else
+  tmux attach-session -t "=$name"
+fi
