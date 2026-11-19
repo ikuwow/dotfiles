@@ -19,9 +19,10 @@
 # so concurrent sessions in one working tree each wake only for their own
 # PRs. When no watcher runs under that ID, the list of the watcher that
 # the same Claude Code process started is used instead, since Bash and the
-# watcher can hold different IDs: a Claude Code restarted into an earlier
-# conversation gives Bash that conversation's ID and the watcher a new
-# one, and `/clear` gives Bash a new ID while the watcher may keep its own.
+# watcher can hold different IDs: a Claude Code process that carried on an
+# earlier conversation gave Bash that conversation's ID and the watcher a
+# new one, and `/clear` gives Bash a new ID while the watcher may keep its
+# own.
 #
 # Each add appends `<owner>/<repo>#<number><TAB><token>` with a fresh
 # token, and the watcher starts a PR whose latest token it has not started
@@ -57,8 +58,13 @@ watcher_runs() {
 # the watcher's grandparent is that Claude Code process.
 sibling_session_id() {
   local ancestors=" " pid=$$ watcher id grandparent
-  while [ -n "$pid" ] && [ "$pid" -gt 1 ]; do
+  # PID 1 stays out, since a watcher whose Claude Code died without
+  # stopping it has PID 1 as its grandparent
+  while true; do
     pid="$(ps -o ppid= -p "$pid" | tr -d ' ')"
+    if [ -z "$pid" ] || [ "$pid" -le 1 ]; then
+      break
+    fi
     ancestors="$ancestors$pid "
   done
   while read -r watcher id; do

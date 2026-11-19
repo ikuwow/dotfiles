@@ -165,9 +165,10 @@ covers what arrived before the watch began.
 - When the watch fails to start, report that and run a state poll in
   its place, with `run_in_background: true`, since without an event
   source a merge or close reaches the session only when someone asks:
-  `while gh pr view <number> --json state --jq '.state == "OPEN"' | grep -qx true; do sleep 60; done`
+  `until gh pr view <number> -R <owner>/<repo> --json state --jq .state | grep -xE 'MERGED|CLOSED'; do sleep 60; done`
   - Its completion means the PR merged or closed, which the Watch
-    step's exit conditions act on
+    step's exit conditions act on, and a failed `gh` call only sends it
+    round again
   - It reports no comment, review, or check, so re-fetch the PR before
     stating where it stands
   - The Finalize step checks the watch again

@@ -40,9 +40,9 @@ A plugin's own `settings.json` takes only the `agent` and `subagentStatusLine` k
 Session ID:
 
 - The watch list is keyed by `CLAUDE_CODE_SESSION_ID`, and when no watcher runs under Bash's ID, `pr-watch` uses the list of the watcher whose grandparent is the Claude Code process it runs under
-  - A Claude Code restarted into an earlier conversation gave Bash that conversation's ID and the watcher a new one, and an add then went to the new watcher's list
+  - A Claude Code process started as `claude --ide` that carried on an earlier conversation gave Bash that conversation's ID and the watcher a new one, and an add then went to the new watcher's list; which way of carrying on causes the split is unmeasured
   - `/clear` gives Bash a new ID; whether the watcher keeps the old one or a second watcher starts is unmeasured
-- `claude --resume <session-id>` keeps the session ID, and the watches resume
+- `claude --resume <session-id>` keeps the session ID, and the watches resume; `--continue` and an in-session `/resume` are unmeasured
 - Two Claude processes with one session ID, or a reload that starts a watcher while the old one is exiting, can leave no watcher running with no line printed
 
 Concurrency:
