@@ -1,6 +1,6 @@
 ---
 name: ide-open
-description: Show a file to the user in their editor, the nvim pane beside Claude Code in an `ide` tmux session, with `ide --open`, and run other editor operations, such as splitting a file beside another, through `ide --socket`. Use whenever a file or a passage of one is to be shown to the user, including code you are about to quote while explaining, reviewing, or reporting on it, and when the user asks to show or open a file in the editor or on the left, such as "Xを見せて", "Xを開いて", or "左で開いて", or to arrange what that editor shows.
+description: Show a file to the user in their editor, the nvim pane beside Claude Code in an `ide` tmux session, with `ide --open`, and run other editor operations, such as opening a second file in a split, through `ide --socket`. Use whenever a file or a passage of one is to be shown to the user, including code you are about to quote while explaining, reviewing, or reporting on it, and when the user asks to show or open a file in the editor or on the left, such as "Xを見せて", "Xを開いて", or "左で開いて", or to arrange what that editor shows.
 ---
 
 # Open a file in the editor
@@ -22,10 +22,11 @@ Run `ide --open <file> [<line>]` from a directory inside the project.
 For anything beyond showing one file, such as opening a second file in a split, run `ide --socket` from inside the project, then pass the path it prints to `nvim --server`.
 
 ```
-timeout 5 nvim --server <socket> --remote-expr 'execute(["belowright split bin/ide", "42"])'
+timeout 5 nvim --server <socket> --remote-expr 'execute(["belowright split /abs/path/to/bin/ide", "42"])'
 ```
 
-- `execute()` runs each Ex command in nvim's current window and returns their output, and an Ex command that fails makes the client exit non-zero with its error, so prefer it over `--remote-send`, which types keys and reports nothing
+- `execute()` runs the Ex commands in nvim's current window and returns their output, and the first one that fails makes the client exit non-zero with its error, leaving the effects of the commands before it, so prefer it over `--remote-send`, which types keys and reports nothing
 - The current window can be the tree, so run `ide --open` first when the operation should act on the editor window
-- A relative path in an Ex command is read against nvim's working directory, the project root
-- `ide --socket` fails with the same errors as `ide --open`, and `timeout 5` exits 124 on the same prompt as `did not answer in 5 seconds`
+- Give file paths in an Ex command as absolute paths, since a relative one is read against the current window's directory, which the tree changes, and a path that names no file opens an empty buffer without an error
+- `ide --socket` fails on the same session and socket errors as `ide --open`, and `timeout 5` exits 124 on the same prompt as `did not answer in 5 seconds`
+- When nvim exited without removing its socket file, `ide --socket` still prints the path, and `nvim --server` then fails with `E247 ... connection refused`, which a new session fixes

@@ -86,17 +86,19 @@ check_session_root() {
 }
 
 # The RPC socket of the nvim in the session of the project the current
-# directory belongs to, failing when that nvim does not listen on it
+# directory belongs to, failing when no socket file exists at its path.
+# open_file runs this in a command substitution, where bash turns off
+# set -e, so each failing step exits on its own
 session_socket() {
   local root name socket
-  root="$(project_root "$(pwd)")"
+  root="$(project_root "$(pwd)")" || exit
   name="$(session_name "$root")"
   if ! tmux has-session -t "=$name" 2>/dev/null; then
     echo "Error: no ide session for $root" >&2
     exit 1
   fi
   check_session_root "$name" "$root"
-  socket="$(nvim_socket "$name")"
+  socket="$(nvim_socket "$name")" || exit
   if [ ! -S "$socket" ]; then
     echo "Error: the nvim of session $name is not listening on $socket" >&2
     exit 1
