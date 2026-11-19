@@ -14,7 +14,8 @@ local function editor_window()
   end
 end
 
--- A line of 0 leaves the cursor where the file last had it
+-- A line of 0 leaves the cursor where this nvim last had it in the file, or
+-- on the first line of a file it has not opened
 function M.open(path, line)
   local win = editor_window()
   if win then
