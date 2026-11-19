@@ -312,40 +312,17 @@
         ]
       }
     ],
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "f=~/.claude/hooks/tmux_claude_state.sh; if [ -f \"$f\" ]; then bash \"$f\" idle; fi"
-          }
-        ]
-      }
-    ],
     "UserPromptSubmit": [
       {
         "hooks": [
           {
             "type": "command",
             "command": "date '+%Y-%m-%dT%H:%M:%S%z' | sed 's/..$/:&/' | jq -Rc '{hookSpecificOutput:{hookEventName:\"UserPromptSubmit\",additionalContext:(\"Current datetime: \"+.)}}' || true"
-          },
-          {
-            "type": "command",
-            "command": "f=~/.claude/hooks/tmux_claude_state.sh; if [ -f \"$f\" ]; then bash \"$f\" busy; fi"
           }
         ]
       }
     ],
     "PreToolUse": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "f=~/.claude/hooks/tmux_claude_state.sh; if [ -f \"$f\" ]; then bash \"$f\" busy; fi"
-          }
-        ]
-      },
       {
         "matcher": "Bash",
         "hooks": [
@@ -460,20 +437,6 @@
             "type": "command",
             "command": "f=~/.claude/hooks/block_unkept_promise.sh; if [ -f \"$f\" ]; then bash \"$f\"; fi",
             "asyncRewake": true
-          },
-          {
-            "type": "command",
-            "command": "f=~/.claude/hooks/tmux_claude_state.sh; if [ -f \"$f\" ]; then bash \"$f\" idle; fi"
-          }
-        ]
-      }
-    ],
-    "StopFailure": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "f=~/.claude/hooks/tmux_claude_state.sh; if [ -f \"$f\" ]; then bash \"$f\" idle; fi"
           }
         ]
       }

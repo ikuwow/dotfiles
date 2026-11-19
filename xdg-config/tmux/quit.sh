@@ -26,18 +26,18 @@ report() {
 # leaves the store takes its group into the session
 groups=" $(tmux list-panes -s -t "$session" -F '#{@tab_group}' | tr '\n' ' ') "
 
-# The panes in scope as "pane-id command claude-state": with "store" the
+# The panes in scope as "pane-id command": with "store" the
 # parked tabs of the session's slots, with "session" the session's own
 panes() {
   if [ "$1" = store ]; then
     if tmux has-session -t "=$store" 2>/dev/null; then
-      tmux list-panes -s -t "=$store" -F '#{@tab_group} #{pane_id} #{pane_current_command} #{@claude_state}' |
+      tmux list-panes -s -t "=$store" -F '#{@tab_group} #{pane_id} #{pane_current_command}' |
         while read -r group rest; do
           case "$groups" in *" $group "*) if [ -n "$group" ]; then echo "$rest"; fi ;; esac
         done
     fi
   elif tmux has-session -t "$session" 2>/dev/null; then
-    tmux list-panes -s -t "$session" -F '#{pane_id} #{pane_current_command} #{@claude_state}'
+    tmux list-panes -s -t "$session" -F '#{pane_id} #{pane_current_command}'
   fi
 }
 
@@ -69,20 +69,13 @@ quit() {
   exit 0
 }
 
-# Nothing is sent while any pane runs something this script cannot quit,
-# or a Claude Code session that its hooks have not marked idle
-while read -r pane cmd state; do
-  if [[ "$cmd" =~ $shells ]] || [ "$cmd" = nvim ]; then
+# Nothing is sent while any pane runs something this script cannot quit
+while read -r pane cmd; do
+  if [[ "$cmd" =~ $shells ]] || [ "$cmd" = nvim ] || [ "$cmd" = claude ]; then
     continue
   fi
-  if [ "$cmd" != claude ]; then
-    report "pane $pane runs $cmd"
-    exit 0
-  fi
-  if [ "$state" != idle ]; then
-    report "claude in pane $pane is ${state:-in an unknown state}"
-    exit 0
-  fi
+  report "pane $pane runs $cmd"
+  exit 0
 done < <(panes store; panes session)
 
 for re in '^nvim$' '^claude$' "$shells"; do

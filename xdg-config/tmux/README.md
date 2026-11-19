@@ -52,9 +52,6 @@ with its last pane.
 A program still running when its round ends stops the run, and the
 status line names its pane; nvim stays while a buffer has unsaved
 changes, and bash stays while it has stopped jobs. Before sending any
-key, the run also stops on a pane running any other program, and on a
-Claude Code session not marked idle in its pane by the hooks of
-`claude/hooks/tmux_claude_state.sh`. Those hooks mark a session busy
-from a submitted prompt or a tool call until its turn ends, and a turn
-interrupted with Esc leaves it busy until the next turn ends. A session
-started before the hooks were installed has no mark, so quit it by hand.
+key, the run also stops on a pane running any other program. Claude
+Code exits on Ctrl-D twice even in the middle of a turn, so check that
+no session is at work before answering `y`.
