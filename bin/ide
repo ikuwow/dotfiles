@@ -1,9 +1,10 @@
 #!/bin/bash
 
-# Open the tmux session for a project, creating it on first use, or open a
-# file in the nvim of the current project's session
+# Open the tmux session for a project, creating it on first use, or reach
+# the nvim of the current project's session
 # Usage: ide [dir]
 #        ide --open <file> [<line>]
+#        ide --socket
 #
 # IDE stands for ikuwow's development environment.
 #
@@ -21,11 +22,15 @@
 # the project the current directory belongs to, beside the tree, at
 # <line> when given. Claude Code's IDE connection gives the model no tool
 # to open a file, so a Claude Code pane runs this instead.
+#
+# --socket prints the RPC socket of that nvim, for any other operation
+# through `nvim --server <socket>`.
 
 set -eu
 
 usage="Usage: ide [dir]
-       ide --open <file> [<line>]"
+       ide --open <file> [<line>]
+       ide --socket"
 
 # The main checkout root of the project that directory $1 belongs to
 project_root() {
@@ -80,20 +85,10 @@ check_session_root() {
   fi
 }
 
-open_file() {
-  local file="$1" line="${2:-0}"
-  if [ ! -f "$file" ]; then
-    echo "Error: no such file: $file" >&2
-    exit 1
-  fi
-  case "$line" in
-    '' | *[!0-9]*)
-      echo "Error: line must be a number: $line" >&2
-      exit 1
-      ;;
-  esac
-  local path root name socket
-  path="$(cd "$(dirname "$file")" && pwd)/$(basename "$file")"
+# The RPC socket of the nvim in the session of the project the current
+# directory belongs to, failing when that nvim does not listen on it
+session_socket() {
+  local root name socket
   root="$(project_root "$(pwd)")"
   name="$(session_name "$root")"
   if ! tmux has-session -t "=$name" 2>/dev/null; then
@@ -106,6 +101,24 @@ open_file() {
     echo "Error: the nvim of session $name is not listening on $socket" >&2
     exit 1
   fi
+  echo "$socket"
+}
+
+open_file() {
+  local file="$1" line="${2:-0}"
+  if [ ! -f "$file" ]; then
+    echo "Error: no such file: $file" >&2
+    exit 1
+  fi
+  case "$line" in
+    '' | *[!0-9]*)
+      echo "Error: line must be a number: $line" >&2
+      exit 1
+      ;;
+  esac
+  local path socket
+  path="$(cd "$(dirname "$file")" && pwd)/$(basename "$file")"
+  socket="$(session_socket)"
   # A Vim string in single quotes takes a quote as two, and the number
   # drops leading zeros, which Vim would read as octal
   local q="'" status=0
@@ -114,20 +127,30 @@ open_file() {
   timeout 5 nvim --server "$socket" --remote-expr \
     "v:lua.require'ide'.open('${path//$q/$q$q}', $((10#$line)))" || status=$?
   if [ "$status" -eq 124 ]; then
-    echo "Error: the nvim of session $name did not answer in 5 seconds; a prompt in its pane may be waiting for input, so answer it and run this again" >&2
+    echo "Error: the nvim on $socket did not answer in 5 seconds; a prompt in its pane may be waiting for input, so answer it and run this again" >&2
   fi
   return "$status"
 }
 
-if [ "${1:-}" = --open ]; then
-  if [ $# -lt 2 ] || [ $# -gt 3 ]; then
-    echo "$usage" >&2
-    exit 1
-  fi
-  shift
-  open_file "$@"
-  exit
-fi
+case "${1:-}" in
+  --open)
+    if [ $# -lt 2 ] || [ $# -gt 3 ]; then
+      echo "$usage" >&2
+      exit 1
+    fi
+    shift
+    open_file "$@"
+    exit
+    ;;
+  --socket)
+    if [ $# -ne 1 ]; then
+      echo "$usage" >&2
+      exit 1
+    fi
+    session_socket
+    exit
+    ;;
+esac
 
 for arg in "$@"; do
   case "$arg" in
