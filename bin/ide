@@ -52,8 +52,9 @@ else
   root="$dir"
 fi
 
-# tmux target syntax reads '.' and ':' as window and pane separators, so
-# a name containing them breaks the exact-match lookups below
+# tmux target syntax reads ':' as the session-window separator and '.' as
+# the window-pane separator, so a name containing them breaks the
+# exact-match lookups below
 name="$(basename "$root" | tr '.:' '__')"
 
 if tmux has-session -t "=$name" 2>/dev/null; then
@@ -63,7 +64,7 @@ if tmux has-session -t "=$name" 2>/dev/null; then
   fi
 else
   # The session starts at the size of the terminal it opens in, because
-  # tmux spreads a later change in window width across the panes instead
+  # tmux spreads a later change in window width evenly across the panes instead
   # of keeping the 55:45 split between nvim and claude
   if [ -n "${TMUX:-}" ]; then
     width="$(tmux display-message -p '#{client_width}')"

@@ -29,11 +29,13 @@ window shows the list once `pane-border-status` is set on it.
 | `C-q x`, then `y` | Close the shown tab and show its neighbor; on a pane without tabs, kill the pane |
 
 - Keep Ctrl held for the second key: `C-q n` and `C-q p` switch windows
-- A tab whose program exits closes like `C-q x`, so quitting Claude Code
-  or typing `exit` in a shell closes its tab
+- A tab whose program exits closes like `C-q x`, so quitting a Claude
+  Code tab opened with `C-q C-a`, or typing `exit` in a shell, closes its
+  tab; the claude that `ide` starts drops to its shell
 - A hidden tab keeps running, parked in the `tabs-store` session
-- A pane removed any other way than `C-q x`, such as with `kill-window`,
-  takes its hidden tabs with it
+- A pane removed any other way than `C-q x` or its program exiting, such
+  as with `kill-window`, loses its hidden tabs the next time `tabs.sh`
+  runs
 - Tabs switch by key only, not by clicking the list
 
 `tabs.sh` does the work behind these keys and the `pane-died` and
@@ -53,7 +55,7 @@ brings the next tab of its slot into view, which is quit in turn.
   status line
 - A second run sends that bash another Ctrl-D, which ends it with its
   stopped jobs, as a second Ctrl-D typed by hand does
-- The run sends nothing more once a pane runs any other program, and
-  names that pane
+- The run sends nothing more once a pane runs any other program, or a
+  shell runs a command such as a script, and names that pane
 - Claude Code exits on Ctrl-D twice even in the middle of a turn, so
-  check that no session is at work before answering `y`
+  check that no Claude Code session is at work before answering `y`

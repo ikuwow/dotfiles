@@ -5,8 +5,10 @@
 #
 # Tmux key bindings and hooks run this with the pane they act on. A tab is
 # a real pane: the shown one sits in the slot, and the others are parked,
-# each in a window of its own in the session $store. Switching swaps a
-# parked pane into the slot, so programs and scrollback keep running.
+# each in a window of its own in the session tabs-store. Switching swaps
+# a parked pane into the slot, so programs keep running and keep their
+# scrollback. Each tab has remain-on-exit on, so a program that exits
+# leaves its pane for this script to close.
 # The panes of one slot share the pane option @tab_group, and their order
 # is the order of their pane IDs, which tmux hands out ascending.
 
@@ -47,6 +49,8 @@ render() {
   group="$(info "$1" '#{@tab_group}')"
   [ -n "$group" ] || return 0
   shown="$(members "$group" | awk -v s="$store" '$2 != s { print $1; exit }')"
+  # A slot closed by a concurrent run has no shown tab to render
+  [ -n "$shown" ] || return 0
   if [ "$(members "$group" | wc -l)" -lt 2 ]; then
     tmux set-option -pu -t "$shown" @tab_group ';' set-option -pu -t "$shown" @tab_list \
       ';' set-option -pu -t "$shown" remain-on-exit
@@ -99,7 +103,9 @@ case "$cmd" in
     tmux select-pane -t "$target"
     ;;
   close | died)
-    # The pane-died hook fires for every pane left open on exit, tab or not
+    # tmux.conf calls this only for a tab, but the pane can lose its group
+    # before this runs, when another run's render ungroups the last tab of
+    # its slot
     if [ -z "$group" ]; then
       if [ "$cmd" = close ]; then tmux kill-pane -t "$pane"; fi
       exit 0
