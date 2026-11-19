@@ -54,28 +54,14 @@ fi
 
 # tmux target syntax reads '.' and ':' as window and pane separators, so
 # a name containing them breaks the exact-match lookups below
-session_name() {
-  basename "$1" | tr '.:' '__'
-}
+name="$(basename "$root" | tr '.:' '__')"
 
-# A session is found by its root, since its name depends on which other
-# sessions held the plain name when it was created
-name="$(tmux list-sessions -F '#{session_path}	#{session_name}' 2>/dev/null |
-  awk -F '\t' -v root="$root" '$1 == root { print $2; exit }')"
-
-if [ -z "$name" ]; then
-  name="$(session_name "$root")"
-  # Of repositories that share a basename, such as a fork and its
-  # upstream, the one opened while another holds the plain name gets the
-  # parent directory's name as a prefix
-  if tmux has-session -t "=$name" 2>/dev/null; then
-    name="$(session_name "$(dirname "$root")")_$name"
-  fi
-  if tmux has-session -t "=$name" 2>/dev/null; then
+if tmux has-session -t "=$name" 2>/dev/null; then
+  if [ "$(tmux display-message -p -t "=$name:" '#{session_path}')" != "$root" ]; then
     echo "Error: session $name belongs to another directory" >&2
     exit 1
   fi
-
+else
   # The session starts at the size of the terminal it opens in, because
   # tmux spreads a later change in window width across the panes instead
   # of keeping the 55:45 split between nvim and claude
@@ -91,6 +77,8 @@ if [ -z "$name" ]; then
   # Start each program from a shell, so its pane keeps a shell after the
   # program exits
   nvim_pane="$(tmux new-session -d -P -F '#{pane_id}' -s "$name" -c "$root" -x "$width" -y "$height")"
+  # The window lists each pane's tabs, kept by tabs.sh, on its top border
+  tmux set-option -w -t "$nvim_pane" pane-border-status top
   tmux send-keys -t "$nvim_pane" 'nvim -c NvimTreeOpen' Enter
   claude_pane="$(tmux split-window -h -l 45% -P -F '#{pane_id}' -t "$nvim_pane" -c "$root")"
   tmux send-keys -t "$claude_pane" 'claude --ide' Enter

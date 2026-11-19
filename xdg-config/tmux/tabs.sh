@@ -75,15 +75,13 @@ case "$cmd" in
       tmux set-option -p -t "$pane" @tab_group "$group" ';' set-option -p -t "$pane" remain-on-exit on
     fi
     if [ "$cmd" = claude ]; then dir="$(info "$pane" '#{session_path}')"; else dir="$(info "$pane" '#{pane_current_path}')"; fi
-    # The store's first window is a placeholder that only lets it exist
-    placeholder=''
-    if ! tmux has-session -t "=$store" 2>/dev/null; then
-      placeholder="$(tmux new-session -d -P -F '#{window_id}' -s "$store" -c /)"
-    fi
     # A Claude Code tab runs claude as its program, so its tab closes with it
     if [ "$cmd" = claude ]; then set -- 'claude --ide'; else set --; fi
-    tab="$(tmux new-window -d -P -F '#{pane_id}' -t "=$store:" -c "$dir" "$@")"
-    if [ -n "$placeholder" ]; then tmux kill-window -t "$placeholder"; fi
+    if tmux has-session -t "=$store" 2>/dev/null; then
+      tab="$(tmux new-window -d -P -F '#{pane_id}' -t "=$store:" -c "$dir" "$@")"
+    else
+      tab="$(tmux new-session -d -P -F '#{pane_id}' -s "$store" -c "$dir" "$@")"
+    fi
     tmux set-option -p -t "$tab" @tab_group "$group" ';' set-option -p -t "$tab" remain-on-exit on
     swap_in "$tab" "$pane"
     tmux select-pane -t "$tab"

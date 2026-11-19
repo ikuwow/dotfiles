@@ -14,10 +14,11 @@ Claude Code pane shown in the window.
 ## Tabs in a pane
 
 A pane can hold several tabs, one shown at a time, such as further
-shells or Claude Code sessions in the right pane that `ide` opens. Every
-pane's top border lists its tabs, with the shown tab in reverse video,
-and a pane without tabs shows itself as tab 1; a Claude Code tab is
-labeled with its session title.
+shells or Claude Code sessions in the right pane that `ide` opens. In
+the window `ide` opens, every pane's top border lists its tabs, with
+the shown tab in reverse video, and a pane without tabs shows itself as
+tab 1; a Claude Code tab is labeled with its session title. Another
+window shows the list once `pane-border-status` is set on it.
 
 | Keys | Action |
 | --- | --- |
