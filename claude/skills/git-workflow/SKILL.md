@@ -162,8 +162,16 @@ covers what arrived before the watch began.
 - For a PR an implementer opened or found, start it on the implementer's
   progress message that gives the URL, or on its completion report when
   no such message came
-- When the watch fails to start, report that and go on, since the
-  Finalize step checks the watch again
+- When the watch fails to start, report that and run a state poll in
+  its place, with `run_in_background: true`, since without an event
+  source a merge or close reaches the session only when someone asks:
+  `until gh pr view <number> -R <owner>/<repo> --json state --jq .state | grep -xE 'MERGED|CLOSED'; do sleep 60; done`
+  - Its completion means the PR merged or closed, which the Watch
+    step's exit conditions act on, and a failed `gh` call only sends it
+    round again
+  - It reports no comment, review, or check, so re-fetch the PR before
+    stating where it stands
+  - The Finalize step checks the watch again
 - Start none when the user named "no PR watch" or a stopping point at
   the draft PR, since an event would otherwise resume work past that
   point
@@ -342,7 +350,9 @@ Bring the PR into a state where a human reviewer can act on it:
    `READY_FOR_REVIEW` is itself a watched event, so a watch started
    after the ready flip can never observe it.
    - When the watch fails to start, or `pr-watch list` exits 1 because
-     no watcher runs, carry that into this step's report
+     no watcher runs, run the state poll from the Create a PR step
+     unless one already runs for the PR, and carry both into this step's
+     report
 1. Then, in the same turn, hand the PR to review:
    - While a point stays open, leave the PR in draft whoever holds the
      flip, report each point with what would settle it, and continue

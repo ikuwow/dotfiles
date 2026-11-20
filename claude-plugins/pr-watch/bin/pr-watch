@@ -17,10 +17,12 @@
 #
 # The watch list is one file per session, keyed by CLAUDE_CODE_SESSION_ID,
 # so concurrent sessions in one working tree each wake only for their own
-# PRs. `/clear` gives Bash a new session ID, so if the running watcher
-# keeps the ID it started with, an add after a `/clear` fails, since no
-# watcher runs under the new ID, while PRs added before it stay watched
-# under the old one.
+# PRs. When no watcher runs under that ID, the list of the watcher that
+# the same Claude Code process started is used instead, since Bash and the
+# watcher can hold different IDs: a Claude Code process that carried on an
+# earlier conversation gave Bash that conversation's ID and the watcher a
+# new one, and `/clear` gives Bash a new ID while the watcher may keep its
+# own.
 #
 # Each add appends `<owner>/<repo>#<number><TAB><token>` with a fresh
 # token, and the watcher starts a PR whose latest token it has not started
@@ -36,8 +38,52 @@ if [ -z "${CLAUDE_CODE_SESSION_ID:-}" ]; then
   echo "pr-watch: CLAUDE_CODE_SESSION_ID is not set; run it from a Claude Code session" >&2
   exit 2
 fi
-list="${XDG_STATE_HOME:-$HOME/.local/state}/pr-watch/$CLAUDE_CODE_SESSION_ID"
-mkdir -p "${list%/*}"
+state="${XDG_STATE_HOME:-$HOME/.local/state}/pr-watch"
+mkdir -p "$state"
+
+# Whether the watcher of session ID $1 runs. Matching the session ID on the
+# watcher's command line keeps a reused PID, including one now held by
+# another session's watcher, from passing for this session's.
+watcher_runs() {
+  local pid
+  pid="$(cat "$state/$1.pid" 2>/dev/null || true)"
+  if [ -z "$pid" ]; then
+    return 1
+  fi
+  ps -ww -p "$pid" -o command= | grep -qF "pr-watch-monitor $1"
+}
+
+# The session ID of the watcher that the Claude Code process this command
+# runs under started. The plugin starts the watcher through a shell, so
+# the watcher's grandparent is that Claude Code process.
+sibling_session_id() {
+  local ancestors=" " pid=$$ watcher id grandparent
+  # PID 1 stays out, since a watcher whose Claude Code died without
+  # stopping it has PID 1 as its grandparent
+  while true; do
+    pid="$(ps -o ppid= -p "$pid" | tr -d ' ')"
+    if [ -z "$pid" ] || [ "$pid" -le 1 ]; then
+      break
+    fi
+    ancestors="$ancestors$pid "
+  done
+  while read -r watcher id; do
+    grandparent="$(ps -o ppid= -p "$(ps -o ppid= -p "$watcher" | tr -d ' ')" | tr -d ' ')"
+    if [ -n "$grandparent" ] && [[ "$ancestors" == *" $grandparent "* ]]; then
+      echo "$id"
+      return
+    fi
+  done < <(ps -ww -A -o pid=,command= | awk '$0 ~ /pr-watch-monitor [0-9a-f-]+$/ { print $1, $NF }')
+}
+
+id="$CLAUDE_CODE_SESSION_ID"
+if ! watcher_runs "$id"; then
+  sibling="$(sibling_session_id)"
+  if [ -n "$sibling" ]; then
+    id="$sibling"
+  fi
+fi
+list="$state/$id"
 touch "$list"
 
 entry_for() {
@@ -80,19 +126,11 @@ add_entry_for() {
   echo "${url%/pull/*}#${url##*/}"
 }
 
-# Matching the session ID on the watcher's command line keeps a reused PID,
-# including one now held by another session's watcher, from passing for
-# this session's.
 watcher_running() {
-  local pid
-  pid="$(cat "$list.pid" 2>/dev/null || true)"
-  if [ -z "$pid" ]; then
-    return 1
-  fi
-  ps -ww -p "$pid" -o command= | grep -qF "pr-watch-monitor $CLAUDE_CODE_SESSION_ID"
+  watcher_runs "$id"
 }
 
-no_watcher="no watcher runs for this session ID; the pr-watch plugin may be missing, the session non-interactive, the watcher stopped, or the ID changed by a /clear"
+no_watcher="no watcher runs for this session ID or under this Claude Code process; the pr-watch plugin may be missing, the session non-interactive, or the watcher stopped"
 
 case "${1:-}" in
   add|remove)
