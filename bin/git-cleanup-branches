@@ -156,7 +156,7 @@ while read -r branch; do
   wt_path=$(lookup_worktree "$branch")
   if [ -n "$wt_path" ]; then
     if ! remove_worktree "$wt_path"; then
-      echo "git-cleanup-branches: skip '$branch' (worktree at $wt_path not removable; uncommitted changes?)" >&2
+      echo "git-cleanup-branches: skip '$branch' (worktree at $wt_path not removable: local changes, a submodule off its recorded commit, or commits no remote-tracking ref holds)" >&2
       continue
     fi
   fi
@@ -209,7 +209,7 @@ while read -r wt_path; do
     continue
   fi
   if ! remove_worktree "$wt_path"; then
-    echo "git-cleanup-branches: keep detached worktree at $wt_path (not removable; uncommitted changes?)" >&2
+    echo "git-cleanup-branches: keep detached worktree at $wt_path (not removable: local changes, a submodule off its recorded commit, or commits no remote-tracking ref holds)" >&2
     continue
   fi
   detached_count=$((detached_count + 1))
