@@ -14,8 +14,9 @@
 # submodule commits no remote-tracking ref holds) skips that branch and
 # the loop continues.
 # Detached-HEAD worktrees are removed when clean, with no rebase, merge,
-# or bisect in progress, and every commit their HEAD and refs/worktree/*
-# reach is held by a branch, tag, or remote-tracking ref.
+# cherry-pick, revert, or bisect in progress, and every commit their HEAD
+# and refs/worktree/* reach is held by a branch, tag, or remote-tracking
+# ref.
 #
 # Origin of the squash-merge detection trick:
 # https://github.com/not-an-aardvark/git-delete-squashed#sh
@@ -195,7 +196,7 @@ detached_count=0
 while read -r wt_path; do
   [ -z "$wt_path" ] && continue
   if operation_in_progress "$wt_path"; then
-    echo "git-cleanup-branches: keep detached worktree at $wt_path (rebase, merge, or bisect in progress)" >&2
+    echo "git-cleanup-branches: keep detached worktree at $wt_path (rebase, merge, cherry-pick, revert, or bisect in progress)" >&2
     continue
   fi
   if ! unshared=$(git -C "$wt_path" rev-list -n1 HEAD --glob='refs/worktree/*' \
