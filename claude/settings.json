@@ -446,14 +446,6 @@
     "type": "command",
     "command": "bash ~/.claude/statusline-command.sh"
   },
-  "footerLinksRegexes": [
-    {
-      "type": "regex",
-      "pattern": "\\b(?<owner>[\\w.-]{1,39})/(?<repo>[\\w.-]{1,100})#(?<num>\\d+)\\b",
-      "url": "https://github.com/{owner}/{repo}/issues/{num}",
-      "label": "{repo}#{num}"
-    }
-  ],
   "enabledPlugins": {
     "codex@openai-codex": true,
     "pr-review-toolkit@claude-plugins-official": true,
