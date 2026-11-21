@@ -9,14 +9,8 @@
 #               (the cherry-pick-id trick)
 # A branch neither check matches is left alone, whatever its upstream
 # says, since the commits it carries exist nowhere else.
-# Worktrees attached to removable branches are removed first; a worktree
-# that cannot be removed without losing work (local changes, or
-# submodule commits no remote-tracking ref holds) skips that branch and
-# the loop continues.
-# Detached-HEAD worktrees are removed when clean, with no rebase, merge,
-# cherry-pick, revert, or bisect in progress, and every commit their HEAD
-# and refs/worktree/* reach is held by a branch, tag, or remote-tracking
-# ref.
+# Worktrees attached to removable branches are removed first, without
+# --force; a dirty worktree skips that branch and the loop continues.
 #
 # Origin of the squash-merge detection trick:
 # https://github.com/not-an-aardvark/git-delete-squashed#sh
@@ -62,67 +56,6 @@ lookup_worktree() {
   printf '%s\n' "$worktree_map" | awk -F'\t' -v b="$branch" '$1 == b { print $2; exit }'
 }
 
-# `git worktree remove` refuses a worktree with initialized submodules
-# even when it is clean, and its --force would also discard dirty
-# content. Removing the worktree also deletes the submodules' git dirs,
-# which live under the worktree's admin dir. So --force is used only
-# when all of these hold:
-#   - the worktree and each submodule, nested ones included, report no
-#     change with any submodule ignore setting overridden
-#   - no submodule sits at a commit other than the one recorded (`+`) or
-#     in a merge conflict (`U`)
-#   - no submodule, wherever its git dir lives, and no git dir under the
-#     worktree's admin dir, including one `git submodule deinit` left
-#     behind, holds a commit, under any ref or its HEAD, that none of its
-#     remote-tracking refs contains
-# A check that fails keeps the worktree, since its empty output would
-# otherwise read as clean.
-remove_worktree() {
-  local wt="$1" submodules dirty modules_dir gitdirs cfg unpushed
-  submodules=$(git -C "$wt" submodule status --recursive) || return 1
-  submodules=$(grep -v '^-' <<<"$submodules" || true)
-  if [ -z "$submodules" ]; then
-    git worktree remove "$wt"
-    return
-  fi
-  dirty=$(git -C "$wt" status --porcelain --ignore-submodules=none) || return 1
-  if [ -n "$dirty" ]; then
-    return 1
-  fi
-  # A nested submodule's own ignore setting applies inside its parent,
-  # past the reach of the top-level --ignore-submodules=none.
-  dirty=$(git -C "$wt" submodule foreach --quiet --recursive \
-    'git status --porcelain --ignore-submodules=none') || return 1
-  if [ -n "$dirty" ]; then
-    return 1
-  fi
-  if grep -q '^[+U]' <<<"$submodules"; then
-    return 1
-  fi
-  # A submodule added from an existing clone keeps its .git inside the
-  # worktree, outside the admin dir.
-  unpushed=$(git -C "$wt" submodule foreach --quiet --recursive \
-    'git rev-list -n1 --all --not --remotes') || return 1
-  if [ -n "$unpushed" ]; then
-    return 1
-  fi
-  # Each submodule git dir, nested ones included, holds a `config` file
-  # at its top.
-  modules_dir=$(git -C "$wt" rev-parse --path-format=absolute --git-path modules) || return 1
-  gitdirs=""
-  if [ -d "$modules_dir" ]; then
-    gitdirs=$(find "$modules_dir" -type f -name config) || return 1
-  fi
-  while read -r cfg; do
-    [ -z "$cfg" ] && continue
-    unpushed=$(git --git-dir="${cfg%/config}" rev-list -n1 --all --not --remotes) || return 1
-    if [ -n "$unpushed" ]; then
-      return 1
-    fi
-  done <<<"$gitdirs"
-  git worktree remove --force "$wt"
-}
-
 # Branches reachable from the default branch (excluding the default itself).
 # `--merged` always lists the default branch; filter it out.
 merged_set=$(git branch --merged "$default_branch" --format='%(refname:short)' \
@@ -155,8 +88,8 @@ while read -r branch; do
 
   wt_path=$(lookup_worktree "$branch")
   if [ -n "$wt_path" ]; then
-    if ! remove_worktree "$wt_path"; then
-      echo "git-cleanup-branches: skip '$branch' (worktree at $wt_path not removable: local changes, a submodule off its recorded commit, or commits no remote-tracking ref holds)" >&2
+    if ! git worktree remove "$wt_path"; then
+      echo "git-cleanup-branches: skip '$branch' (worktree at $wt_path not removable; uncommitted changes?)" >&2
       continue
     fi
   fi
@@ -173,49 +106,4 @@ while read -r branch; do
   removed_count=$((removed_count + 1))
 done < <(git for-each-ref refs/heads/ '--format=%(refname:short)')
 
-# A worktree in the middle of a rebase shows as detached, and a clean one
-# stopped at an `edit` or `break` would otherwise lose its rebase state.
-operation_in_progress() {
-  local wt="$1" state path
-  for state in rebase-merge rebase-apply MERGE_HEAD CHERRY_PICK_HEAD REVERT_HEAD BISECT_LOG; do
-    path=$(git -C "$wt" rev-parse --path-format=absolute --git-path "$state") || return 0
-    if [ -e "$path" ]; then
-      return 0
-    fi
-  done
-  return 1
-}
-
-# A detached worktree has no branch for the loop above to reach. Keep one
-# whose HEAD or refs/worktree/* reach a commit no branch, tag, or
-# remote-tracking ref holds, since that commit would then survive only in
-# per-worktree refs, which go with the worktree, or in the stash, which
-# is meant to be dropped. The first entry is the main worktree, which git
-# never removes.
-detached_count=0
-while read -r wt_path; do
-  [ -z "$wt_path" ] && continue
-  if operation_in_progress "$wt_path"; then
-    echo "git-cleanup-branches: keep detached worktree at $wt_path (rebase, merge, cherry-pick, revert, or bisect in progress)" >&2
-    continue
-  fi
-  if ! unshared=$(git -C "$wt_path" rev-list -n1 HEAD --glob='refs/worktree/*' \
-    --not --branches --tags --remotes); then
-    echo "git-cleanup-branches: keep detached worktree at $wt_path (cannot inspect its refs)" >&2
-    continue
-  fi
-  if [ -n "$unshared" ]; then
-    echo "git-cleanup-branches: keep detached worktree at $wt_path (holds commits no shared ref holds)" >&2
-    continue
-  fi
-  if ! remove_worktree "$wt_path"; then
-    echo "git-cleanup-branches: keep detached worktree at $wt_path (not removable: local changes, a submodule off its recorded commit, or commits no remote-tracking ref holds)" >&2
-    continue
-  fi
-  detached_count=$((detached_count + 1))
-done < <(git worktree list --porcelain | awk '
-  /^worktree / { path = substr($0, 10); n++ }
-  /^detached$/ { if (n > 1) print path }
-')
-
-echo "removed $removed_count branches (merged: $merged_count, squashed: $squashed_count) and $detached_count detached worktrees; pruned $pruned_count worktree entries"
+echo "removed $removed_count branches (merged: $merged_count, squashed: $squashed_count); pruned $pruned_count worktree entries"
