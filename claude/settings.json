@@ -449,7 +449,7 @@
   "footerLinksRegexes": [
     {
       "type": "regex",
-      "pattern": "\\b(?<owner>[\\w.-]+)/(?<repo>[\\w.-]+)#(?<num>\\d+)\\b",
+      "pattern": "\\b(?<owner>[\\w.-]{1,39})/(?<repo>[\\w.-]{1,100})#(?<num>\\d+)\\b",
       "url": "https://github.com/{owner}/{repo}/issues/{num}",
       "label": "{repo}#{num}"
     }
