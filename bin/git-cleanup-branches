@@ -158,10 +158,6 @@ operation_in_progress() {
 detached_count=0
 while read -r wt_path; do
   [ -z "$wt_path" ] && continue
-  if has_submodules "$wt_path"; then
-    list_candidate "$wt_path" "detached worktree at $wt_path"
-    continue
-  fi
   if operation_in_progress "$wt_path"; then
     echo "git-cleanup-branches: keep detached worktree at $wt_path (operation in progress)" >&2
     continue
@@ -173,6 +169,12 @@ while read -r wt_path; do
   if ! unshared=$(git -C "$wt_path" rev-list -n1 HEAD --glob='refs/worktree/*' \
     --not --branches --tags --remotes) || [ -n "$unshared" ]; then
     echo "git-cleanup-branches: keep detached worktree at $wt_path (holds commits no shared ref holds)" >&2
+    continue
+  fi
+  # Listed only after the checks above, so the --force it suggests never
+  # drops a commit or an operation those checks would have kept.
+  if has_submodules "$wt_path"; then
+    list_candidate "$wt_path" "detached worktree at $wt_path"
     continue
   fi
   if ! git worktree remove "$wt_path"; then
