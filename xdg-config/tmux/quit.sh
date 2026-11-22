@@ -33,16 +33,23 @@ panes() {
 # same command name, and a Ctrl-D left in its input would end it once the
 # script returns. Drawing a prompt hands the terminal for a few tens of
 # milliseconds to a subshell or a command-not-found handler run from
-# PROMPT_COMMAND, so a shell counts as busy only when it keeps the
-# terminal away from itself for 2 seconds. A pane that has closed counts
-# as idle and gets no keys.
+# PROMPT_COMMAND, while a shell running a loop typed at its prompt takes
+# the terminal back only for an instant between the loop's commands. So a
+# shell counts as idle once it holds the terminal in 3 samples in a row,
+# 0.1 seconds apart, and as busy when that does not happen within 2
+# seconds. A pane that has closed counts as idle and gets no keys.
 idle() {
-  local pid tpgid
+  local pid tpgid held=0
   pid="$(tmux display-message -p -t "$1" '#{pane_pid}' 2>/dev/null)" || return 0
   for _ in $(seq 20); do
     tpgid="$(ps -o tpgid= -p "$pid")" || return 0
     if [ "${tpgid// /}" = "$pid" ]; then
-      return 0
+      held=$((held + 1))
+      if [ "$held" -ge 3 ]; then
+        return 0
+      fi
+    else
+      held=0
     fi
     sleep 0.1
   done
