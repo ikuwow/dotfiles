@@ -44,7 +44,7 @@ is kept.
 
 ## Quitting a session
 
-`C-q X`, then `y`, quits every program in the session with the keys its
+`C-q C-x`, then `y`, quits every program in the session with the keys its
 user would type, so the session closes with its last pane: nvim gets
 `:qa`, Claude Code Ctrl-D twice, and a shell Ctrl-D once. A pane whose
 program exits drops to its shell, which is quit next, and a closed tab
