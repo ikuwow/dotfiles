@@ -33,25 +33,29 @@ panes() {
 # same command name, and a Ctrl-D left in its input would end it once the
 # script returns. Drawing a prompt hands the terminal for a few tens of
 # milliseconds to a subshell or a command-not-found handler run from
-# PROMPT_COMMAND, while a shell running a loop typed at its prompt takes
-# the terminal back only for an instant between the loop's commands. So a
-# shell counts as idle once it holds the terminal in 3 samples in a row,
-# 0.1 seconds apart, and as busy when that does not happen within 2
-# seconds. A pane that has closed counts as idle and gets no keys.
+# PROMPT_COMMAND, while a shell running a loop of external commands typed
+# at its prompt takes the terminal back only for an instant between them.
+# So a shell counts as idle once it holds the terminal in 20 samples in a
+# row, 0.01 seconds apart, which with the time ps takes spans about 0.3
+# seconds, and as busy when that does not happen in 150 samples, about 3
+# seconds. A loop hands the terminal to each command it runs, so it never
+# holds it that long on end, while a loop of builtins alone keeps the
+# terminal and reads as idle. A pane that has closed counts as idle and
+# gets no keys.
 idle() {
   local pid tpgid held=0
   pid="$(tmux display-message -p -t "$1" '#{pane_pid}' 2>/dev/null)" || return 0
-  for _ in $(seq 20); do
+  for _ in $(seq 150); do
     tpgid="$(ps -o tpgid= -p "$pid")" || return 0
     if [ "${tpgid// /}" = "$pid" ]; then
       held=$((held + 1))
-      if [ "$held" -ge 3 ]; then
+      if [ "$held" -ge 20 ]; then
         return 0
       fi
     else
       held=0
     fi
-    sleep 0.1
+    sleep 0.01
   done
   return 1
 }
