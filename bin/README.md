@@ -11,7 +11,7 @@ Custom executable scripts deployed to `~/bin/` via symlinks.
 | `gcloud-adc-mcp-headers` | Print a bearer token from gcloud Application Default Credentials and a quota project header for an MCP server's `headersHelper` |
 | `ide` | ikuwow's development environment: open the tmux session for a project, creating it with nvim and `claude --ide` side by side, started from the main checkout's root even inside a worktree; `ide --open <file> [<line>]` shows a file in that nvim, beside the tree, and `ide --socket` prints that nvim's RPC socket for other operations |
 | `install-aimsg-hook.sh` | Symlink `~/.config/git/hooks/prepare-commit-msg` into the current repo's `.git/hooks/` to enable the AI commit-message drafter in a repo outside `ikuwow/` |
-| `git-cleanup-branches` | Delete local branches whose content the default branch holds (merged, squash-merged) and prune stale worktree entries |
+| `git-cleanup-branches` | Delete local branches whose content the default branch holds (merged, squash-merged) with their worktrees, remove clean detached worktrees, list worktrees with submodules for removal by hand, and prune stale worktree entries |
 | `git-worktree-create` | Create a git worktree under `.worktrees/`. Defaults to branching from `origin/<default>`; pass a second argument to override the base |
 | `pipectlx` | PipeCD CLI wrapper that auto-injects API key and server address from config |
 | `ssm` | Start an AWS SSM session by instance ID or Name tag |
