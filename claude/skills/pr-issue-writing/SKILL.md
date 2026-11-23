@@ -61,8 +61,10 @@ loaded when it is another repository than the working directory's.
     `PUBLIC`, `INTERNAL` to `PUBLIC`) and the body will carry anything
     from the source (its `owner/repo`, issue and PR numbers, quoted
     code, comments, or rule text), confirm with the user before
-    writing, since everyone the target admits can read it from the
+    sending, since everyone the target admits can read it from the
     moment it is created
+    - The user's choice to send a draft shown in chat beside this
+      target and its visibility is that confirmation
 - Rules: read `CONTRIBUTING.md` at the target's root, in `.github/`, or
   in `docs/`, and when the target is another repository than the
   working directory's, also its root `CLAUDE.md` and `AGENTS.md`

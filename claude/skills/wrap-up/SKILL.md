@@ -1,19 +1,20 @@
 ---
 name: wrap-up
-description: Take stock of a session before it ends (unfinished work, state that ending the session discards, and findings recorded nowhere), describe each serious failure in how the agent worked with its risk and the directions a fix could take, clear the routine cleanup, propose the writes the user decides on, and report whether the session is safe to end. Trigger when the user signals that the session or the task is over ("終わり", "done", "これで完了", "おつかれ"), when they ask what is left before quitting, and when they invoke /wrap-up.
+description: End a session quickly and safely. Finish without asking whatever is quick and can be undone (routine cleanup, issue checkboxes, PR body fixes, small promised work, records on the user's own issues and PRs), ask once about everything else in a single list, and report whether the session is safe to end, along with any serious failure in how the agent worked. Trigger when the user signals that the session or the task is over ("終わり", "done", "これで完了", "おつかれ"), when they ask what is left before quitting, and when they invoke /wrap-up.
 ---
 
 # Wrap Up
 
-This skill brings a session to a state where ending it loses nothing the
-user needs. Reading and routine cleanup run on their own, since
-routine cleanup removes only local state whose content exists elsewhere,
-and its one GitHub write, closing a settled issue the user owns,
-is undone by reopening it. A write the
-user decides on runs only after they select it, since one wrap-up can
-touch several repositories and PRs and the user approves exactly the
-operations and text they were shown. Step 2 draws the line between the
-two.
+The user invokes this skill to leave the session, so what it costs them
+is the turns it takes and the text it makes them read. One test sorts
+every item that needs action: is it quick, and can it be undone? An item
+that passes runs without a question and appears in the report. An item
+that fails goes on one list, which the user answers once, and so do
+three kinds of write whose cost an undo does not return.
+
+When the user only asks what is left, answer from Step 1's inventory and
+stop there, since a question does not say the work is over. Steps 2 to 4
+run once the user says the session or the task is over.
 
 ## Step 1: Inventory
 
@@ -29,7 +30,7 @@ tool-based listing when this session lacks that tool.
   - `git worktree list`
   - the current branch
 - PRs this session created or updated
-  - `gh pr view <number> --repo <owner>/<repo> --json state,isDraft,statusCheckRollup,reviewDecision`
+  - `gh pr view <number> --repo <owner>/<repo> --json state,isDraft,statusCheckRollup,reviewDecision,author,body`
   - unresolved review threads, listed by `gh pr-review review view -R <owner>/<repo> <number> --unresolved --not_outdated`
 - Open issues that those PRs address or that the user named as the work target, read with `gh issue view <number> --repo <owner>/<repo> --json title,body,state,comments,author,assignees`
 - Work that runs only while this session is open
@@ -37,156 +38,121 @@ tool-based listing when this session lacks that tool.
   - PR watches, listed by `pr-watch list` (the `pr-watch:watch` skill)
   - session crons, listed by `CronList`
   - artifact watches, listed by the `ArtifactComments` tool's `watch` action with no `url`
-- The conversation
-  - work the session said it would do and did not start
+- The conversation and scratchpad content
+  - work the session said it would do and did not finish
   - questions put to the user that have no answer yet
-  - decisions and investigation results that no repository file, issue, or PR holds
-  - serious failures in how the agent worked this session, judged by the criterion in Step 2
-- Findings that exist only in scratchpad content
+  - findings that pass the record test in Step 2
+  - serious failures in how the agent worked, by the test in Step 4's report
 
-Attribute each uncommitted change and stash entry before listing it, and
-list only those this session made. Another concurrent session may share
-the working tree and the stash, and committing its edits would ship them
-under this session's intent.
+Attribute each uncommitted change and stash entry before acting on it,
+and act only on those this session made. Another concurrent session may
+share the working tree and the stash, and committing its edits would
+ship them under this session's intent.
 
-## Step 2: Sort into cleanup and proposals
+An item already safe to leave (pushed, recorded in an issue or PR, or
+finished) needs no action and no mention.
 
-Sort each item that needs action into routine cleanup or a proposal. An
-item already safe to leave (pushed, recorded in an issue or PR, or
-finished) gets neither and is counted in the report.
+## Step 2: Do what is quick and can be undone
 
-Routine cleanup removes local state whose content exists somewhere the
-user can still reach. Run each cleanup operation here, as it is sorted,
-and carry the result to the report. Naming one before the selection
-would put it in front of the user as something to read and weigh, which
-is the cost this class exists to remove.
+Run each item below as it is found, without naming it to the user
+first. Asking about one costs the user a decision to protect state they
+can restore.
 
-Where the worst case of a local cleanup is that the user reruns a
-command, it belongs in this class. Sorting such an item into a proposal
-costs the user a decision to buy back state they can recreate, so the
-doubtful local cleanup runs and appears in the report.
+- Quick: it finishes in this turn within a few minutes, with no new PR and no wait on CI, a review, or another outside result
+- Can be undone: it removes local state whose content exists somewhere the user can still reach, or it writes to something the user owns in a way git or GitHub reverses (a comment is edited or deleted, a body keeps its edit history, an issue reopens, a commit is followed by another)
+- The user owns a PR they authored, and an issue whose `assignees` include their login (`gh api user --jq .login`) or that they authored with `assignees` empty
+
+An item that fits Step 3's `new`, `others`, or `wider` tag goes on the
+list even when it passes both.
+
+The items:
 
 - Local branches whose content the default branch already holds, and the worktrees attached to them, removed by `git home` and then `git cleanup`, run from the root worktree of each repository this session worked in
-  - `git cleanup` judges each branch against the local default branch without fetching, so `git home` pulls first; otherwise a branch merged on GitHub since the last pull survives, and the default branch is checked out at its pre-merge commit
-  - Skip both while the working tree has uncommitted changes, since the switch in `git home` would carry them onto the default branch, and report the skip as a line rather than as a failed cleanup
-  - When `git home` fails (no remote, offline, a diverged default branch), run `git cleanup` anyway and report the failed pull, since branches the local default branch already holds are still safe to remove
-  - `git cleanup` decides each branch on its own content, deletes none while the working tree has uncommitted changes, and leaves a worktree it cannot remove without `--force`, so the run needs no per-branch gate from this skill
-  - `git home` switches to the default branch, which fails inside a linked worktree and, in the root worktree, moves the session off the branch it was on, so the report names the switch alongside the branches removed
+  - It runs here whichever session created a branch or worktree, since what it removes holds no content that a remaining ref lacks
+  - `git cleanup` judges each branch against the local default branch without fetching, so `git home` pulls first
+  - Skip both while the working tree has uncommitted changes, since the switch in `git home` would carry them onto the default branch, and report the skip
+  - When `git home` fails (no remote, offline, a diverged default branch), run `git cleanup` anyway and report the failed pull
+  - `git home` moves the session onto the default branch, so the report names the switch alongside the branches removed
 - A background shell, Monitor, subagent, session cron, or artifact watch this session started whose result the session has already reported
 - A PR watch on a PR whose outcome the session has already reported, stopped through the `pr-watch:watch` skill, since a resumed session would otherwise start it again
-- An open issue from Step 1, closed with `gh issue close` once every item it lists as closing it (the body's request when it lists none) is settled by a merged change or a check run in this session, or once the user said it is not needed or a duplicate
-  - Settled items: `--reason completed`, with a comment of a few lines naming what settled each item and linking the PR
+- Checkboxes in the user's issues and PRs, ticked for each item that a merged change or a check run in this session settled
+- A statement in the body of the user's PR that this session's work made untrue, corrected
+- An open issue the user owns, closed with `gh issue close` once every item it lists as closing it (the body's request when it lists none) is settled, or once the user said it is not needed or a duplicate
+  - Settled: `--reason completed`, with a comment of a few lines naming what settled each item and linking the PR
   - Not needed: `--reason "not planned"`, and a duplicate of `<M>`: `--duplicate-of <M>`, each with a comment quoting what the user said
-  - An issue with an unsettled item stays open, and the report names that item
-  - Only an issue whose `assignees` include the user's login (`gh api user --jq .login`), or whose `author` is the user with `assignees` empty, closes here; closing any other issue is a proposal, since its owner decides when it is done
-  - This is the one GitHub write in this class, and it belongs here because reopening the issue undoes it and the comment keeps its basis on record
+- Work the session said it would do and did not finish, when it lies within what the user asked for and passes the quick test
+- This session's finished changes left uncommitted on its feature branch, committed and pushed
+  - Stage by path, never with `git add -A` or `git commit -a`, so another session's changes stay out
+  - When the push starts CI, report that it is running rather than waiting for it
+- A finding that passes the record test, written as a comment on the issue or PR of the user's that tracks the work
 
-Everything else is a proposal: a write to a repository or to GitHub, a
-removal of content held nowhere else (uncommitted changes, a stash
-entry, an unpushed commit, a finding that lives only in scratchpad
-content), and an operation on state another session created. A proposal
-that holds local state keeps it: `git cleanup` deletes nothing while the
-working tree is dirty, and it spares a branch whose content the default
-branch lacks.
+The record test: a finding is recorded only when it changes what a
+reader of that issue or PR decides or does next. A finding that restates
+documented tool behavior, or what the target already says, fails it.
+So does a problem that only a vendor or the OS can fix, since no
+repository's owner can act on it. Write the finding itself into the
+comment, since nobody looks for a scratchpad path they do not remember.
 
-- Each proposal names the operation (commit, push, create an issue, comment on a PR, stop a task whose result is recorded nowhere, delete a branch whose PR is not merged, and so on)
-- Each proposal names its target: the repository, branch, and PR or issue number
-- A write that carries text includes the full draft of that text (title, body, comment, commit message)
-- A proposal that needs another to run first names that proposal, as a push names the commit it pushes
+Issue and PR bodies and comments written in this step go through the
+`pr-issue-writing` skill, and commit message bodies through
+`technical-writing`. A write that `pr-issue-writing` would stop to ask
+about goes on Step 3's list instead.
 
-A record goes where a later reader will look for it.
+## Step 3: Ask once about the rest
 
-- A fact about a PR's change goes in that PR's body when it changes what the reviewer decides, and in a comment on the PR otherwise
-- Unfinished work and investigation results not tied to a PR go in a comment on the open issue already tracking that work, or else in a new issue in the repository the work belongs to
-  - A defect this session introduced, in a change of its own already merged, is proposed as the fix: a branch, the edit, and a commit, ending there, with the edit and the commit message as the proposal's draft
-    - The issue is shown with its draft as that proposal's alternative, the pair numbered as one-of-two (3a fix, 3b issue, with "run all" taking the fix), so a declined fix can still leave the defect recorded
-    - An issue carries the defect on its own when the session cannot fix it that way
-- Findings from scratchpad content are written into the issue or PR itself
-  - A file path is not a record, because nobody looks in a place they do not remember
+Everything else that needs action goes on the list, tagged with the
+reason it is there.
 
-A serious failure in how the agent worked is described to the user and
-left without a drafted fix to the rule, skill, hook, or permission
-behind it, since the direction a fix takes is theirs to settle in
-conversation before any edit is written. A defect it left in a
-deliverable still gets the fix proposal above.
+- `slow`: work that fails the quick test, such as a fix that needs a new PR, unfinished work that takes longer than a few minutes, or uncommitted changes on the default branch, which need a branch and a PR of their own
+- `permanent`: a removal of content held nowhere else (uncommitted changes, a stash entry, an unpushed commit)
+- `new`: creating an issue or a PR, since the user has to triage what it adds
+- `others`: a write to an issue or PR the user does not own, a push to a branch other than this session's feature branch, and an operation on state another session created
+  - The object written to decides this, so the user's own PR and this session's branch in an organization's repository are the user's
+- `wider`: a write to a repository visible to more people than one the session worked in (private to internal or public, internal to public), since its readers have the text from the moment it is posted
 
-A failure is serious when all three of the following hold. A failure
-that misses one costs the user a read and a decision at the end of the
-session without changing what they would do: they catch it on the spot
-next time, or no edit can keep it from recurring.
+With nothing on the list, go to Step 4.
 
-- Harm: it would have done one of the following had no checkpoint (plan review, PR review, a hook, the user) caught it
-  - changed the direction of the work through a misjudgment
-  - left the user to redo work by hand
-  - introduced an error into a deliverable
-  - misled the user with a confidently wrong assertion
-  - spent the user's turns on a stop or confirmation the task did not need, such as asking approval for an action the user already said to take without asking
-- Cause: a specific instruction text or a missing gate accounts for it, so an edit to a rule, skill, hook, or permission can keep the next session from repeating it
-  - "The agent did not follow the rule" and "the agent misread it" describe the failure rather than its cause, so look for the cause in that rule's wording, where it loads, or the gate it lacks
-- Exposure: its next occurrence would go unnoticed by the user, or would cause harm that cannot be undone or that leaves the machine
+1. Show the list numbered, one line per item: the operation, its target, and its tag
+   - Show no draft text, since text is written only for what the user selects
+   - A `wider` item is the exception: its line names the target repository and its visibility, and its full draft follows, written through `pr-issue-writing`, so the user reads the text before the target's readers do
+     - When that skill stops on a question, the question takes the draft's place, and the item cannot be selected in this wrap-up, since its text was never shown
+1. Ask which to run at the end of that same message, in plain text, and end the turn there
+   - Text sent in the same turn as an AskUserQuestion call can fail to reach the user
+1. Act on the reply without asking again
+   - Numbers select those items
+   - A go-ahead without numbers ("ok", "はよ", "go") selects every item except those tagged `slow`, `permanent`, or `wider`, since it asks for the session to end sooner and names no removal and no wider post; on a one-item list it selects that item unless the item is tagged `wider`
+   - A reply that changes an item, or names another operation and its target, is run as the reply states it, except where Step 4 holds a `wider` write back
+   - An item the reply leaves undecided does not run
 
-Two cases adjust those conditions.
+## Step 4: Run and report
 
-- A failure the agent corrected on its own, before the user pointed it out, is not serious, even when it repeated within the session
-- Any other failure matching an issue with the `retrospective` label in `ikuwow/dotfiles` is serious when two of the three conditions hold, since its recurrence across sessions shows that leaving it alone did not settle it
-  - Find matches with `gh issue list --repo ikuwow/dotfiles --label retrospective --state all --limit 200 --json number,title,state`, reading the body of a candidate whose title alone does not settle the match
-  - A closed issue counts, since a recurrence after its fix landed shows the fix did not hold
+Write the text for each selected item, then run it. A `wider` write
+is posted only as its draft was shown. One whose draft was not shown, or
+whose text the reply changes, is not posted, and the report carries its
+draft, or the question that stopped it. Issue and PR
+titles, bodies, and comments go through the `pr-issue-writing` skill,
+and commit message bodies through `technical-writing`. A question
+`pr-issue-writing` would stop to ask (a duplicate it found, a contact
+channel in the template config) stops that item, and the report carries
+the question.
 
-Each serious failure is presented as follows.
+Each item ends at the last operation its line names, so a commit stops
+at the commit. When an item cannot run as listed (a command fails, or
+the target has changed), stop it and every selected item that needs it.
 
-- A session with none says nothing about failures
-- Describe each one in a few lines: what happened, how it meets each condition, the risk it carries, the directions a fix could take, and the matching issue when one exists
-- A direction is a structural change: an edit to a named instruction text, a new gate (hook, permission, check), or a removal
-  - "Be more careful", "follow the rule more closely", recording it in memory, and restating an existing rule are not directions, since each depends on the model's attention or recall improving
-- Its one proposal is an issue whose body is that description, so that a session ended before the conversation still keeps the failure on record
-  - When the matching issue is open, the proposal is a comment on that issue carrying the description, in place of the new issue the next bullet would place
-- The issue goes to the session's repository without a label when every direction lands in that project's own rule file, and to `ikuwow/dotfiles` with the `retrospective` label otherwise
-- Text for `ikuwow/dotfiles`, a public repository, describes the failure by its behavior pattern and leaves out private repository names, their PR and issue numbers, their code, and quoted text from their rule files
+`slow` work that was not selected is recorded in one line as a comment
+on the user's issue or PR that tracks it, when one exists and the
+comment fits no tag.
 
-Draft issue and PR titles and bodies against the `pr-issue-writing`
-skill, and comments, commit message bodies, and other prose longer than
-a sentence with the `technical-writing` skill. This step takes their
-writing criteria, and from `pr-issue-writing` also its review of a
-draft against its sources, plus its preflight for a proposal that
-creates an issue or PR, since Step 4 runs the draft as shown: the
-commands that create or edit an issue or PR run in Step 4, for a
-selected proposal. A question the preflight would stop to ask becomes
-a choice within that proposal in Step 3.
-
-Local git proposals keep to what the session changed.
-
-- A commit proposal names the exact paths it stages, and stages them by path rather than with `git add -A` or `git commit -a`, so another session's changes stay out of it
-- Uncommitted changes on the default branch get a proposal to create a branch and commit there
-
-## Step 3: Select
-
-When there are no proposals, go to Step 5, where the cleanup Step 2 already ran is reported.
-
-1. Show every proposal in the conversation, numbered, with its draft in full
-   - A serious failure's description comes directly before its proposal, which shows the issue title or the target issue and points to the description as its text, so the user reads the text once
-1. Ask for the selection at the end of that same message, in plain text that names the proposal numbers (run 1, run 2, run all, run none), and end the turn there
-   - Text sent in the same turn as an AskUserQuestion call can fail to reach the user, so the selection is taken from the user's reply instead
-1. Run exactly the proposals the reply selects, and treat every other proposal as declined
-   - An "ok" selects the only proposal when there is one, since that proposal names its operation and target; with several, an "ok" or a question neither selects nor declines, so ask again rather than guess
-   - When the reply changes a draft or asks for another operation, show the revised proposals and ask again before Step 4
-   - When the reply takes up the direction of a fix for a serious failure, answer it as conversation, and ask for the selection again once that conversation settles, since the proposals stay open until then
-
-## Step 4: Execute
-
-Run the selected proposals as drafted. Each proposal ends at the last
-operation it names, so a commit proposal stops at the commit, without a
-push, a PR, or a CI watch that no selected proposal names.
-
-When a proposal cannot run as shown (a command fails, or the target has
-changed), stop it and every selected proposal that needs it, and carry
-them to the report with the steps that already ran, rather than running
-a version the user did not see.
-
-## Step 5: Report
+The report:
 
 1. Open with the verdict
-   - Safe to end: the routine cleanup and every selected proposal ran
-   - Items remain: a cleanup operation failed in Step 2, or a selected proposal failed or was stopped in Step 4
-1. List the routine cleanup that ran, one line per operation
-1. For each declined, failed, or stopped item, write one line naming where it now lives: a PR or issue URL, a place that exists only on this machine (uncommitted changes, a stash entry, or an unpushed branch, with its repository), or what ending the session stops or discards
-1. Give the count of items already safe to leave
+   - Safe to end: every operation in Step 2 and every selected item ran
+   - Items remain: one of them failed or was stopped
+1. List what ran, one line per operation, with the URL of anything posted or edited, so the user can find it to undo it
+1. For each item that did not run, write one line naming where it now lives: a PR or issue URL, a place that exists only on this machine (uncommitted changes, a stash entry, or an unpushed branch, with its repository), or what ending the session stops or discards
+1. Describe each serious failure in how the agent worked in one or two lines: what the agent did and what it cost the user
+   - A failure is serious when the user had to correct it or redo work because of it, when it put an error into a deliverable or a wrong assertion in front of the user, or when it spent the user's turns on a stop or a confirmation the task did not need
+   - Leave out one the agent corrected on its own before the user pointed it out or this wrap-up began, and say nothing about failures when none is serious
+   - Give no cause for it, propose no change to a rule, skill, or hook, and write no record of it, since one session shows one instance: whether to act on it, and where a change belongs (a global rule, a project rule, a skill, or a hook), is settled with the user in the conversation that follows
+   - A defect the failure left in a deliverable is still an item in Step 2 or Step 3
