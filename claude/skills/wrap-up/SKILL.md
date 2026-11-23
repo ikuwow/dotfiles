@@ -89,7 +89,7 @@ comment, since nobody looks for a scratchpad path they do not remember.
 Everything else that needs action goes on the list, tagged with the
 reason it is there.
 
-- `slow`: work that fails the quick test, such as a fix that needs a new PR or changes the session left unfinished
+- `slow`: work that fails the quick test, such as a fix that needs a new PR, changes the session left unfinished, or uncommitted changes on the default branch, which need a branch of their own
 - `permanent`: a removal of content held nowhere else (uncommitted changes, a stash entry, an unpushed commit)
 - `new`: creating an issue or a PR, since the user has to triage what it adds
 - `others`: a write to an issue, PR, or repository someone else owns, and an operation on state another session created
