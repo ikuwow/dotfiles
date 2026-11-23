@@ -139,15 +139,15 @@ With nothing on the list, go to Step 4.
 1. Act on the reply without asking again
    - Numbers select those items
    - A go-ahead without numbers ("ok", "はよ", "go") selects every item except those tagged `slow`, `permanent`, or `wider`, since it asks for the session to end sooner and names no removal and no wider post; on a one-item list it selects that item unless the item is tagged `wider`
-   - A reply that changes an item, or names another operation and its target, is run as the reply states it, except a change to the text of a `wider` item, which Step 4 holds back
+   - A reply that changes an item, or names another operation and its target, is run as the reply states it, except where Step 4 holds a `wider` write back
    - An item the reply leaves undecided does not run
 
 ## Step 4: Run and report
 
-Write the text for each selected item, then run it. A `wider` item is
-posted only as its draft was shown. One whose draft was not shown is not
-posted, and neither is one whose text the reply changes, whose changed
-draft the report carries. Issue and PR
+Write the text for each selected item, then run it. A `wider` write
+is posted only as its draft was shown. One whose draft was not shown, or
+whose text the reply changes, is not posted, and the report carries its
+draft, or the question that stopped it. Issue and PR
 titles, bodies, and comments go through the `pr-issue-writing` skill,
 and commit message bodies through `technical-writing`. A question
 `pr-issue-writing` would stop to ask (a duplicate it found, a contact
