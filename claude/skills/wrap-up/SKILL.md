@@ -9,7 +9,8 @@ The user invokes this skill to leave the session, so what it costs them
 is the turns it takes and the text it makes them read. One test sorts
 every item that needs action: is it quick, and can it be undone? An item
 that passes runs without a question and appears in the report. An item
-that fails goes on one list, which the user answers once.
+that fails goes on one list, which the user answers once, and so do
+three kinds of write whose cost an undo does not return.
 
 ## Step 1: Inventory
 
@@ -57,6 +58,9 @@ can restore.
 - Can be undone: it removes local state whose content exists somewhere the user can still reach, or it writes to something the user owns in a way git or GitHub reverses (a comment is edited or deleted, a body keeps its edit history, an issue reopens, a commit is followed by another)
 - The user owns a PR they authored, and an issue whose `assignees` include their login (`gh api user --jq .login`) or that they authored with `assignees` empty
 
+An item that fits Step 3's `new`, `others`, or `wider` tag goes on the
+list even when it passes both.
+
 The items:
 
 - Local branches whose content the default branch already holds, and the worktrees attached to them, removed by `git home` and then `git cleanup`, run from the root worktree of each repository this session worked in
@@ -71,7 +75,7 @@ The items:
 - An open issue the user owns, closed with `gh issue close` once every item it lists as closing it (the body's request when it lists none) is settled, or once the user said it is not needed or a duplicate
   - Settled: `--reason completed`, with a comment of a few lines naming what settled each item and linking the PR
   - Not needed: `--reason "not planned"`, and a duplicate of `<M>`: `--duplicate-of <M>`, each with a comment quoting what the user said
-- Work the session said it would do and did not finish, when it lies within what the user asked for
+- Work the session said it would do and did not finish, when it lies within what the user asked for and passes the quick test
 - This session's finished changes left uncommitted on its feature branch, committed and pushed
   - Stage by path, never with `git add -A` or `git commit -a`, so another session's changes stay out
   - When the push starts CI, report that it is running rather than waiting for it
@@ -84,29 +88,34 @@ So does a problem that only a vendor or the OS can fix, since no
 repository's owner can act on it. Write the finding itself into the
 comment, since nobody looks for a scratchpad path they do not remember.
 
+Issue and PR bodies and comments written in this step go through the
+`pr-issue-writing` skill, and commit message bodies through
+`technical-writing`. A write that `pr-issue-writing` would stop to ask
+about goes on Step 3's list instead.
+
 ## Step 3: Ask once about the rest
 
 Everything else that needs action goes on the list, tagged with the
 reason it is there.
 
-- `slow`: work that fails the quick test, such as a fix that needs a new PR, changes the session left unfinished, or uncommitted changes on the default branch, which need a branch of their own
+- `slow`: work that fails the quick test, such as a fix that needs a new PR, unfinished work that takes longer than a few minutes, or uncommitted changes on the default branch, which need a branch of their own
 - `permanent`: a removal of content held nowhere else (uncommitted changes, a stash entry, an unpushed commit)
 - `new`: creating an issue or a PR, since the user has to triage what it adds
 - `others`: a write to an issue, PR, or repository someone else owns, and an operation on state another session created
-- `public`: a write to a public repository from a session that worked in a private one, since its readers have the text from the moment it is posted
+- `wider`: a write to a repository visible to more people than one the session worked in (private to internal or public, internal to public), since its readers have the text from the moment it is posted
 
 A failure in how the agent worked gets one line on the list when both
 hold, and a session without one says nothing about failures.
 
-- The user had to correct it or redo work because of it, or it put an error into a deliverable or a wrong assertion in front of the user
-- The agent had not corrected it before the user pointed it out
+- The user had to correct it or redo work because of it, it put an error into a deliverable or a wrong assertion in front of the user, or it spent the user's turns on a stop or a confirmation the task did not need
+- The agent did not correct it on its own before the user pointed it out or this wrap-up began
 
 That line proposes a record in `ikuwow/dotfiles`, tagged `new`, plus
-`public` when the session worked in a private repository. When
-selected, it becomes a comment on the open issue describing the same
-pattern, found with `gh issue list --repo ikuwow/dotfiles --label
-retrospective --state open --json number,title`, or else a new issue
-with the `retrospective` label. The text says what the agent did and
+`wider` when the session worked in a private or internal repository.
+When selected, it becomes a comment on the open issue describing the
+same pattern, found with `gh issue list --repo ikuwow/dotfiles --label
+retrospective --state open --limit 200 --json number,title`, or else a
+new issue with the `retrospective` label. The text says what the agent did and
 what it cost the user, as a behavior pattern, without private
 repository names, their issue and PR numbers, their code, or text from
 their rule files. It names no cause and no fix: one session shows one
@@ -117,6 +126,7 @@ With nothing on the list, go to Step 4.
 
 1. Show the list numbered, one line per item: the operation, its target, and its tag
    - Show no draft text, since text is written only for what the user selects
+   - The line of a `wider` item names the target repository and its visibility
 1. Ask which to run at the end of that same message, in plain text, and end the turn there
    - Text sent in the same turn as an AskUserQuestion call can fail to reach the user
 1. Act on the reply without asking again
@@ -129,18 +139,18 @@ With nothing on the list, go to Step 4.
 
 Write the text for each selected item, then run it. Issue and PR
 titles, bodies, and comments go through the `pr-issue-writing` skill,
-and commit message bodies through `technical-writing`. Selecting an
-item tagged `public` is the confirmation `pr-issue-writing` asks for
-before a write to a wider audience. Any other question that skill would
-stop to ask (a duplicate it found, a contact channel in the template
-config) stops that item instead, and the report carries the question.
+and commit message bodies through `technical-writing`. A question
+`pr-issue-writing` would stop to ask (a duplicate it found, a contact
+channel in the template config) stops that item, and the report carries
+the question.
 
 Each item ends at the last operation its line names, so a commit stops
 at the commit. When an item cannot run as listed (a command fails, or
 the target has changed), stop it and every selected item that needs it.
 
 `slow` work that was not selected is recorded in one line as a comment
-on the user's issue or PR that tracks it, when one exists.
+on the user's issue or PR that tracks it, when one exists and the
+comment fits no tag.
 
 The report:
 

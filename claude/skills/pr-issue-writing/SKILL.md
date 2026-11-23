@@ -63,6 +63,8 @@ loaded when it is another repository than the working directory's.
     code, comments, or rule text), confirm with the user before
     writing, since everyone the target admits can read it from the
     moment it is created
+    - A selection the user made from a list that named this target and
+      its visibility is that confirmation
 - Rules: read `CONTRIBUTING.md` at the target's root, in `.github/`, or
   in `docs/`, and when the target is another repository than the
   working directory's, also its root `CLAUDE.md` and `AGENTS.md`
