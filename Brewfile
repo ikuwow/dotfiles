@@ -203,6 +203,7 @@ mas "Numbers", id: 409203825
 mas "Keynote", id: 409183694
 mas "Pages", id: 409201541
 mas "Day One", id: 1055511498
+mas "Fantastical", id: 975937182
 mas "New File Menu", id: 1064959555
 mas "Kindle", id: 302584613
 mas "LINE", id: 539883307
