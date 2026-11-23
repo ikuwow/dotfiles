@@ -13,8 +13,8 @@ that fails goes on one list, which the user answers once, and so do
 three kinds of write whose cost an undo does not return.
 
 When the user only asks what is left, answer from Step 1's inventory and
-stop there, since a question does not say the session is over. Steps 2
-to 4 run once the user says it is.
+stop there, since a question does not say the work is over. Steps 2 to 4
+run once the user says the session or the task is over.
 
 ## Step 1: Inventory
 
@@ -68,7 +68,7 @@ list even when it passes both.
 The items:
 
 - Local branches whose content the default branch already holds, and the worktrees attached to them, removed by `git home` and then `git cleanup`, run from the root worktree of each repository this session worked in
-  - It runs here whichever session created a branch, since it removes only branches whose content the default branch holds
+  - It runs here whichever session created a branch or worktree, since what it removes holds no content that a remaining ref lacks
   - `git cleanup` judges each branch against the local default branch without fetching, so `git home` pulls first
   - Skip both while the working tree has uncommitted changes, since the switch in `git home` would carry them onto the default branch, and report the skip
   - When `git home` fails (no remote, offline, a diverged default branch), run `git cleanup` anyway and report the failed pull
@@ -133,20 +133,21 @@ With nothing on the list, go to Step 4.
 1. Show the list numbered, one line per item: the operation, its target, and its tag
    - Show no draft text, since text is written only for what the user selects
    - A `wider` item is the exception: its line names the target repository and its visibility, and its full draft follows, written through `pr-issue-writing`, so the user reads the text before the target's readers do
-     - When that skill stops on a question, the question takes the draft's place, and the item cannot be selected in this wrap-up
+     - When that skill stops on a question, the question takes the draft's place, and the item cannot be selected in this wrap-up, since its text was never shown
 1. Ask which to run at the end of that same message, in plain text, and end the turn there
    - Text sent in the same turn as an AskUserQuestion call can fail to reach the user
 1. Act on the reply without asking again
    - Numbers select those items
    - A go-ahead without numbers ("ok", "はよ", "go") selects every item except those tagged `slow`, `permanent`, or `wider`, since it asks for the session to end sooner and names no removal and no wider post; on a one-item list it selects that item unless the item is tagged `wider`
-   - A reply that changes an item, or names another operation and its target, is run as the reply states it
+   - A reply that changes an item, or names another operation and its target, is run as the reply states it, except a change to the text of a `wider` item, which Step 4 holds back
    - An item the reply leaves undecided does not run
 
 ## Step 4: Run and report
 
 Write the text for each selected item, then run it. A `wider` item is
-posted as its draft was shown, with any change the reply states, and one
-whose draft was not shown is not posted. Issue and PR
+posted only as its draft was shown. One whose draft was not shown is not
+posted, and neither is one whose text the reply changes, whose changed
+draft the report carries. Issue and PR
 titles, bodies, and comments go through the `pr-issue-writing` skill,
 and commit message bodies through `technical-writing`. A question
 `pr-issue-writing` would stop to ask (a duplicate it found, a contact
