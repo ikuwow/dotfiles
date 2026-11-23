@@ -12,6 +12,10 @@ that passes runs without a question and appears in the report. An item
 that fails goes on one list, which the user answers once, and so do
 three kinds of write whose cost an undo does not return.
 
+When the user only asks what is left, answer from Step 1's inventory and
+stop there, since a question does not say the session is over. Steps 2
+to 4 run once the user says it is.
+
 ## Step 1: Inventory
 
 Collect the items with read-only commands and from the conversation. Skip a
@@ -64,6 +68,7 @@ list even when it passes both.
 The items:
 
 - Local branches whose content the default branch already holds, and the worktrees attached to them, removed by `git home` and then `git cleanup`, run from the root worktree of each repository this session worked in
+  - It runs here whichever session created a branch, since it removes only branches whose content the default branch holds
   - `git cleanup` judges each branch against the local default branch without fetching, so `git home` pulls first
   - Skip both while the working tree has uncommitted changes, since the switch in `git home` would carry them onto the default branch, and report the skip
   - When `git home` fails (no remote, offline, a diverged default branch), run `git cleanup` anyway and report the failed pull
@@ -98,7 +103,7 @@ about goes on Step 3's list instead.
 Everything else that needs action goes on the list, tagged with the
 reason it is there.
 
-- `slow`: work that fails the quick test, such as a fix that needs a new PR, unfinished work that takes longer than a few minutes, or uncommitted changes on the default branch, which need a branch of their own
+- `slow`: work that fails the quick test, such as a fix that needs a new PR, unfinished work that takes longer than a few minutes, or uncommitted changes on the default branch, which need a branch and a PR of their own
 - `permanent`: a removal of content held nowhere else (uncommitted changes, a stash entry, an unpushed commit)
 - `new`: creating an issue or a PR, since the user has to triage what it adds
 - `others`: a write to an issue or PR the user does not own, a push to a branch other than this session's feature branch, and an operation on state another session created
@@ -128,7 +133,7 @@ With nothing on the list, go to Step 4.
 1. Show the list numbered, one line per item: the operation, its target, and its tag
    - Show no draft text, since text is written only for what the user selects
    - A `wider` item is the exception: its line names the target repository and its visibility, and its full draft follows, written through `pr-issue-writing`, so the user reads the text before the target's readers do
-     - A question that skill would stop to ask takes the draft's place under the line
+     - When that skill stops on a question, the question takes the draft's place, and the item cannot be selected in this wrap-up
 1. Ask which to run at the end of that same message, in plain text, and end the turn there
    - Text sent in the same turn as an AskUserQuestion call can fail to reach the user
 1. Act on the reply without asking again
@@ -140,8 +145,8 @@ With nothing on the list, go to Step 4.
 ## Step 4: Run and report
 
 Write the text for each selected item, then run it. A `wider` item is
-posted as its draft was shown, and one whose draft was not shown is not
-posted. Issue and PR
+posted as its draft was shown, with any change the reply states, and one
+whose draft was not shown is not posted. Issue and PR
 titles, bodies, and comments go through the `pr-issue-writing` skill,
 and commit message bodies through `technical-writing`. A question
 `pr-issue-writing` would stop to ask (a duplicate it found, a contact
