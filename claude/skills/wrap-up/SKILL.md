@@ -113,10 +113,10 @@ hold, and a session without one says nothing about failures.
 
 That line proposes a record in `ikuwow/dotfiles`, tagged `new`, plus
 `wider` when the session worked in a private or internal repository.
-When selected, it becomes a comment on the open issue describing the
-same pattern, found with `gh issue list --repo ikuwow/dotfiles --label
-retrospective --state open --limit 200 --json number,title`, or else a
-new issue with the `retrospective` label. The text says what the agent did and
+The record is a comment on the open issue describing the same pattern,
+found with `gh issue list --repo ikuwow/dotfiles --label retrospective
+--state open --limit 200 --json number,title`, or else a new issue with
+the `retrospective` label. The text says what the agent did and
 what it cost the user, as a behavior pattern, without private
 repository names, their issue and PR numbers, their code, or text from
 their rule files. It names no cause and no fix: one session shows one
@@ -127,18 +127,21 @@ With nothing on the list, go to Step 4.
 
 1. Show the list numbered, one line per item: the operation, its target, and its tag
    - Show no draft text, since text is written only for what the user selects
-   - The line of a `wider` item names the target repository and its visibility
+   - A `wider` item is the exception: its line names the target repository and its visibility, and its full draft follows, written through `pr-issue-writing`, so the user reads the text before the target's readers do
+     - A question that skill would stop to ask takes the draft's place under the line
 1. Ask which to run at the end of that same message, in plain text, and end the turn there
    - Text sent in the same turn as an AskUserQuestion call can fail to reach the user
 1. Act on the reply without asking again
    - Numbers select those items
-   - A go-ahead without numbers ("ok", "はよ", "go") selects every item except those tagged `slow` or `permanent`, since it asks for the session to end sooner; on a one-item list it selects that item
+   - A go-ahead without numbers ("ok", "はよ", "go") selects every item except those tagged `slow`, `permanent`, or `wider`, since it asks for the session to end sooner and names no removal and no wider post; on a one-item list it selects that item unless the item is tagged `wider`
    - A reply that changes an item, or names another operation and its target, is run as the reply states it
    - An item the reply leaves undecided does not run
 
 ## Step 4: Run and report
 
-Write the text for each selected item, then run it. Issue and PR
+Write the text for each selected item, then run it. A `wider` item is
+posted as its draft was shown, and one whose draft was not shown is not
+posted. Issue and PR
 titles, bodies, and comments go through the `pr-issue-writing` skill,
 and commit message bodies through `technical-writing`. A question
 `pr-issue-writing` would stop to ask (a duplicate it found, a contact
