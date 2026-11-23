@@ -101,7 +101,8 @@ reason it is there.
 - `slow`: work that fails the quick test, such as a fix that needs a new PR, unfinished work that takes longer than a few minutes, or uncommitted changes on the default branch, which need a branch of their own
 - `permanent`: a removal of content held nowhere else (uncommitted changes, a stash entry, an unpushed commit)
 - `new`: creating an issue or a PR, since the user has to triage what it adds
-- `others`: a write to an issue, PR, or repository someone else owns, and an operation on state another session created
+- `others`: a write to an issue or PR the user does not own, a push to a branch other than this session's feature branch, and an operation on state another session created
+  - The object written to decides this, so the user's own PR and this session's branch in an organization's repository are the user's
 - `wider`: a write to a repository visible to more people than one the session worked in (private to internal or public, internal to public), since its readers have the text from the moment it is posted
 
 A failure in how the agent worked gets one line on the list when both
