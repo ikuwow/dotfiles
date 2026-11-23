@@ -1,6 +1,6 @@
 ---
 name: wrap-up
-description: End a session quickly and safely. Finish without asking whatever is quick and can be undone (routine cleanup, issue checkboxes, PR body fixes, small promised work, records on the user's own issues and PRs), ask once about everything else in a single list, and report whether the session is safe to end. Trigger when the user signals that the session or the task is over ("終わり", "done", "これで完了", "おつかれ"), when they ask what is left before quitting, and when they invoke /wrap-up.
+description: End a session quickly and safely. Finish without asking whatever is quick and can be undone (routine cleanup, issue checkboxes, PR body fixes, small promised work, records on the user's own issues and PRs), ask once about everything else in a single list, and report whether the session is safe to end, along with any serious failure in how the agent worked. Trigger when the user signals that the session or the task is over ("終わり", "done", "これで完了", "おつかれ"), when they ask what is left before quitting, and when they invoke /wrap-up.
 ---
 
 # Wrap Up
@@ -42,7 +42,7 @@ tool-based listing when this session lacks that tool.
   - work the session said it would do and did not finish
   - questions put to the user that have no answer yet
   - findings that pass the record test in Step 2
-  - failures in how the agent worked that pass the test in Step 3
+  - serious failures in how the agent worked, by the test in Step 4's report
 
 Attribute each uncommitted change and stash entry before acting on it,
 and act only on those this session made. Another concurrent session may
@@ -110,24 +110,6 @@ reason it is there.
   - The object written to decides this, so the user's own PR and this session's branch in an organization's repository are the user's
 - `wider`: a write to a repository visible to more people than one the session worked in (private to internal or public, internal to public), since its readers have the text from the moment it is posted
 
-A failure in how the agent worked gets one line on the list when both
-hold, and a session without one says nothing about failures.
-
-- The user had to correct it or redo work because of it, it put an error into a deliverable or a wrong assertion in front of the user, or it spent the user's turns on a stop or a confirmation the task did not need
-- The agent did not correct it on its own before the user pointed it out or this wrap-up began
-
-That line proposes a record in `ikuwow/dotfiles`, tagged `new`, plus
-`wider` when the session worked in a private or internal repository.
-The record is a comment on the open issue describing the same pattern,
-found with `gh issue list --repo ikuwow/dotfiles --label retrospective
---state open --limit 200 --json number,title`, or else a new issue with
-the `retrospective` label. The text says what the agent did and
-what it cost the user, as a behavior pattern, without private
-repository names, their issue and PR numbers, their code, or text from
-their rule files. It names no cause and no fix: one session shows one
-instance, and whether a fix belongs in a global rule, a project rule, a
-skill, or a hook is judged when the issue is worked.
-
 With nothing on the list, go to Step 4.
 
 1. Show the list numbered, one line per item: the operation, its target, and its tag
@@ -169,3 +151,8 @@ The report:
    - Items remain: one of them failed or was stopped
 1. List what ran, one line per operation, with the URL of anything posted or edited, so the user can find it to undo it
 1. For each item that did not run, write one line naming where it now lives: a PR or issue URL, a place that exists only on this machine (uncommitted changes, a stash entry, or an unpushed branch, with its repository), or what ending the session stops or discards
+1. Describe each serious failure in how the agent worked in one or two lines: what the agent did and what it cost the user
+   - A failure is serious when the user had to correct it or redo work because of it, when it put an error into a deliverable or a wrong assertion in front of the user, or when it spent the user's turns on a stop or a confirmation the task did not need
+   - Leave out one the agent corrected on its own before the user pointed it out or this wrap-up began, and say nothing about failures when none is serious
+   - Give no cause for it, propose no change to a rule, skill, or hook, and write no record of it, since one session shows one instance: whether to act on it, and where a change belongs (a global rule, a project rule, a skill, or a hook), is settled with the user in the conversation that follows
+   - A defect the failure left in a deliverable is still an item in Step 2 or Step 3
