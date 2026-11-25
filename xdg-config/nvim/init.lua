@@ -200,9 +200,19 @@ Plug('mattn/emmet-vim')
 Plug('junegunn/vim-easy-align')
 Plug('tpope/vim-surround')
 
--- Neovim's runtime reads an empty .tf file as TinyFugue, so a new Terraform
--- file would get no Terraform syntax until reopened
-vim.filetype.add({ extension = { tf = 'terraform' } })
+-- Terraform files mapped as vim-terraform's ftdetect maps them, since Neovim's
+-- runtime reads an empty .tf file as TinyFugue, gives .tfvars a filetype with
+-- no syntax, and leaves the rest undetected
+vim.filetype.add({
+  extension = { tf = 'terraform', tofu = 'terraform', tfvars = 'terraform', tfbackend = 'hcl' },
+  filename = { ['.terraformrc'] = 'hcl', ['terraform.rc'] = 'hcl' },
+  pattern = {
+    ['.*%.tftest%.hcl'] = 'terraform',
+    ['.*%.tofutest%.hcl'] = 'terraform',
+    ['.*%.tfstate'] = 'json',
+    ['.*%.tfstate%.backup'] = 'json',
+  },
+})
 
 -- File specific, for formats Neovim's runtime has no dedicated syntax for:
 -- Jinja in .j2 files, Ansible, Brewfile, and YAMAHA RTX router configs
