@@ -89,8 +89,8 @@ vim.g.ale_linters = {
 }
 vim.g.ale_lint_on_text_changed = 'never'
 vim.g.ale_virtualtext_cursor = 0
--- ALE's gopls is the only Go language server, so formatting on save and the
--- definition and hover keys of Go buffers come from ALE
+-- ALE's gopls is the only Go language server, so the definition and hover
+-- keys of Go buffers come from ALE, and its gofmt fixer formats on save
 vim.g.ale_fixers = { go = { 'gofmt' } }
 vim.g.ale_fix_on_save = 1
 vim.api.nvim_create_autocmd('FileType', {
