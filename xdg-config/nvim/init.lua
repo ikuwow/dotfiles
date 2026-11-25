@@ -200,18 +200,29 @@ Plug('mattn/emmet-vim')
 Plug('junegunn/vim-easy-align')
 Plug('tpope/vim-surround')
 
--- File specific
-Plug('KazuakiM/vim-sqlfix')
-Plug('cespare/vim-toml')
-Plug('hashivim/vim-terraform')
-Plug('othree/yajs.vim')
-Plug('mattn/vim-sqlfmt')
-Plug('chr4/nginx.vim')
+-- Terraform filetypes: Neovim's runtime reads a .tf file holding only blank
+-- lines or lines starting with ; or / as TinyFugue, gives .tfvars a filetype
+-- with no syntax, detects .tftest.hcl and terraform.rc as other types, and
+-- leaves .tofu, .tfbackend, .terraformrc, and .tfstate undetected
+vim.filetype.add({
+  extension = { tf = 'terraform', tofu = 'terraform', tfvars = 'terraform', tfbackend = 'hcl' },
+  filename = { ['.terraformrc'] = 'hcl', ['terraform.rc'] = 'hcl' },
+  pattern = {
+    ['.*%.tftest%.hcl'] = 'terraform',
+    ['.*%.tofutest%.hcl'] = 'terraform',
+    ['.*%.tfstate'] = 'json',
+    ['.*%.tfstate%.backup'] = 'json',
+  },
+})
+
+-- File specific, for formats Neovim's runtime has no dedicated syntax for:
+-- Jinja in .j2 files, Ansible, Brewfile, and YAMAHA RTX router configs
 Plug('glench/vim-jinja2-syntax')
 Plug('pearofducks/ansible-vim')
-Plug('posva/vim-vue')
 Plug('bfontaine/Brewfile.vim')
 Plug('okkiroxx/rtx.vim')
+-- :SQLFmt formats SQL through sqlformat, which Brewfile's sqlparse installs
+Plug('mattn/vim-sqlfmt')
 
 Plug('kassio/neoterm')
 Plug('folke/snacks.nvim')
