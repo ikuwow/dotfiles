@@ -210,6 +210,8 @@ Plug('glench/vim-jinja2-syntax')
 Plug('pearofducks/ansible-vim')
 Plug('bfontaine/Brewfile.vim')
 Plug('okkiroxx/rtx.vim')
+-- :SQLFmt formats SQL through sqlformat, which Brewfile's sqlparse installs
+Plug('mattn/vim-sqlfmt')
 
 Plug('kassio/neoterm')
 Plug('folke/snacks.nvim')
