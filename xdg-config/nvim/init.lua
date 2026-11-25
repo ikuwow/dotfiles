@@ -200,16 +200,9 @@ Plug('mattn/emmet-vim')
 Plug('junegunn/vim-easy-align')
 Plug('tpope/vim-surround')
 
--- File specific
-Plug('KazuakiM/vim-sqlfix')
-Plug('cespare/vim-toml')
-Plug('hashivim/vim-terraform')
-Plug('othree/yajs.vim')
-Plug('mattn/vim-sqlfmt')
-Plug('chr4/nginx.vim')
+-- File specific, for files that Neovim's runtime gives no syntax of their own
 Plug('glench/vim-jinja2-syntax')
 Plug('pearofducks/ansible-vim')
-Plug('posva/vim-vue')
 Plug('bfontaine/Brewfile.vim')
 Plug('okkiroxx/rtx.vim')
 
