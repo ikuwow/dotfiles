@@ -89,6 +89,18 @@ vim.g.ale_linters = {
 }
 vim.g.ale_lint_on_text_changed = 'never'
 vim.g.ale_virtualtext_cursor = 0
+-- ALE's gopls is the only Go language server, so formatting on save and the
+-- definition and hover keys of Go buffers come from ALE
+vim.g.ale_fixers = { go = { 'gofmt' } }
+vim.g.ale_fix_on_save = 1
+vim.api.nvim_create_autocmd('FileType', {
+  group = vim.api.nvim_create_augroup('vimrc-ale-go', { clear = true }),
+  pattern = 'go',
+  callback = function(args)
+    vim.keymap.set('n', 'gd', '<Plug>(ale_go_to_definition)', { buffer = args.buf })
+    vim.keymap.set('n', 'K', '<Plug>(ale_hover)', { buffer = args.buf })
+  end,
+})
 
 Plug('thinca/vim-zenspace')
 vim.g['zenspace#default_mode'] = 'on'
@@ -194,7 +206,6 @@ Plug('cespare/vim-toml')
 Plug('hashivim/vim-terraform')
 Plug('othree/yajs.vim')
 Plug('mattn/vim-sqlfmt')
-Plug('fatih/vim-go', { ['do'] = 'GoUpdateBinaries' })
 Plug('chr4/nginx.vim')
 Plug('glench/vim-jinja2-syntax')
 Plug('pearofducks/ansible-vim')
