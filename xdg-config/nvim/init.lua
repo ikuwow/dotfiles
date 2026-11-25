@@ -200,9 +200,9 @@ Plug('mattn/emmet-vim')
 Plug('junegunn/vim-easy-align')
 Plug('tpope/vim-surround')
 
--- Terraform files mapped as vim-terraform's ftdetect maps them, since Neovim's
--- runtime reads an empty .tf file as TinyFugue, gives .tfvars a filetype with
--- no syntax, and leaves the rest undetected
+-- Terraform filetypes: Neovim's runtime reads an empty .tf file as TinyFugue,
+-- gives .tfvars a filetype with no syntax, and leaves the other Terraform
+-- file types undetected
 vim.filetype.add({
   extension = { tf = 'terraform', tofu = 'terraform', tfvars = 'terraform', tfbackend = 'hcl' },
   filename = { ['.terraformrc'] = 'hcl', ['terraform.rc'] = 'hcl' },
