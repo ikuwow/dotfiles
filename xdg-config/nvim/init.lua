@@ -200,7 +200,12 @@ Plug('mattn/emmet-vim')
 Plug('junegunn/vim-easy-align')
 Plug('tpope/vim-surround')
 
--- File specific, for files that Neovim's runtime gives no syntax of their own
+-- Neovim's runtime reads an empty .tf file as TinyFugue, so a new Terraform
+-- file would get no Terraform syntax until reopened
+vim.filetype.add({ extension = { tf = 'terraform' } })
+
+-- File specific, for formats Neovim's runtime has no dedicated syntax for:
+-- Jinja in .j2 files, Ansible, Brewfile, and YAMAHA RTX router configs
 Plug('glench/vim-jinja2-syntax')
 Plug('pearofducks/ansible-vim')
 Plug('bfontaine/Brewfile.vim')
