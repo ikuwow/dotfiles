@@ -1,11 +1,14 @@
 #!/bin/bash
-# Notification hook: one macOS notification per event, naming the session
-# and sounding per notification type, the same in any terminal.
+# Notification hook: one macOS notification per event, naming the session.
 #
-# noti posts the notification and plays its sound in one call,
-# independent of which terminal runs Claude Code. Claude Code's own
-# notification is turned off with preferredNotifChannel so the two do not
-# stack.
+# Under tmux in Ghostty the notification goes out as an OSC 777 sequence
+# written to the tty of the Ghostty client showing the session, so
+# Ghostty posts it in its own name and a click focuses that Ghostty tab.
+# Writing to the client's tty skips tmux, which needs no passthrough
+# setting. Ghostty plays the system default sound for every notification.
+# Elsewhere noti posts it and plays a sound chosen per notification type.
+# Claude Code's own notification is turned off with preferredNotifChannel
+# so the two do not stack.
 #
 # The body says what the notification is about, read from the transcript:
 # the pending tool call for permission_prompt, and a summary of Claude's
@@ -13,10 +16,6 @@
 # falls back to Claude Code's own message when no body comes out, so the
 # notification still goes out.
 set -eu
-
-if ! command -v noti >/dev/null; then
-  exit 0
-fi
 
 input=$(cat)
 type=$(jq -r '.notification_type // empty' <<<"$input")
@@ -87,6 +86,36 @@ summarize_last_message() {
   head -n 1 <<<"$summary"
 }
 
+# The tty of a Ghostty client showing this pane's session. A Claude Code
+# tab parked by xdg-config/tmux/tabs.sh sits in tabs-store, so its session
+# is the one showing a tab of the same group.
+ghostty_tty() {
+  local s group
+  if [ -z "${TMUX_PANE:-}" ]; then
+    return 0
+  fi
+  s=$(tmux display-message -p -t "$TMUX_PANE" '#{session_name}')
+  if [ "$s" = tabs-store ]; then
+    group=$(tmux display-message -p -t "$TMUX_PANE" '#{@tab_group}')
+    if [ -z "$group" ]; then
+      return 0
+    fi
+    s=$(tmux list-panes -a -F '#{@tab_group} #{session_name}' |
+      awk -v g="$group" '$1 == g && $2 != "tabs-store" { print $2; exit }')
+  fi
+  if [ -z "$s" ]; then
+    return 0
+  fi
+  tmux list-clients -t "=$s" -F '#{client_termname} #{client_tty}' |
+    awk '$1 == "xterm-ghostty" { print $2; exit }'
+}
+
+# OSC 777 separates its fields with ";" and ends at BEL, so neither may
+# appear inside a field.
+osc_field() {
+  LC_ALL=C tr -d '\000-\037\177' | tr ';' ','
+}
+
 detail=''
 case "$type" in
   permission_prompt)
@@ -101,4 +130,12 @@ case "$type" in
   *) mark='🔔' sound=Pop ;;
 esac
 
-NOTI_NSUSER_SOUNDNAME=$sound noti --title "$mark ${session:-Claude Code}" --message "${detail:-$message}"
+title="$mark ${session:-Claude Code}"
+body=${detail:-$message}
+
+tty=$(ghostty_tty || true)
+if [ -n "$tty" ] && [ -w "$tty" ]; then
+  printf '\033]777;notify;%s;%s\007' "$(osc_field <<<"$title")" "$(osc_field <<<"$body")" >"$tty"
+elif command -v noti >/dev/null; then
+  NOTI_NSUSER_SOUNDNAME=$sound noti --title "$title" --message "$body"
+fi
