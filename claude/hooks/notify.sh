@@ -147,8 +147,12 @@ case ",${flags:-}," in
 esac
 
 if [ -n "$tty" ] && [ -w "$tty" ] && [ "$focused" = 0 ]; then
-  # Ghostty adds the tab title, which names the session, as the subtitle
-  printf '\033]777;notify;%s;%s\007' "$(osc_field <<<"$mark $kind")" "$(osc_field <<<"$body")" >"$tty"
+  # Ghostty adds the tab title as the subtitle, which names this session
+  # only while this pane is the one on screen
+  if [ "$(pane_hidden || true)" = 0 ]; then
+    title="$mark $kind"
+  fi
+  printf '\033]777;notify;%s;%s\007' "$(osc_field <<<"$title")" "$(osc_field <<<"$body")" >"$tty"
 elif [ "$focused" = 1 ] && [ "$(pane_hidden || true)" = 0 ]; then
   afplay "/System/Library/Sounds/$sound.aiff"
 elif command -v noti >/dev/null; then
