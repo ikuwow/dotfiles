@@ -2,22 +2,12 @@
 # Notification hook: at most one macOS notification per event, naming the
 # session.
 #
-# When a Ghostty client shows this pane's tmux session and that client is
-# out of focus, the notification goes out as an OSC 777 sequence written
-# to the client's tty, so Ghostty posts it in its own name and a click
-# focuses that Ghostty tab. Writing to the client's tty bypasses tmux, so
-# tmux needs no allow-passthrough setting. OSC 777 carries no sound, and
-# Ghostty plays the system default sound.
-#
-# Ghostty shows no notification for the surface in focus, so while the
-# client is focused the hook goes around it: a pane on screen gets only
-# the sound, since its prompt is in view, and a pane hidden in another
-# tmux window, behind a zoomed pane, or parked in tabs-store gets a noti
-# notification. Outside a
-# Ghostty client noti posts too, and nothing is posted when noti is not
-# installed. noti plays a sound chosen per notification type. Claude
-# Code's own notification is turned off with preferredNotifChannel so the
-# two do not stack.
+# Ghostty posts it when its tab shows the session out of focus, so a click
+# focuses that tab; the OSC 777 sequence goes to the client's tty,
+# bypassing tmux. Ghostty shows nothing for the focused surface, so then a
+# pane on screen gets only the sound, and a hidden pane gets noti, as other
+# terminals do. Claude Code's own notification is off
+# (preferredNotifChannel) so the two do not stack.
 #
 # The body says what the notification is about, read from the transcript:
 # the pending tool call for permission_prompt, and a summary of Claude's
@@ -95,10 +85,8 @@ summarize_last_message() {
   head -n 1 <<<"$summary"
 }
 
-# The tty and client flags of a Ghostty client showing this pane's
-# session, told apart by Ghostty's TERM, xterm-ghostty; prints nothing
-# when there is none. A tab parked by xdg-config/tmux/tabs.sh sits in
-# tabs-store, so its session is the one showing a tab of the same group.
+# A tab parked by xdg-config/tmux/tabs.sh sits in tabs-store, so its
+# session is the one showing a tab of the same group.
 ghostty_client() {
   local s group
   if [ -z "${TMUX_PANE:-}" ]; then
@@ -120,18 +108,12 @@ ghostty_client() {
     awk '$1 == "xterm-ghostty" { print $2, $3; exit }'
 }
 
-# Prints 1 when this pane is off screen: parked in tabs-store, in a window
-# other than its session's current one, or behind another pane zoomed in
-# its window.
 pane_hidden() {
   tmux display-message -p -t "$TMUX_PANE" \
     '#{?#{==:#{session_name},tabs-store},1,#{?window_active,#{?window_zoomed_flag,#{?pane_active,0,1},0},1}}'
 }
 
-# An OSC string ends at BEL or ESC, so control bytes are dropped, the
-# newline <<< adds included. Ghostty ends the title at the first ";" after
-# "notify;", so ";" is replaced to keep the title whole, and the body gets
-# the same treatment.
+# OSC ends at BEL or ESC, and Ghostty ends the title at the first ";".
 osc_field() {
   LC_ALL=C tr -d '\000-\037\177' | tr ';' ','
 }
@@ -157,8 +139,7 @@ esac
 title="$mark ${session:-Claude Code}"
 body=${detail:-$message}
 
-# Read after the body, which can take claude -p up to 20 seconds, so the
-# focus is the one at posting time.
+# After the body, which claude -p can take 20 seconds to draft.
 read -r tty flags <<<"$(ghostty_client || true)" || true
 case ",${flags:-}," in
   *,focused,*) focused=1 ;;
