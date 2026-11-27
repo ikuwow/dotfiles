@@ -12,7 +12,8 @@
 # Ghostty shows no notification for the surface in focus, so while the
 # client is focused the hook goes around it: a pane on screen gets only
 # the sound, since its prompt is in view, and a pane hidden in another
-# tmux window or parked in tabs-store gets a noti notification. Outside a
+# tmux window, behind a zoomed pane, or parked in tabs-store gets a noti
+# notification. Outside a
 # Ghostty client noti posts too, and nothing is posted when noti is not
 # installed. noti plays a sound chosen per notification type. Claude
 # Code's own notification is turned off with preferredNotifChannel so the
@@ -119,11 +120,12 @@ ghostty_client() {
     awk '$1 == "xterm-ghostty" { print $2, $3; exit }'
 }
 
-# Prints 1 when this pane is off screen: parked in tabs-store, or in a
-# window other than its session's current one.
+# Prints 1 when this pane is off screen: parked in tabs-store, in a window
+# other than its session's current one, or behind another pane zoomed in
+# its window.
 pane_hidden() {
   tmux display-message -p -t "$TMUX_PANE" \
-    '#{?#{==:#{session_name},tabs-store},1,#{?window_active,0,1}}'
+    '#{?#{==:#{session_name},tabs-store},1,#{?window_active,#{?window_zoomed_flag,#{?pane_active,0,1},0},1}}'
 }
 
 # An OSC string ends at BEL or ESC, so control bytes are dropped, the
