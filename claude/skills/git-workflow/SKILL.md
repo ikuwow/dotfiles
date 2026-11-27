@@ -244,6 +244,10 @@ other two, since no check changes the branch or the working tree:
   handling, test coverage). These aspects leave out `simplify`, which
   edits in place. Reports findings in the conversation, does not post
   PR comments.
+  - Brief comment-analyzer to list each comment the branch added that
+    says only what its code already shows, as a finding to remove,
+    since review-pr describes that agent as an accuracy check and a
+    brief drawn from that description can leave removals out
 
 Fix a self-review finding that only touches the PR body as soon as it
 reports, since `gh pr edit` changes neither the branch nor the working
