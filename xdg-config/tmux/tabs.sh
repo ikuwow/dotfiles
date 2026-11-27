@@ -57,9 +57,10 @@ render() {
       ';' set-option -pu -t "$shown" remain-on-exit
     return 0
   fi
-  # Each tab gets an even share of the slot's width, less the 4 columns of
-  # " N:" and the trailing space, and one more for the "…" a cut label ends with
-  w=$(($(info "$shown" '#{pane_width}') / n - 5))
+  # The border draws after 2 columns of line. Each tab gets an even share of
+  # the rest, less the 4 columns of " N:" and the trailing space, and one
+  # more for the "…" a cut label ends with
+  w=$((($(info "$shown" '#{pane_width}') - 2) / n - 5))
   if [ "$w" -lt 3 ]; then
     w=3
   fi
