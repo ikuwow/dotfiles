@@ -125,15 +125,15 @@ fi
 detail=''
 case "$type" in
   permission_prompt)
-    mark='🔐' sound=Submarine
+    mark='🔐' kind='許可待ち' sound=Submarine
     detail=$(pending_tool || true)
     ;;
   idle_prompt)
-    mark='✅' sound=Glass
+    mark='✅' kind='入力待ち' sound=Glass
     detail=$(summarize_last_message || true)
     ;;
-  elicitation_dialog | elicitation_url_dialog) mark='❓' sound=Ping ;;
-  *) mark='🔔' sound=Pop ;;
+  elicitation_dialog | elicitation_url_dialog) mark='❓' kind='質問' sound=Ping ;;
+  *) mark='🔔' kind='通知' sound=Pop ;;
 esac
 
 title="$mark ${session:-Claude Code}"
@@ -147,7 +147,8 @@ case ",${flags:-}," in
 esac
 
 if [ -n "$tty" ] && [ -w "$tty" ] && [ "$focused" = 0 ]; then
-  printf '\033]777;notify;%s;%s\007' "$(osc_field <<<"$title")" "$(osc_field <<<"$body")" >"$tty"
+  # Ghostty adds the tab title, which names the session, as the subtitle
+  printf '\033]777;notify;%s;%s\007' "$(osc_field <<<"$mark $kind")" "$(osc_field <<<"$body")" >"$tty"
 elif [ "$focused" = 1 ] && [ "$(pane_hidden || true)" = 0 ]; then
   afplay "/System/Library/Sounds/$sound.aiff"
 elif command -v noti >/dev/null; then
