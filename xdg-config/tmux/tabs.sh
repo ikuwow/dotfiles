@@ -45,23 +45,31 @@ swap_in() {
 }
 
 render() {
-  local group shown list='' i=0 p label
+  local group shown list='' i=0 p label n w
   group="$(info "$1" '#{@tab_group}')"
   [ -n "$group" ] || return 0
   shown="$(members "$group" | awk -v s="$store" '$2 != s { print $1; exit }')"
   # A slot closed by a concurrent run has no shown tab to render
   [ -n "$shown" ] || return 0
-  if [ "$(members "$group" | wc -l)" -lt 2 ]; then
+  n="$(members "$group" | wc -l)"
+  if [ "$n" -lt 2 ]; then
     tmux set-option -pu -t "$shown" @tab_group ';' set-option -pu -t "$shown" @tab_list \
       ';' set-option -pu -t "$shown" remain-on-exit
     return 0
   fi
+  # The border draws after 2 columns of line. Each tab gets an even share of
+  # the rest, less the 4 columns of " N:" and the trailing space, and one
+  # more for the "…" a cut label ends with
+  w=$((($(info "$shown" '#{pane_width}') - 2) / n - 5))
+  if [ "$w" -lt 3 ]; then
+    w=3
+  fi
+  label="#{=/$w/…:#{E:@tab_label}}"
   # The shown tab's label stays a format, so it follows its pane live
-  label="$(tmux show-options -gv @tab_label)"
   while read -r p _; do
     i=$((i + 1))
     if [ "$p" = "$shown" ]; then
-      list="$list#[reverse] $i:#{E:@tab_label} #[noreverse]"
+      list="$list#[reverse] $i:$label #[noreverse]"
     else
       list="$list $i:$(info "$p" "$label" | sed 's/#/##/g') "
     fi
