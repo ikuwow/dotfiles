@@ -1,14 +1,13 @@
 #!/bin/bash
-# Notification hook: one macOS notification per event, naming the session.
+# Notification hook: at most one macOS notification per event, naming the
+# session.
 #
-# Under tmux in Ghostty the notification goes out as an OSC 777 sequence
-# written to the tty of the Ghostty client showing the session, so
-# Ghostty posts it in its own name and a click focuses that Ghostty tab.
-# Writing to the client's tty skips tmux, which needs no passthrough
-# setting. Ghostty plays the system default sound for every notification.
-# Elsewhere noti posts it and plays a sound chosen per notification type.
-# Claude Code's own notification is turned off with preferredNotifChannel
-# so the two do not stack.
+# Ghostty posts it when its tab shows the session out of focus, so a click
+# focuses that tab; the OSC 777 sequence goes to the client's tty,
+# bypassing tmux. Ghostty shows nothing for the focused surface, so then a
+# pane on screen gets only the sound, and a hidden pane gets noti, as other
+# terminals do. Claude Code's own notification is off
+# (preferredNotifChannel) so the two do not stack.
 #
 # The body says what the notification is about, read from the transcript:
 # the pending tool call for permission_prompt, and a summary of Claude's
@@ -86,10 +85,9 @@ summarize_last_message() {
   head -n 1 <<<"$summary"
 }
 
-# The tty of a Ghostty client showing this pane's session. A Claude Code
-# tab parked by xdg-config/tmux/tabs.sh sits in tabs-store, so its session
-# is the one showing a tab of the same group.
-ghostty_tty() {
+# A tab parked by xdg-config/tmux/tabs.sh sits in tabs-store, so its
+# session is the one showing a tab of the same group.
+ghostty_client() {
   local s group
   if [ -z "${TMUX_PANE:-}" ]; then
     return 0
@@ -106,15 +104,23 @@ ghostty_tty() {
   if [ -z "$s" ]; then
     return 0
   fi
-  tmux list-clients -t "=$s" -F '#{client_termname} #{client_tty}' |
-    awk '$1 == "xterm-ghostty" { print $2; exit }'
+  tmux list-clients -t "=$s" -F '#{client_termname} #{client_tty} #{client_flags}' |
+    awk '$1 == "xterm-ghostty" { print $2, $3; exit }'
 }
 
-# OSC 777 separates its fields with ";" and ends at BEL, so neither may
-# appear inside a field.
+pane_hidden() {
+  tmux display-message -p -t "$TMUX_PANE" \
+    '#{?#{==:#{session_name},tabs-store},1,#{?window_active,#{?window_zoomed_flag,#{?pane_active,0,1},0},1}}'
+}
+
+# OSC ends at BEL or ESC, and Ghostty ends the title at the first ";".
 osc_field() {
   LC_ALL=C tr -d '\000-\037\177' | tr ';' ','
 }
+
+if ! command -v noti >/dev/null && [ -z "$(ghostty_client || true)" ]; then
+  exit 0
+fi
 
 detail=''
 case "$type" in
@@ -133,9 +139,17 @@ esac
 title="$mark ${session:-Claude Code}"
 body=${detail:-$message}
 
-tty=$(ghostty_tty || true)
-if [ -n "$tty" ] && [ -w "$tty" ]; then
+# After the body, which claude -p can take 20 seconds to draft.
+read -r tty flags <<<"$(ghostty_client || true)" || true
+case ",${flags:-}," in
+  *,focused,*) focused=1 ;;
+  *) focused=0 ;;
+esac
+
+if [ -n "$tty" ] && [ -w "$tty" ] && [ "$focused" = 0 ]; then
   printf '\033]777;notify;%s;%s\007' "$(osc_field <<<"$title")" "$(osc_field <<<"$body")" >"$tty"
+elif [ "$focused" = 1 ] && [ "$(pane_hidden || true)" = 0 ]; then
+  afplay "/System/Library/Sounds/$sound.aiff"
 elif command -v noti >/dev/null; then
   NOTI_NSUSER_SOUNDNAME=$sound noti --title "$title" --message "$body"
 fi
